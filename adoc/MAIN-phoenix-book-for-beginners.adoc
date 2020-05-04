@@ -1,0 +1,29 @@
+[[art.daps.asciidoc]]
+= Phoenix Framework for Beginners
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
+:Revision: 0
+:toc:
+:icons: font
+:numbered:
+:website: https://www.wintermeyer-consulting.de/
+
+ifdef::env-github[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+// Entities
+:adoc: AsciiDoc
+:db: DocBook
+:daps: DAPS
+
+https://www.phoenixframework.org[{Phoenix Framework}] is a used to "Build rich, interactive web applications quickly, with less code and fewer moving parts."
+
+== Motivation
+
+Phoenix is very good but the initial learning curve is steep.
+

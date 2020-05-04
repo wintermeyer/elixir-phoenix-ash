@@ -1,0 +1,30 @@
+## Doc config file for the DAPS example document
+## See /etc/daps/config for documentation of the settings below
+##
+
+# MAIN file (mandatory) 1
+#
+MAIN="MAIN-phoenix-book-for-beginners.adoc"
+
+#----- optional parameters -----
+
+# Image directory  2
+#
+ADOC_IMG_DIR="adoc/images"
+
+# Type 3
+#
+ADOC_TYPE="book"
+
+# Turn on postprocessing  4
+#
+ADOC_POST="yes"
+
+# Stylesheet directory  5
+#
+STYLEROOT="/usr/share/xml/docbook/stylesheet/daps2013"
+
+# XSLT Parameters for customizing the stylesheets 6
+#
+XSLTPARAM="--stringparam homepage=https://github.com/openSUSE/daps"
+XSLTPARAM+="--param variablelist.as.blocks=1"
