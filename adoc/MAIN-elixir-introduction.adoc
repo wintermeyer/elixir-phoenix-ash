@@ -1,3 +1,36 @@
+[elixir_introduction]
 ## Elixir Introduction
 
-You can not learn Phoenix without some basic Elixir Knowledge. In this chapter 
+This chapter will teach you the absolut basics you need to programm with Elixir.
+All code examples are tested with Elixir version 10.2.
+
+## iex
+
+Your Elixir installation comes with an Elixir's Interactive Shell (`iex`) which we 
+will use for most examples in this chapter. Please go to your command line and 
+fire it up:
+
+[source,bash]
+----
+$ iex 
+Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
+
+Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> <1>
+----
+<1> This is your iex prompt.
+
+IMPORTANT: You have to press `CTRL-C` twice(!) to leave the `iex`.
+
+## Hello world!
+
+The classic! But never the less important. You can use the function `IO.puts()`
+to print a string to standard output:
+
+[source,bash]
+----
+iex(1)> IO.puts("Hello world!")
+Hello world!
+:ok
+----
+

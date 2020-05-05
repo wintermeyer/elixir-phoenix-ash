@@ -1,30 +1,26 @@
 == Preface
 
-[quote, https://www.phoenixframework.org]
-
----
-
-Build rich, interactive web applications quickly, with less code and fewer
-moving parts.
-
----
-
-Phoenix is very good but the initial learning curve is steep. Very steep! Most
-new Phoenix developers have never worked with Elixir and it being their first
+[Phoenix](https://www.phoenixframework.org) is very good but the initial
+learning curve is steep. Very steep! Most new Phoenix developers have never
+worked with [Elixir](https://elixir-lang.org) and it being their first
 functional programming language doesn't help either. As with so many other
-programming topics the usual how-tos and tutorials all start with "this is easy"
+frameworks the usual how-tos and tutorials all start with "this is easy"
 followed by a way too complicated example of how to build something you have no
 intention to build anyway. Mostly leaving a couple of steps out because the
 author thought of them as obvious.
 
-This book is written as a step by step guide. We start at zero. You are expected
-to understand the basics of programming and HTML but other than that you don't
-have to have any knowledge of Phoenix or Elixir.
+* This book is written as a step by step guide. We start at zero. You are
+  expected to understand the basics of programming and HTML but other than that
+  you don't have to have any knowledge of Phoenix or Elixir.
+* I will not hesitate to oversimply stuff. My aim is to get you productive in
+  the quickest time possible.
+* The applications in this book are not intended to become eye candy. We will
+  not waste time and energy to make stuff beautiful.
 
 And we are not going to build one giant application in the course of the book.
 We tackle small problems which make sense within their realm. If a specific
 chapter doesn't interest you: Go ahead and skip it. Only one expection: If you
-have never worked with Elixir you have to start with Elixir Introduction.
+have never worked with Elixir you have to start with <<elixir_introduction>>.
 
 Stefan Wintermeyer
 
