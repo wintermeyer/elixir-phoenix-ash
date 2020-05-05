@@ -1,9 +1,13 @@
-[elixir_introduction]
+[[elixir_introduction]]
 ## Elixir Introduction
 
-This chapter will teach you the absolut basics you need to programm with Elixir.
-All code examples are tested with Elixir version 10.2.
+This chapter will teach you the absolut basics of Elixir. There is a lot more to
+learn and to understand about Elixir. The content of this chapter is just enough
+to use Phoenix.
 
+NOTE: All code examples are tested with Elixir version 10.2.
+
+[[elixir-introduction-iex]]
 ## Elixir's Interactive Shell (iex)
 
 Your Elixir installation comes with an Elixir's Interactive Shell (`iex`) which we 
@@ -28,6 +32,7 @@ to dive into the core of your Phoenix application. You can do so too while
 being in production mode but that is the equivalent to an open heard surgery. It can 
 be a life saver but you really need to know what you are doing.
 
+[[elixir-introduction-hello-world]]
 ## Hello world!
 
 The classic! But never the less very important. You can use the function `IO.puts()`
@@ -57,7 +62,7 @@ BREAK: (a)bort (c)ontinue (p)roc info (i)nfo (l)oaded
 displays this list of choices (the `BREAK` menu) and with the second `Ctrl+C`
 you end the `iex`.
 
-
+[[elixir-introduction-basic-calculations]]
 ## Basic Calculations
 
 We can use the types `integer` (Integer numbers) and `float` (Real numbers) to
@@ -89,6 +94,7 @@ BREAK: (a)bort (c)ontinue (p)roc info (i)nfo (l)oaded
 NOTE: If it's OK with you I'll skip the `iex` and the `BREAK` part in the rest
 of this chapter. By that we get more real estate for the essential stuff.
 
+[[elixir-introduction-logical-expressions]]
 ## Logical Expressions
 
 A type `boolean` can store the values `true` and `false`. Together with `and`,
@@ -109,5 +115,36 @@ false
 The operators `and`, `or` and `not` can only work with boolean values. The operators 
 `&&` (and), `||` (or) and `!` (not) basically do the same but are a bit more free spirited and accept *truthy* and *falsy* values. We will get to that later if needed.
 
+[[elixir-introduction-variables]]
 ## Variables
 
+You already know how variables work from experiences in other programming
+languages. Therefor we can dive right into it. Variable names follow the
+[snake_case](https://en.wikipedia.org/wiki/Snake_case) format and start with a
+lower case. Some examples:
+
+[source,elixir]
+----
+iex(1)> length = 10
+10
+iex(2)> width = 23
+23
+iex(3)> area = length * width
+230
+----
+
+If you start a variable name with a capital error you'll get an error:
+
+[source,elixir]
+----
+iex(4)> Radius = 2
+** (MatchError) no match of right hand side value: 2 <1>
+----
+<1> Yes, `MatchError` is a rather strange error message here. It will make more
+sense later. Binding values in variables is a bit more complicated than it seems
+right now.
+
+[[elixir-introduction-strings]]
+## Strings
+
+We already used a string in the <<elixir-introduction-hello-worlds,Hello World>> example. 

@@ -30,22 +30,27 @@ Stefan Wintermeyer
 During or after reading this book there will come the time when you have a
 problem or a question. Here is my advise for those times:
 
-- https://www.google.com  
-  `Phoenix` is not an easy to search for term. There are millions of
-  construction companies with Phoenix in their name which can help you build a
-  house but don't offer any programming help on their webpage. You often want to
-  add either `Framework` or `Elixir` to your search queries.
-- https://stackoverflow.com  
-  My favorate spot to find help. There is a good chance somebody already had the
-  same problem and it is answered on stackoverflow. If not you normally get
-  surprisingly fast answers there for new questions.
-- Send me an e-mail to sw@wintermeyer-consulting.de  
-  Feel free to send me an email if everything else doesn't help. Please add the
-  used Elixir and Phoenix version and other information which helps (e.g.
-  database and operation system). If possible, create a first a question on
-  stackoverflow.com and send me an email with the link of that question. By that
-  I can answer it for you and for everybody who has the same problem in the
-  future.
+* https://www.google.com
++
+`Phoenix` is not an easy to search for term. There are millions of
+construction companies with Phoenix in their name which can help you build a
+house but don't offer any programming help on their webpage. You often want to
+add either `Framework` or `Elixir` to your search queries.
+
+* https://stackoverflow.com
++
+My favorate spot to find help. There is a good chance somebody already had the
+same problem and it is answered on stackoverflow. If not you normally get
+surprisingly fast answers there for new questions.
+
+* Send me an e-mail to sw@wintermeyer-consulting.de
++
+Feel free to send me an email if everything else doesn't help. Please add the
+used Elixir and Phoenix version and other information which helps (e.g.
+database and operation system). If possible, create a first a question on
+stackoverflow.com and send me an email with the link of that question. By that
+I can answer it for you and for everybody who has the same problem in the
+future.
 
 === Training and Consulting
 
