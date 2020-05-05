@@ -1,0 +1,3 @@
+## Elixir Introduction
+
+You can not learn Phoenix without some basic Elixir Knowledge. In this chapter 
