@@ -4,13 +4,13 @@
 This chapter will teach you the absolut basics you need to programm with Elixir.
 All code examples are tested with Elixir version 10.2.
 
-## iex
+## Elixir's Interactive Shell (iex)
 
 Your Elixir installation comes with an Elixir's Interactive Shell (`iex`) which we 
 will use for most examples in this chapter. Please go to your command line and 
 fire it up:
 
-[source,bash]
+[source,elixir]
 ----
 $ iex 
 Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
@@ -20,17 +20,94 @@ iex(1)> <1>
 ----
 <1> This is your iex prompt.
 
-IMPORTANT: You have to press `CTRL-C` twice(!) to leave the `iex`.
+IMPORTANT: You have to press `CTRL-C` twice(!) to stop the `iex`.
+
+The `iex` will be your trusted friend during the work with this book and later
+while working with Phoenix. While programming in development mode you can use it 
+to dive into the core of your Phoenix application. You can do so too while 
+being in production mode but that is the equivalent to an open heard surgery. It can 
+be a life saver but you really need to know what you are doing.
 
 ## Hello world!
 
-The classic! But never the less important. You can use the function `IO.puts()`
+The classic! But never the less very important. You can use the function `IO.puts()`
 to print a string to standard output:
 
-[source,bash]
+[source,elixir]
 ----
 iex(1)> IO.puts("Hello world!")
 Hello world!
 :ok
 ----
+
+Strings are always encapsuled within double quotes. In case you need to have 
+double quotes within a string you have to escape them with backslashes:
+
+[source,elixir]
+----
+iex(2)> IO.puts("With double quotes: \"Hello world!\"")
+With double quotes: "Hello world!"
+:ok
+iex(3)>
+BREAK: (a)bort (c)ontinue (p)roc info (i)nfo (l)oaded
+       (v)ersion (k)ill (D)b-tables (d)istribution
+^C⏎ <1>
+----
+<1> Don't be afraid of the `BREAK` menue. With the first `Ctrl+C` the `iex`
+displays this list of choices (the `BREAK` menu) and with the second `Ctrl+C`
+you end the `iex`.
+
+
+## Basic Calculations
+
+We can use the types `integer` (Integer numbers) and `float` (Real numbers) to
+do all sorts of calcuations. The use it pretty straight forward. I'll show you a
+couple of examples:
+
+[source,elixir]
+----
+$ iex
+Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
+
+Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> 1 + 1
+2
+iex(2)> 1.1 + 1
+2.1
+iex(3)> 2 - 1
+1
+iex(4)> 10 * 1000000000000000
+10000000000000000
+iex(5)> 23 / 3
+7.666666666666667
+iex(6)> 
+BREAK: (a)bort (c)ontinue (p)roc info (i)nfo (l)oaded
+       (v)ersion (k)ill (D)b-tables (d)istribution
+^C⏎ 
+----
+
+NOTE: If it's OK with you I'll skip the `iex` and the `BREAK` part in the rest
+of this chapter. By that we get more real estate for the essential stuff.
+
+## Logical Expressions
+
+A type `boolean` can store the values `true` and `false`. Together with `and`,
+`or` and `not` those can create expressions:
+
+[source,elixir]
+----
+iex(1)> true and true
+true
+iex(2)> false and false
+false
+iex(3)> true or false
+true
+iex(4)> not true
+false
+----
+
+The operators `and`, `or` and `not` can only work with boolean values. The operators 
+`&&` (and), `||` (or) and `!` (not) basically do the same but are a bit more free spirited and accept *truthy* and *falsy* values. We will get to that later if needed.
+
+## Variables
 

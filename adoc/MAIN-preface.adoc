@@ -12,8 +12,9 @@ author thought of them as obvious.
 * This book is written as a step by step guide. We start at zero. You are
   expected to understand the basics of programming and HTML but other than that
   you don't have to have any knowledge of Phoenix or Elixir.
-* I will not hesitate to oversimply stuff. My aim is to get you productive in
-  the quickest time possible.
+* **I will not hesitate to oversimply stuff.** My aim is to get you productive
+  in the quickest time possible. There are other good books to learn Elixir
+  or OTP in detail once you are hooked.
 * The applications in this book are not intended to become eye candy. We will
   not waste time and energy to make stuff beautiful.
 
