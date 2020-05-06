@@ -99,7 +99,43 @@ BREAK: (a)bort (c)ontinue (p)roc info (i)nfo (l)oaded
 ----
 
 NOTE: If it's OK with you I'll skip the `iex` and the `BREAK` part in the rest
-of this chapter. By that we get more real estate for the essential stuff.
+of this chapter. By that we get more real estate for the essential stuff and less trees 
+have to die to get the book version printed.
+
+[[elixir-introduction-atoms]]
+### Atoms
+
+An atom just consists of it's own name. In some other programming languages they 
+are called symbols. Atoms start with a `:`
+
+[source,elixir]
+----
+iex(1)> :red
+:red
+iex(2)> :blue
+:blue
+----
+
+NOTE: Atom names can be written in snake_case or in CamelCase. But the usual Elixir 
+convention is to use snake_case.
+
+#### Booleans are atoms too
+
+Booleans are a good example for the use of atoms. But they are special because 
+you don't have to prefix them with a `:`.
+
+[source,elixir]
+----
+iex(1)> false == :false <1>
+true
+iex(2)> is_atom(false) <2>
+true
+iex(3)> is_boolean(:false) <3>
+true
+----
+<1> We haven't talked about logical expressions yet. But you know how '==' works.
+<2> The function `is_atom()` can be used to check if something is an atom.
+<3> The function `is_boolean()` can be used to check if something is a boolean.
 
 [[elixir-introduction-logical-expressions]]
 ### Logical Expressions
@@ -297,6 +333,7 @@ iex(5)> total_price.(10, vat)
 <4> Example calculation which uses the `food_vat` function as the second parameter.
 
 ### The & operator
+indexterm:["% operator"]
 
 It is likely that you will stumble upon the `&` operator while searching
 solutions for Elixir problems. It is a so called *capture operator*. It 
@@ -324,6 +361,7 @@ iex(6)> rectangle_area.(7,8)
 Sometimes it is easier to read code which uses the `&` operator. Sometimes it is not.
 
 ### Variable Scopes
+indexterm:["Scopes", "Variable Scopes"]
 
 In every programming language variables have some sort of scope. Let's have a look 
 into some code to figure out how variables in Elixr are scoped:
@@ -389,3 +427,246 @@ iex(4)> IO.puts(pi) <4>
 <2> We bind the inner scoped variable `pi` with the value 3.14.
 <3> The 3.14 and not the 3.14159265359 gets used.
 <4> The outer scoped `pi` is not changed.
+
+NOTE: You can not change the value of an outer scoped variable but you can read
+it. And you can create a new inner scope variable with the same name without
+interacting with the outer scoped one.
+
+### Functions and Modules
+
+Anonymous functions are useful but using just them to build a big software 
+project would become messy very fast. We need a better way to structure our 
+code. Let me introduce you to modules which include functions.
+
+[source,elixir]
+----
+iex(1)> defmodule Store do <1>
+...(1)>   def total_price(price, amount) do <2>
+...(1)>     price * amount
+...(1)>   end
+...(1)> end
+{:module, Store,
+ <<70, 79, 82, 49, 0, 0, 5, 4, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 133, 0,
+   0, 0, 14, 12, 69, 108, 105, 120, 105, 114, 46, 83, 116, 111, 114, 101, 8, 95,
+   95, 105, 110, 102, 111, 95, 95, 7, ...>>, {:total_price, 2}}
+iex(2)> Store.total_price(10,7) <3>
+70
+----
+<1> `defmodule` is the keyword to define a module. The name of a modul starts with a capital letter.
+<2> `def` is the keyword to define a function within a module.
+<3> A function of a given module can be called from outside the module with this syntax.
+
+`defmodule` and `def` use a `do ... end` construct to begin and end.
+
+IMPORTANT: Moduel names use CamelCase which start with a capital letter. Function names use snake_case which start with a lower case letter.
+
+Normaly a module contains more than one function:
+
+[source,elixir]
+----
+iex(1)> defmodule Area do <1>
+...(1)>   def rectangle(a, b) do <2>
+...(1)>     a * b
+...(1)>   end
+...(1)> 
+...(1)>   def square(a) do <3>
+...(1)>     a * a
+...(1)>   end
+...(1)> end
+{:module, Area,
+ <<70, 79, 82, 49, 0, 0, 5, 156, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 137,
+   0, 0, 0, 15, 11, 69, 108, 105, 120, 105, 114, 46, 65, 114, 101, 97, 8, 95,
+   95, 105, 110, 102, 111, 95, 95, 7, 99, ...>>, {:square, 1}}
+iex(2)> Area.rectangle(4,5)
+20
+iex(3)> Area.square(4)
+16
+----
+<1> We call this module 'Area'.
+<2> The function rectangle/2 calculates the area of a rectangle.
+<2> The function square/1 calculates the area of a square.
+
+#### Private functions
+
+Sometimes you want to define a function within a module without exposing it to the outside world. 
+This can be done with a private functions which gets declared with `devp`:
+
+[source,elixir]
+----
+iex(1)> defmodule Area do
+...(1)>   def circle(radius) do
+...(1)>     pi() * radius * radius
+...(1)>   end
+...(1)> 
+...(1)>   defp pi do <1>
+...(1)>     3.14
+...(1)>   end
+...(1)> end
+{:module, Area,
+ <<70, 79, 82, 49, 0, 0, 5, 104, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 130,
+   0, 0, 0, 15, 11, 69, 108, 105, 120, 105, 114, 46, 65, 114, 101, 97, 8, 95,
+   95, 105, 110, 102, 111, 95, 95, 7, 99, ...>>, {:pi, 0}}
+iex(2)> Area.circle(10) <2>
+314.0
+iex(3)> Area.pi
+** (UndefinedFunctionError) function Area.pi/0 is undefined or private
+    Area.pi()
+----
+<1> The function `pi/0` is a private function.
+<2> The function `circle/1` can be called from the outsite. It can use the private function `pi/0` from within the module.
+<3> The function `pi/0` can not be called from the outsite.
+
+#### Function Arity
+
+In the last couple of sentences you probably recognized the names of a functions
+with the number of parameters following. `pi/0` let to `defp pi do` and
+`circle/1` to `circle(radius)`. This number or arguments or parameters is called
+**arity**. Arity is kind of a big thing in Elixir. Why? Because not just the
+function name but also the arity defines a function. If we want to create a
+module which calculates the area of rectangles it could look like this:
+
+[source,elixir]
+----
+iex(1)> defmodule Rectangle do
+...(1)>   def area(a) do <1>
+...(1)>     a * a 
+...(1)>   end
+...(1)> 
+...(1)>   def area(a, b) do <2>
+...(1)>     a * b
+...(1)>   end
+...(1)> end
+{:module, Rectangle,
+ <<70, 79, 82, 49, 0, 0, 5, 108, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 130,
+   0, 0, 0, 14, 16, 69, 108, 105, 120, 105, 114, 46, 82, 101, 99, 116, 97, 110,
+   103, 108, 101, 8, 95, 95, 105, 110, 102, ...>>, {:area, 2}}
+iex(2)> Rectangle.area(9) <3>
+81
+iex(3)> Rectangle.area(4,5) <4>
+20
+----
+<1> The function ´area/1´ with the arity of 1 accepts one parameter.
+<2> The function ´area/2´ with the arity of 2 accepts two parameters.
+<3> So to calculate the area of a square you can call `area/1` with just one parameter.
+<4> All non square rectangle areas have to be calculated with `area/2` which accepts two parameters.
+
+#### Import
+
+We can call all functions by `ModuleName.function_name` but sometimes it would be nice 
+to be able to just call that function by `function_name`. But Elixir has you covered. 
+You can `import` a Module and have that:
+
+[source,elixir]
+----
+iex(1)> defmodule Rectangle do
+...(1)>   def area(a) do
+...(1)>     a * a 
+...(1)>   end
+...(1)> 
+...(1)>   def area(a, b) do
+...(1)>     a * b
+...(1)>   end
+...(1)> end
+{:module, Rectangle,
+ <<70, 79, 82, 49, 0, 0, 5, 108, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 130,
+   0, 0, 0, 14, 16, 69, 108, 105, 120, 105, 114, 46, 82, 101, 99, 116, 97, 110,
+   103, 108, 101, 8, 95, 95, 105, 110, 102, ...>>, {:area, 2}}
+iex(2)> import Rectangle <1>
+Rectangle
+iex(3)> area(5) <2>
+25
+----
+<1> Here we `import Rectangle` to have all the functions of that module at our fingertips.
+<2> No need to `Rectangle.area/1` any more `area/1` is just fine.
+
+And you can also just import special functions from that module:
+
+[source,elixir]
+----
+iex(3)> import Rectangle, only: [area: 2] <1>
+Rectangle
+iex(4)> area(1) <2>
+** (CompileError) iex:7: undefined function area/1
+
+iex(7)> area(1,5) <3>
+5
+----
+<1> Let's just import `area/2` but not all the other functions of that module.
+<2> I try to run `area/1` but that throughts an error because I didn't import it.
+<3> Just works fine.
+
+NOTE: When ever you just use a given function without a module name before 
+that module has already been imported by Elixir (e.g. the `Kernel` modul gets 
+imported automatically).
+
+### Lists
+
+Elixir offers Lists as a way to store multiple values or different types. 
+A list is encapsuled in `[]`:
+
+[source,elixir]
+----
+iex(1)> [1, 2, 3, 4]
+[1, 2, 3, 4]
+iex(2)> ["a", "b", "c"]
+["a", "b", "c"]
+iex(3)> [1, "b", true, false, :blue, "house"]
+[1, "b", true, false, :blue, "house"]
+iex(4)>
+----
+
+The operators `++` and `--` can be used to concatenate and substract lists from each other:
+
+[source,elixir]
+----
+iex(1)> [1, 2] ++ [2, 4] <1>
+[1, 2, 2, 4]
+iex(2)> [1, 2] ++ [1] <2>
+[1, 2, 1]
+iex(3)> [1, "a", 2, false, true] -- ["a", 2] <3>
+[1, false, true]
+----
+<1> Makes totally sense.
+<2> So does this.
+<3> A bit trickier. The second and third element of the first list get substracted.
+
+#### Head and Tail of Lists
+
+A lot of times Elixir developers want to work with the head and tail of a list. Head 
+is the first element (counting from the left side) and the tail is the rest. There 
+are too functions for that:
+
+[source,elixir]
+----
+iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"] <1>
+["apple", "orange", "banana", "pineapple"]
+iex(2)> hd(shopping_list) <2>
+"apple"
+iex(3)> tl(shopping_list) <3>
+["orange", "banana", "pineapple"]
+iex(4)> shopping_list <4>
+["apple", "orange", "banana", "pineapple"]
+----
+<1> We define a list and bind it to the variable `shopping_list`.
+<2> `hd/1` fetches the first element of the list.
+<3> `tl/1` fetches the rest of the list.
+<4> The `shopping_list` itself hasn't changed.
+
+Let's see what happens with empty lists or lists which just have one element:
+
+[source,elixir]
+----
+iex(6)> hd([])
+** (ArgumentError) argument error
+    :erlang.hd([])
+iex(6)> tl([])
+** (ArgumentError) argument error
+    :erlang.tl([])
+iex(6)> hd(["grapefruit"])
+"grapefruit"
+iex(7)> tl(["grapefruit"])
+[]
+----
+
+### Pattern Matching
+
