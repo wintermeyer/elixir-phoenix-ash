@@ -1,4 +1,4 @@
-== Preface
+## Preface
 
 [Phoenix](https://www.phoenixframework.org) is very good but the initial
 learning curve is steep. Very steep! Most new Phoenix developers have never
@@ -12,10 +12,13 @@ author thought of them as obvious.
 * This book is written as a step by step guide. We start at zero. You are
   expected to understand the basics of programming and HTML but other than that
   you don't have to have any knowledge of Phoenix or Elixir.
+* I'll work with bite size code examples. Everytime a new concept is introduced 
+  I'll include a callout (a number) to the code example which adds an explanation 
+  at the bottom of the example.
 * **I will not hesitate to oversimply stuff.** My aim is to get you productive
   in the quickest time possible. There are other good books to learn Elixir
   or OTP in detail once you are hooked.
-* The applications in this book are not intended to become eye candy. We will
+* The web-applications in this book are not intended to become eye candy. We will
   not waste time and energy to make stuff beautiful.
 
 And we are not going to build one giant application in the course of the book.
@@ -25,7 +28,11 @@ have never worked with Elixir you have to start with <<elixir_introduction>>.
 
 Stefan Wintermeyer
 
-=== Finding Help
+PS: You can reach me by e-mail (sw@wintermeyer-consulting.de) or follow me on Twitter 
+([@wintermeyer](https://twitter.com/wintermeyer)). Don't be shy. Feedback always 
+helps to improve this book.
+
+### Finding Help
 
 During or after reading this book there will come the time when you have a
 problem or a question. Here is my advise for those times:
