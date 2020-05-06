@@ -12,6 +12,7 @@ author thought of them as obvious.
 * This book is written as a step by step guide. We start at zero. You are
   expected to understand the basics of programming and HTML but other than that
   you don't have to have any knowledge of Phoenix or Elixir.
+* All steps/lessons are linear. I try hard to avoid chicken-egg situations.
 * I'll work with bite size code examples. Everytime a new concept is introduced 
   I'll include a callout (a number) to the code example which adds an explanation 
   at the bottom of the example.

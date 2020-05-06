@@ -433,6 +433,7 @@ it. And you can create a new inner scope variable with the same name without
 interacting with the outer scoped one.
 
 ### Functions and Modules
+indexterm:["Modules", "Functions"]
 
 Anonymous functions are useful but using just them to build a big software 
 project would become messy very fast. We need a better way to structure our 
@@ -484,9 +485,10 @@ iex(3)> Area.square(4)
 ----
 <1> We call this module 'Area'.
 <2> The function rectangle/2 calculates the area of a rectangle.
-<2> The function square/1 calculates the area of a square.
+<3> The function square/1 calculates the area of a square.
 
-#### Private functions
+#### Private Functions
+indexterm:["Private functions"]
 
 Sometimes you want to define a function within a module without exposing it to the outside world. 
 This can be done with a private functions which gets declared with `devp`:
@@ -508,7 +510,7 @@ iex(1)> defmodule Area do
    95, 105, 110, 102, 111, 95, 95, 7, 99, ...>>, {:pi, 0}}
 iex(2)> Area.circle(10) <2>
 314.0
-iex(3)> Area.pi
+iex(3)> Area.pi <3>
 ** (UndefinedFunctionError) function Area.pi/0 is undefined or private
     Area.pi()
 ----
@@ -517,6 +519,7 @@ iex(3)> Area.pi
 <3> The function `pi/0` can not be called from the outsite.
 
 #### Function Arity
+indexterm:["Function Arity", "Arity"]
 
 In the last couple of sentences you probably recognized the names of a functions
 with the number of parameters following. `pi/0` let to `defp pi do` and
@@ -551,6 +554,7 @@ iex(3)> Rectangle.area(4,5) <4>
 <4> All non square rectangle areas have to be calculated with `area/2` which accepts two parameters.
 
 #### Import
+indexterm:["Import"]
 
 We can call all functions by `ModuleName.function_name` but sometimes it would be nice 
 to be able to just call that function by `function_name`. But Elixir has you covered. 
@@ -599,9 +603,29 @@ NOTE: When ever you just use a given function without a module name before
 that module has already been imported by Elixir (e.g. the `Kernel` modul gets 
 imported automatically).
 
-### Lists
+### Lists and Tuples
+indexterm:["Lists and Tuples"]
 
-Elixir offers Lists as a way to store multiple values or different types. 
+Lists and tuples are used to store multiple elements in a sort of list. Both
+look alike but are quite different performance wise. 
+
+* Tuples are fast when you have to access it's data but slow when you want to
+  change it's data. They are stored contiguously in memory. Accessing one
+  element of a tuple or getting the size of it is fast and always takes the same
+  amount of time.
+* Lists are stored as linked lists in memory. One element holds it's own value
+  and a link to the next element. Accessing single elements and the length of a
+  lists is a linear operation which takes more time. The longer the list the
+  more time it takes. But it is fast to add a new element to the end of a list.
+
+NOTE: Right now you don't need to loose sleep over the decision which one to
+use. Over the course of the book you'll get a feeling which one is best suited
+for what problem.
+
+#### Lists
+indexterm:["Lists"]
+
+List store multiple values or different types.
 A list is encapsuled in `[]`:
 
 [source,elixir]
@@ -630,7 +654,8 @@ iex(3)> [1, "a", 2, false, true] -- ["a", 2] <3>
 <2> So does this.
 <3> A bit trickier. The second and third element of the first list get substracted.
 
-#### Head and Tail of Lists
+##### Head and Tail of Lists
+indexterm:["Head", "Tail", "hd/1", "tl/1"]
 
 A lot of times Elixir developers want to work with the head and tail of a list. Head 
 is the first element (counting from the left side) and the tail is the rest. There 
@@ -656,16 +681,105 @@ Let's see what happens with empty lists or lists which just have one element:
 
 [source,elixir]
 ----
-iex(6)> hd([])
+iex(6)> hd([]) <1>
 ** (ArgumentError) argument error
     :erlang.hd([])
-iex(6)> tl([])
+iex(6)> tl([]) <2>
 ** (ArgumentError) argument error
     :erlang.tl([])
-iex(6)> hd(["grapefruit"])
+iex(6)> hd(["grapefruit"]) <3>
 "grapefruit"
-iex(7)> tl(["grapefruit"])
+iex(7)> tl(["grapefruit"]) <4>
 []
+----
+<1> You can't get the head of an empty list.
+<2> And there is no tail of an empty list.
+<3> There is a head of a list with one element.
+<4> The tail of a list with one element is an empty list.
+
+##### length/1
+indexterm:["length/1"]
+
+The function `length/1` tells how many elements a list contains:
+
+[source,elixir]
+----
+iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex(2)> length(shopping_list)
+4
+iex(3)> length([1, 2])
+2
+iex(4)> length([])
+0
+----
+
+#### Tuples
+indexterm:["Tuples"]
+
+Like Lists tuples can hold multiple elements of different types. The 
+elements are encapsuled with '{}':
+
+[source,elixir]
+----
+iex(1)> {1, 2, 3} <1>
+{1, 2, 3}
+iex(2)> {:ok, "test"} <2>
+{:ok, "test"}
+iex(3)> {true, :apple, 234, "house", 3.14} <3>
+{true, :apple, 234, "house", 3.14}
+----
+<1> A tuple which contains three integers. 
+<2> A tuple which contains one atom which represents a status and one string. 
+Is is actually something very common in Elixir. You will see that a lot. 
+<3> A tuple with a mix of all sorts of values.
+
+We don't use the head and tail idea with tuples. But we can access every element
+of a tuple with an index:
+
+[source,elixir]
+----
+iex(1)> result = {:ok, "Lorem ipsum"}   
+{:ok, "Lorem ipsum"}
+iex(2)> elem(result, 1) <1>
+"Lorem ipsum"
+iex(3)> elem(result, 0) <2>
+:ok
+----
+<1> The function `elem/2` gives us a fast access to each element of a tuple.
+<2> The count starts with 0 for the first element.
+
+##### Tuple Functions
+indexterm:["Tuple functions"]
+
+The following functions are useful when you handle data with tuples:
+
+* `Tuple.append/2` adds an element to a tuple.
+indexterm:["append/2", "Tuple.append/2"]
+* `Tuple.delete_at/2` deletes an element of a tuple.
+indexterm:["delete_at/2", "Tuple.delete_at/2"]
+* `Tuple.insert_at/3` adds an element at a specific position.
+indexterm:["insert_at/3", "Tuple.insert_at/3"]
+* `Tuple.to_list/1` converts a tuple to a list.
+indexterm:["to_list/1", "Tuple.to_list/1"]
+* `Tuple.size/1` returns the number of elements of the tuple.
+
+Examples:
+
+[source,elixir]
+----
+iex(1)> results = {:ok, "Lorem ipsum"}
+{:ok, "Lorem ipsum"}
+iex(2)> b = Tuple.append(results, "Test")
+{:ok, "Lorem ipsum", "Test"}
+iex(3)> c = Tuple.delete_at(b, 1)
+{:ok, "Test"}
+iex(4)> d = Tuple.insert_at(b, 1, "ipsum")
+{:ok, "ipsum", "Lorem ipsum", "Test"}
+iex(5)> new_list = Tuple.to_list(d)
+[:ok, "ipsum", "Lorem ipsum", "Test"]
+iex(6)> tuple_size(d)
+4
 ----
 
 ### Pattern Matching
