@@ -603,6 +603,50 @@ NOTE: When ever you just use a given function without a module name before
 that module has already been imported by Elixir (e.g. the `Kernel` modul gets 
 imported automatically).
 
+#### The Pipe Operator (|>)
+indexterm:["Pipe Operator", "|>"]
+
+Quite often one wants to use a couple of different functions in a row. 
+Let's assume you want to reverse a string and capitalize it afterwards. 
+Here's the code to do that:
+
+[source,elixir]
+----
+iex(1)> String.reverse("house") <1>
+"esuoh"
+iex(2)> String.capitalize("esuoh") <2>
+"Esuoh"
+iex(3)> String.capitalize(String.reverse("house")) <3>
+"Esuoh"
+----
+<1> `String.reverse/1` reverses the string.
+<2> `String.capitalize/1` capitalizes all the letters in a string.
+<3>  Connect the two functions.
+
+The problem with `String.capitalize(String.reverse("house"))` is the 
+lack of readability. It kind of works with just two functions but 
+what about one or two more functions in that line? Here comes the 
+pipe operator for the rescue. It is a piece of syntax sugar. Have 
+a look:
+
+[source,elixir]
+----
+iex(4)> String.reverse("house") |> String.capitalize <1>
+"Esuoh"
+----
+<1> The pipe operator `|>` takes the result of the first function 
+and puts it as the first parameter of the following function.
+
+Of course you can use multiple pipe operators:
+
+[source,elixir]
+----
+iex(5)> String.reverse("house") |> String.capitalize |> String.downcase
+"esuoh"
+----
+
+The pipe operator is just a way to make code more readable.
+
 ### Lists and Tuples
 indexterm:["Lists and Tuples"]
 
@@ -784,3 +828,30 @@ iex(6)> tuple_size(d)
 
 ### Pattern Matching
 
+
+
+
+### Help in the iex
+
+The iex has a build in help function `h/1` which gives you access to some 
+basic documentation. 
+
+[source,elixir]
+----
+iex(2)> h length/1
+
+                                def length(list)                                
+
+  @spec length(list()) :: non_neg_integer()
+
+guard: true
+
+Returns the length of list.
+
+Allowed in guard tests. Inlined by the compiler.
+
+## Examples
+
+    iex> length([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    9
+----
