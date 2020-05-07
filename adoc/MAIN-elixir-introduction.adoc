@@ -438,9 +438,10 @@ interacting with the outer scoped one.
 ### Functions and Modules
 indexterm:["Modules", "Functions"]
 
-Anonymous functions are useful but using just them to build a big software 
-project would become messy very fast. We need a better way to structure our 
-code. Let me introduce you to modules which include functions.
+Anonymous functions are useful but using just them to build a big software
+project would become messy very fast. We need a better way to structure our
+code. Let me introduce you to Modules which are used to organize a collection of
+functions.
 
 [source,elixir]
 ----
@@ -556,8 +557,53 @@ iex(3)> Rectangle.area(4,5) <4>
 <3> So to calculate the area of a square you can call `area/1` with just one parameter.
 <4> All non square rectangle areas have to be calculated with `area/2` which accepts two parameters.
 
+#### Hierachical Modules
+
+In a big project you will have multiple layers of Module namespaces to keep everything in 
+some sort of structure.
+
+This can be done by adding `.` between the Module names:
+
+[source,elixir]
+----
+iex(1)> defmodule Calculator.Area do
+...(1)>   def square(a) do
+...(1)>     a * a
+...(1)>   end
+...(1)> end
+{:module, Calculator.Area,
+ <<70, 79, 82, 49, 0, 0, 4, 232, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
+   0, 0, 0, 14, 22, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
+   97, 116, 111, 114, 46, 65, 114, 101, 97, ...>>, {:square, 1}}
+iex(2)> Calculator.Area.square(5)
+25
+----
+
+It is just a shortcut. You could also nest the Modules:
+
+[source,elixir]
+----
+iex(1)> defmodule Calculator do
+...(1)>   defmodule Area do
+...(1)>     def square(a) do
+...(1)>       a * a
+...(1)>     end
+...(1)>   end
+...(1)> end
+{:module, Calculator,
+ <<70, 79, 82, 49, 0, 0, 3, 164, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 124,
+   0, 0, 0, 12, 17, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
+   97, 116, 111, 114, 8, 95, 95, 105, 110, ...>>,
+ {:module, Calculator.Area,
+  <<70, 79, 82, 49, 0, 0, 4, 232, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
+    0, 0, 0, 14, 22, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
+    97, 116, 111, 114, 46, ...>>, {:square, 1}}}
+iex(2)> Calculator.Area.square(5)
+25
+----
+
 #### Import
-indexterm:["Import"]
+indexterm:["Import", "Import Modules"]
 
 We can call all functions by `ModuleName.function_name` but sometimes it would be nice 
 to be able to just call that function by `function_name`. But Elixir has you covered. 
@@ -605,6 +651,28 @@ iex(7)> area(1,5) <3>
 NOTE: When ever you just use a given function without a module name before 
 that module has already been imported by Elixir (e.g. the `Kernel` modul gets 
 imported automatically).
+
+##### Import Hierarchical Modules
+
+Often - especially in a Phoenix application - you are going to import hierachical 
+modules. Here's how:
+
+[source,elixir]
+----
+iex(1)> defmodule Calculator.Area do
+...(1)>   def square(a) do
+...(1)>     a * a
+...(1)>   end
+...(1)> end
+{:module, Calculator.Area,
+ <<70, 79, 82, 49, 0, 0, 4, 232, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
+   0, 0, 0, 14, 22, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
+   97, 116, 111, 114, 46, 65, 114, 101, 97, ...>>, {:square, 1}}
+iex(2)> import Calculator.Area
+Calculator.Area
+iex(3)> square(5)     
+25
+----
 
 #### The Pipe Operator (|>)
 indexterm:["Pipe Operator", "|>"]
@@ -829,170 +897,6 @@ iex(6)> tuple_size(d)
 4
 ----
 
-### Pattern Matching
-indexterm:["Pattern Matching"]
-
-Pattern matching is super important in Elixir and we already used it without 
-knowing so.
-
-[source,elixir]
-----
-iex(1)> a = 10 <1>
-10
-iex(2)> a
-10
-iex(3)> {b, c} = {10, 15} <2>
-{10, 15}
-iex(4)> b
-10
-iex(5)> c
-15
-iex(6)> {d, e} = 100
-** (MatchError) no match of right hand side value: 100 <3>
-----
-<1> This is actually a pattern match. The left side of `=` will be matched to the right site if possible.
-<2> Here we pattern match `{b, c}` on the left side with a tuple on the right side.
-<3> Boom! Because we can not match the `{d, e}` tuple with an integer we get a `MatchError`.
-
-Since we don't have much time I'll fast forward to match a head and tail of a
-list. Because there is a special syntax for that:
-
-[source,elixir]
-----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"] <1>
-["apple", "orange", "banana", "pineapple"]
-iex(2)> [head | tail] = shopping_list <2>
-["apple", "orange", "banana", "pineapple"]
-iex(3)> head
-"apple"
-iex(4)> tail
-["orange", "banana", "pineapple"]
-iex(5)> [a | b] = tail <3>
-["orange", "banana", "pineapple"]
-iex(6)> a
-"orange"
-iex(7)> b
-["banana", "pineapple"]
-iex(8)> [first_product, second_product | tail] = shopping_list <4>
-["apple", "orange", "banana", "pineapple"]
-iex(9)> first_product
-"apple"
-iex(10)> second_product
-"orange"
-iex(11)> tail
-["banana", "pineapple"]
-iex(12)> [first_product | [second_product | tail]] = shopping_list <5>
-["apple", "orange", "banana", "pineapple"]
-----
-<1> We match a list to the variable `shopping_list`.
-<2> `[head|tail]` is the special syntax to match a head and tail of a given list.
-<3> Again we match the head `a` and the tail `b` with `tail`.
-<4> A bit more complex. We match agains the first and second product followed by a tail.
-<5> Same result. Different syntax and logic. Pick the one you prefer.
-
-Of course if we now that a list has a specific number of elements we can match
-it directly:
-
-[source,elixir]
-----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
-["apple", "orange", "banana", "pineapple"]
-iex(2)> [a, b, c, d] = shopping_list
-["apple", "orange", "banana", "pineapple"]
-iex(3)> a
-"apple"
-iex(4)> b
-"orange"
-iex(5)> [e, f, g] = shopping_list <1>
-** (MatchError) no match of right hand side value: ["apple", "orange", "banana", "pineapple"]
-----
-<1> Just checking. You get an `MatchError` if Elixir can't match both sides.
-
-#### Wildcard Matching
-indexterm:["Pattern Matching"]
-
-Sometimes you need the pattern matching to get a value but you don't need all
-the potential values in the pattern. For those cases you can use `_` (alone or
-as a prefix to a variable name). It indicates to Elixir, das you don't need that
-to be bind to anything.
-
-[source,elixir]
-----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
-["apple", "orange", "banana", "pineapple"]
-iex(2)> [first_product | _tail] = shopping_list <1>
-["apple", "orange", "banana", "pineapple"]
-iex(3)> first_product
-"apple"
-iex(4)> tail <2>
-** (CompileError) iex:4: undefined function tail/0
-
-iex(4)> [head | _] = shopping_list <3>
-["apple", "orange", "banana", "pineapple"]
-iex(5)> head
-"apple"
-----
-<1> We pattern match the head of `shopping_list` to `first_product`. But we don't need the tail and indicate that by prefix it with a `_`.
-<2> Just double-checking. No, it is not there.
-<3> We can use just a `_` too. Using `_tail` instead of just a `_` often adds a bit of code readablity. So everybody knows that we don't need that value but now what it would be.
-
-#### Matching against a variable
-indexterm:["Pattern Matching"]
-
-Assuming I'd like to fetch the second product of a shopping_list list but only if the first product is 
-an `organge`. I could do this like this:
-
-[source,elixir]
-----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
-["apple", "orange", "banana", "pineapple"]
-iex(2)> ["apple", second_product | _tail] = shopping_list <1>
-["apple", "orange", "banana", "pineapple"]
-iex(3)> second_product
-"orange"
-iex(4)> ["potato", second_product | _tail] = shopping_list <2>
-** (MatchError) no match of right hand side value: ["apple", "orange", "banana", "pineapple"]
-----
-<1> Is this cool or not!?
-<2> Just checking what happens if it doesn't match. `MatchError` is a good indicator for a missmatch.
-
-But let's now assume that you want to match the first product against the content of the variable 
-`first_product`:
-
-[source,elixir]
-----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
-["apple", "orange", "banana", "pineapple"]
-iex(2)> product = "potato" <1>
-"potato"
-iex(3)> [product, second_product | _tail] = shopping_list <2>
-["apple", "orange", "banana", "pineapple"]
-iex(4)> product
-"apple"
-iex(5)> second_product
-"orange"
-iex(6)> product = "potato" <3>
-"potato"
-iex(7)> [^product, second_product | _tail] = shopping_list <4>
-** (MatchError) no match of right hand side value: ["apple", "orange", "banana", "pineapple"]
-
-iex(7)> product = "apple" <5>
-"apple"
-iex(8)> [^product, second_product | _tail] = shopping_list <6>
-["apple", "orange", "banana", "pineapple"]
-----
-<1> We bind the string `potato` to the variable `product`.
-<2> Now we try to match `[product, second_product | _tail]` to `shopping_list`. 
-That should result in an `MatchError` because `product` represents `potato`. 
-But no `MatchError`. Because Elixir doesn't know that you want to actually use the bound 
-value of `product`. It thinks that you want to bind the first element of the list to the 
-variable `product`.
-<3> Let's try it again.
-<4> To match against the content of `product` we have to prefix it with a `^`. By doing 
-so we get a `MatchError` because it doesn't match.
-<5> Let's bind "apple" to `product`.
-<6> Bingo! Now we got a working pattern match against a variable.
-
 ### Maps and Structs
 
 List and Tuples don't provide a functionality to access values with a key. 
@@ -1133,6 +1037,193 @@ iex(6)>
 <2> Same with a new Struct. There is no `weight` field defined. Therefor we can not set it.
 
 NOTE: Because Struct build on top of Maps they can be used with the same mechanisms.
+
+### Pattern Matching
+indexterm:["Pattern Matching"]
+
+Pattern matching is super important in Elixir and we already used it without 
+knowing so.
+
+[source,elixir]
+----
+iex(1)> a = 10 <1>
+10
+iex(2)> a
+10
+iex(3)> {b, c} = {10, 15} <2>
+{10, 15}
+iex(4)> b
+10
+iex(5)> c
+15
+iex(6)> {d, e} = 100
+** (MatchError) no match of right hand side value: 100 <3>
+----
+<1> This is actually a pattern match. The left side of `=` will be matched to the right site if possible.
+<2> Here we pattern match `{b, c}` on the left side with a tuple on the right side.
+<3> Boom! Because we can not match the `{d, e}` tuple with an integer we get a `MatchError`.
+
+Since we don't have much time I'll fast forward to match a head and tail of a
+list. Because there is a special syntax for that:
+
+[source,elixir]
+----
+iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"] <1>
+["apple", "orange", "banana", "pineapple"]
+iex(2)> [head | tail] = shopping_list <2>
+["apple", "orange", "banana", "pineapple"]
+iex(3)> head
+"apple"
+iex(4)> tail
+["orange", "banana", "pineapple"]
+iex(5)> [a | b] = tail <3>
+["orange", "banana", "pineapple"]
+iex(6)> a
+"orange"
+iex(7)> b
+["banana", "pineapple"]
+iex(8)> [first_product, second_product | tail] = shopping_list <4>
+["apple", "orange", "banana", "pineapple"]
+iex(9)> first_product
+"apple"
+iex(10)> second_product
+"orange"
+iex(11)> tail
+["banana", "pineapple"]
+iex(12)> [first_product | [second_product | tail]] = shopping_list <5>
+["apple", "orange", "banana", "pineapple"]
+----
+<1> We match a list to the variable `shopping_list`.
+<2> `[head|tail]` is the special syntax to match a head and tail of a given list.
+<3> Again we match the head `a` and the tail `b` with `tail`.
+<4> A bit more complex. We match agains the first and second product followed by a tail.
+<5> Same result. Different syntax and logic. Pick the one you prefer.
+
+Of course if we now that a list has a specific number of elements we can match
+it directly:
+
+[source,elixir]
+----
+iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex(2)> [a, b, c, d] = shopping_list
+["apple", "orange", "banana", "pineapple"]
+iex(3)> a
+"apple"
+iex(4)> b
+"orange"
+iex(5)> [e, f, g] = shopping_list <1>
+** (MatchError) no match of right hand side value: ["apple", "orange", "banana", "pineapple"]
+----
+<1> Just checking. You get an `MatchError` if Elixir can't match both sides.
+
+#### Matching Maps
+
+Matching a Map works a little bit different to matching a Tuple or List. 
+You can match just against the values you are interested in:
+
+[source,elixir]
+----
+iex(1)> product_prices = %{apple: 0.5, orange: 0.7, pineapple: 1}
+%{apple: 0.5, orange: 0.7, pineapple: 1}
+iex(2)> %{orange: price} = product_prices <1>
+%{apple: 0.5, orange: 0.7, pineapple: 1}
+iex(3)> price
+0.7
+iex(4)> %{orange: price1, apple: price2} = product_prices <2>
+%{apple: 0.5, orange: 0.7, pineapple: 1}
+iex(5)> price1
+0.7
+iex(6)> price2
+0.5
+----
+<1> We can just match one value.
+<2> Or we can match multiples. But we don't have to match the whole Map.
+
+#### Wildcard Matching
+indexterm:["Pattern Matching"]
+
+Sometimes you need the pattern matching to get a value but you don't need all
+the potential values in the pattern. For those cases you can use `_` (alone or
+as a prefix to a variable name). It indicates to Elixir, das you don't need that
+to be bind to anything.
+
+[source,elixir]
+----
+iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex(2)> [first_product | _tail] = shopping_list <1>
+["apple", "orange", "banana", "pineapple"]
+iex(3)> first_product
+"apple"
+iex(4)> tail <2>
+** (CompileError) iex:4: undefined function tail/0
+
+iex(4)> [head | _] = shopping_list <3>
+["apple", "orange", "banana", "pineapple"]
+iex(5)> head
+"apple"
+----
+<1> We pattern match the head of `shopping_list` to `first_product`. But we don't need the tail and indicate that by prefix it with a `_`.
+<2> Just double-checking. No, it is not there.
+<3> We can use just a `_` too. Using `_tail` instead of just a `_` often adds a bit of code readablity. So everybody knows that we don't need that value but now what it would be.
+
+#### Matching against a variable
+indexterm:["Pattern Matching"]
+
+Assuming I'd like to fetch the second product of a shopping_list list but only if the first product is 
+an `organge`. I could do this like this:
+
+[source,elixir]
+----
+iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex(2)> ["apple", second_product | _tail] = shopping_list <1>
+["apple", "orange", "banana", "pineapple"]
+iex(3)> second_product
+"orange"
+iex(4)> ["potato", second_product | _tail] = shopping_list <2>
+** (MatchError) no match of right hand side value: ["apple", "orange", "banana", "pineapple"]
+----
+<1> Is this cool or not!?
+<2> Just checking what happens if it doesn't match. `MatchError` is a good indicator for a missmatch.
+
+But let's now assume that you want to match the first product against the content of the variable 
+`first_product`:
+
+[source,elixir]
+----
+iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex(2)> product = "potato" <1>
+"potato"
+iex(3)> [product, second_product | _tail] = shopping_list <2>
+["apple", "orange", "banana", "pineapple"]
+iex(4)> product
+"apple"
+iex(5)> second_product
+"orange"
+iex(6)> product = "potato" <3>
+"potato"
+iex(7)> [^product, second_product | _tail] = shopping_list <4>
+** (MatchError) no match of right hand side value: ["apple", "orange", "banana", "pineapple"]
+
+iex(7)> product = "apple" <5>
+"apple"
+iex(8)> [^product, second_product | _tail] = shopping_list <6>
+["apple", "orange", "banana", "pineapple"]
+----
+<1> We bind the string `potato` to the variable `product`.
+<2> Now we try to match `[product, second_product | _tail]` to `shopping_list`. 
+That should result in an `MatchError` because `product` represents `potato`. 
+But no `MatchError`. Because Elixir doesn't know that you want to actually use the bound 
+value of `product`. It thinks that you want to bind the first element of the list to the 
+variable `product`.
+<3> Let's try it again.
+<4> To match against the content of `product` we have to prefix it with a `^`. By doing 
+so we get a `MatchError` because it doesn't match.
+<5> Let's bind "apple" to `product`.
+<6> Bingo! Now we got a working pattern match against a variable.
 
 ### Help in the iex
 
