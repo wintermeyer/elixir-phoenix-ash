@@ -1090,7 +1090,50 @@ iex(9)> c = Map.put(product_prices, :potato, 0.2) <7>
 
 #### Structs
 indexterm:["Struct"]
- 
+
+A Struct is a fancy Map with a couple of extra features. To define a 
+Struct you have to use the `defstruct` construct:
+
+[source,elixir]
+----
+iex(1)> defmodule Product do <1>
+...(1)>   defstruct name: nil, price: 0 <2>
+...(1)> end
+{:module, Product,
+ <<70, 79, 82, 49, 0, 0, 6, 192, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 184,
+   0, 0, 0, 18, 14, 69, 108, 105, 120, 105, 114, 46, 80, 114, 111, 100, 117, 99,
+   116, 8, 95, 95, 105, 110, 102, 111, 95, ...>>, %Product{name: nil, price: 0}}
+iex(2)> %Product{}
+%Product{name: nil, price: 0}
+iex(3)> apple = %Product{name: "Apple", price: 0.5} <3>
+%Product{name: "Apple", price: 0.5}
+iex(4)> apple
+%Product{name: "Apple", price: 0.5}
+iex(5)> apple.price
+0.5
+----
+<1> We define a new Struct with the name `Product` and the keys `name` and `price`.
+<2> We define default values.
+<3> We define a new Product Struct and set all values.
+
+A Struct guarantees that only the defined fields are allowed:
+
+[source,elixir]
+----
+iex(6)> apple.description <1>
+** (KeyError) key :description not found in: %Product{name: "Apple", price: 0.5}
+
+iex(6)> banana = %Product{name: "Banana", weight: 0.1} <2>
+** (KeyError) key :weight not found
+    expanding struct: Product.__struct__/1
+    iex:6: (file)
+iex(6)>
+----
+<1> Since we didn't define a `description` field in the Struct we can not access it.
+<2> Same with a new Struct. There is no `weight` field defined. Therefor we can not set it.
+
+NOTE: Because Struct build on top of Maps they can be used with the same mechanisms.
+
 ### Help in the iex
 
 The iex has a build in help function `h/1` which gives you access to some 
