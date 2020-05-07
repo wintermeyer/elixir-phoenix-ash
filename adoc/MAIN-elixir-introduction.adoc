@@ -605,9 +605,8 @@ iex(2)> Calculator.Area.square(5)
 #### Import
 indexterm:["Import", "Import Modules"]
 
-We can call all functions by `ModuleName.function_name` but sometimes it would be nice 
-to be able to just call that function by `function_name`. But Elixir has you covered. 
-You can `import` a Module and have that:
+We can import access to public functions from other modules. So that we don't 
+have to use their fully qualified name.
 
 [source,elixir]
 ----
@@ -654,8 +653,7 @@ imported automatically).
 
 ##### Import Hierarchical Modules
 
-Often - especially in a Phoenix application - you are going to import hierachical 
-modules. Here's how:
+Often your want to import hierachical modules. Here's how:
 
 [source,elixir]
 ----
@@ -673,6 +671,34 @@ Calculator.Area
 iex(3)> square(5)     
 25
 ----
+
+#### Alias
+indexterm:["Alias"]
+
+`alias` offers the possiblity to set an alias to a module name.
+
+[source,elixir]
+----
+iex(1)> defmodule Calculator.Area do
+...(1)>   def square(a) do
+...(1)>     a * a
+...(1)>   end
+...(1)> end
+{:module, Calculator.Area,
+ <<70, 79, 82, 49, 0, 0, 4, 232, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
+   0, 0, 0, 14, 22, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
+   97, 116, 111, 114, 46, 65, 114, 101, 97, ...>>, {:square, 1}}
+iex(2)> alias Calculator.Area, as: Area <1>
+Calculator.Area
+iex(3)> Area.square(99)
+9801
+iex(4)> alias Calculator.Area <2>      
+Calculator.Area
+iex(5)> Area.square(99)      
+9801
+----
+<1> Set an alias for `Calculator.Area` as `Area`.
+<2> A shortcurt for that specific case. Same result but less to type.
 
 #### The Pipe Operator (|>)
 indexterm:["Pipe Operator", "|>"]
