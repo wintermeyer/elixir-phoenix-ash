@@ -22,7 +22,7 @@ ADOC_POST="yes"
 
 # Stylesheet directory  5
 #
-# STYLEROOT="/usr/share/xml/docbook/stylesheet/daps2013"
+STYLEROOT="/usr/share/xml/docbook/stylesheet/daps2013"
 
 # XSLT Parameters for customizing the stylesheets 6
 #
