@@ -993,6 +993,103 @@ so we get a `MatchError` because it doesn't match.
 <5> Let's bind "apple" to `product`.
 <6> Bingo! Now we got a working pattern match against a variable.
 
+### Maps and Structs
+
+List and Tuples don't provide a functionality to access values with a key. 
+That can be achieved with Maps and Structs.
+
+#### Maps
+indexterm:["Map"]
+
+Maps provide a way to store and retrieve key-value pairs. A Map is created 
+with a `%{}` syntax. 
+
+[source,elixir]
+----
+iex(1)> product_prices = %{"Apple" => 0.5, "Orange" => 0.7} <1>
+%{"Apple" => 0.5, "Orange" => 0.7}
+iex(2)> Map.get(product_prices, "Orange") <2>
+0.7
+iex(3)> Map.get(product_prices, "Banana") <3>
+nil
+iex(4)> Map.has_key?(product_prices, "Banana") <4>
+false
+----
+<1> We create a new map and bind it to the variable `product_prices`.
+<2> `Map.get/2` gets a value to a given key.
+<3> `Map.get/2` returns nil if a given key doesn't exist.
+<4> If you need to check if a key exists you can do it with `Map.hay_key?/2`
+
+But keys don't have to be a specific type. Everything can be a key and a value:
+
+[source,elixir]
+----
+iex(1)> %{"one" => 1, "two" => "abc", 3 => 7, true => "asdf"} <1>
+%{3 => 7, true => "asdf", "one" => 1, "two" => "abc"}
+iex(2)> %{"one" => 1, true => "asdf", true => "z"} <2>               
+warning: key true will be overridden in map
+  iex:2
+
+%{true => "z", "one" => 1}
+----
+<1> A mixed bag of different types. Feel free to go wild.
+<2> A key has to be unique within a Map. The last one will be the winner.
+
+##### Atom keys
+
+Using Atoms as keys in Maps gives you access to some nifty features:
+
+[source,elixir]
+----
+iex(1)> product_prices = %{apple: 0.5, orange: 0.7} <1>
+%{apple: 0.5, orange: 0.7}
+iex(2)> product_prices.apple <2>
+0.5
+iex(3)> product_prices.banana <3>
+** (KeyError) key :banana not found in: %{apple: 0.5, orange: 0.7}
+----
+<1> With Atoms as keys you can use this syntax which is a bit easier to read and less work to type.
+<2> Again, this syntax is easier to work with but only works for Atom keys.
+<3> Just checking what happens if the key doesn't exist in the Map.
+
+##### Functions
+
+The Map module offers a bunch of useful functions. For a complete list have a 
+look at https://hexdocs.pm/elixir/Map.html
+
+Here are just a couple of examples:
+
+[source,elixir]
+----
+iex(1)> product_prices = %{apple: 0.5, orange: 0.7, coconut: 1}
+%{apple: 0.5, coconut: 1, orange: 0.7}
+iex(2)> Map.to_list(product_prices) <1>
+[apple: 0.5, coconut: 1, orange: 0.7]
+iex(3)> Map.values(product_prices) <2>
+[0.5, 1, 0.7]
+iex(4)> Map.split(product_prices, [:orange, :apple]) <3>
+{%{apple: 0.5, orange: 0.7}, %{coconut: 1}}
+iex(5)> a = Map.delete(product_prices, :orange) <4>
+%{apple: 0.5, coconut: 1}
+iex(6)> b = Map.drop(product_prices, [:apple, :organge]) <5>
+%{coconut: 1, orange: 0.7}
+iex(7)> additional_prices = %{banana: 0.4, pineapple: 1.2}
+%{banana: 0.4, pineapple: 1.2}
+iex(8)> Map.merge(product_prices, additional_prices) <6>
+%{apple: 0.5, banana: 0.4, coconut: 1, orange: 0.7, pineapple: 1.2}
+iex(9)> c = Map.put(product_prices, :potato, 0.2) <7>
+%{apple: 0.5, coconut: 1, orange: 0.7, potato: 0.2}
+----
+<1> `Map.to_list/1` converts a Map into a List.
+<2> `Map.values/1` returns the values of a Map.
+<3> `Map.split/2` splits a given map into two new maps. The first one contains all the key-value pairs which are requested by a list (e.g. `[:orange, :apple]`)
+<4> `Map.delete/2` deletes a specific key-value pair in a Map.
+<5> `Map.drop/2` deletes a list of key-value pairs in a Map.
+<6> `Map.merge/2` merges two Maps.
+<7> `Map.put/2` adds a key-value pair to a Map.
+
+#### Structs
+indexterm:["Struct"]
  
 ### Help in the iex
 
