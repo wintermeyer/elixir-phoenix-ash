@@ -1210,7 +1210,7 @@ iex(5)> head
 ----
 <1> We pattern match the head of `shopping_list` to `first_product`. But we don't need the tail and indicate that by prefix it with a `_`.
 <2> Just double-checking. No, it is not there.
-<3> We can use just a `_` too. Using `_tail` instead of just a `_` often adds a bit of code readablity. 
+<3> We can use just a `_` too. Using `_tail` just improves a bit the code readablity. 
 So everybody knows that we don't need that value but can guess what it would be.
 
 #### Matching against a variable
