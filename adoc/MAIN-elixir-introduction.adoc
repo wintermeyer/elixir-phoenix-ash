@@ -40,6 +40,31 @@ TIP: The iex offers autocomplete when possible. So when in doubt press `TAB`.
 
 TIP: The iex offers a history too. To recycle the last command just press on the arrow-up key.
 
+#### Help in the iex
+
+The iex has a build in help function `h/1` which gives you access to some 
+basic documentation: 
+
+[source,elixir]
+----
+iex(2)> h length/1
+
+                                def length(list)                                
+
+  @spec length(list()) :: non_neg_integer()
+
+guard: true
+
+Returns the length of list.
+
+Allowed in guard tests. Inlined by the compiler.
+
+## Examples
+
+    iex> length([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    9
+----
+
 [[elixir-introduction-hello-world]]
 ### Hello world!
 
@@ -1271,6 +1296,7 @@ so we get a `MatchError` because it doesn't match.
 <6> Bingo! Now we got a working pattern match against a variable.
 
 #### Pattern Matching with Functions
+indexterm:["Pattern Matching with Functions"]
 
 Pattern matching is used everywhere in Elixir. You can even use it with Functions:
 
@@ -1305,6 +1331,7 @@ iex(4)> Area.circle(4)
 <3> We define a `circle/1` function which calls the `cirle/2` function with the `:normal` argument.
 
 ##### Functions with Guards
+indexterm:["Guards", "Functions with Guards"]
 
 Guards add some additional spices to pattern matching with functions. You can find 
 all the details at https://hexdocs.pm/elixir/1.6.5/guards.html
@@ -1370,27 +1397,55 @@ false
 ----
 <1> `_value` catches everything that was not caught by the first `is_a_number?/1` definition.
 
-### Help in the iex
+### Case
+indexterm:["Case"]
 
-The iex has a build in help function `h/1` which gives you access to some 
-basic documentation. 
+`case` is a controll structure which matches a given value to a couple of 
+matching cases until one matches.
+
+Let's assume we want to create a function that converts morse coded 
+numbers to integers:
 
 [source,elixir]
 ----
-iex(2)> h length/1
-
-                                def length(list)                                
-
-  @spec length(list()) :: non_neg_integer()
-
-guard: true
-
-Returns the length of list.
-
-Allowed in guard tests. Inlined by the compiler.
-
-## Examples
-
-    iex> length([1, 2, 3, 4, 5, 6, 7, 8, 9])
-    9
+iex(1)> defmodule Morse do
+...(1)>   def morse_to_number(input) do
+...(1)>     case input do <1>
+...(1)>       "-----" -> 0
+...(1)>       ".----" -> 1
+...(1)>       "..---" -> 2
+...(1)>       "...--" -> 3
+...(1)>       "....-" -> 4
+...(1)>       "....." -> 5
+...(1)>       "-...." -> 6
+...(1)>       "--..." -> 7
+...(1)>       "---.." -> 8
+...(1)>       "----." -> 9
+...(1)>       _ -> :error
+...(1)>     end
+...(1)>   end
+...(1)> end
+{:module, Morse,
+ <<70, 79, 82, 49, 0, 0, 6, 240, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 141,
+   0, 0, 0, 14, 12, 69, 108, 105, 120, 105, 114, 46, 77, 111, 114, 115, 101, 8,
+   95, 95, 105, 110, 102, 111, 95, 95, 7, ...>>, {:morse_to_number, 1}}
+iex(2)> Morse.morse_to_number("-....") <4>
+6
 ----
+<1> After `case` comes the value we want to check.
+<2> `"-----"` is the expression we want to match to return a 0.
+<3> `_` is the catch all in case nothing matched yet. In this case return an `:error` atom.
+<4> It works. :-)
+
+Of course we could solve this problem just with functions too. It's up to you 
+what makes most sense in the given situation.
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
