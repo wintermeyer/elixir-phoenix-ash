@@ -1,12 +1,12 @@
 [[elixir_introduction]]
 ## Elixir Introduction
 
-This chapter will teach you the absolut basics of Elixir. There is a lot more to
-learn and to understand about Elixir. The content of this chapter is just enough
-to use Phoenix.
+This chapter will teach you the absolut basics of Elixir. Just enough to become
+productive with Phoenix. There is a lot more to learn and to understand about
+Elixir.
 
-Buckle up. It is going to be a bumpy right. It's tough to teach you all the needed 
-Elixir knowledge in just one chapter.
+Buckle up. It is going to be a bumpy and sometimes boring ride. It's tough to
+teach all the needed Elixir knowledge in just one chapter.
 
 NOTE: All code examples are tested with Elixir version 10.2.
 
@@ -982,7 +982,7 @@ iex(3)> product_prices.banana <3>
 <2> Again, this syntax is easier to work with but only works for Atom keys.
 <3> Just checking what happens if the key doesn't exist in the Map.
 
-##### Functions
+##### Map Functions
 
 The Map module offers a bunch of useful functions. For a complete list have a 
 look at https://hexdocs.pm/elixir/Map.html
@@ -1068,7 +1068,7 @@ NOTE: Because Struct build on top of Maps they can be used with the same mechani
 indexterm:["Pattern Matching"]
 
 Pattern matching is super important in Elixir and we already used it without 
-knowing so.
+knowing so for binding values to variables.
 
 [source,elixir]
 ----
@@ -1166,6 +1166,24 @@ iex(6)> price2
 <1> We can just match one value.
 <2> Or we can match multiples. But we don't have to match the whole Map.
 
+#### Matching Stringparts
+indexterm:["Matching Stringparts"]
+
+Easiest explained with a code example:
+
+[source,elixir]
+----
+iex(1)> user = "Stefan Wintermeyer"
+"Stefan Wintermeyer"
+iex(2)> "Stefan " <> last_name = user
+"Stefan Wintermeyer"
+iex(3)> last_name
+"Wintermeyer"
+----
+
+NOTE: The left side of a `<>` operator in a match should always be a string.
+Otherwise Elixir can't verify it's size.
+
 #### Wildcard Matching
 indexterm:["Pattern Matching"]
 
@@ -1250,6 +1268,106 @@ variable `product`.
 so we get a `MatchError` because it doesn't match.
 <5> Let's bind "apple" to `product`.
 <6> Bingo! Now we got a working pattern match against a variable.
+
+#### Pattern Matching with Functions
+
+Pattern matching is used everywhere in Elixir. You can even use it with Functions:
+
+[source,elixir]
+----
+iex(1)> defmodule Area do
+...(1)>   def circle(:exact, radius) do <1>
+...(1)>     3.14159265359 * radius * radius
+...(1)>   end
+...(1)> 
+...(1)>   def circle(:normal, radius) do <2>
+...(1)>     3.14 * radius * radius
+...(1)>   end
+...(1)> 
+...(1)>   def circle(radius) do <3>
+...(1)>     circle(:normal, radius)
+...(1)>   end
+...(1)> end
+{:module, Area,
+ <<70, 79, 82, 49, 0, 0, 6, 40, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
+   0, 0, 0, 15, 11, 69, 108, 105, 120, 105, 114, 46, 65, 114, 101, 97, 8, 95,
+   95, 105, 110, 102, 111, 95, 95, 7, 99, ...>>, {:circle, 1}}
+iex(2)> Area.circle(:exact, 4)
+50.26548245744
+iex(3)> Area.circle(:normal, 4)
+50.24
+iex(4)> Area.circle(4)         
+50.24
+----
+<1> We define a `circle/2` function which matches if the first argument is the atom `:exact`.
+<2> We define a `circle/2` function which matches if the first argument is the atom `:normal`.
+<3> We define a `circle/1` function which calls the `cirle/2` function with the `:normal` argument.
+
+##### Functions with Guards
+
+Guards add some additional spices to pattern matching with functions. You can find 
+all the details at https://hexdocs.pm/elixir/1.6.5/guards.html
+
+Here are just some examples to show you the concept. Guards start with `when`:
+
+[source,elixir]
+----
+iex(1)> defmodule Law do
+...(1)>   def can_vote?(age) when is_integer(age) and age > 17 do <1>
+...(1)>     true
+...(1)>   end
+...(1)> 
+...(1)>   def can_vote?(age) when is_integer(age) do <2>
+...(1)>     false
+...(1)>   end
+...(1)> end
+{:module, Law,
+ <<70, 79, 82, 49, 0, 0, 5, 32, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
+   0, 0, 0, 15, 10, 69, 108, 105, 120, 105, 114, 46, 76, 97, 119, 8, 95, 95,
+   105, 110, 102, 111, 95, 95, 7, 99, 111, ...>>, {:can_vote?, 1}}
+iex(2)> Law.can_vote?(15)
+false
+iex(3)> Law.can_vote?(20)
+true
+iex(4)> Law.can_vote?("test") <3>
+** (FunctionClauseError) no function clause matching in Law.can_vote?/1    
+    
+    The following arguments were given to Law.can_vote?/1:
+    
+        # 1
+        "test"
+    
+    iex:2: Law.can_vote?/1
+----
+<1> This guard checks if the `age` argument is an integer and the value of it is bigger than 17.
+<2> This guard just checks if the `age` argument is an integer.
+<3> Since `"test"` is a string and not an integer no function matches this.
+
+Sometimes it is useful to have a catch all at the end:
+
+[source,elixir]
+----
+iex(1)> defmodule GuardExample do
+...(1)>   def is_a_number?(value) when is_integer(value) or is_float(value) do 
+...(1)>     true
+...(1)>   end
+...(1)> 
+...(1)>   def is_a_number?(_value) do <1>
+...(1)>     false
+...(1)>   end
+...(1)> end
+{:module, GuardExample,
+ <<70, 79, 82, 49, 0, 0, 5, 56, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 150,
+   0, 0, 0, 15, 19, 69, 108, 105, 120, 105, 114, 46, 71, 117, 97, 114, 100, 69,
+   120, 97, 109, 112, 108, 101, 8, 95, 95, ...>>, {:is_a_number?, 1}}
+iex(2)> GuardExample.is_a_number?(3)
+true
+iex(3)> GuardExample.is_a_number?(3.14)
+true
+iex(4)> GuardExample.is_a_number?("one")
+false
+----
+<1> `_value` catches everything that was not caught by the first `is_a_number?/1` definition.
 
 ### Help in the iex
 
