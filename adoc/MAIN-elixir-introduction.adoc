@@ -1334,7 +1334,7 @@ iex(4)> Area.circle(4)
 indexterm:["Guards", "Functions with Guards"]
 
 Guards add some additional spices to pattern matching with functions. You can find 
-all the details at https://hexdocs.pm/elixir/1.6.5/guards.html
+all the details at https://hexdocs.pm/elixir/guards.html
 
 Here are just some examples to show you the concept. Guards start with `when`:
 
@@ -1411,7 +1411,7 @@ numbers to integers:
 iex(1)> defmodule Morse do
 ...(1)>   def morse_to_number(input) do
 ...(1)>     case input do <1>
-...(1)>       "-----" -> 0
+...(1)>       "-----" -> 0 <2>
 ...(1)>       ".----" -> 1
 ...(1)>       "..---" -> 2
 ...(1)>       "...--" -> 3
@@ -1421,7 +1421,7 @@ iex(1)> defmodule Morse do
 ...(1)>       "--..." -> 7
 ...(1)>       "---.." -> 8
 ...(1)>       "----." -> 9
-...(1)>       _ -> :error
+...(1)>       _ -> :error <3>
 ...(1)>     end
 ...(1)>   end
 ...(1)> end
@@ -1527,3 +1527,169 @@ Banana
 ----
 <1> Those anonymous functions may run on totally different CPUs. The life in their own little universe.
 <2> The value of `product` has changed multiple times. But for `test1.()` it is the value from that point in time when we created the function.
+
+### Sigils
+indexterm:["Sigils"]
+
+Until now encapsulated Strings in double quotes and we haven't talked about char
+lists at all (IMO not needed for a beginners introduction). But there is one more 
+mechanism to represent texts. They are called `Sigils` and start with a `~` (tilde) 
+character which is followed by on letter which indicates what kind of sigil it is. 
+After that you can use a couple of different delimiters:
+
+[source,elixir]
+----
+~r/example text/
+~r|example text|
+~r"example text"
+~r'example text'
+~r(example text)
+~r[example text]
+~r{example text}
+~r<example text>
+----
+
+NOTE: Elixir provides different delimiters for sigils so that you can write
+literals without escaped delimiters.
+
+#### Regular expressions
+indexterm:["Regular expression"]
+
+`~r` marks a [regular expression](https://en.wikipedia.org/wiki/Regular_expression):
+
+[source,elixir]
+----
+iex(1)> regex = ~r/bcd/
+~r/bcd/
+iex(2)> "abcde" =~ regex
+true
+iex(3)> "efghi" =~ regex
+false
+iex(4)> regex = ~r/stef/i <1>
+~r/stef/i
+iex(5)> "Stefan" =~ regex
+true
+----
+<1> Modifier are supported too. For a complete list have a look at https://hexdocs.pm/elixir/Regex.html
+
+#### String
+indexterm:["String"]
+
+You can use the `~s` sigil to generate a string:
+
+[source,elixir]
+----
+iex(1)> example = ~s(WOW! "double" and 'single' quotes without escaping)
+"WOW! \"double\" and 'single' quotes without escaping"
+iex(2)> IO.puts(example)
+WOW! "double" and 'single' quotes without escaping
+:ok
+----
+
+Sigils support heredocs too. You can use triple double- or single-quotes as separatos:
+
+[source,elixir]
+----
+iex(1)> example_text = ~s"""
+...(1)> This is an example text.
+...(1)> Multiple lines are not a problem.
+...(1)> """
+"This is an example text.\nMultiple lines are not a problem.\n"
+iex(2)> IO.puts(example_text)
+This is an example text.
+Multiple lines are not a problem.
+
+:ok
+----
+
+#### Word lists
+indexterm:["Word lists"]
+
+The `~w` sigil is a useful way to generate lists of words:
+
+[source,elixir]
+----
+iex(1)> shopping_cart = ~w(apple orange banana)
+["apple", "orange", "banana"]
+iex(2)> shopping_cart_atoms = ~w(apple orange banana)a <1>
+[:apple, :orange, :banana]
+----
+<1> The `a` modifier tells Elixir to generate a list of atoms and not strings.
+
+#### Date and Time
+
+Elixir provides a couple of good to go time related [structs](Struct) which 
+all have their own sigil.
+
+##### Date
+indexterm:["Date"]
+
+Elixir provides a `%Date{}` struct that contains the following fields:
+
+- `year`
+- `month`
+- `day`
+- `calendar`
+
+With the `~D` sigil you can create new `%Date{}` struct:
+
+[source,elixir]
+----
+iex(1)> birthday = ~D[1973-03-23]
+~D[1973-03-23]
+iex(2)> birthday.day
+23
+iex(3)> birthday.month
+3
+iex(4)> birthday.year
+1973
+----
+
+##### Time
+indexterm:["Time"]
+
+Elixir provides a `%Time{}` struct that contains the following fields:
+
+- `hour`
+- `minute`
+- `second`
+- `microsecond`
+- `calendar`
+
+With the `~T` sigil you can create new `%Time{}` struct:
+
+[source,elixir]
+----
+iex(1)> now = ~T[09:29:00.0]
+~T[09:29:00.0]
+iex(2)> now.hour
+9
+----
+
+##### NaiveDateTime
+indexterm:["NaiveDateTime"]
+
+The `%NaiveDateTime{}` struct mixes `%Date{}` with `%Time{}`.
+
+With the `~N` sigil you can create new `%NaiveDateTime{}` struct:
+
+[source,elixir]
+----
+iex(1)> timestamp = ~N[2020-05-08 09:48:00]
+~N[2020-05-08 09:48:00]
+----
+
+##### DateTime
+indexterm:["DateTime"]
+
+The `%DateTime{}` struct adds a timezone to a `%NaiveDateTime{}`.
+
+With the `~U` sigil you can create new `%NaiveDateTime{}` struct:
+
+[source,elixir]
+----
+iex(4)> timestamp = ~U[2029-05-08 09:59:03Z]
+~U[2029-05-08 09:59:03Z]
+----
+
+NOTE: Find more information about timezones and DateTime at https://hexdocs.pm/elixir/DateTime.html
