@@ -1470,7 +1470,60 @@ iex(3)> if 1 == 1, do: "Bingo!"
 
 NOTE: Most Elixir developers prefer `case` over `if` or `unless`. 
  
- 
- 
- 
- 
+### Immutability
+indexterm:["Immutability"]
+
+Probably you have already heard about immutability in Elixir. What's that about?
+
+A variable points to a specific part of the memory where the data is stored. In
+many programming languages that data can be changed to update a variable. In
+Elixir it can not be changed. So that doesn't mean that you can't rebind a
+variable to a different value but that this new value gets a new piece of memory
+and doesn't overwrite the old memory. Once a function returns a result and
+therefor has finished it's work everything gets garbage collected (wiped blank).
+
+Why is that important at all? With immutable variables we can be absolutly sure
+that other processes can not change their values while running parallel tasks.
+That has a massive effect. At the end it means that your Phoenix application can
+run on multiple CPUs on the same server in parallel. It even means that your
+Phoenix application can share multiple CPUs on serveral nodes of a
+server-cluster in your data center. It makes Elixir extremly scalable and save.
+
+But doesn't that make your application slower? Funny thing: No. This way is 
+actually faster. It is not efficiant to change data in memory.
+
+But don't worry. It is not as complicated as it sounds. Everytime you use a
+variable it uses the value of that moment in time. It will not be effected/changed
+afterwords:
+
+[source,elixir]
+----
+iex(1)> product = "Orange"
+"Orange"
+iex(2)> test1 = fn -> IO.puts(product) end <1>
+#Function<21.126501267/0 in :erl_eval.expr/5>
+iex(3)> product = "Apple"
+"Apple"
+iex(4)> test2 = fn -> IO.puts(product) end
+#Function<21.126501267/0 in :erl_eval.expr/5>
+iex(5)> product = "Pineapple"
+"Pineapple"
+iex(6)> test3 = fn -> IO.puts(product) end
+#Function<21.126501267/0 in :erl_eval.expr/5>
+iex(7)> product = "Banana"
+"Banana"
+iex(8)> test1.() <2>
+Orange
+:ok
+iex(9)> test2.()
+Apple
+:ok
+iex(10)> test3.()
+Pineapple
+:ok
+iex(11)> IO.puts(product)
+Banana
+:ok
+----
+<1> Those anonymous functions may run on totally different CPUs. The life in their own little universe.
+<2> The value of `product` has changed multiple times. But for `test1.()` it is the value from that point in time when we created the function.
