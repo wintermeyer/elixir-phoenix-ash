@@ -1693,3 +1693,110 @@ iex(4)> timestamp = ~U[2029-05-08 09:59:03Z]
 ----
 
 NOTE: Find more information about timezones and DateTime at https://hexdocs.pm/elixir/DateTime.html
+
+### Recursion
+indexterm:["Recursion"]
+
+Recursions are magic and can be a dangerous trap at the same time. 
+Because of immutability they are more important in Elixir than in 
+other objectoriented programming languages.
+
+Let's write a function recursion function which provides a countdown:
+
+[source,elixir]
+----
+iex(1)> defmodule Example do
+...(1)>   def countdown(1) do <1>
+...(1)>     IO.puts "1" <2>
+...(1)>   end
+...(1)> 
+...(1)>   def countdown(n) when is_integer(n) and n > 1 do <3>
+...(1)>     IO.puts Integer.to_string(n) <4>
+...(1)>     countdown(n - 1) <5>
+...(1)>   end
+...(1)> end
+{:module, Example,
+ <<70, 79, 82, 49, 0, 0, 5, 188, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 166,
+   0, 0, 0, 17, 14, 69, 108, 105, 120, 105, 114, 46, 69, 120, 97, 109, 112, 108,
+   101, 8, 95, 95, 105, 110, 102, 111, 95, ...>>, {:countdown, 1}}
+iex(2)> Example.countdown(4) <6>
+4
+3
+2
+1
+:ok
+----
+<1> If `countdown/1` is called with the argument `1` this is the best match.
+<2> We call `IO.puts("1")` to print 1 to STDOUT.
+<3> If `countdown/1` is called with an integer bigger than 1 as an argument this function matches.
+<4> We either have to use `Integer.to_string(n)` (we could to a "#{n}" too) to print that integer to STDOUT.
+<5> We recursively decrese `n` by 1 and call `countdown/1` with that new number.
+<6> It works!
+
+Here's a different example where we calculate the sum of a list of integers:
+
+[source,elixir]
+----
+iex(1)> defmodule Example do
+...(1)>   def sum([]) do <1>
+...(1)>     0
+...(1)>   end
+...(1)> 
+...(1)>   def sum([head | tail]) do <2>
+...(1)>     head + sum(tail) <3>
+...(1)>   end
+...(1)> end
+{:module, Example,
+ <<70, 79, 82, 49, 0, 0, 5, 12, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 127,
+   0, 0, 0, 14, 14, 69, 108, 105, 120, 105, 114, 46, 69, 120, 97, 109, 112, 108,
+   101, 8, 95, 95, 105, 110, 102, 111, 95, ...>>, {:sum, 1}}
+iex(2)> Example.sum([10, 8, 12, 150]) <4>
+180
+iex(3)> [head | tail] = [150] <5>
+[150]
+iex(4)> tail
+[]
+----
+<1> The sum of an empty list is 0.
+<2> We pattern match a list and split it into a `head` and a `tail`.
+<3> We add the current `head` to the sum of the `tail`.
+<4> It works!
+<5> This is just to show how Elixir handles the case of a list with one element.
+
+You can use the same concept to transform every element of a list. Let's assume 
+we want to double the value of every element of a list:
+
+[source,elixir]
+----
+iex(1)> defmodule Example do
+...(1)>   def double([]) do <1>
+...(1)>     []
+...(1)>   end
+...(1)> 
+...(1)>   def double([head | tail]) do
+...(1)>     [head * 2 | double(tail)] <2>
+...(1)>   end
+...(1)> end
+{:module, Example,
+ <<70, 79, 82, 49, 0, 0, 5, 40, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 130,
+   0, 0, 0, 14, 14, 69, 108, 105, 120, 105, 114, 46, 69, 120, 97, 109, 112, 108,
+   101, 8, 95, 95, 105, 110, 102, 111, 95, ...>>, {:double, 1}}
+iex(2)> Ex
+Example      Exception    
+iex(2)> Example.double([10, 5, 999])
+[20, 10, 1998]
+----
+<1> We again start with the most simple match. An empty list. That will result in an empty list.
+<2> The `[head | tail]` syntax works both ways. We can use it to build a list too.
+
+#### To to find a good recursion
+
+Unless you are doing this every day you will see problems where you know that a
+recursion is a good solution but you just can't think of a recursion for it. 
+
+Let me share a pro tip for these situations: https://www.google.com and 
+https://stackoverflow.com are my life-saver in such situations. No embarrassment!
+
+During this book we will work with recursions. So you'll get a better feeling for 
+it.
+
