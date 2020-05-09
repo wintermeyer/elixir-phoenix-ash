@@ -1809,3 +1809,15 @@ https://stackoverflow.com are my life-saver in such situations. No embarrassment
 During this book we will work with recursions. So you'll get a better feeling for 
 it.
 
+### What else?
+
+This chapter just deals with the tip of the iceberg. It provides the basic
+knowledge that you need to tackle the Phoenix Framework. There is a lot more to
+learn. If you want to dive more into Elixir than I recommend the following
+books:
+
+- [Learn Functional Programming with Elixir](https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir) by Ulisses Almeida ([@ulissesalmeida
+](https://twitter.com/ulissesalmeida))
+In my opinion the best beginners book for Elixir.
+- [Programming Elixir 1.6](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas ([@pragdave](https://twitter.com/pragdave))
+Dave - as always - wrote a very book book which good into many details.
