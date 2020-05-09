@@ -65,11 +65,20 @@ Allowed in guard tests. Inlined by the compiler.
     9
 ----
 
+#### Run the code examples not in iex
+
+If you prefer to run all code examples not in the `iex` you can do so. Just put
+them in a file with the ending `.exs` and call that file from the command file
+with `elixir example.exs`.
+
+When tackling deployment I'll discuss how to compile the code.
+`elixir example.exs` does not compile it.
+
 [[elixir-introduction-hello-world]]
 ### Hello world!
 
-The classic! But never the less very important. You can use the function `IO.puts()`
-to print a string to standard output:
+The classic! But never the less very important. You can use the function
+`IO.puts()` to print a string to standard output:
 
 [source,elixir]
 ----
