@@ -1798,10 +1798,10 @@ iex(2)> Example.double([10, 5, 999])
 <1> We again start with the most simple match. An empty list. That will result in an empty list.
 <2> The `[head | tail]` syntax works both ways. We can use it to build a list too.
 
-#### To to find a good recursion
+#### How to tackle a recursion
 
-Unless you are doing this every day you will see problems where you know that a
-recursion is a good solution but you just can't think of a recursion for it. 
+Unless you are doing this every day you will get to problems where you know that a
+recursion is a good solution but you just can't think of a good recursion for it. 
 
 Let me share a pro tip for these situations: https://www.google.com and 
 https://stackoverflow.com are my life-saver in such situations. No embarrassment!
@@ -1818,6 +1818,8 @@ books:
 
 - [Learn Functional Programming with Elixir](https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir) by Ulisses Almeida ([@ulissesalmeida
 ](https://twitter.com/ulissesalmeida))
++
 In my opinion the best beginners book for Elixir.
 - [Programming Elixir 1.6](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas ([@pragdave](https://twitter.com/pragdave))
-Dave - as always - wrote a very book book which good into many details.
++
+Dave - as always - wrote a very book book which shines a light into many details.

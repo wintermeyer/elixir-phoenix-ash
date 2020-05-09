@@ -1,37 +1,39 @@
 ## Preface
 
-[Phoenix](https://www.phoenixframework.org) is very good but the initial
-learning curve is steep. Very steep! Most new Phoenix developers have never
-worked with [Elixir](https://elixir-lang.org) and it being their first
-functional programming language doesn't help either. As with so many other
-frameworks the usual how-tos and tutorials all start with "this is easy"
-followed by a way too complicated example of how to build something you have no
+[Phoenix](https://www.phoenixframework.org)'s learning curve is steep. Very
+steep! Most new Phoenix developers have never worked with
+[Elixir](https://elixir-lang.org) and it being often their first functional
+programming language doesn't help either. I am not going to sugar coat it with a
+"this is easy" start. I hate those "this is easy" how-tos and tutorials which
+provide by a way too complicated example of how to build something you have no
 intention to build anyway. Mostly leaving a couple of steps out because the
 author thought of them as obvious.
 
-* This book is written as a step by step guide. We start at zero. You are
-  expected to understand the basics of programming and HTML but other than that
-  you don't have to have any knowledge of Phoenix or Elixir.
-* All steps/lessons are linear. I try hard to avoid chicken-egg situations.
-* I'll work with bite size code examples. Everytime a new concept is introduced 
-  I'll include a callout (a number) to the code example which adds an explanation 
-  at the bottom of the example.
+* **This book is a step by step guide. We start at zero.** I present you a small
+  bite size pieces of code and add some callouts with additional information at
+  the bottom of it. Step by step. As few chicken-egg-problems as possible. You
+  are expected to understand the basics of programming and HTML but other than
+  that you don't have to have any knowledge of Phoenix or Elixir.
 * **I will not hesitate to oversimply stuff.** My aim is to get you productive
-  in the quickest time possible. There are other good books to learn Elixir
-  or OTP in detail once you are hooked.
+  in the quickest time possible. There are other resources to learn the details.
 * The web-applications in this book are not intended to become eye candy. We will
   not waste time and energy to make stuff beautiful.
 
 And we are not going to build one giant application in the course of the book.
 We tackle small problems which make sense within their realm. If a specific
-chapter doesn't interest you: Go ahead and skip it. Only one expection: If you
-have never worked with Elixir you have to start with <<elixir_introduction>>.
+chapter doesn't interest you: Go ahead and skip it. You can come back later 
+if needed.
+
+The chapter <<elixir_introduction>> is special. Because if you have never worked 
+with Elixir you want to read it. You don't have to work through all examples. 
+But you have to read it to get the basic ideas of the language.
 
 Stefan Wintermeyer
 
-PS: You can reach me by e-mail (sw@wintermeyer-consulting.de) or follow me on Twitter 
-([@wintermeyer](https://twitter.com/wintermeyer)). Don't be shy. Feedback always 
-helps to improve this book.
+PS: Please do send me feedback (good and bad) by e-mail
+(sw@wintermeyer-consulting.de) and follow me on Twitter
+([@wintermeyer](https://twitter.com/wintermeyer)). To receive positive feedback
+from a reader is a happy moment for any author!
 
 ### Finding Help
 
@@ -42,27 +44,25 @@ problem or a question. Here is my advise for those times:
 +
 `Phoenix` is not an easy to search for term. There are millions of
 construction companies with Phoenix in their name which can help you build a
-house but don't offer any programming help on their webpage. You often want to
+house but don't offer any programming help at all. You often want to
 add either `Framework` or `Elixir` to your search queries.
 
 * https://stackoverflow.com
 +
 My favorate spot to find help. There is a good chance somebody already had the
-same problem and it is answered on stackoverflow. If not you normally get
-surprisingly fast answers there for new questions.
+same problem and it is answered on stackoverflow.com. If not you normally get
+surprisingly fast answers for new questions.
 
 * Send me an e-mail to sw@wintermeyer-consulting.de
 +
 Feel free to send me an email if everything else doesn't help. Please add the
 used Elixir and Phoenix version and other information which helps (e.g.
-database and operation system). If possible, create a first a question on
+database and operation system). If possible, create first a question on
 stackoverflow.com and send me an email with the link of that question. By that
-I can answer it for you and for everybody who has the same problem in the
+I can answer it for you and for everybody else who has the same problem in the
 future.
 
 === Training and Consulting
 
 I offer Phoenix Framework beginners training and consulting. Onside and remote.
-Please send me an email to sw@wintermeyer-consulting.de and give me some
-background information (e.g. 1:1 training or a big group of attendees). I'll
-send you an offer.
+Please send me an email to sw@wintermeyer-consulting.de for an offer.
