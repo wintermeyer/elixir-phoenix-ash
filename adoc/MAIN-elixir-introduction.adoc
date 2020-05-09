@@ -737,9 +737,9 @@ iex(5)> Area.square(99)
 #### The Pipe Operator (|>)
 indexterm:["Pipe Operator", "|>"]
 
-Quite often one wants to use a couple of different functions in a row. 
-Let's assume you want to reverse a string and capitalize it afterwards. 
-Here's the code to do that:
+Quite often one wants to chain a couple of different functions in a row. Let's
+assume you want to reverse a string with `String.reverse/1` and capitalize it
+with `String.capitalize/1` afterwards. Here's the code to do that:
 
 [source,elixir]
 ----
@@ -754,11 +754,10 @@ iex(3)> String.capitalize(String.reverse("house")) <3>
 <2> `String.capitalize/1` capitalizes all the letters in a string.
 <3>  Connect the two functions.
 
-The problem with `String.capitalize(String.reverse("house"))` is the 
-lack of readability. It kind of works with just two functions but 
-what about one or two more functions in that line? Here comes the 
-pipe operator for the rescue. It is a piece of syntax sugar. Have 
-a look:
+The problem with `String.capitalize(String.reverse("house"))` is the lack of
+readability. It kind of works with just two functions but what about one or two
+more functions in that line? Here comes the pipe operator `|>` for the rescue.
+It is a piece of syntactic sugar. Have a look:
 
 [source,elixir]
 ----
@@ -1809,11 +1808,110 @@ https://stackoverflow.com are my life-saver in such situations. No embarrassment
 During this book we will work with recursions. So you'll get a better feeling for 
 it.
 
+### mix
+indexterm:["Recursion"]
+
+By now you understand the basics of Elixir. The next step is to create an
+application. In the Elixir ecosystem this is done with the (already installed)
+command-line interface (CLI) `mix`. Let's do that for a "Hello world!"
+application:
+
+[source,shell]
+----
+$ mix new hello_world
+* creating README.md
+* creating .formatter.exs
+* creating .gitignore
+* creating mix.exs
+* creating lib
+* creating lib/hello_world.ex
+* creating test
+* creating test/test_helper.exs
+* creating test/hello_world_test.exs
+
+Your Mix project was created successfully.
+You can use "mix" to compile it, test it, and more:
+
+    cd hello_world
+    mix test
+
+Run "mix help" for more commands.
+----
+
+The command ´mix new projectname` creates a new directory with the name `projectname` 
+and fills it with a default structure:
+
+[source,shell]
+----
+$ cd hello_world
+$ tree
+.
+├── README.md
+├── lib
+│   └── hello_world.ex
+├── mix.exs
+└── test
+    ├── hello_world_test.exs
+    └── test_helper.exs
+
+2 directories, 5 files
+----
+
+The Phoenix directory structure will be more complex but has the same core.
+
+### mix tasks
+indexterm:["mix tasks", "task]
+
+A task is the mechanism to start code with `mix`. For our "Hello world!"
+programm we have to create the directory `lib/mix/tasks` and create the file
+`lib/mix/tasks/start.ex` with this code:
+
+lib/mix/tasks/start.ex
+[source,elixir]
+----
+defmodule Mix.Tasks.Start do 
+  use Mix.Task
+
+  def run(_) do <1>
+    IO.puts "Hello world!"
+  end
+end
+----
+<1> The `run(_)` function is the default function which gets called automatically.
+
+Now we can start the `mix start` task:
+
+[source,shell]
+----
+$ mix start
+Compiling 1 file (.ex)
+Generated hello_world app
+Hello world!
+----
+
+The `.ex` file gets compiled and the `start` task gets run. The compile is only 
+done when needed. If we call `mix start` a second time no compile is needed:
+
+[source,shell]
+----
+$ mix start
+Hello world!
+----
+
+Obviously `mix` as a topic is much more complex. In this section I just wanted 
+to show you the very basic idea of mix. So that you know where to search if you 
+want to know what happens if you do a `mix server` with a Phoenix application.
+
 ### What else?
 
 This chapter just deals with the tip of the iceberg. It provides the basic
-knowledge that you need to tackle the Phoenix Framework. There is a lot more to
-learn. If you want to dive more into Elixir than I recommend the following
+knowledge that you need to start with the Phoenix Framework. There is a lot more
+to learn. But I wouldn't worry too much about that right now. You are good to 
+go for the next chapter of this book. Have fun!
+
+#### Elixir Books
+
+If you want to dive more into Elixir than I recommend the following
 books:
 
 - [Learn Functional Programming with Elixir](https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir) by Ulisses Almeida ([@ulissesalmeida
