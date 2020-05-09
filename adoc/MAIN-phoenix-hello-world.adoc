@@ -1,0 +1,302 @@
+[[phoenix-hello-world]]
+## Phoenix Hello World
+
+For our very first Phoenix Framework "Hello World!" example create a new 
+Phoenix application without a database connector (that's the `no-ecto` part):
+
+[source,shell]
+----
+$ mix phx.new hello_world --no-ecto
+* creating hello_world/config/config.exs
+* creating hello_world/config/dev.exs
+* creating hello_world/config/prod.exs
+...
+Fetch and install dependencies? [Yn] Y <1>
+* running mix deps.get
+* running mix deps.compile
+* running cd assets && npm install && node node_modules/webpack/bin/webpack.js --mode development
+
+We are almost there! The following steps are missing:
+
+    $ cd hello_world
+
+Start your Phoenix app with:
+
+    $ mix phx.server
+
+You can also run your app inside IEx (Interactive Elixir) as:
+
+    $ iex -S mix phx.server
+----
+<1> You always want to press `Y` here. And yes, it sometimes takes for ever.
+
+After that we `cd hello_world` into the new directory and fire up the Phoenix server 
+with `mix phx.server`
+
+[source,shell]
+----
+$ cd hello_world
+$ mix phx.server
+Compiling 13 files (.ex) <1>
+Generated hello_world app
+[info] Running HelloWorldWeb.Endpoint with cowboy 2.7.0 at 0.0.0.0:4000 (http)
+[info] Access HelloWorldWeb.Endpoint at http://localhost:4000 <2>
+
+webpack is watching the files… <3>
+
+Hash: d1d9f443badbfcdce354
+Version: webpack 4.41.5
+Time: 852ms
+Built at: 2020-05-09 16:22:36
+                Asset       Size  Chunks                   Chunk Names
+       ../css/app.css   10.6 KiB     app  [emitted]        app
+   ../css/app.css.map   13.4 KiB     app  [emitted] [dev]  app
+       ../favicon.ico   1.23 KiB          [emitted]        
+../images/phoenix.png   13.6 KiB          [emitted]        
+        ../robots.txt  202 bytes          [emitted]        
+               app.js   7.89 KiB     app  [emitted]        app
+           app.js.map   9.41 KiB     app  [emitted] [dev]  app
+Entrypoint app = ../css/app.css app.js ../css/app.css.map app.js.map
+[0] multi ./js/app.js 28 bytes {app} [built]
+[../deps/phoenix_html/priv/static/phoenix_html.js] 2.21 KiB {app} [built]
+[./css/app.scss] 39 bytes {app} [built]
+[./js/app.js] 490 bytes {app} [built]
+    + 2 hidden modules
+Child mini-css-extract-plugin node_modules/css-loader/dist/cjs.js!node_modules/sass-loader/dist/cjs.js!css/app.scss:
+    Entrypoint mini-css-extract-plugin = *
+    [./node_modules/css-loader/dist/cjs.js!./css/phoenix.css] 10.4 KiB {mini-css-extract-plugin} [built]
+    [./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./css/app.scss] 939 bytes {mini-css-extract-plugin} [built]
+        + 1 hidden module
+----
+<1> Source-Code which hasn't been compiled yet will be compiled now.
+<2> Here you see the URL which you can enter in your browser: http://localhost:4000
+<3> For now we just don't care about that webpack JavaScript and CSS stuff. Phoenix is doing a fine job in not bothering us with that.
+
+Now it's time to fire up the webbrowser with the URL http://localhost:4000
+
+image::images/hello-world-first-view.png[http://localhost:4000]
+
+On the terminal you can see the log output:
+
+[source,shell]
+----
+[info] GET /
+[debug] Processing with HelloWorldWeb.PageController.index/2
+  Parameters: %{}
+  Pipelines: [:browser]
+[info] Sent 200 in 44ms
+----
+
+Now we hit reload on the browser and watch the log output:
+
+[source,shell]
+----
+[info] GET /
+[debug] Processing with HelloWorldWeb.PageController.index/2
+  Parameters: %{}
+  Pipelines: [:browser]
+[info] Sent 200 in 517µs
+----
+
+517µs! WOW! Half a millisecond on my old laptop. That must be the speed
+everybody is talking about.
+
+Let's open `lib/hello_world_web/router.ex` which holds all the routing
+configuration and have a look around:
+
+lib/hello_world_web/router.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.Router do
+  use HelloWorldWeb, :router
+
+  pipeline :browser do <1>
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_flash
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
+  pipeline :api do <2>
+    plug :accepts, ["json"]
+  end
+
+  scope "/", HelloWorldWeb do <3>
+    pipe_through :browser <4>
+
+    get "/", PageController, :index <5>
+  end
+  [...]
+----
+<1> This part takes care of all the generic stuff (e.g. session handling) in the beginning. 
+<2> This part takes care of `json` requests. We don't need that now.
+<3> This part is interesting for us now. It is triggered for all requests which start with `/`.
+<4> Runs through all the generic stuff.
+<5> Bingo. That is the URL we opened in our browser. The router pipes that to `index` function in the `PageController` which is actually the module `HelloWorldWeb.PageController`.
+
+The module `HelloWorldWeb.PageController` is defined in the file `lib/hello_world_web/controllers/page_controller.ex`. Time for us to have a look:
+
+lib/hello_world_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.PageController do
+  use HelloWorldWeb, :controller
+
+  def index(conn, _params) do <1>
+    render(conn, "index.html") <2>
+  end
+end
+----
+<1> This is us. The router piped the request to this `index/2` function. 
+`conn` is a struct which contains the request.
+<2> The `render/2` function is used to render the template `index.html`.
+
+That `index.html` template is actually the file 
+`lib/hello_world_web/templates/page/index.html.eex`. Please open it and change 
+the content to this:
+
+lib/hello_world_web/templates/page/index.html.eex
+[source,html]
+----
+<h1>Hello world!</h1>
+----
+
+And after you saved that file you didn't even have to manually reload the page. 
+Phoenix took care of that because you are currently working in the development 
+environment.
+
+image::images/hello-world-hello-world.png[http://localhost:4000]
+
+You see the `Hello world!` H1. But you also see the default header. That code 
+can be found at `lib/hello_world_web/templates/layout/app.html.eex`
+
+lib/hello_world_web/templates/layout/app.html.eex
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en"> <1>
+  <head> 
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>HelloWorld · Phoenix Framework</title> <2>
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/> <3>
+    <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+  </head>
+  <body>
+    <header> <4>
+      <section class="container">
+        <nav role="navigation">
+          <ul>
+            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
+            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+              <li><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
+            <% end %>
+          </ul>
+        </nav>
+        <a href="https://phoenixframework.org/" class="phx-logo">
+          <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
+        </a>
+      </section>
+    </header>
+    <main role="main" class="container">
+      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p> <5>
+      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+      <%= @inner_content %> <6>
+    </main>
+  </body>
+</html>
+----
+<1> You might want to change the language here in case this webpage is going to be in an other language than English.
+<2> You probably want to change this to a better `<title>`.
+<3> Phoenix's asset management takes care of the CSS and JavaScript. No need to worry for now.
+<4> This is the navigation part you are seeing on the top of the page.
+<5> This part renders so called flash messages. We'll get to that later.
+<6> This is the line where the content of the template get's included.
+
+IMPORTANT: `<%= @foobar %>` prints the value of `@foobar` into that place in the HTML file. The `=` is important. Otherwise the Elixir code would run but the output would not be included in the HTML.
+
+First let's get rid of that default top navigation. Please update `app.html.eex` to this:
+
+lib/hello_world_web/templates/layout/app.html.eex
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>HelloWorld · Phoenix Framework</title>
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+    <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+  </head>
+  <body>
+    <main role="main" class="container">
+      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+      <%= @inner_content %>
+    </main>
+  </body>
+</html>
+----
+
+And let's change the `index.html.eex` file to:
+
+lib/hello_world_web/templates/page/index.html.eex
+[source,html]
+----
+<h1>Hello world!</h1>
+
+<table>
+  <tr>
+    <td>Host:</td><td><%= @conn.host %></td></tr>
+    <td>Port:</td><td><%= @conn.port %></td></tr>
+  </tr>
+</table>
+----
+
+Again a manual reload is not necessary. Phoenix takes care of that.
+
+image::images/hello-world-conn-example.png[http://localhost:4000]
+
+You see that `render(conn, "index.html")` from the controller made sure 
+we have access to the `conn` struct. We only have to add a `@` which makes 
+it a '@conn' in the template.
+
+hmmm... than we probably can pipe other information too from the controller 
+into the template. Let's try this:
+
+lib/hello_world_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.PageController do
+  use HelloWorldWeb, :controller
+
+  def index(conn, _params) do
+    headline = "This is a test headline" <1>
+
+    conn
+    |> assign(:headline, headline) <2>
+    |> render("index.html")
+  end
+end
+----
+<1> We define the variable headline.
+<2> We use `Plug.Conn.assign/2` to pipe the `headline` variable into the `conn` struct. 
+This will make `@headline` available in the template. We can use `assign/2` insteat of `Plug.Conn.assign/2` because `Phoenix.Controller` imports `Plug.Conn` automatically.
+
+lib/hello_world_web/templates/page/index.html.eex
+[source,html]
+----
+<h1><%= @headline %></h1> <1>
+
+<table>
+  <tr>
+    <td>Host:</td><td><%= @conn.host %></td></tr>
+    <td>Port:</td><td><%= @conn.port %></td></tr>
+  </tr>
+</table>
+----
+<1> Here we use the `@headline` variable.
