@@ -520,3 +520,134 @@ lib/hello_world_web/templates/page/pong.html.eex
 image::images/ping_with_pong_link.png[http://localhost:4000/ping]
 
 Now you can play HTML Ping-Pong.
+
+[[game-controller]]
+### Move Ping-Pong to a GameController
+
+I am happy with our HTML ping-pong game but having it in the `PageController`
+doesn't feel right. We should create a `GameController` and move it to that new 
+home. 
+
+First we change the routes:
+
+lib/hello_world_web/router.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.Router do
+  [...]
+
+  scope "/", HelloWorldWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+
+    get "/game/ping", GameController, :ping <1>
+    get "/game/pong", GameController, :pong
+  end
+
+  [...]
+----
+<1> Of course we don't have to change the URL path but to I think `/game/ping` makes sense. It calls `:ping` in the `GameController`.
+
+We have to create a new `lib/hello_world_web/controllers/game_controller.ex`
+file and move `ping/2` and `pong/2` from the `PageController` to it.
+
+lib/hello_world_web/controllers/game_controller.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.GameController do
+  use HelloWorldWeb, :controller
+
+  def ping(conn, _params) do
+    render(conn, "ping.html")
+  end
+
+  def pong(conn, _params) do
+    render(conn, "pong.html")
+  end  
+end
+----
+
+And here the cleaned up PageController:
+
+lib/hello_world_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.PageController do
+  use HelloWorldWeb, :controller
+
+  def index(conn, _params) do
+    headline = "This is a test headline"
+    {:ok, timestamp} = DateTime.now("Etc/UTC")
+
+    conn
+    |> assign(:headline, headline)
+    |> assign(:timestamp, timestamp)
+    |> render("index.html")
+  end 
+end
+----
+
+Lastly we have to create a new template directory and move the templates from
+the `page` to the new `game` directory:
+
+[source,shell]
+----
+$ mkdir lib/hello_world_web/templates/game
+$ mv lib/hello_world_web/templates/page/p?ng.html.eex lib/hello_world_web/templates/game/
+$ tree lib/hello_world_web/templates/
+lib/hello_world_web/templates/
+├── game
+│   ├── ping.html.eex
+│   └── pong.html.eex
+├── layout
+│   └── app.html.eex
+└── page
+    └── index.html.eex
+
+3 directories, 4 files
+----
+
+We haven't talked about the Views yet and I am not going to do so now. Let's just say 
+that we need a View to have access to a template. Therefor we need to create a new `GameView`.
+
+lib/hello_world_web/views/game_view.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.GameView do
+  use HelloWorldWeb, :view
+end
+----
+
+Now everything should just work. Let's open `http://localhost:4000/game/ping` in the browser.
+
+image::images/game_ping_no_action_pong.png[http://localhost:4000/game/ping]
+
+Ups ... the error says "no action :pong for
+HelloWorldWeb.Router.Helpers.page_path/2.". Ahh! We haven't updated the links in
+the templates. They still show to the now not existing `pong` action in the
+`PageController`. Easy fix:
+
+lib/hello_world_web/templates/game/ping.html.eex
+[source,html]
+----
+<h1>Ping</h1>
+
+<p>
+<%= link "Pong!", to: Routes.game_path(@conn, :pong) %>
+</p>
+----
+
+lib/hello_world_web/templates/game/pong.html.eex
+[source,html]
+----
+<h1>Pong</h1>
+
+<p>
+<%= link "Ping!", to: Routes.game_path(@conn, :ping) %>
+</p>
+----
+
+Now everything is working:
+
+image::images/ping_game_controller.png[http://localhost:4000/game/ping]
