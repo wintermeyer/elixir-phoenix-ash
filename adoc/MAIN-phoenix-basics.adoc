@@ -651,3 +651,83 @@ lib/hello_world_web/templates/game/pong.html.eex
 Now everything is working:
 
 image::images/ping_game_controller.png[http://localhost:4000/game/ping]
+
+### Roundup new pages
+
+In Phoenix for every webpage we have to take care of these components:
+
+- A route in the `lib/hello_world_web/router.ex`
+- A controller (e.g. `lib/hello_world_web/controllers/page_controller.ex`)
+- An action (function) in that controller (e.g. `ping/2`)
+- A view (e.g. `lib/hello_world_web/views/game_view.ex`)
+- A template (e.g. `lib/hello_world_web/templates/game/ping.html.eex`)
+
+### Static files
+indexterm:["Static files"]
+
+Of course any webapplication doesn't only have dynamic webpages but also 
+some static files. The best example would be a `robots.txt`or a `favicon.ico` 
+file. There is the `assets/static/` directory where we can put those files. 
+By default the following files are already in that directory:
+
+[source,shell]
+----
+$ tree assets/static/
+assets/static/
+├── favicon.ico
+├── images
+│   └── phoenix.png
+└── robots.txt
+----
+
+They get delivered by the webserver without any additional interaction 
+within the Phoenix application. But adding a file to that directory is 
+not enough. You have to whitelist it. Assuming we add a `ads.txt` 
+file into the `assets/static/` directory. Than we have to update the 
+`lib/hello_world_web/endpoint.ex` file accordingly:
+
+lib/hello_world_web/endpoint.ex
+[source,elixir]
+----
+[...]
+
+plug Plug.Static,
+  at: "/",
+  from: :hello_world,
+  gzip: false,
+  only: ~w(css fonts images js favicon.ico robots.txt ads.txt) <1>
+
+[...]
+----
+<1> All static files or directories have to be whitelisted in this list.
+
+#### Images
+
+Images are a special case of static files. They can be stored in the 
+`assets/static/images/` directory which is already whitelisted to be ok 
+for static files.
+
+In every fresh Phoenix installation you'll find the Phoenix logo file at 
+`assets/static/images/phoenix.png`. So you can use that with our "Hello world!" 
+application and use `Routes.static_path(@conn, "/images/phoenix.png")` to show 
+it:
+
+lib/hello_world_web/templates/page/index.html.eex
+[source,html]
+----
+<h1><%= @headline %></h1>
+
+<pre>Timestamp: <%= @timestamp %></pre>
+
+<table>
+  <tr>
+    <td>Host:</td><td><%= @conn.host %></td></tr>
+    <td>Port:</td><td><%= @conn.port %></td></tr>
+  </tr>
+</table>
+
+<img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" /> <1>
+----
+<1> `Routes.static_path/2` returns the complete route of the static file.
+
+image::images/hello-world-with-phoenix-logo.png[http://localhost:4000/game/ping]
