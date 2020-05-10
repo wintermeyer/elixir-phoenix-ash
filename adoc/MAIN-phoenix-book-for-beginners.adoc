@@ -22,4 +22,4 @@ endif::[]
 
 include::MAIN-preface.adoc[]
 include::MAIN-elixir-introduction.adoc[]
-include::MAIN-phoenix-hello-world.adoc[]
+include::MAIN-phoenix-basics.adoc[]

@@ -1,5 +1,16 @@
+[[Phoenix's Basics]]
+## Phoenix's Basics
+
+Phoenix follows the Model-View-Controller (MVC) architecture. If you are not
+familiar with that: Just follow my lead. MVC is just a fixed flow of what goes
+where. You are not forced to follow it but it makes live easier if you do. After
+a couple of examples you'll get a feeling for it.
+
+In this chapter I'll show how you can create simple webpages which have some
+programming logic. But we will not touch the database yet. Step by step!
+
 [[phoenix-hello-world]]
-## Phoenix Hello World
+### Phoenix Hello World
 
 For our very first Phoenix Framework "Hello World!" example create a new 
 Phoenix application without a database connector (that's the `no-ecto` part):
@@ -300,3 +311,212 @@ lib/hello_world_web/templates/page/index.html.eex
 </table>
 ----
 <1> Here we use the `@headline` variable.
+
+After saving that you will see a difference in the browser:
+
+image::images/hello-world-conn-assign-example.png[http://localhost:4000]
+
+[[a-static-clock]]
+### A static Clock
+
+Until now our page is very static. The easiest way to add something always 
+changing is to display the current time. We setup the needed programming 
+logic in the controller:
+
+lib/hello_world_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.PageController do
+  use HelloWorldWeb, :controller
+
+  def index(conn, _params) do
+    headline = "This is a test headline"
+    {:ok, timestamp} = DateTime.now("Etc/UTC") <1>
+
+    conn
+    |> assign(:headline, headline)
+    |> assign(:timestamp, timestamp)
+    |> render("index.html")
+  end
+end
+----
+<1> More information about 'DateTime.now/1' at https://hexdocs.pm/elixir/DateTime.html#now/2
+
+After that we change the content of the template to display `@timestamp`.
+
+lib/hello_world_web/templates/page/index.html.eex
+[source,html]
+----
+<h1><%= @headline %></h1>
+
+<pre>Timestamp: <%= @timestamp %></pre> <1>
+
+<table>
+  <tr>
+    <td>Host:</td><td><%= @conn.host %></td></tr>
+    <td>Port:</td><td><%= @conn.port %></td></tr>
+  </tr>
+</table>
+----
+<1> The time will not be formated. And you'll see that I wrote this part of the
+book on a Sunday morning.
+
+Now we see the current time in the browser. Reload as often as you like to 
+see the differences.
+
+image::images/hello-world-time-now.png[http://localhost:4000]
+
+And just for fun have a look at the log:
+
+[source,shell]
+----
+[info] GET /
+[debug] Processing with HelloWorldWeb.PageController.index/2
+  Parameters: %{}
+  Pipelines: [:browser]
+[info] Sent 200 in 434µs <1>
+----
+<1> WOW! I'll never get tired of reading those low µs numbers in a Phoenix log.
+
+[[ping-pong]]
+### Ping-Pong
+
+The web consists of webpages which link to each other. So the next step on our
+venture is to create a `http://localhost:4000/ping` and
+`http://localhost:4000/pong` and connect the both of them via links.
+
+Our first stop is the `lib/hello_world_web/router.ex` file. Here we have to 
+define how the webpages are accessable.
+
+lib/hello_world_web/router.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.Router do
+  [...]
+
+  scope "/", HelloWorldWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/ping", PageController, :ping <1>
+    get "/pong", PageController, :pong <2>
+  end
+
+  [...]
+----
+<1> Sets the route for `http://localhost:4000/ping`
+<2> Sets the route for `http://localhost:4000/pong`
+
+We haven't created any template yet but let's try to open the page 
+`http://localhost:4000/ping` in the browser:
+
+image::images/pagecontroller_ping_is_undefined.png[http://localhost:4000/ping]
+
+NOTE: Yes, those error pages look scary. But 9 out of 10 times they say right 
+away what is missing or where you should start to search for the bug.
+
+Phoenix takes us by the hand and says 
+`function HelloWorldWeb.PageController.ping/2 is undefined or private`. 
+That means we have to open the `PageController` in the editor and add those 
+functions:
+
+lib/hello_world_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule HelloWorldWeb.PageController do
+  use HelloWorldWeb, :controller
+
+  def index(conn, _params) do
+    headline = "This is a test headline"
+    {:ok, timestamp} = DateTime.now("Etc/UTC") <1>
+
+    conn
+    |> assign(:headline, headline)
+    |> assign(:timestamp, timestamp)
+    |> render("index.html")
+  end
+
+  def ping(conn, _params) do <1>
+    render(conn, "ping.html")
+  end
+
+  def pong(conn, _params) do <2>
+    render(conn, "pong.html")
+  end
+end
+----
+<1> Voilá, the `ping/2` function.
+<2> And the `pong/2` function.
+
+Saving that file will result in new error:
+
+image::images/could_not_render_ping_html.png[http://localhost:4000]
+
+The error message says "Could not render "ping.html" for HelloWorldWeb.PageView,
+please ... define a template at "lib/hello_world_web/templates/page/*".". That's
+easy. We create a new template `lib/hello_world_web/templates/page/ping.html.eex`.
+
+lib/hello_world_web/templates/page/ping.html.eex
+[source,html]
+----
+<h1>Ping</h1>
+----
+
+Perfect. What a nice pong we have created page:
+
+image::images/ping.png[http://localhost:4000/ping]
+
+The missing pong part is easy:
+
+lib/hello_world_web/templates/page/pong.html.eex
+[source,html]
+----
+<h1>Pong</h1>
+----
+
+But for Ping-Pong we need a `href` link between both pages. We could add
+one manually with `<a href="/pong">Pong</a>` but that would not be very clean. 
+
+Let's have a look at the existing routes for the PageController. For that 
+we either stop the Phoenix server with `CTRL-C` (twice!) or we open an other 
+terminal.
+
+[source,shell]
+----
+$ mix phx.routes | grep PageController
+    page_path  GET  /       HelloWorldWeb.PageController :index
+    page_path  GET  /ping   HelloWorldWeb.PageController :ping
+    page_path  GET  /pong   HelloWorldWeb.PageController :pong <1>
+----
+<1> For us important is the `page_path` and the `:pong`.
+
+With that information we can use the `link` helper (which is already 
+awailable) to create that link:
+indexterm:["Link"]
+
+lib/hello_world_web/templates/page/ping.html.eex
+[source,html]
+----
+<h1>Ping</h1>
+
+<p>
+<%= link "Pong!", to: Routes.page_path(@conn, :pong) %> <1>
+</p>
+----
+<1> `page_path` and `:pong` become `Routes.page_path(@conn, :pong)` for this.
+
+We do the same on the pong page:
+
+lib/hello_world_web/templates/page/pong.html.eex
+[source,html]
+----
+<h1>Pong</h1>
+
+<p>
+<%= link "Ping!", to: Routes.page_path(@conn, :ping) %> <1>
+</p>
+----
+
+image::images/ping_with_pong_link.png[http://localhost:4000/ping]
+
+Now you can play HTML Ping-Pong.
