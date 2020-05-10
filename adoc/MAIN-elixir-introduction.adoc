@@ -1902,6 +1902,16 @@ Obviously `mix` as a topic is much more complex. In this section I just wanted
 to show you the very basic idea of mix. So that you know where to search if you 
 want to know what happens if you do a `mix server` with a Phoenix application.
 
+### mix format
+indexterm:["mix tasks", "task]
+
+You are going to love `mix format`. You can call it in the root directory of 
+your Phoenix application and it will autoformat all your Elixir source code 
+files.
+
+You should use `mix format` everytime you are going to commit code to a 
+repository.
+
 ### What else?
 
 This chapter just deals with the tip of the iceberg. It provides the basic
