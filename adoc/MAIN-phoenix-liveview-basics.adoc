@@ -483,6 +483,8 @@ end
 <5> `update/3` is used to call a capture function to increase the value of the `counter` by 1.
 <6> We reset the `counter` to 0 here.
 
+image::images/liveview_counter.png[http://localhost:4000/counter]
+
 #### assign vs update
 indexterm:["assign (LiveView)", "update (LiveView)"]
 
