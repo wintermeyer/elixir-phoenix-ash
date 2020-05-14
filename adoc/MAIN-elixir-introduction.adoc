@@ -370,11 +370,11 @@ iex(5)> total_price.(10, vat)
 <4> Example calculation which uses the `food_vat` function as the second parameter.
 
 ### The & operator
-indexterm:["% operator"]
+indexterm:["& operator", "Capture operator", "Capture syntax"]
 
 It is likely that you will stumble upon the `&` operator while searching
 solutions for Elixir problems. It is a so called *capture operator*. It 
-is a syntactical shortcut.
+is a syntactical shortcut for anonymous functions.
 
 [source,elixir]
 ----

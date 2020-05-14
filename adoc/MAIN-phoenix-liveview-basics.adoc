@@ -24,7 +24,10 @@ having to rely on JavaScript.
 During this chapter I'll show you a couple of examples. They are meant to give 
 you an idea of the possiblities. If LiveView is the right choice for your 
 project you'll have to invest more time afterwards with experiements and the 
-lecture of https://github.com/phoenixframework/phoenix_live_view
+lecture of 
+
+- https://github.com/phoenixframework/phoenix_live_view
+- https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html
 
 ### The Light Switch
 
@@ -111,13 +114,14 @@ end
 ====
 We use the `~L` sigil to store the template code in this controller. It is
 easier for the purpose of this document. For bigger templates it makes more
-sense to store them in their own file. That would be named
-`lib/demo_web/live/light_live.html.leex` in this case and include
-`<h1>The light is off.</h1>`. When you have that file you don't need the
-`render/1` function at all.
+sense to store them in their own file. That would be a LiveEEx Templates
+(`.leex` extension) and would be named `lib/demo_web/live/light_live.html.leex`
+in this case and include `<h1>The light is off.</h1>`. When you have that file
+you don't need the `render/1` function at all.
 
 Have a look at https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html for more information.
 ====
+indexterm:["LiveEEx Templates"]
 
 Now we can open the browser and open the URL `http://localhost:4000/light`
 
@@ -414,3 +418,96 @@ end
 Fire up the webserver with `mix phx.server` and open http://localhost:4000/clock in your browser.
 
 image::images/liveview-clock.png[http://localhost:4000/clock]
+
+### A Counter
+
+This LiveView example will generate a counter website. It starts with 0 and each
+time you click on a button it will increase by one.
+
+[source,shell]
+----
+$ mix phx.new demo --live --no-ecto
+[...]
+$ cd demo
+----
+
+lib/demo_web/router.ex
+[source,elixir]
+----
+scope "/", DemoWeb do
+  pipe_through :browser
+
+  live "/", PageLive, :index
+  live "/counter", CounterLive <1>
+end
+----
+<1> The counter will be available at http://localhost:4000/counter
+
+Now we have to create the `lib/demo_web/live/counter_live.ex` file and fill it
+with live:
+
+lib/demo_web/live/counter_live.ex
+[source,elixir]
+----
+defmodule DemoWeb.CounterLive do
+  use DemoWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    socket = assign(socket, :counter, 0) <1>
+    {:ok, socket}
+  end
+
+  def render(assigns) do
+    ~L"""
+    <h1>Current count: <%= @counter %></h1> <2>
+    <button phx-click="inc">+1</button> <3>
+    <button phx-click="reset">Reset</button> <4>
+    """
+  end
+
+  def handle_event("inc", _, socket) do
+    socket = update(socket, :counter, &(&1 + 1)) <5>
+    {:noreply, socket}
+  end
+
+  def handle_event("reset", _, socket) do
+    socket = assign(socket, :counter, 0) <6>
+    {:noreply, socket}
+  end
+end
+----
+<1> We assign the value of 0 to `counter`.
+<2> Display the value of `@counter`.
+<3> Increase by 1 button.
+<4> Reset the counter to 0 button.
+<5> `update/3` is used to call a capture function to increase the value of the `counter` by 1.
+<6> We reset the `counter` to 0 here.
+
+#### assign vs update
+indexterm:["assign (LiveView)", "update (LiveView)"]
+
+In the counter example we use this code with an `update/3` function:
+
+[source,elixir]
+----
+def handle_event("inc", _, socket) do
+  socket = update(socket, :counter, &(&1 + 1))
+  {:noreply, socket}
+end
+----
+
+We could achieve the same result with this code which uses the `assign/3`
+function. But for that we'd have to get the value of `counter` via the 
+`socket` struct:
+
+[source,elixir]
+----
+def handle_event("inc", _, socket) do
+  counter = socket.assigns.counter + 1
+  socket = assign(socket, :counter, counter)
+  {:noreply, socket}
+end
+----
+
+Both versions work fine. Of course the `update/3` is a bit more elegant. But you
+will get no medal for using it. Use the function you feel more comfortable with.
