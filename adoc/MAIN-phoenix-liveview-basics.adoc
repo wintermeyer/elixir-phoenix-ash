@@ -1,11 +1,30 @@
 [[phoenix-liveview-basics]]
 ## Phoenix LiveView Basics
 
-LiveView is an interesting alternative to single page JavaScript applications which get and post data from and to the server via JSON. 
-Of course that can be done with Phoenix too. But it always involves 
-some sort of JavaScript framework which adds to your tech stack. 
-LiveView is a one-stop-shop for these kinds of functionality. And 
-you don't even have to learn JavaScript to use it!
+LiveView is an interesting alternative to single-page application (SPA) written
+with JavaScript which communicate with the server via JSON and change the
+content of the page by themself. Adding a JavaScript Framework to create a SPA 
+is adding an other element to your technology stack which has consequences. 
+Creating the same functionality with LiveView keeps your technology stack light 
+and you don't add one more programming language (JavaScript) to your development 
+process.
+
+Of course LiveView does use JavaScript to do it's magic but that is done for 
+you. You don't have to code any JavaScript yourself. The good to go LiveView 
+JavaScript connects via a websocket to your Phoenix application and both 
+communicate with each other. On the JavaScript side this is as light weighted 
+as possible and uses much less client resources than most JavaScript frameworks.
+
+One need thing about LiveView is that on the initial request Phoenix delivers 
+a normal HTML page which includes all the design and content you want it to have. 
+So the user doesn't have to wait for JavaScript to do it's work to have a 
+usable webpage. As a sideeffect all search engines can use it right away without 
+having to rely on JavaScript.
+
+During this chapter I'll show you a couple of examples. They are meant to give 
+you an idea of the possiblities. If LiveView is the right choice for your 
+project you'll have to invest more time afterwards with experiements and the 
+lecture of https://github.com/phoenixframework/phoenix_live_view
 
 ### The Light Switch
 
@@ -88,15 +107,14 @@ end
 <1> The `render/1` function renders the template. We use the `~L` sigil to define the template.
 ----
 
-[NOTE] 
+[IMPORTANT] 
 ====
-We use the `~L` sigil to store the template code in this controller. It is easier for the purpose of this demo. Normaly you'd have that code probably in a file and use this code in the controller: 
-
-```
-def render(assigns) do
-  Phoenix.View.render(DemoWeb.LightLive, "light.html", assigns)
-end
-```
+We use the `~L` sigil to store the template code in this controller. It is
+easier for the purpose of this document. For bigger templates it makes more
+sense to store them in their own file. That would be named
+`lib/demo_web/live/light_live.html.leex` in this case and include
+`<h1>The light is off.</h1>`. When you have that file you don't need the
+`render/1` function at all.
 
 Have a look at https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html for more information.
 ====
@@ -306,3 +324,93 @@ without writing a single line of JavaScript. Phoenix LiveView takes care of all
 that. We can concentrate on the application development with Elixir.
 
 image::images/liveview-working-on-off-button.png[http://localhost:4000/light]
+
+### The Clock
+
+The clock is an example of content that is pushed and triggered by the server. 
+No interaction by the user. It displays the current server time on a webpage.
+
+We start with a fresh Phoenix application:
+
+[source,shell]
+----
+$ mix phx.new clock --live --no-ecto <1>
+* creating demo/config/config.exs
+* creating demo/config/dev.exs
+
+[...]
+
+$ cd clock
+----
+<1> No need to complicate things by adding Ecto to this example.
+
+The first thing is always to add a new route for the LiveView:
+
+lib/clock_web/router.ex
+[source,elixir]
+----
+defmodule ClockWeb.Router do
+  use ClockWeb, :router
+
+  [...]
+
+  scope "/", ClockWeb do
+    pipe_through :browser
+
+    live "/", PageLive, :index
+    live "/clock", ClockLive <1>
+  end
+
+  [...]
+----
+<1> Our new clock will be available at http://localhost:4000/clock
+
+lib/clock_web/live/clock_live.ex
+[source,elixir]
+----
+defmodule ClockWeb.ClockLive do
+  use ClockWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    if connected?(socket) do <1>
+      :timer.send_interval(1000, self(), :tick) <2>
+    end
+
+    socket = assign_current_time(socket) <3>
+    {:ok, socket}
+  end
+
+  def render(assigns) do
+    ~L"""
+    <h1><%= @now %></h1>
+    """
+  end
+
+  def handle_info(:tick, socket) do <4>
+    socket = assign_current_time(socket)
+
+    {:noreply, socket}
+  end
+
+  def assign_current_time(socket) do
+    now =
+      Time.utc_now() <5>
+      |> Time.to_string()
+      |> String.split(".") <6>
+      |> hd
+
+    assign(socket, now: now) <7>
+  end
+end
+----
+<1> `mount/3` gets called twice. The first time when the inital HTTP-Request gets answered. That would be the initial webpage. And a second time when the LiveView JavaScript client has connected to the websocket. We want to start our timer at that second request.
+<2> This is a bit of Erlang code which fires up a timer which calls the `tick/1` method every 1,000 milliseconds.
+<3> The `assign_current_time/1` function gets called to add the `now` value to the `socket` struct.
+<4> `handle_info/2` gets called by the 1 second timer to update the value of `now`.
+<5> `Time.utc_now()` returns the current time on the server.
+<6> This pipeline is just used so that the time is displayed without the milliseconds.
+<7> Returns a `socket` struct.
+
+Fire up the webserver with `mix phx.server` and open http://localhost:4000/clock in your browser.
+
+image::images/liveview-clock.png[http://localhost:4000/clock]
