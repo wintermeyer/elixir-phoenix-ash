@@ -273,9 +273,9 @@ defmodule DemoWeb.LightLive do
 end
 ----
 
-Now we have a webpage with two buttons which work to turn the imaginary light on and off. 
-But I don't like that both buttons are active all the time. That is bad UX. Let's 
-fix that:
+Now we have a webpage with two buttons which work to turn the imaginary light on
+and off. But I don't like that both buttons are active all the time. That is bad
+UX. Let's fix that:
 
 lib/demo_web/live/light_live.ex
 [source,elixir]
@@ -329,6 +329,8 @@ end
 We are all set. The buttons work in the way a user would like them to work. All
 without writing a single line of JavaScript. Phoenix LiveView takes care of all
 that. We can concentrate on the application development with Elixir.
+
+Please open your browser at http://localhost:4000/light and give it a try.
 
 image::images/liveview-working-on-off-button.png[http://localhost:4000/light]
 
@@ -486,6 +488,8 @@ end
 <5> `update/3` is used to call a capture function to increase the value of the `counter` by 1.
 <6> We reset the `counter` to 0 here.
 
+Please open your browser at http://localhost:4000/counter and give it a try.
+
 image::images/liveview_counter.png[http://localhost:4000/counter]
 
 #### assign vs update
@@ -584,7 +588,7 @@ end
 <2> `search_by_code/1` searches for airport code's fragments and full codes.
 <3> We hardcode a list of German airports here. In a real application this would be longer and probably database driven.
 
-This time we don't use the `~L` sigil in the controller but a LiveEEx Templates
+This time we don't use the `~L` sigil in the controller but a LiveEEx Template
 file:
 
 lib/travelagent_web/live/search_live.html.leex
@@ -663,5 +667,52 @@ end
 <4> The upcased search string gets returned to the view.
 <5> The result of the search gets returned to the view.
 
+Please open your browser at http://localhost:4000/search and give it a try.
+
 image::images/liveview_airport_search.png[http://localhost:4000/search]
+
+#### Airport Code Search Autocomplete
+
+It would be nice to have some sort of autocomplete functionality for the airport
+code search. So that when I start to enter an `h` I'll get all airports which
+codes start with an `h`. Without having to click on the `Search Airport` button. 
+Lucky us we only have to do a couple of changes in the LiveEEx Template file.
+
+lib/travelagent_web/live/search_live.html.leex
+[source,html]
+----
+<form phx-change="airport_code_search"> <1>
+  <fieldset>
+    <label for="nameField">Airport Code</label>
+    <input type="text" name="airport_code" value="<%= @airport_code %>"
+    placeholder="e.g. FRA" 
+    autofocus autocomplete="off" />
+  </fieldset>
+</form>
+
+<%= unless @airports == [] do %>
+  <h2>Search Results</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Airport Code</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for airport <- @airports do %>
+      <tr>
+        <td><%= airport.code %></td>
+        <td><%= airport.name %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+----
+<1> We just have to use `phx-change` for the form. This means that each change triggers `handle_event/3`.
+
+Please open your browser at http://localhost:4000/search and give it a try.
+
+image::images/liveview_airport_search_autocomplete.png[http://localhost:4000/search]
 
