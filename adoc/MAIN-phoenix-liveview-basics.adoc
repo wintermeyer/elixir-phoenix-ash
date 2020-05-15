@@ -517,7 +517,7 @@ end
 Both versions work fine. Of course the `update/3` is a bit more elegant. But you
 will get no medal for using it. Use the function you feel more comfortable with.
 
-### Airport Code Live Search
+### Airport Code Search
 
 In this LiveView example we create a search field for airport codes.
 
@@ -526,4 +526,142 @@ In this LiveView example we create a search field for airport codes.
 $ mix phx.new travelagent --live --no-ecto
 $ cd travelagent
 ----
+
+We begin with the route of the new page:
+
+lib/travelagent_web/router.ex
+[source,elixir]
+----
+[...]
+scope "/", TravelagentWeb do
+  pipe_through :browser
+
+  live "/", PageLive, :index
+  live "/search", SearchLive
+end
+[...]
+----
+
+Next we need to create a module which holds that list of airports and a search 
+function. We'll put this into `lib/travelagent/airports.ex`
+
+lib/travelagent/airports.ex
+[source,elixir]
+----
+defmodule Travelagent.Airports do
+  def search_by_code(""), do: [] <1>
+
+  def search_by_code(code) do <2>
+    list_airports()
+    |> Enum.filter(&String.starts_with?(&1.code, code))
+  end
+
+  def list_airports do <3>
+    [
+      %{name: "Berlin Brandenburg", code: "BER"},
+      %{name: "Berlin Schönefeld", code: "SXF"},
+      %{name: "Berlin Tegel", code: "TXL"},
+      %{name: "Bremen", code: "BRE"},
+      %{name: "Köln/Bonn", code: "CGN"},
+      %{name: "Dortmund", code: "DTM"},
+      %{name: "Dresden", code: "DRS"},
+      %{name: "Düsseldorf", code: "DUS"},
+      %{name: "Frankfurt", code: "FRA"},
+      %{name: "Frankfurt-Hahn", code: "HHN"},
+      %{name: "Hamburg", code: "HAM"},
+      %{name: "Hannover", code: "HAJ"},
+      %{name: "Leipzig Halle", code: "LEJ"},
+      %{name: "München", code: "MUC"},
+      %{name: "Münster Osnabrück", code: "FMO"},
+      %{name: "Nürnberg", code: "NUE"},
+      %{name: "Paderborn Lippstadt", code: "PAD"},
+      %{name: "Stuttgart", code: "STR"}
+    ]
+  end
+end
+----
+<1> A search for an empty string results in an empty list.
+<2> `search_by_code/1` searches for airport code's fragments and full codes.
+<3> We hardcode a list of German airports here. In a real application this would be longer and probably database driven.
+
+This time we don't use the `~L` sigil in the controller but a LiveEEx Templates
+file:
+
+lib/travelagent_web/live/search_live.html.leex
+[source,html]
+----
+<form phx-submit="airport_code_search">
+  <fieldset>
+    <label for="nameField">Airport Code</label>
+    <input type="text" name="airport_code" value="<%= @airport_code %>"
+    placeholder="e.g. FRA" 
+    autofocus autocomplete="off" /> <1>
+    <input class="button-primary" type="submit" value="Search Airport">
+  </fieldset>
+</form>
+
+<%= unless @airports == [] do %> <2>
+  <h2>Search Results</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Airport Code</th>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for airport <- @airports do %>
+      <tr>
+        <td><%= airport.code %></td>
+        <td><%= airport.name %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+----
+<1> I think it is always a curtesy to the user to set the first input field to `autofocus`. And we add an `autocomplete="off"` just to be sure that the browser doesn't interact with us.
+<2> When search results in a list of airport a table with the results will be displayed.
+
+Lastly the TravelagentWeb.SearchLive module:
+
+lib/travelagent_web/live/search_live.ex
+[source,elixir]
+----
+defmodule TravelagentWeb.SearchLive do
+  use TravelagentWeb, :live_view
+  alias Travelagent.Airports <1>
+
+  def mount(_params, _session, socket) do
+    socket =
+      socket
+      |> assign(:airport_code, "") <2>
+      |> assign(:airports, [])
+
+    {:ok, socket}
+  end
+
+  def handle_event(
+        "airport_code_search",
+        %{"airport_code" => airport_code},
+        socket
+      ) do
+    airport_code = String.upcase(airport_code) <3>
+
+    socket =
+      socket
+      |> assign(:airport_code, airport_code) <4>
+      |> assign(:airports, Airports.search_by_code(airport_code)) <5>
+
+    {:noreply, socket}
+  end
+end
+----
+<1> One can argue if this `alias` is needed here. It results in a shorter line of code later on.
+<2> We assign the `airport_code` to empty and assign an empty list to `airports`.
+<3> We auto upcase the search string.
+<4> The upcased search string gets returned to the view.
+<5> The result of the search gets returned to the view.
+
+image::images/liveview_airport_search.png[http://localhost:4000/search]
 
