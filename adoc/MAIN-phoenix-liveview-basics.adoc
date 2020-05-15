@@ -9,6 +9,9 @@ Creating the same functionality with LiveView keeps your technology stack light
 and you don't add one more programming language (JavaScript) to your development 
 process.
 
+NOTE: Feel free to skip this chapter if you are not interested in single-page
+applications. You can come back any time.
+
 Of course LiveView does use JavaScript to do it's magic but that is done for 
 you. You don't have to code any JavaScript yourself. The good to go LiveView 
 JavaScript connects via a websocket to your Phoenix application and both 
@@ -513,3 +516,14 @@ end
 
 Both versions work fine. Of course the `update/3` is a bit more elegant. But you
 will get no medal for using it. Use the function you feel more comfortable with.
+
+### Airport Code Live Search
+
+In this LiveView example we create a search field for airport codes.
+
+[source,shell]
+----
+$ mix phx.new travelagent --live --no-ecto
+$ cd travelagent
+----
+

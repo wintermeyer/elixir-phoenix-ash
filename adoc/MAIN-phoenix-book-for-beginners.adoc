@@ -1,4 +1,4 @@
-= Phoenix Framework for Beginners
+= Learn the Phoenix Framework with Hello World Examples
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 :Revision: 0
 :toc:

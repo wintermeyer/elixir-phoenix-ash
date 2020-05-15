@@ -9,11 +9,17 @@ provide by a way too complicated example of how to build something you have no
 intention to build anyway. Mostly leaving a couple of steps out because the
 author thought of them as obvious.
 
-* **This book is a step by step guide. We start at zero.** I present you a small
-  bite size pieces of code and add some callouts with additional information at
-  the bottom of it. Step by step. As few chicken-egg-problems as possible. You
-  are expected to understand the basics of programming and HTML but other than
-  that you don't have to have any knowledge of Phoenix or Elixir.
+I learn best from Hello World like examples. I do not care about abstract ideas
+or therories in the background. Give me a simple example and I can make sense of
+it and if I can't the language is not for me.
+
+* **This book teaches by presenting bite size code examples.** I created those
+  examples in a way that one can understand them by reading it's code. I add
+  additional information with callouts next to the source code lines.
+* **This book is a step by step guide. We start at zero.** Step by step. As few
+  chicken-egg-problems as possible. You are expected to understand the basics of
+  programming and HTML but other than that you don't have to have any knowledge
+  of Phoenix or Elixir.
 * **I will not hesitate to oversimply stuff.** My aim is to get you productive
   in the quickest time possible. There are other resources to learn the details.
 * The web-applications in this book are not intended to become eye candy. We will
