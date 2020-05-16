@@ -1,8 +1,8 @@
 ## Preface
 
-[Phoenix](https://www.phoenixframework.org)'s learning curve is steep. Very
+https://www.phoenixframework.org[Phoenix]'s learning curve is steep. Very
 steep! Most new Phoenix developers have never worked with
-[Elixir](https://elixir-lang.org) and it being often their first functional
+https://elixir-lang.org[Elixir] and it being often their first functional
 programming language doesn't help either. I am not going to sugar coat it with a
 "this is easy" start. I hate those "this is easy" how-tos and tutorials which
 provide by a way too complicated example of how to build something you have no
@@ -38,7 +38,7 @@ Stefan Wintermeyer
 
 PS: Please do send me feedback (good and bad) by e-mail
 (sw@wintermeyer-consulting.de) and follow me on Twitter
-([@wintermeyer](https://twitter.com/wintermeyer)). To receive positive feedback
+(https://twitter.com/wintermeyer)[@wintermeyer]. To receive positive feedback
 from a reader is a happy moment for any author!
 
 ### Finding Help

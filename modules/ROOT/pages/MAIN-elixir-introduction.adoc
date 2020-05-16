@@ -202,7 +202,7 @@ indexterm:["Variables"]
 
 You already know how variables work from experiences in other programming
 languages. Therefor we can dive right into it. Variable names follow the
-[snake_case](https://en.wikipedia.org/wiki/Snake_case) format and start with a
+https://en.wikipedia.org/wiki/Snake_case[snake_case] format and start with a
 lower case. Some examples:
 
 [source,elixir]
@@ -1563,7 +1563,7 @@ literals without escaped delimiters.
 #### Regular expressions
 indexterm:["Regular expression"]
 
-`~r` marks a [regular expression](https://en.wikipedia.org/wiki/Regular_expression):
+`~r` marks a https://en.wikipedia.org/wiki/Regular_expression[regular expression]:
 
 [source,elixir]
 ----
@@ -1626,7 +1626,7 @@ iex(2)> shopping_cart_atoms = ~w(apple orange banana)a <1>
 
 #### Date and Time
 
-Elixir provides a couple of good to go time related [structs](Struct) which 
+Elixir provides a couple of good to go time related Struct[structs] which 
 all have their own sigil.
 
 ##### Date
@@ -1924,10 +1924,10 @@ go for the next chapter of this book. Have fun!
 If you want to dive more into Elixir than I recommend the following
 books:
 
-- [Learn Functional Programming with Elixir](https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir) by Ulisses Almeida ([@ulissesalmeida
+- https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir[Learn Functional Programming with Elixir] by Ulisses Almeida ([@ulissesalmeida
 ](https://twitter.com/ulissesalmeida))
 +
 In my opinion the best beginners book for Elixir.
-- [Programming Elixir 1.6](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas ([@pragdave](https://twitter.com/pragdave))
+- https://twitter.com/pragdave)[Programming Elixir 1.6](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas ([@pragdave]
 +
 Dave - as always - wrote a very book book which shines a light into many details.

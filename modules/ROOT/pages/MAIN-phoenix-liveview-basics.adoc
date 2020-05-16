@@ -36,8 +36,8 @@ lecture of
 
 The light switch is the "Hello World!" of LiveView. 
 
-NOTE: I stole the idea from the great Pragmatic Studio online course at 
-https://online.pragmaticstudio.com/courses/liveview
+NOTE: I stole the light switch idea from the great Pragmatic Studio online
+course at https://online.pragmaticstudio.com/courses/liveview
 
 We start with a fresh Phoenix application:
 
