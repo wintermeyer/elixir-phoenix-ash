@@ -1,5 +1,5 @@
-name: main
-title: Main
+name: book
+title: Book
 version: 1.5.1
 start_page: ROOT:index.adoc
 nav:
