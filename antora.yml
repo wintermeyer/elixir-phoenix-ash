@@ -1,6 +1,6 @@
-name: component-a
-title: Component A
-version: 1.0.0
+name: main
+title: Main
+version: 1.5.1
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/nav.adoc

@@ -1,4 +1,4 @@
-[[Phoenix's Basics]]
+[[phoenixs-basics]]
 # Phoenix's Basics
 
 Phoenix follows the Model-View-Controller (MVC) architecture. If you are not
