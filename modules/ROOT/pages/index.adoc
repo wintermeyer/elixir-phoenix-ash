@@ -4,7 +4,7 @@ Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 :toc:
 :icons: font
 :numbered:
-:website: https://www.wintermeyer-consulting.de/
+:website: https://www.wintermeyer-consulting.de/books/phoenix
 
 ifdef::env-github[]
 //Admonitions
@@ -20,8 +20,8 @@ endif::[]
 :db: DocBook
 :daps: DAPS
 
-include::MAIN-preface.adoc[]
-include::MAIN-elixir-introduction.adoc[]
-include::MAIN-phoenix-basics.adoc[]
-include::MAIN-phoenix-liveview-basics.adoc[]
-include::MAIN-ecto-basics.adoc[]
+include::preface.adoc[]
+include::elixir-introduction.adoc[]
+include::phoenix-basics.adoc[]
+include::phoenix-liveview-basics.adoc[]
+include::ecto-basics.adoc[]
