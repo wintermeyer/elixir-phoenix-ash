@@ -20,9 +20,3 @@ endif::[]
 :adoc: AsciiDoc
 :db: DocBook
 :daps: DAPS
-
-include::preface.adoc[]
-include::elixir-introduction.adoc[]
-include::phoenix-basics.adoc[]
-include::phoenix-liveview-basics.adoc[]
-include::ecto-basics.adoc[]
