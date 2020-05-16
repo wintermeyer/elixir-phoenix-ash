@@ -1,4 +1,4 @@
-= Phoenix Framework Beginners Guide
+= Phoenix Framework Beginner's Guide
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 :Revision: 0
 :icons: font
