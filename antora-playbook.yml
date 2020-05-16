@@ -5,7 +5,7 @@ site:
   start_page: component-a::MAIN-phoenix-book-index.adoc
 content:
   sources:
-  - url: https://github.com/wintermeyer/phoenix-book.git
+  - url: git@github.com:wintermeyer/phoenix-book.git
     branches: master
     # setting edit_url to false disables the Edit this Page link for any page that originates from this repository
     # the same thing can be achieved by adding empty credentials (i.e., @) in front of the domain in the URL
