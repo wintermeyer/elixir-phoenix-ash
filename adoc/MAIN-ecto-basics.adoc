@@ -1,0 +1,110 @@
+[[ecto_introduction]]
+## Ecto Introduction
+
+Ecto is a persistence framework for Elixir. That is a fancy way of saying that
+we use Ecto to talk to a SQL database.
+
+NOTE: Phoenix works fine without Ecto and Ecto is used in many other Elixir
+applications which are not Phoenix based.
+
+This chapter will show you the basics about Ecto. 
+
+IMPORTANT: We are going to use a PostgreSQL (https://www.postgresql.org)
+database. Ecto works fine with other databases too (e.g. MariaDB) but most
+Phoenix developers prefer PostgreSQL. For this book we assume that you have
+PostgreSQL installed on your development system (localhost) and that the
+database user "postgres" (password: "postgres") has the proper rights to create
+a new database.
+
+### Create Data
+
+Before we can query data we have to create it and before that we have to tell
+Ecto what data model we are using. Because we are ending up using Ecto in
+Phoenix anyway I am using a basic Phoenix application to walk you through the
+process. Let's create a small bookstore:
+
+[source,shell]
+----
+$ mix phx.new bookstore
+[...]
+$ cd bookstore
+----
+
+To generate the needed files we can use the `mix phx.gen.context` generator (more info about it at https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html). 
+
+As a first resource we want to create a table with authors. In the Phoenix world
+we have to put that new resource `authors` into a context. 
+
+NOTE: A context is an API boundary for one or more resources. Don't loose any
+sleep on the question what a context is. You'll get a feeling about it. Good
+naming of contexts is important but not right now in the learning process.
+
+[source,shell]
+----
+$ mix phx.gen.context Store Author authors first_name last_name twitter_account
+* creating lib/bookstore/store/author.ex
+* creating priv/repo/migrations/20200516093442_create_authors.exs
+* creating lib/bookstore/store.ex
+* injecting lib/bookstore/store.ex
+* creating test/bookstore/store_test.exs
+* injecting test/bookstore/store_test.exs
+
+Remember to update your repository by running migrations:
+
+    $ mix ecto.migrate
+----
+
+The last output of that command is a bit misleading right now. If we do a `mix ecto.migrate` we get this repeating error message:
+
+[source,shell]
+----
+$ mix ecto.migrate
+Compiling 16 files (.ex)
+Generated bookstore app
+
+11:42:00.676 [error] Postgrex.Protocol (#PID<0.384.0>) failed to connect: ** (Postgrex.Error) FATAL 3D000 (invalid_catalog_name) database "bookstore_dev" does not exist
+----
+
+Ecto wants to connect to a database but there is none. We have to create it first with the comment `mix ecto.create`.
+
+[source,shell]
+----
+$ mix ecto.create
+The database for Bookstore.Repo has been created
+----
+
+The configuration for this development database can be found in the file
+`config/dev.exs`. Please change that in case you use a different database or
+user.
+
+config/dev.exs
+[source,elixir]
+----
+use Mix.Config
+
+# Configure your database
+config :bookstore, Bookstore.Repo,
+  username: "postgres",
+  password: "postgres",
+  database: "bookstore_dev",
+  hostname: "localhost",
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
+[...]
+----
+
+TIP: In case you want to drop the just created database you can do that with `mix ecto.drop`
+
+Now we can run the migration.
+
+[source,shell]
+----
+$ mix ecto.migrate
+
+11:53:48.162 [info]  == Running 20200516093442 Bookstore.Repo.Migrations.CreateAuthors.change/0 forward
+
+11:53:48.164 [info]  create table authors
+
+11:53:48.177 [info]  == Migrated 20200516093442 in 0.0s
+----
+
