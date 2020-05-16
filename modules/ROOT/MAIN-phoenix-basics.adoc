@@ -85,7 +85,7 @@ Child mini-css-extract-plugin node_modules/css-loader/dist/cjs.js!node_modules/s
 
 Now it's time to fire up the webbrowser with the URL http://localhost:4000
 
-image::images/hello-world-first-view.png[http://localhost:4000]
+image::hello-world-first-view.png[http://localhost:4000]
 
 On the terminal you can see the log output:
 
@@ -177,7 +177,7 @@ And after you saved that file you didn't even have to manually reload the page.
 Phoenix took care of that because you are currently working in the development 
 environment.
 
-image::images/hello-world-hello-world.png[http://localhost:4000]
+image::hello-world-hello-world.png[http://localhost:4000]
 
 You see the `Hello world!` H1. But you also see the default header. That code 
 can be found at `lib/hello_world_web/templates/layout/app.html.eex`
@@ -270,7 +270,7 @@ lib/hello_world_web/templates/page/index.html.eex
 
 Again a manual reload is not necessary. Phoenix takes care of that.
 
-image::images/hello-world-conn-example.png[http://localhost:4000]
+image::hello-world-conn-example.png[http://localhost:4000]
 
 You see that `render(conn, "index.html")` from the controller made sure 
 we have access to the `conn` struct. We only have to add a `@` which makes 
@@ -314,7 +314,7 @@ lib/hello_world_web/templates/page/index.html.eex
 
 After saving that you will see a difference in the browser:
 
-image::images/hello-world-conn-assign-example.png[http://localhost:4000]
+image::hello-world-conn-assign-example.png[http://localhost:4000]
 
 [[a-static-clock]]
 ### A static Clock
@@ -364,7 +364,7 @@ book on a Sunday morning.
 Now we see the current time in the browser. Reload as often as you like to 
 see the differences.
 
-image::images/hello-world-time-now.png[http://localhost:4000]
+image::hello-world-time-now.png[http://localhost:4000]
 
 And just for fun have a look at the log:
 
@@ -410,7 +410,7 @@ defmodule HelloWorldWeb.Router do
 We haven't created any template yet but let's try to open the page 
 `http://localhost:4000/ping` in the browser:
 
-image::images/pagecontroller_ping_is_undefined.png[http://localhost:4000/ping]
+image::pagecontroller_ping_is_undefined.png[http://localhost:4000/ping]
 
 NOTE: Yes, those error pages look scary. But 9 out of 10 times they say right 
 away what is missing or where you should start to search for the bug.
@@ -450,7 +450,7 @@ end
 
 Saving that file will result in new error:
 
-image::images/could_not_render_ping_html.png[http://localhost:4000]
+image::could_not_render_ping_html.png[http://localhost:4000]
 
 The error message says "Could not render "ping.html" for HelloWorldWeb.PageView,
 please ... define a template at "lib/hello_world_web/templates/page/*".". That's
@@ -464,7 +464,7 @@ lib/hello_world_web/templates/page/ping.html.eex
 
 Perfect. What a nice pong we have created page:
 
-image::images/ping.png[http://localhost:4000/ping]
+image::ping.png[http://localhost:4000/ping]
 
 The missing pong part is easy:
 
@@ -517,7 +517,7 @@ lib/hello_world_web/templates/page/pong.html.eex
 </p>
 ----
 
-image::images/ping_with_pong_link.png[http://localhost:4000/ping]
+image::ping_with_pong_link.png[http://localhost:4000/ping]
 
 Now you can play HTML Ping-Pong.
 
@@ -621,7 +621,7 @@ end
 
 Now everything should just work. Let's open `http://localhost:4000/game/ping` in the browser.
 
-image::images/game_ping_no_action_pong.png[http://localhost:4000/game/ping]
+image::game_ping_no_action_pong.png[http://localhost:4000/game/ping]
 
 Ups ... the error says "no action :pong for
 HelloWorldWeb.Router.Helpers.page_path/2.". Ahh! We haven't updated the links in
@@ -650,7 +650,7 @@ lib/hello_world_web/templates/game/pong.html.eex
 
 Now everything is working:
 
-image::images/ping_game_controller.png[http://localhost:4000/game/ping]
+image::ping_game_controller.png[http://localhost:4000/game/ping]
 
 ### Roundup new pages
 
@@ -730,4 +730,4 @@ lib/hello_world_web/templates/page/index.html.eex
 ----
 <1> `Routes.static_path/2` returns the complete route of the static file.
 
-image::images/hello-world-with-phoenix-logo.png[http://localhost:4000/game/ping]
+image::hello-world-with-phoenix-logo.png[http://localhost:4000/game/ping]

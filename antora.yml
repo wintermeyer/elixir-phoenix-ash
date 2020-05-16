@@ -1,0 +1,4 @@
+name: component-a
+title: Component A
+version: 1.0.0
+start_page: ROOT:MAIN-phoenix-book-index.adoc
