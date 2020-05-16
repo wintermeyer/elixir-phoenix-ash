@@ -1,5 +1,5 @@
 [[Phoenix's Basics]]
-## Phoenix's Basics
+# Phoenix's Basics
 
 Phoenix follows the Model-View-Controller (MVC) architecture. If you are not
 familiar with that: Just follow my lead. MVC is just a fixed flow of what goes
@@ -10,7 +10,7 @@ In this chapter I'll show how you can create simple webpages which have some
 programming logic. But we will not touch the database yet. Step by step!
 
 [[phoenix-hello-world]]
-### Phoenix Hello World
+## Phoenix Hello World
 
 For our very first Phoenix Framework "Hello World!" example create a new 
 Phoenix application without a database connector (that's the `no-ecto` part):
@@ -317,7 +317,7 @@ After saving that you will see a difference in the browser:
 image::hello-world-conn-assign-example.png[http://localhost:4000]
 
 [[a-static-clock]]
-### A static Clock
+## A static Clock
 
 Until now our page is very static. The easiest way to add something always 
 changing is to display the current time. We setup the needed programming 
@@ -379,7 +379,7 @@ And just for fun have a look at the log:
 <1> WOW! I'll never get tired of reading those low µs numbers in a Phoenix log.
 
 [[ping-pong]]
-### Ping-Pong
+## Ping-Pong
 
 The web consists of webpages which link to each other. So the next step on our
 venture is to create a `http://localhost:4000/ping` and
@@ -522,7 +522,7 @@ image::ping_with_pong_link.png[http://localhost:4000/ping]
 Now you can play HTML Ping-Pong.
 
 [[game-controller]]
-### Move Ping-Pong to a GameController
+## Move Ping-Pong to a GameController
 
 I am happy with our HTML ping-pong game but having it in the `PageController`
 doesn't feel right. We should create a `GameController` and move it to that new 
@@ -652,7 +652,7 @@ Now everything is working:
 
 image::ping_game_controller.png[http://localhost:4000/game/ping]
 
-### Roundup new pages
+## Roundup new pages
 
 In Phoenix for every webpage we have to take care of these components:
 
@@ -662,7 +662,7 @@ In Phoenix for every webpage we have to take care of these components:
 - A view (e.g. `lib/hello_world_web/views/game_view.ex`)
 - A template (e.g. `lib/hello_world_web/templates/game/ping.html.eex`)
 
-### Static files
+## Static files
 indexterm:["Static files"]
 
 Of course any webapplication doesn't only have dynamic webpages but also 
@@ -701,7 +701,7 @@ plug Plug.Static,
 ----
 <1> All static files or directories have to be whitelisted in this list.
 
-#### Images
+### Images
 
 Images are a special case of static files. They can be stored in the 
 `assets/static/images/` directory which is already whitelisted to be ok 

@@ -1,5 +1,5 @@
 [[ecto_introduction]]
-## Ecto Introduction
+# Ecto Introduction
 
 Ecto is a persistence framework for Elixir. That is a fancy way of saying that
 we use Ecto to talk to a SQL database.
@@ -16,7 +16,7 @@ PostgreSQL installed on your development system (localhost) and that the
 database user "postgres" (password: "postgres") has the proper rights to create
 a new database.
 
-### Create Data
+## Create Data
 
 Before we can query data we have to create it and before that we have to tell
 Ecto what data model we are using. Because we are ending up using Ecto in

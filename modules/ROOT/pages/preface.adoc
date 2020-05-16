@@ -1,4 +1,4 @@
-## Preface
+# Preface
 
 https://www.phoenixframework.org[Phoenix]'s learning curve is steep. Very
 steep! Most new Phoenix developers have never worked with
@@ -41,7 +41,7 @@ PS: Please do send me feedback (good and bad) by e-mail
 (https://twitter.com/wintermeyer)[@wintermeyer]. To receive positive feedback
 from a reader is a happy moment for any author!
 
-### Finding Help
+## Finding Help
 
 During or after reading this book there will come the time when you have a
 problem or a question. Here is my advise for those times:

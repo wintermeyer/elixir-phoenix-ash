@@ -1,5 +1,5 @@
 [[elixir_introduction]]
-## Elixir Introduction
+# Elixir Introduction
 
 This chapter will teach you the absolut basics of Elixir. Just enough to become
 productive with Phoenix. There is a lot more to learn and to understand about
@@ -11,7 +11,7 @@ teach all the needed Elixir knowledge in just one chapter.
 NOTE: All code examples are tested with Elixir version 10.2.
 
 [[elixir-introduction-iex]]
-### Elixir's Interactive Shell (iex)
+## Elixir's Interactive Shell (iex)
 
 Your Elixir installation comes with an Elixir's Interactive Shell (`iex`) which we 
 will use for most examples in this chapter. Please go to your command line and 
@@ -40,7 +40,7 @@ TIP: The iex offers autocomplete when possible. So when in doubt press `TAB`.
 
 TIP: The iex offers a history too. To recycle the last command just press on the arrow-up key.
 
-#### Help in the iex
+### Help in the iex
 
 The iex has a build in help function `h/1` which gives you access to some 
 basic documentation: 
@@ -59,13 +59,13 @@ Returns the length of list.
 
 Allowed in guard tests. Inlined by the compiler.
 
-## Examples
+# Examples
 
     iex> length([1, 2, 3, 4, 5, 6, 7, 8, 9])
     9
 ----
 
-#### Run the code examples not in iex
+### Run the code examples not in iex
 
 If you prefer to run all code examples not in the `iex` you can do so. Just put
 them in a file with the ending `.exs` and call that file from the command file
@@ -75,7 +75,7 @@ When tackling deployment I'll discuss how to compile the code.
 `elixir example.exs` does not compile it.
 
 [[elixir-introduction-hello-world]]
-### Hello world!
+## Hello world!
 
 The classic! But never the less very important. You can use the function
 `IO.puts()` to print a string to standard output:
@@ -107,7 +107,7 @@ you end the `iex`.
 indexterm:["BREAK menue"]
 
 [[elixir-introduction-basic-calculations]]
-### Basic Calculations
+## Basic Calculations
 
 We can use the types `integer` (Integer numbers) and `float` (Real numbers) to
 do all sorts of calcuations. We can use the usual operators. I'll show you a
@@ -140,7 +140,7 @@ of this chapter. By that we get more real estate for the essential stuff and les
 have to die to get the book version printed.
 
 [[elixir-introduction-atoms]]
-### Atoms
+## Atoms
 
 An atom just consists of it's own name. In some other programming languages they 
 are called symbols. Atoms start with a `:`
@@ -156,7 +156,7 @@ iex(2)> :blue
 NOTE: Atom names can be written in snake_case or in CamelCase. But the usual Elixir 
 convention is to use snake_case.
 
-#### Booleans are atoms too
+### Booleans are atoms too
 
 Booleans are a good example for the use of atoms. But they are special because 
 you don't have to prefix them with a `:`.
@@ -175,7 +175,7 @@ true
 <3> The function `is_boolean()` can be used to check if something is a boolean.
 
 [[elixir-introduction-logical-expressions]]
-### Logical Expressions
+## Logical Expressions
 
 A type `boolean` can store the values `true` and `false`. Together with `and`,
 `or` and `not` those can create expressions:
@@ -197,7 +197,7 @@ The operators `and`, `or` and `not` can only work with boolean values. The opera
 `&&` (and), `||` (or) and `!` (not) basically do the same but are a bit more free spirited and accept *truthy* and *falsy* values. We will get to that later if needed.
 
 [[elixir-introduction-variables]]
-### Variables
+## Variables
 indexterm:["Variables"]
 
 You already know how variables work from experiences in other programming
@@ -228,7 +228,7 @@ sense later. Binding values in variables is a bit more complicated than it seems
 right now.
 
 [[elixir-introduction-strings]]
-### Strings
+## Strings
 indexterm:["Strings"]
 
 We already used a string in the <<elixir-introduction-hello-world,Hello World>> example. 
@@ -261,7 +261,7 @@ String-interpolation is done by the `Kernel.to_string/1` macro which evokes
 and atoms (later more on atoms) out of the box.
 indexterm:["String-Interpolation"]
 
-### Anonymous Functions
+## Anonymous Functions
 indexterm:["Functions", "Anonymous Functions"]
 
 Functions are the method in a functional programming language to handle subprograms. 
@@ -341,7 +341,7 @@ iex(4)> volumne.(10,10,10) <2>
 NOTE: A function can not have more than 255 parameters. As a rule of thumb I suggest you never 
 use more than 5 parameters. That is always an indicator that you should refactor your code.
 
-#### Functions are First-Class Citizens
+### Functions are First-Class Citizens
 
 In Elixir a function is a value of the type `function`. So they are just like any 
 other value. That means you can programm a function that expects an other function as 
@@ -369,7 +369,7 @@ iex(5)> total_price.(10, vat)
 <3> This function calculates the total price which includes the tax. You see that the second parameter is a function.
 <4> Example calculation which uses the `food_vat` function as the second parameter.
 
-### The & operator
+## The & operator
 indexterm:["& operator", "Capture operator", "Capture syntax"]
 
 It is likely that you will stumble upon the `&` operator while searching
@@ -397,7 +397,7 @@ iex(6)> rectangle_area.(7,8)
 
 Sometimes it is easier to read code which uses the `&` operator. Sometimes it is not.
 
-### Variable Scopes
+## Variable Scopes
 indexterm:["Scopes", "Variable Scopes"]
 
 In every programming language variables have some sort of scope. Let's have a look 
@@ -469,7 +469,7 @@ NOTE: You can not change the value of an outer scoped variable but you can read
 it. And you can create a new inner scope variable with the same name without
 interacting with the outer scoped one.
 
-### Functions and Modules
+## Functions and Modules
 indexterm:["Modules", "Functions"]
 
 Anonymous functions are useful but using just them to build a big software
@@ -525,7 +525,7 @@ iex(3)> Area.square(4)
 <2> The function rectangle/2 calculates the area of a rectangle.
 <3> The function square/1 calculates the area of a square.
 
-#### Private Functions
+### Private Functions
 indexterm:["Private functions"]
 
 Sometimes you want to define a function within a module without exposing it to the outside world. 
@@ -556,7 +556,7 @@ iex(3)> Area.pi <3>
 <2> The function `circle/1` can be called from the outsite. It can use the private function `pi/0` from within the module.
 <3> The function `pi/0` can not be called from the outsite.
 
-#### Function Arity
+### Function Arity
 indexterm:["Function Arity", "Arity"]
 
 In the last couple of sentences you probably recognized the names of a functions
@@ -591,7 +591,7 @@ iex(3)> Rectangle.area(4,5) <4>
 <3> So to calculate the area of a square you can call `area/1` with just one parameter.
 <4> All non square rectangle areas have to be calculated with `area/2` which accepts two parameters.
 
-#### Hierachical Modules
+### Hierachical Modules
 
 In a big project you will have multiple layers of Module namespaces to keep everything in 
 some sort of structure.
@@ -636,7 +636,7 @@ iex(2)> Calculator.Area.square(5)
 25
 ----
 
-#### Import
+### Import
 indexterm:["Import", "Import Modules"]
 
 We can import access to public functions from other modules. So that we don't 
@@ -685,7 +685,7 @@ NOTE: When ever you just use a given function without a module name before
 that module has already been imported by Elixir (e.g. the `Kernel` modul gets 
 imported automatically).
 
-##### Import Hierarchical Modules
+#### Import Hierarchical Modules
 
 Often your want to import hierachical modules. Here's how:
 
@@ -706,7 +706,7 @@ iex(3)> square(5)
 25
 ----
 
-#### Alias
+### Alias
 indexterm:["Alias"]
 
 `alias` offers the possiblity to set an alias to a module name.
@@ -734,7 +734,7 @@ iex(5)> Area.square(99)
 <1> Set an alias for `Calculator.Area` as `Area`.
 <2> A shortcurt for that specific case. Same result but less to type.
 
-#### The Pipe Operator (|>)
+### The Pipe Operator (|>)
 indexterm:["Pipe Operator", "|>"]
 
 Quite often one wants to chain a couple of different functions in a row. Let's
@@ -777,7 +777,7 @@ iex(5)> String.reverse("house") |> String.capitalize |> String.downcase
 
 The pipe operator is just a way to make code more readable.
 
-### Lists and Tuples
+## Lists and Tuples
 indexterm:["Lists and Tuples"]
 
 Lists and tuples are used to store multiple elements in a sort of list. Both
@@ -796,7 +796,7 @@ NOTE: Right now you don't need to loose sleep over the decision which one to
 use. Over the course of the book you'll get a feeling which one is best suited
 for what problem.
 
-#### Lists
+### Lists
 indexterm:["Lists"]
 
 List store multiple values or different types.
@@ -828,7 +828,7 @@ iex(3)> [1, "a", 2, false, true] -- ["a", 2] <3>
 <2> So does this.
 <3> A bit trickier. The second and third element of the first list get substracted.
 
-##### Head and Tail of Lists
+#### Head and Tail of Lists
 indexterm:["Head", "Tail", "hd/1", "tl/1"]
 
 A lot of times Elixir developers want to work with the head and tail of a list. Head 
@@ -871,7 +871,7 @@ iex(7)> tl(["grapefruit"]) <4>
 <3> There is a head of a list with one element.
 <4> The tail of a list with one element is an empty list.
 
-##### length/1
+#### length/1
 indexterm:["length/1"]
 
 The function `length/1` tells how many elements a list contains:
@@ -888,7 +888,7 @@ iex(4)> length([])
 0
 ----
 
-#### Tuples
+### Tuples
 indexterm:["Tuples"]
 
 Like Lists tuples can hold multiple elements of different types. The 
@@ -923,7 +923,7 @@ iex(3)> elem(result, 0) <2>
 <1> The function `elem/2` gives us a fast access to each element of a tuple.
 <2> The count starts with 0 for the first element.
 
-##### Tuple Functions
+#### Tuple Functions
 indexterm:["Tuple functions"]
 
 The following functions are useful when you handle data with tuples:
@@ -956,12 +956,12 @@ iex(6)> tuple_size(d)
 4
 ----
 
-### Maps and Structs
+## Maps and Structs
 
 List and Tuples don't provide a functionality to access values with a key. 
 That can be achieved with Maps and Structs.
 
-#### Maps
+### Maps
 indexterm:["Map"]
 
 Maps provide a way to store and retrieve key-value pairs. A Map is created 
@@ -998,7 +998,7 @@ warning: key true will be overridden in map
 <1> A mixed bag of different types. Feel free to go wild.
 <2> A key has to be unique within a Map. The last one will be the winner.
 
-##### Atom keys
+#### Atom keys
 
 Using Atoms as keys in Maps gives you access to some nifty features:
 
@@ -1015,7 +1015,7 @@ iex(3)> product_prices.banana <3>
 <2> Again, this syntax is easier to work with but only works for Atom keys.
 <3> Just checking what happens if the key doesn't exist in the Map.
 
-##### Map Functions
+#### Map Functions
 
 The Map module offers a bunch of useful functions. For a complete list have a 
 look at https://hexdocs.pm/elixir/Map.html
@@ -1051,7 +1051,7 @@ iex(9)> c = Map.put(product_prices, :potato, 0.2) <7>
 <6> `Map.merge/2` merges two Maps.
 <7> `Map.put/2` adds a key-value pair to a Map.
 
-#### Structs
+### Structs
 indexterm:["Struct"]
 
 A Struct is a fancy Map with a couple of extra features. To define a 
@@ -1097,7 +1097,7 @@ iex(6)>
 
 NOTE: Because Struct build on top of Maps they can be used with the same mechanisms.
 
-### Pattern Matching
+## Pattern Matching
 indexterm:["Pattern Matching"]
 
 Pattern matching is super important in Elixir and we already used it without 
@@ -1176,7 +1176,7 @@ iex(5)> [e, f, g] = shopping_list <1>
 ----
 <1> Just checking. You get an `MatchError` if Elixir can't match both sides.
 
-#### Matching Maps
+### Matching Maps
 
 Matching a Map works a little bit different to matching a Tuple or List. 
 You can match just against the values you are interested in:
@@ -1199,7 +1199,7 @@ iex(6)> price2
 <1> We can just match one value.
 <2> Or we can match multiples. But we don't have to match the whole Map.
 
-#### Matching Stringparts
+### Matching Stringparts
 indexterm:["Matching Stringparts"]
 
 Easiest explained with a code example:
@@ -1217,7 +1217,7 @@ iex(3)> last_name
 NOTE: The left side of a `<>` operator in a match should always be a string.
 Otherwise Elixir can't verify it's size.
 
-#### Wildcard Matching
+### Wildcard Matching
 indexterm:["Pattern Matching"]
 
 Sometimes you need the pattern matching to get a value but you don't need all
@@ -1246,7 +1246,7 @@ iex(5)> head
 <3> We can use just a `_` too. Using `_tail` just improves a bit the code readablity. 
 So everybody knows that we don't need that value but can guess what it would be.
 
-#### Matching against a variable
+### Matching against a variable
 indexterm:["Pattern Matching"]
 
 Assuming I'd like to fetch the second product of a shopping_list list but only if the first product is 
@@ -1303,7 +1303,7 @@ so we get a `MatchError` because it doesn't match.
 <5> Let's bind "apple" to `product`.
 <6> Bingo! Now we got a working pattern match against a variable.
 
-#### Pattern Matching with Functions
+### Pattern Matching with Functions
 indexterm:["Pattern Matching with Functions"]
 
 Pattern matching is used everywhere in Elixir. You can even use it with Functions:
@@ -1338,7 +1338,7 @@ iex(4)> Area.circle(4)
 <2> We define a `circle/2` function which matches if the first argument is the atom `:normal`.
 <3> We define a `circle/1` function which calls the `cirle/2` function with the `:normal` argument.
 
-##### Functions with Guards
+#### Functions with Guards
 indexterm:["Guards", "Functions with Guards"]
 
 Guards add some additional spices to pattern matching with functions. You can find 
@@ -1405,7 +1405,7 @@ false
 ----
 <1> `_value` catches everything that was not caught by the first `is_a_number?/1` definition.
 
-### Case
+## Case
 indexterm:["Case"]
 
 `case` is a controll structure which matches a given value to a couple of 
@@ -1448,7 +1448,7 @@ iex(2)> Morse.morse_to_number("-....") <4>
 Of course we could solve this problem just with functions too. It's up to you 
 what makes most sense in a given situation.
 
-### if and unless
+## if and unless
 indexterm:["if", "unless", "else"]
 
 `if` and `unless` are the classics in any programming language. The following 
@@ -1478,7 +1478,7 @@ iex(3)> if 1 == 1, do: "Bingo!"
 
 NOTE: Most Elixir developers prefer `case` over `if` or `unless`. 
  
-### Immutability
+## Immutability
 indexterm:["Immutability"]
 
 Probably you have already heard about immutability in Elixir. What's that about?
@@ -1536,7 +1536,7 @@ Banana
 <1> Those anonymous functions may run on totally different CPUs. The life in their own little universe.
 <2> The value of `product` has changed multiple times. But for `test1.()` it is the value from that point in time when we created the function.
 
-### Sigils
+## Sigils
 indexterm:["Sigils"]
 
 Until now encapsulated Strings in double quotes and we haven't talked about char
@@ -1560,7 +1560,7 @@ After that you can use a couple of different delimiters:
 NOTE: Elixir provides different delimiters for sigils so that you can write
 literals without escaped delimiters.
 
-#### Regular expressions
+### Regular expressions
 indexterm:["Regular expression"]
 
 `~r` marks a https://en.wikipedia.org/wiki/Regular_expression[regular expression]:
@@ -1580,7 +1580,7 @@ true
 ----
 <1> Modifier are supported too. For a complete list have a look at https://hexdocs.pm/elixir/Regex.html
 
-#### String
+### String
 indexterm:["String"]
 
 You can use the `~s` sigil to generate a string:
@@ -1610,7 +1610,7 @@ Multiple lines are not a problem.
 :ok
 ----
 
-#### Word lists
+### Word lists
 indexterm:["Word lists"]
 
 The `~w` sigil is a useful way to generate lists of words:
@@ -1624,12 +1624,12 @@ iex(2)> shopping_cart_atoms = ~w(apple orange banana)a <1>
 ----
 <1> The `a` modifier tells Elixir to generate a list of atoms and not strings.
 
-#### Date and Time
+### Date and Time
 
 Elixir provides a couple of good to go time related Struct[structs] which 
 all have their own sigil.
 
-##### Date
+#### Date
 indexterm:["Date"]
 
 Elixir provides a `%Date{}` struct that contains the following fields:
@@ -1653,7 +1653,7 @@ iex(4)> birthday.year
 1973
 ----
 
-##### Time
+#### Time
 indexterm:["Time"]
 
 Elixir provides a `%Time{}` struct that contains the following fields:
@@ -1674,7 +1674,7 @@ iex(2)> now.hour
 9
 ----
 
-##### NaiveDateTime
+#### NaiveDateTime
 indexterm:["NaiveDateTime"]
 
 The `%NaiveDateTime{}` struct mixes `%Date{}` with `%Time{}`.
@@ -1687,7 +1687,7 @@ iex(1)> timestamp = ~N[2020-05-08 09:48:00]
 ~N[2020-05-08 09:48:00]
 ----
 
-##### DateTime
+#### DateTime
 indexterm:["DateTime"]
 
 The `%DateTime{}` struct adds a timezone to a `%NaiveDateTime{}`.
@@ -1702,7 +1702,7 @@ iex(4)> timestamp = ~U[2029-05-08 09:59:03Z]
 
 NOTE: Find more information about timezones and DateTime at https://hexdocs.pm/elixir/DateTime.html
 
-### Recursion
+## Recursion
 indexterm:["Recursion"]
 
 Recursions are magic and can be a dangerous trap at the same time. 
@@ -1797,7 +1797,7 @@ iex(2)> Example.double([10, 5, 999])
 <1> We again start with the most simple match. An empty list. That will result in an empty list.
 <2> The `[head | tail]` syntax works both ways. We can use it to build a list too.
 
-#### How to tackle a recursion
+### How to tackle a recursion
 
 Unless you are doing this every day you will get to problems where you know that a
 recursion is a good solution but you just can't think of a good recursion for it. 
@@ -1808,7 +1808,7 @@ https://stackoverflow.com are my life-saver in such situations. No embarrassment
 During this book we will work with recursions. So you'll get a better feeling for 
 it.
 
-### mix
+## mix
 indexterm:["Recursion"]
 
 By now you understand the basics of Elixir. The next step is to create an
@@ -1859,7 +1859,7 @@ $ tree
 
 The Phoenix directory structure will be more complex but has the same core.
 
-### mix tasks
+## mix tasks
 indexterm:["mix tasks", "task]
 
 A task is the mechanism to start code with `mix`. For our "Hello world!"
@@ -1902,7 +1902,7 @@ Obviously `mix` as a topic is much more complex. In this section I just wanted
 to show you the very basic idea of mix. So that you know where to search if you 
 want to know what happens if you do a `mix server` with a Phoenix application.
 
-### mix format
+## mix format
 indexterm:["mix tasks", "task]
 
 You are going to love `mix format`. You can call it in the root directory of 
@@ -1912,14 +1912,14 @@ files.
 You should use `mix format` everytime you are going to commit code to a 
 repository.
 
-### What else?
+## What else?
 
 This chapter just deals with the tip of the iceberg. It provides the basic
 knowledge that you need to start with the Phoenix Framework. There is a lot more
 to learn. But I wouldn't worry too much about that right now. You are good to 
 go for the next chapter of this book. Have fun!
 
-#### Elixir Books
+### Elixir Books
 
 If you want to dive more into Elixir than I recommend the following
 books:
