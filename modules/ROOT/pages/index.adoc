@@ -1,7 +1,6 @@
 = Phoenix Framework Beginners Guide
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 :Revision: 0
-:toc:
 :icons: font
 :numbered:
 :website: https://www.wintermeyer-consulting.de/books/phoenix
