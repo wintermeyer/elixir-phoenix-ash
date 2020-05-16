@@ -1,3 +1,3 @@
 # Phoenix Framework for Beginners Book
 
-We use https://opensuse.github.io/daps/ to write this book.
+We use https://antora.org to convert the AsciiDoc to HTML.
