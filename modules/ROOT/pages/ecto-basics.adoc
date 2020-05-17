@@ -78,7 +78,7 @@ The configuration for this development database can be found in the file
 `config/dev.exs`. Please change that in case you use a different database or
 user.
 
-config/dev.exs
+.config/dev.exs
 [source,elixir]
 ----
 use Mix.Config
