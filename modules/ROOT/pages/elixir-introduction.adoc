@@ -1,5 +1,6 @@
 [[elixir_introduction]]
 # Elixir Introduction
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 This chapter will teach you the absolut basics of Elixir. Just enough to become
 productive with Phoenix. There is a lot more to learn and to understand about
@@ -8,9 +9,18 @@ Elixir.
 Buckle up. It is going to be a bumpy and sometimes boring ride. It's tough to
 teach all the needed Elixir knowledge in just one chapter.
 
-IMPORTANT: All code examples are written and tested for Elixir version 1.10.2.
-Please make sure that you have that or a later version installed. You can check
-the installed Elixir version with the commant `elixir -v`
+[IMPORTANT]
+.Elixir version
+====
+All code examples are written and tested for Elixir version 1.10.2.
+Please make sure that you have that or a later version installed.
+````
+$ elixir -v
+Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
+
+Elixir 1.10.2 (compiled with Erlang/OTP 21)
+````
+====
 
 [[elixir-introduction-iex]]
 ## Elixir's Interactive Shell (iex)

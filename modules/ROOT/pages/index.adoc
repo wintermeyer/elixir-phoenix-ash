@@ -23,13 +23,14 @@ endif::[]
 # Preface
 
 https://www.phoenixframework.org[Phoenix]'s learning curve is steep. I am not
-going to sugar coat this book with a "this is easy" start. Most new Phoenix
+going to sugar coat this book with a "this is easy" start. Many new Phoenix
 developers have never worked with https://elixir-lang.org[Elixir] and it being
 often their first functional programming language doesn't help either.
 
-I learn best from "Hello World!" like examples. I do not care about abstract ideas
-or programming theories. Give me a good example and I can make sense of
-it and if I can't the language is just not for me.
+I learn best from "Hello World!" like examples. I do not care about abstract
+ideas or programming theories. Give me a good and clean example and I make sense
+of it for me. If you like this kind of teaching you are reading the right book.
+Otherwise it is not too late for returning it.
 
 * **This book teaches by presenting bite size code examples.** I created those
   examples in a way that you can understand them by reading it's code. In

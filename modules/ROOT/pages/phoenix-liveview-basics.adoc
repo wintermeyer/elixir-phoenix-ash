@@ -1,5 +1,6 @@
 [[phoenix-liveview-basics]]
 # Phoenix LiveView Basics
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 LiveView is an interesting alternative to single-page application (SPA) written
 with JavaScript which communicate with the server via JSON and change the

@@ -1,5 +1,6 @@
 [[ecto_introduction]]
 # Ecto Introduction
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Ecto is a persistence framework for Elixir. That is a fancy way of saying that
 we use Ecto to talk to a SQL database.
