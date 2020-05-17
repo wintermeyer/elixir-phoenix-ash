@@ -124,8 +124,10 @@ Now we hit reload on the browser and watch the log output:
 [info] Sent 200 in 517µs
 ----
 
-517µs! WOW! Half a millisecond on my old laptop. That must be the speed
-everybody is talking about.
+NOTE: `Sent 200 in 517µs`.
+https://en.wikipedia.org/wiki/Microsecond[Microseconds]! WOW! On my old
+development laptop. That must be the famous speed of Phoenix/Elixir everybody is
+talking about.
 
 Let's open `lib/hello_world_web/router.ex` which holds all the routing
 configuration and have a look around:

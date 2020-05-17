@@ -30,10 +30,10 @@ We tackle small problems which make sense within their realm.
 IMPORTANT: If a specific chapter or section doesn't interest you: Go ahead and
 skip it. You can come back later if needed.
 
-The chapter <<elixir-introduction.adoc#elixir_introduction>> offers a jump start
-for everybody who hasn't worked with Elixir before. You don't have to work
-through all examples. But you should read it to get the basic ideas of the
-language.
+The chapter xref:elixir-introduction.adoc[Elixir Introduction]
+offers a jump start for everybody who hasn't worked with Elixir before. You
+don't have to work through all examples. But you should read it to get the basic
+ideas of the language.
 
 Stefan Wintermeyer
 
