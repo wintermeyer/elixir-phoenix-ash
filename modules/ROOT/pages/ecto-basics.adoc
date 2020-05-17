@@ -3,12 +3,10 @@
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Ecto is a persistence framework for Elixir. That is a fancy way of saying that
-we use Ecto to talk to a SQL database.
+we use Ecto to talk to a SQL database. Phoenix works fine without Ecto and Ecto
+is used in many other Elixir applications which are not Phoenix based.
 
-NOTE: Phoenix works fine without Ecto and Ecto is used in many other Elixir
-applications which are not Phoenix based.
-
-This chapter will show you the basics about Ecto. 
+This chapter will introduce you to the basics of Ecto. 
 
 IMPORTANT: We are going to use a https://www.postgresql.org[PostgreSQL]
 database. Ecto works fine with other databases too (e.g.
@@ -31,10 +29,12 @@ $ mix phx.new bookstore
 $ cd bookstore
 ----
 
-To generate the needed files we can use the `mix phx.gen.context` generator (more info about it at https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html). 
+To generate the needed files we can use the `mix phx.gen.context` generator
+(more info about it at
+https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html).
 
 As a first resource we want to create a table with authors. In the Phoenix world
-we have to put that new resource `authors` into a context. 
+we have to put that new resource `authors` into a context.
 
 NOTE: A context is an API boundary for one or more resources. Don't loose any
 sleep on the question what a context is. You'll get a feeling about it. Good
