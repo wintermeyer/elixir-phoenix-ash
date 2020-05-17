@@ -10,9 +10,9 @@ applications which are not Phoenix based.
 
 This chapter will show you the basics about Ecto. 
 
-IMPORTANT: We are going to use a https://www.postgresql.org(PostgreSQL)
+IMPORTANT: We are going to use a https://www.postgresql.org[PostgreSQL]
 database. Ecto works fine with other databases too (e.g.
-https://mariadb.com(MariaDB)) but most Phoenix developers prefer PostgreSQL. For
+https://mariadb.com[MariaDB]) but most Phoenix developers prefer PostgreSQL. For
 this book we assume that you have PostgreSQL installed on your development
 system (localhost) and that the database #user "postgres"# (#password: "postgres"#)
 has the proper rights to create a new database.
