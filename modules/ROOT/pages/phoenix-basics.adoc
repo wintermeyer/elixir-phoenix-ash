@@ -130,7 +130,7 @@ everybody is talking about.
 Let's open `lib/hello_world_web/router.ex` which holds all the routing
 configuration and have a look around:
 
-lib/hello_world_web/router.ex
+.lib/hello_world_web/router.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.Router do
@@ -163,7 +163,7 @@ defmodule HelloWorldWeb.Router do
 
 The module `HelloWorldWeb.PageController` is defined in the file `lib/hello_world_web/controllers/page_controller.ex`. Time for us to have a look:
 
-lib/hello_world_web/controllers/page_controller.ex
+.lib/hello_world_web/controllers/page_controller.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.PageController do
@@ -182,7 +182,7 @@ That `index.html` template is actually the file
 `lib/hello_world_web/templates/page/index.html.eex`. Please open it and change 
 the content to this:
 
-lib/hello_world_web/templates/page/index.html.eex
+.lib/hello_world_web/templates/page/index.html.eex
 [source,html]
 ----
 <h1>Hello world!</h1>
@@ -197,7 +197,7 @@ image::hello-world-hello-world.png[http://localhost:4000]
 You see the `Hello world!` H1. But you also see the default header. That code 
 can be found at `lib/hello_world_web/templates/layout/app.html.eex`
 
-lib/hello_world_web/templates/layout/app.html.eex
+.lib/hello_world_web/templates/layout/app.html.eex
 [source,html]
 ----
 <!DOCTYPE html>
@@ -245,7 +245,7 @@ IMPORTANT: `<%= @foobar %>` prints the value of `@foobar` into that place in the
 
 First let's get rid of that default top navigation. Please update `app.html.eex` to this:
 
-lib/hello_world_web/templates/layout/app.html.eex
+.lib/hello_world_web/templates/layout/app.html.eex
 [source,html]
 ----
 <!DOCTYPE html>
@@ -270,7 +270,7 @@ lib/hello_world_web/templates/layout/app.html.eex
 
 And let's change the `index.html.eex` file to:
 
-lib/hello_world_web/templates/page/index.html.eex
+.lib/hello_world_web/templates/page/index.html.eex
 [source,html]
 ----
 <h1>Hello world!</h1>
@@ -294,7 +294,7 @@ it a '@conn' in the template.
 hmmm... than we probably can pipe other information too from the controller 
 into the template. Let's try this:
 
-lib/hello_world_web/controllers/page_controller.ex
+.lib/hello_world_web/controllers/page_controller.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.PageController do
@@ -313,7 +313,7 @@ end
 <2> We use `Plug.Conn.assign/2` to pipe the `headline` variable into the `conn` struct. 
 This will make `@headline` available in the template. We can use `assign/2` insteat of `Plug.Conn.assign/2` because `Phoenix.Controller` imports `Plug.Conn` automatically.
 
-lib/hello_world_web/templates/page/index.html.eex
+.lib/hello_world_web/templates/page/index.html.eex
 [source,html]
 ----
 <h1><%= @headline %></h1> <1>
@@ -338,7 +338,7 @@ Until now our page is very static. The easiest way to add something always
 changing is to display the current time. We setup the needed programming 
 logic in the controller:
 
-lib/hello_world_web/controllers/page_controller.ex
+.lib/hello_world_web/controllers/page_controller.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.PageController do
@@ -359,7 +359,7 @@ end
 
 After that we change the content of the template to display `@timestamp`.
 
-lib/hello_world_web/templates/page/index.html.eex
+.lib/hello_world_web/templates/page/index.html.eex
 [source,html]
 ----
 <h1><%= @headline %></h1>
@@ -403,7 +403,7 @@ venture is to create a `http://localhost:4000/ping` and
 Our first stop is the `lib/hello_world_web/router.ex` file. Here we have to 
 define how the webpages are accessable.
 
-lib/hello_world_web/router.ex
+.lib/hello_world_web/router.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.Router do
@@ -435,7 +435,7 @@ Phoenix takes us by the hand and says
 That means we have to open the `PageController` in the editor and add those 
 functions:
 
-lib/hello_world_web/controllers/page_controller.ex
+.lib/hello_world_web/controllers/page_controller.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.PageController do
@@ -467,11 +467,11 @@ Saving that file will result in new error:
 
 image::could_not_render_ping_html.png[http://localhost:4000]
 
-The error message says "Could not render "ping.html" for HelloWorldWeb.PageView,
-please ... define a template at "lib/hello_world_web/templates/page/*".". That's
+The error message says `Could not render "ping.html" for HelloWorldWeb.PageView,
+please ... define a template at "lib/hello_world_web/templates/page/*"`. That's
 easy. We create a new template `lib/hello_world_web/templates/page/ping.html.eex`.
 
-lib/hello_world_web/templates/page/ping.html.eex
+.lib/hello_world_web/templates/page/ping.html.eex
 [source,html]
 ----
 <h1>Ping</h1>
@@ -483,7 +483,7 @@ image::ping.png[http://localhost:4000/ping]
 
 The missing pong part is easy:
 
-lib/hello_world_web/templates/page/pong.html.eex
+.lib/hello_world_web/templates/page/pong.html.eex
 [source,html]
 ----
 <h1>Pong</h1>
@@ -509,7 +509,7 @@ With that information we can use the `link` helper (which is already
 awailable) to create that link:
 indexterm:["Link"]
 
-lib/hello_world_web/templates/page/ping.html.eex
+.lib/hello_world_web/templates/page/ping.html.eex
 [source,html]
 ----
 <h1>Ping</h1>
@@ -522,7 +522,7 @@ lib/hello_world_web/templates/page/ping.html.eex
 
 We do the same on the pong page:
 
-lib/hello_world_web/templates/page/pong.html.eex
+.lib/hello_world_web/templates/page/pong.html.eex
 [source,html]
 ----
 <h1>Pong</h1>
@@ -545,7 +545,7 @@ home.
 
 First we change the routes:
 
-lib/hello_world_web/router.ex
+.lib/hello_world_web/router.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.Router do
@@ -567,7 +567,7 @@ defmodule HelloWorldWeb.Router do
 We have to create a new `lib/hello_world_web/controllers/game_controller.ex`
 file and move `ping/2` and `pong/2` from the `PageController` to it.
 
-lib/hello_world_web/controllers/game_controller.ex
+.lib/hello_world_web/controllers/game_controller.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.GameController do
@@ -585,7 +585,7 @@ end
 
 And here the cleaned up PageController:
 
-lib/hello_world_web/controllers/page_controller.ex
+.lib/hello_world_web/controllers/page_controller.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.PageController do
@@ -626,7 +626,7 @@ lib/hello_world_web/templates/
 We haven't talked about the Views yet and I am not going to do so now. Let's just say 
 that we need a View to have access to a template. Therefor we need to create a new `GameView`.
 
-lib/hello_world_web/views/game_view.ex
+.lib/hello_world_web/views/game_view.ex
 [source,elixir]
 ----
 defmodule HelloWorldWeb.GameView do
@@ -643,7 +643,7 @@ HelloWorldWeb.Router.Helpers.page_path/2.". Ahh! We haven't updated the links in
 the templates. They still show to the now not existing `pong` action in the
 `PageController`. Easy fix:
 
-lib/hello_world_web/templates/game/ping.html.eex
+.lib/hello_world_web/templates/game/ping.html.eex
 [source,html]
 ----
 <h1>Ping</h1>
@@ -653,7 +653,7 @@ lib/hello_world_web/templates/game/ping.html.eex
 </p>
 ----
 
-lib/hello_world_web/templates/game/pong.html.eex
+.lib/hello_world_web/templates/game/pong.html.eex
 [source,html]
 ----
 <h1>Pong</h1>
@@ -702,7 +702,7 @@ not enough. You have to whitelist it. Assuming we add a `ads.txt`
 file into the `assets/static/` directory. Than we have to update the 
 `lib/hello_world_web/endpoint.ex` file accordingly:
 
-lib/hello_world_web/endpoint.ex
+.lib/hello_world_web/endpoint.ex
 [source,elixir]
 ----
 [...]
@@ -728,7 +728,7 @@ In every fresh Phoenix installation you'll find the Phoenix logo file at
 application and use `Routes.static_path(@conn, "/images/phoenix.png")` to show 
 it:
 
-lib/hello_world_web/templates/page/index.html.eex
+.lib/hello_world_web/templates/page/index.html.eex
 [source,html]
 ----
 <h1><%= @headline %></h1>
