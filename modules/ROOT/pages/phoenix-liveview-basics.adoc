@@ -34,7 +34,7 @@ lecture of
 - https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html
 
 [[light-switch]]
-## A Light Switch
+## Light Switch
 
 The light switch is the "Hello World!" of LiveView. 
 
@@ -337,7 +337,7 @@ Please open your browser at http://localhost:4000/light and give it a try.
 image::liveview-working-on-off-button.png[http://localhost:4000/light]
 
 [[clock]]
-## A Clock
+## Clock
 
 The clock is an example of content that is pushed and triggered by the server. 
 No interaction by the user. It displays the current server time on a webpage.
@@ -428,7 +428,7 @@ Fire up the webserver with `mix phx.server` and open http://localhost:4000/clock
 image::liveview-clock.png[http://localhost:4000/clock]
 
 [[counter]]
-## A Counter
+## Counter
 
 This LiveView example will generate a counter website. It starts with 0 and each
 time you click on a button it will increase by one.
