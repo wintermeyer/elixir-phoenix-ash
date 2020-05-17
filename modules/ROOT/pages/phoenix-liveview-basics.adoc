@@ -33,7 +33,8 @@ lecture of
 - https://github.com/phoenixframework/phoenix_live_view
 - https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html
 
-## The Light Switch
+[[light-switch]]
+## A Light Switch
 
 The light switch is the "Hello World!" of LiveView. 
 
@@ -335,7 +336,8 @@ Please open your browser at http://localhost:4000/light and give it a try.
 
 image::liveview-working-on-off-button.png[http://localhost:4000/light]
 
-## The Clock
+[[clock]]
+## A Clock
 
 The clock is an example of content that is pushed and triggered by the server. 
 No interaction by the user. It displays the current server time on a webpage.
@@ -425,6 +427,7 @@ Fire up the webserver with `mix phx.server` and open http://localhost:4000/clock
 
 image::liveview-clock.png[http://localhost:4000/clock]
 
+[[counter]]
 ## A Counter
 
 This LiveView example will generate a counter website. It starts with 0 and each
@@ -522,6 +525,7 @@ end
 Both versions work fine. Of course the `update/3` is a bit more elegant. But you
 will get no medal for using it. Use the function you feel more comfortable with.
 
+[[aiport-code-search]]
 ## Airport Code Search
 
 In this LiveView example we create a search field for airport codes.
@@ -672,7 +676,8 @@ Please open your browser at http://localhost:4000/search and give it a try.
 
 image::liveview_airport_search.png[http://localhost:4000/search]
 
-### Airport Code Search Autocomplete
+[[autocomplete]]
+### Autocomplete
 
 It would be nice to have some sort of autocomplete functionality for the airport
 code search. So that when I start to enter an `h` I'll get all airports which

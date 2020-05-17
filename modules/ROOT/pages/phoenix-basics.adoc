@@ -537,7 +537,7 @@ image::ping_with_pong_link.png[http://localhost:4000/ping]
 Now you can play HTML Ping-Pong.
 
 [[game-controller]]
-## Move Ping-Pong to a GameController
+### Move Ping-Pong to a GameController
 
 I am happy with our HTML ping-pong game but having it in the `PageController`
 doesn't feel right. We should create a `GameController` and move it to that new 
@@ -667,7 +667,7 @@ Now everything is working:
 
 image::ping_game_controller.png[http://localhost:4000/game/ping]
 
-## Roundup new pages
+## Roundup new Pages
 
 In Phoenix for every webpage we have to take care of these components:
 
@@ -677,6 +677,7 @@ In Phoenix for every webpage we have to take care of these components:
 - A view (e.g. `lib/hello_world_web/views/game_view.ex`)
 - A template (e.g. `lib/hello_world_web/templates/game/ping.html.eex`)
 
+[[static-files]]
 ## Static files
 indexterm:["Static files"]
 
