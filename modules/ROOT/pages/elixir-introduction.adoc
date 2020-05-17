@@ -8,7 +8,9 @@ Elixir.
 Buckle up. It is going to be a bumpy and sometimes boring ride. It's tough to
 teach all the needed Elixir knowledge in just one chapter.
 
-NOTE: All code examples are tested with Elixir version 10.2.
+IMPORTANT: All code examples are written and tested for Elixir version 1.10.2.
+Please make sure that you have that or a later version installed. You can check
+the installed Elixir version with the commant `elixir -v`
 
 [[elixir-introduction-iex]]
 ## Elixir's Interactive Shell (iex)

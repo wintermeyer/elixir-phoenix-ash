@@ -4,10 +4,16 @@
 Phoenix follows the Model-View-Controller (MVC) architecture. If you are not
 familiar with that: Just follow my lead. MVC is just a fixed flow of what goes
 where. You are not forced to follow it but it makes live easier if you do. After
-a couple of examples you'll get a feeling for it.
+a couple of examples you'll get a feeling for it. Same goes for the directory
+structure or file names.
 
 In this chapter I'll show how you can create simple webpages which have some
 programming logic. But we will not touch the database yet. Step by step!
+
+IMPORTANT: The code examples of this book are written and tested for Phoenix
+version 1.5.1 or above. Please make sure that you have a 1.5.x version
+installed. You can check the installed version with the command
+`mix phx.new --version`
 
 [[phoenix-hello-world]]
 ## Phoenix Hello World
