@@ -1,5 +1,5 @@
-name: book
-title: Book
+name: phoenix
+title: Phoenix
 version: 1.5.1
 start_page: ROOT:index.adoc
 nav:

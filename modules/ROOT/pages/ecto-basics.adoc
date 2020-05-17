@@ -94,7 +94,8 @@ config :bookstore, Bookstore.Repo,
 [...]
 ----
 
-TIP: In case you want to drop the just created database you can do that with `mix ecto.drop`
+TIP: In case you want to drop this database you can do that with the command
+`mix ecto.drop`
 
 Now we can run the migration.
 
