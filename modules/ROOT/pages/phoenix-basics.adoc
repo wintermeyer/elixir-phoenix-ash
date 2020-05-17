@@ -331,8 +331,8 @@ After saving that you will see a difference in the browser:
 
 image::hello-world-conn-assign-example.png[http://localhost:4000]
 
-[[a-static-clock]]
-## A static Clock
+[[static-clock]]
+## Static Clock
 
 Until now our page is very static. The easiest way to add something always 
 changing is to display the current time. We setup the needed programming 

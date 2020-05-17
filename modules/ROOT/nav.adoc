@@ -2,7 +2,7 @@
 * xref:elixir-introduction.adoc[Elixir Introduction]
 * xref:phoenix-basics.adoc[Phoenix Basics]
 ** xref:phoenix-basics.adoc#phoenix-hello-world[Hello World!]
-** xref:phoenix-basics.adoc#a-static-clock[A static Clock]
+** xref:phoenix-basics.adoc#static-clock[A static Clock]
 ** xref:phoenix-basics.adoc#ping-pong[Ping-Pong]
 ** xref:phoenix-basics.adoc#static-files[Static files]
 * xref:phoenix-liveview-basics.adoc[LiveView Basics]
