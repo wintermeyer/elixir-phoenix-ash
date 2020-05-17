@@ -17,10 +17,11 @@ programming logic. But we will not touch the database yet. Step by step!
 The code examples of this book are written and tested for Phoenix
 version 1.5.1 or above. Please make sure that you have a 1.5.x version
 installed.
-````
+[source,bash]
+----
 $ mix phx.new --version
 Phoenix v1.5.1
-````
+----
 ====
 
 [[phoenix-hello-world]]

@@ -14,12 +14,13 @@ teach all the needed Elixir knowledge in just one chapter.
 ====
 All code examples are written and tested for Elixir version 1.10.2.
 Please make sure that you have that or a later version installed.
-````
+[source,bash]
+----
 $ elixir -v
 Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
 
 Elixir 1.10.2 (compiled with Erlang/OTP 21)
-````
+----
 ====
 
 [[elixir-introduction-iex]]
