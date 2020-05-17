@@ -1,26 +1,5 @@
-= Phoenix Framework Beginner's Guide
-Stefan Wintermeyer <sw@wintermeyer-consulting.de>
-:Revision: 0
-:icons: font
-:numbered:
-:website: https://www.wintermeyer-consulting.de/books/phoenix
-:doctype: book
-
-ifdef::env-github[]
-//Admonitions
-:tip-caption: :bulb:
-:note-caption: :information_source:
-:important-caption: :heavy_exclamation_mark:
-:caution-caption: :fire:
-:warning-caption: :warning:
-endif::[]
-
-// Entities
-:adoc: AsciiDoc
-:db: DocBook
-:daps: DAPS
-
 # Preface
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 https://www.phoenixframework.org[Phoenix]'s learning curve is steep. I am not
 going to sugar coat this book with a "this is easy" start. Many new Phoenix
