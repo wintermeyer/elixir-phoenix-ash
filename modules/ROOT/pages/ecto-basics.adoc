@@ -8,12 +8,19 @@ is used in many other Elixir applications which are not Phoenix based.
 
 This chapter will introduce you to the basics of Ecto. 
 
-IMPORTANT: We are going to use a https://www.postgresql.org[PostgreSQL]
+[IMPORTANT] 
+====
+We are going to use a https://www.postgresql.org[PostgreSQL]
 database. Ecto works fine with other databases too (e.g.
 https://mariadb.com[MariaDB]) but most Phoenix developers prefer PostgreSQL. For
-this book we assume that you have PostgreSQL installed on your development
-system (localhost) and that the database #user "postgres"# (#password: "postgres"#)
-has the proper rights to create a new database.
+this book we assume that you have a PostgreSQL user on your development which was 
+granted the right to create a database and which has the following credentials:
+
+- user: postgres
+- password: postgres
+
+Simply because those are the default values for the development system in Phoenix.
+====
 
 ## Create Data
 
@@ -110,3 +117,32 @@ $ mix ecto.migrate
 11:53:48.177 [info]  == Migrated 20200516093442 in 0.0s
 ----
 
+The migration script created the table `authors` in the database `bookstore_dev`. 
+But let's double check:
+
+[source,bash]
+----
+$ psql -U postgres bookstore_dev <1>
+psql (12.2)
+Type "help" for help.
+
+bookstore_dev=# SELECT column_name FROM information_schema.columns WHERE TABLE_NAME='authors'; <2>
+   column_name   
+-----------------
+ id
+ first_name
+ last_name
+ twitter_account
+ inserted_at
+ updated_at
+(6 rows)
+
+bookstore_dev=# \q <3>
+----
+<1> `psql` is the command line client for PostgreSQL. If you are not familiar with it: Don't try this at home.
+<2> This command lists all column names of the table `authors`.
+<3> `\q` is the command to quit the command line client.
+
+The migration created that table and added columns. But it added more columns than 
+we asked for. It added `id`, `inserted_at` and `updated_at`. But that is all right. 
+We will see what they are for in a minute.
