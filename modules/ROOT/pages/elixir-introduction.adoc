@@ -13,7 +13,7 @@ teach all the needed Elixir knowledge in just one chapter.
 .Elixir version
 ====
 All code examples are written and tested for Elixir version 1.10.2.
-Please make sure that you have that or a later version installed.
+Please make sure that you have that or a higher version installed.
 [source,bash]
 ----
 $ elixir -v
@@ -1829,7 +1829,7 @@ application. In the Elixir ecosystem this is done with the (already installed)
 command-line interface (CLI) `mix`. Let's do that for a "Hello world!"
 application:
 
-[source,shell]
+[source,bash]
 ----
 $ mix new hello_world
 * creating README.md
@@ -1854,7 +1854,7 @@ Run "mix help" for more commands.
 The command ´mix new projectname` creates a new directory with the name `projectname` 
 and fills it with a default structure:
 
-[source,shell]
+[source,bash]
 ----
 $ cd hello_world
 $ tree
@@ -1894,7 +1894,7 @@ end
 
 Now we can start the `mix start` task:
 
-[source,shell]
+[source,bash]
 ----
 $ mix start
 Compiling 1 file (.ex)
@@ -1905,7 +1905,7 @@ Hello world!
 The `.ex` file gets compiled and the `start` task gets run. The compile is only 
 done when needed. If we call `mix start` a second time no compile is needed:
 
-[source,shell]
+[source,bash]
 ----
 $ mix start
 Hello world!

@@ -24,7 +24,7 @@ Ecto what data model we are using. Because we are ending up using Ecto in
 Phoenix anyway I am using a basic Phoenix application to walk you through the
 process. Let's create a small bookstore:
 
-[source,shell]
+[source,bash]
 ----
 $ mix phx.new bookstore
 [...]
@@ -40,7 +40,7 @@ NOTE: A context is an API boundary for one or more resources. Don't loose any
 sleep on the question what a context is. You'll get a feeling about it. Good
 naming of contexts is important but not right now in the learning process.
 
-[source,shell]
+[source,bash]
 ----
 $ mix phx.gen.context Store Author authors first_name last_name twitter_account
 * creating lib/bookstore/store/author.ex
@@ -57,7 +57,7 @@ Remember to update your repository by running migrations:
 
 The last output of that command is a bit misleading right now. If we do a `mix ecto.migrate` we get this repeating error message:
 
-[source,shell]
+[source,bash]
 ----
 $ mix ecto.migrate
 Compiling 16 files (.ex)
@@ -68,7 +68,7 @@ Generated bookstore app
 
 Ecto wants to connect to a database but there is none. We have to create it first with the comment `mix ecto.create`.
 
-[source,shell]
+[source,bash]
 ----
 $ mix ecto.create
 The database for Bookstore.Repo has been created
@@ -98,7 +98,7 @@ TIP: In case you want to drop the just created database you can do that with `mi
 
 Now we can run the migration.
 
-[source,shell]
+[source,bash]
 ----
 $ mix ecto.migrate
 

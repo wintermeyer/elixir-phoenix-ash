@@ -42,7 +42,7 @@ course at https://online.pragmaticstudio.com/courses/liveview
 
 We start with a fresh Phoenix application:
 
-[source,shell]
+[source,bash]
 ----
 $ mix phx.new demo --live --no-ecto <1>
 * creating demo/config/config.exs
@@ -342,7 +342,7 @@ No interaction by the user. It displays the current server time on a webpage.
 
 We start with a fresh Phoenix application:
 
-[source,shell]
+[source,bash]
 ----
 $ mix phx.new clock --live --no-ecto <1>
 * creating demo/config/config.exs
@@ -430,7 +430,7 @@ image::liveview-clock.png[http://localhost:4000/clock]
 This LiveView example will generate a counter website. It starts with 0 and each
 time you click on a button it will increase by one.
 
-[source,shell]
+[source,bash]
 ----
 $ mix phx.new demo --live --no-ecto
 [...]
@@ -526,7 +526,7 @@ will get no medal for using it. Use the function you feel more comfortable with.
 
 In this LiveView example we create a search field for airport codes.
 
-[source,shell]
+[source,bash]
 ----
 $ mix phx.new travelagent --live --no-ecto
 $ cd travelagent

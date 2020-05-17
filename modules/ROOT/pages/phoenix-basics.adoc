@@ -30,7 +30,7 @@ Phoenix v1.5.1
 For our very first Phoenix Framework "Hello World!" example create a new 
 Phoenix application without a database connector (that's the `no-ecto` part):
 
-[source,shell]
+[source,bash]
 ----
 $ mix phx.new hello_world --no-ecto
 * creating hello_world/config/config.exs
@@ -59,7 +59,7 @@ You can also run your app inside IEx (Interactive Elixir) as:
 After that we `cd hello_world` into the new directory and fire up the Phoenix server 
 with `mix phx.server`
 
-[source,shell]
+[source,bash]
 ----
 $ cd hello_world
 $ mix phx.server
@@ -104,7 +104,7 @@ image::hello-world-first-view.png[http://localhost:4000]
 
 On the terminal you can see the log output:
 
-[source,shell]
+[source,bash]
 ----
 [info] GET /
 [debug] Processing with HelloWorldWeb.PageController.index/2
@@ -115,7 +115,7 @@ On the terminal you can see the log output:
 
 Now we hit reload on the browser and watch the log output:
 
-[source,shell]
+[source,bash]
 ----
 [info] GET /
 [debug] Processing with HelloWorldWeb.PageController.index/2
@@ -383,7 +383,7 @@ image::hello-world-time-now.png[http://localhost:4000]
 
 And just for fun have a look at the log:
 
-[source,shell]
+[source,bash]
 ----
 [info] GET /
 [debug] Processing with HelloWorldWeb.PageController.index/2
@@ -496,7 +496,7 @@ Let's have a look at the existing routes for the PageController. For that
 we either stop the Phoenix server with `CTRL-C` (twice!) or we open an other 
 terminal.
 
-[source,shell]
+[source,bash]
 ----
 $ mix phx.routes | grep PageController
     page_path  GET  /       HelloWorldWeb.PageController :index
@@ -606,7 +606,7 @@ end
 Lastly we have to create a new template directory and move the templates from
 the `page` to the new `game` directory:
 
-[source,shell]
+[source,bash]
 ----
 $ mkdir lib/hello_world_web/templates/game
 $ mv lib/hello_world_web/templates/page/p?ng.html.eex lib/hello_world_web/templates/game/
@@ -685,7 +685,7 @@ some static files. The best example would be a `robots.txt`or a `favicon.ico`
 file. There is the `assets/static/` directory where we can put those files. 
 By default the following files are already in that directory:
 
-[source,shell]
+[source,bash]
 ----
 $ tree assets/static/
 assets/static/
