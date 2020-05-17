@@ -124,8 +124,9 @@ Now we hit reload on the browser and watch the log output:
 [info] Sent 200 in 517µs
 ----
 
-NOTE: `Sent 200 in 517µs`.
-https://en.wikipedia.org/wiki/Microsecond[Microseconds]! WOW! On my old
+[sidebar] 
+The log says that the request was answered in 517µs. WOW!
+https://en.wikipedia.org/wiki/Microsecond[Microseconds]! That is on my old
 development laptop. That must be the famous speed of Phoenix/Elixir everybody is
 talking about.
 
