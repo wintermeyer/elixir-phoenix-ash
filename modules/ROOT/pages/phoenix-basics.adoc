@@ -2,13 +2,15 @@
 # Phoenix's Basics
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-Phoenix follows the Model-View-Controller (MVC) architecture. If you are not
-familiar with that: Just follow my lead. MVC is just a fixed flow of what goes
-where. You are not forced to follow it but it makes live easier if you do. After
-a couple of examples you'll get a feeling for it. Same goes for the directory
-structure or file names.
+Phoenix follows the
+https://en.wikipedia.org/wiki/Model–view–controller[Model-View-Controller] (MVC)
+architecture. If you are not familiar with that: Just follow my lead. MVC is
+just a set of rules of what goes where so that everybody knows where stuff is.
+You are not forced to follow it but it makes live easier if you do. After a
+couple of examples you'll get a feeling for it. Same goes for the directory
+structure and the file names.
 
-In this chapter I'll show how you can create simple webpages which have some
+In this chapter I'll show you how you can create simple webpages which have some
 programming logic. But we will not touch the database yet. Step by step!
 
 [IMPORTANT]
@@ -24,24 +26,33 @@ Phoenix v1.5.1
 ----
 ====
 
-[[phoenix-hello-world]]
-## Phoenix Hello World
+## Development Environment
 
-For our very first Phoenix Framework "Hello World!" example create a new 
-Phoenix application without a database connector (that's the `no-ecto` part):
+By default Phoenix offers three different environments:
+
+- Development
+- Testing
+- Production
+
+In this chapter we are only going to use the development environment. It offers some pleasantries which make the life of a developer easier (e.g. more verbose error messages and auto reload after code changes).
+
+[[the-base-setup]]
+## The Base Setup
+
+The base of every Phoenix application is created with the command
+`mix phx.new application_name` which generates all needed files and the
+directory structure.
+
+We call our new application `demo`:
 
 [source,bash]
 ----
-$ mix phx.new hello_world --no-ecto
-* creating hello_world/config/config.exs
-* creating hello_world/config/dev.exs
-* creating hello_world/config/prod.exs
-...
-Fetch and install dependencies? [Yn] Y <1>
-* running mix deps.get
-* running mix deps.compile
-* running cd assets && npm install && node node_modules/webpack/bin/webpack.js --mode development
-
+$ mix phx.new demo --no-ecto <1>
+* creating demo/config/config.exs
+* creating demo/config/dev.exs
+[...]
+Fetch and install dependencies? [Yn] Y <2>
+[...]
 We are almost there! The following steps are missing:
 
     $ cd hello_world
@@ -54,162 +65,130 @@ You can also run your app inside IEx (Interactive Elixir) as:
 
     $ iex -S mix phx.server
 ----
-<1> You always want to press `Y` here. And yes, it sometimes takes for ever.
+<1> '--no-ecto' creates a fresh application without the Ecto (database connector) part. We don't need a database for the basic examples.
+<2> You always want to press `Y` here. And yes, it sometimes takes for ever.
 
-After that we `cd hello_world` into the new directory and fire up the Phoenix server 
+After that we `cd demo` into the new directory and fire up the Phoenix server 
 with `mix phx.server`
 
 [source,bash]
 ----
-$ cd hello_world
 $ mix phx.server
 Compiling 13 files (.ex) <1>
-Generated hello_world app
-[info] Running HelloWorldWeb.Endpoint with cowboy 2.7.0 at 0.0.0.0:4000 (http)
-[info] Access HelloWorldWeb.Endpoint at http://localhost:4000 <2>
+Generated demo app
+[info] Running DemoWeb.Endpoint with cowboy 2.7.0 at 0.0.0.0:4000 (http)
+[info] Access DemoWeb.Endpoint at http://localhost:4000 <2>
 
-webpack is watching the files… <3>
+webpack is watching the files…
 
-Hash: d1d9f443badbfcdce354
+Hash: f3ee21a2f5780f52f176
 Version: webpack 4.41.5
-Time: 852ms
-Built at: 2020-05-09 16:22:36
-                Asset       Size  Chunks                   Chunk Names
-       ../css/app.css   10.6 KiB     app  [emitted]        app
-   ../css/app.css.map   13.4 KiB     app  [emitted] [dev]  app
-       ../favicon.ico   1.23 KiB          [emitted]        
-../images/phoenix.png   13.6 KiB          [emitted]        
-        ../robots.txt  202 bytes          [emitted]        
-               app.js   7.89 KiB     app  [emitted]        app
-           app.js.map   9.41 KiB     app  [emitted] [dev]  app
-Entrypoint app = ../css/app.css app.js ../css/app.css.map app.js.map
-[0] multi ./js/app.js 28 bytes {app} [built]
-[../deps/phoenix_html/priv/static/phoenix_html.js] 2.21 KiB {app} [built]
-[./css/app.scss] 39 bytes {app} [built]
-[./js/app.js] 490 bytes {app} [built]
-    + 2 hidden modules
-Child mini-css-extract-plugin node_modules/css-loader/dist/cjs.js!node_modules/sass-loader/dist/cjs.js!css/app.scss:
-    Entrypoint mini-css-extract-plugin = *
-    [./node_modules/css-loader/dist/cjs.js!./css/phoenix.css] 10.4 KiB {mini-css-extract-plugin} [built]
-    [./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./css/app.scss] 939 bytes {mini-css-extract-plugin} [built]
-        + 1 hidden module
+[...]
 ----
-<1> Source-Code which hasn't been compiled yet will be compiled now.
-<2> Here you see the URL which you can enter in your browser: http://localhost:4000
-<3> For now we just don't care about that webpack JavaScript and CSS stuff. Phoenix is doing a fine job in not bothering us with that.
+<1> Source-Code which hasn't been compiled yet is compiled.
+<2> The URL which service the development website: http://localhost:4000
 
-Now it's time to fire up the webbrowser with the URL http://localhost:4000
+Please open the URL http://localhost:4000 in your webbrowser:
 
 image::hello-world-first-view.png[http://localhost:4000]
 
-On the terminal you can see the log output:
+On the terminal you can see the server log:
 
 [source,bash]
 ----
 [info] GET /
-[debug] Processing with HelloWorldWeb.PageController.index/2
+[debug] Processing with DemoWeb.PageController.index/2
   Parameters: %{}
   Pipelines: [:browser]
-[info] Sent 200 in 44ms
+[info] Sent 200 in 22ms
 ----
 
-Now we hit reload on the browser and watch the log output:
+Do a reload in the browser and watch the log output:
 
 [source,bash]
 ----
 [info] GET /
-[debug] Processing with HelloWorldWeb.PageController.index/2
+[debug] Processing with DemoWeb.PageController.index/2
   Parameters: %{}
   Pipelines: [:browser]
-[info] Sent 200 in 517µs
+[info] Sent 200 in 426µs
 ----
 
 [sidebar] 
-The log says that the request was answered in 517µs. WOW!
+The log says that the request was answered in 426µs. WOW!
 https://en.wikipedia.org/wiki/Microsecond[Microseconds]! That is on my old
 development laptop. That must be the famous speed of Phoenix/Elixir everybody is
 talking about.
 
-Let's open `lib/hello_world_web/router.ex` which holds all the routing
-configuration and have a look around:
+What we see is the default `index.html.eex` page. The file extension `eex` stands for https://hexdocs.pm/eex/EEx.html[Embedded Elixir] and means that this is a mix of static HTML and dynamic Elixir code which generated HTML. These files are called templates and are located in the `lib/demo_web/templates/` directory. A fresh Phoenix application has two templates:
 
-.lib/hello_world_web/router.ex
-[source,elixir]
+[source,bash]
 ----
-defmodule HelloWorldWeb.Router do
-  use HelloWorldWeb, :router
-
-  pipeline :browser do <1>
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
-  end
-
-  pipeline :api do <2>
-    plug :accepts, ["json"]
-  end
-
-  scope "/", HelloWorldWeb do <3>
-    pipe_through :browser <4>
-
-    get "/", PageController, :index <5>
-  end
-  [...]
+$ tree lib/demo_web/templates/
+lib/demo_web/templates/
+├── layout
+│   └── app.html.eex
+└── page
+    └── index.html.eex
 ----
-<1> This part takes care of all the generic stuff (e.g. session handling) in the beginning. 
-<2> This part takes care of `json` requests. We don't need that now.
-<3> This part is interesting for us now. It is triggered for all requests which start with `/`.
-<4> Runs through all the generic stuff.
-<5> Bingo. That is the URL we opened in our browser. The router pipes that to `index` function in the `PageController` which is actually the module `HelloWorldWeb.PageController`.
 
-The module `HelloWorldWeb.PageController` is defined in the file `lib/hello_world_web/controllers/page_controller.ex`. Time for us to have a look:
+Let's have a look into `index.html.eex` which contains the core part of the page.
 
-.lib/hello_world_web/controllers/page_controller.ex
-[source,elixir]
-----
-defmodule HelloWorldWeb.PageController do
-  use HelloWorldWeb, :controller
-
-  def index(conn, _params) do <1>
-    render(conn, "index.html") <2>
-  end
-end
-----
-<1> This is us. The router piped the request to this `index/2` function. 
-`conn` is a struct which contains the request.
-<2> The `render/2` function is used to render the template `index.html`.
-
-That `index.html` template is actually the file 
-`lib/hello_world_web/templates/page/index.html.eex`. Please open it and change 
-the content to this:
-
-.lib/hello_world_web/templates/page/index.html.eex
+.lib/demo_web/templates/page/index.html.eex
 [source,html]
 ----
-<h1>Hello world!</h1>
+<section class="phx-hero">
+  <h1><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h1>
+  <p>Peace-of-mind from prototype to production</p>
+</section>
+
+<section class="row">
+  <article class="column">
+    <h2>Resources</h2>
+    <ul>
+      <li>
+        <a href="https://hexdocs.pm/phoenix/overview.html">Guides &amp; Docs</a>
+      </li>
+      <li>
+        <a href="https://github.com/phoenixframework/phoenix">Source</a>
+      </li>
+      <li>
+        <a href="https://github.com/phoenixframework/phoenix/blob/v1.5/CHANGELOG.md">v1.5 Changelog</a>
+      </li>
+    </ul>
+  </article>
+  <article class="column">
+    <h2>Help</h2>
+    <ul>
+      <li>
+        <a href="https://elixirforum.com/c/phoenix-forum">Forum</a>
+      </li>
+      <li>
+        <a href="https://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on Freenode IRC</a>
+      </li>
+      <li>
+        <a href="https://twitter.com/elixirphoenix">Twitter @elixirphoenix</a>
+      </li>
+      <li>
+        <a href="https://elixir-slackin.herokuapp.com/">Elixir on Slack</a>
+      </li>
+    </ul>
+  </article>
+</section>
 ----
 
-And after you saved that file you didn't even have to manually reload the page. 
-Phoenix took care of that because you are currently working in the development 
-environment.
+But a bit of HTML boilerplate is missing and can be found in `lib/demo_web/templates/layout/app.html.eex`.
 
-image::hello-world-hello-world.png[http://localhost:4000]
-
-You see the `Hello world!` H1. But you also see the default header. That code 
-can be found at `lib/hello_world_web/templates/layout/app.html.eex`
-
-.lib/hello_world_web/templates/layout/app.html.eex
+.lib/demo_web/templates/layout/app.html.eex
 [source,html]
 ----
 <!DOCTYPE html>
 <html lang="en"> <1>
-  <head> 
+  <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>HelloWorld · Phoenix Framework</title> <2>
+    <title>Demo · Phoenix Framework</title> <2>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/> <3>
     <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </head>
@@ -239,514 +218,13 @@ can be found at `lib/hello_world_web/templates/layout/app.html.eex`
 ----
 <1> You might want to change the language here in case this webpage is going to be in an other language than English.
 <2> You probably want to change this to a better `<title>`.
-<3> Phoenix's asset management takes care of the CSS and JavaScript. No need to worry for now.
-<4> This is the navigation part you are seeing on the top of the page.
+<3> Phoenix's asset management takes care of the CSS and JavaScript. No need to worry about it for now.
+<4> This is the boilerplate header part you are seeing on the top of every page.
 <5> This part renders so called flash messages. We'll get to that later.
-<6> This is the line where the content of the template get's included.
+<6> This is the line where the template's content gets included.
 
-IMPORTANT: `<%= @foobar %>` prints the value of `@foobar` into that place in the HTML file. The `=` is important. Otherwise the Elixir code would run but the output would not be included in the HTML.
+IMPORTANT: https://hexdocs.pm/eex/EEx.html[Embedded Elixir] (`.eex`) uses the `<% %>` syntax to embedd Elixir code in HTML. `<% %>` runs the Elixir code within. `<%= %>` runs the Elixir code and includes the result of that as HTML in the template.
 
-First let's get rid of that default top navigation. Please update `app.html.eex` to this:
-
-.lib/hello_world_web/templates/layout/app.html.eex
-[source,html]
-----
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>HelloWorld · Phoenix Framework</title>
-    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-    <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
-  </head>
-  <body>
-    <main role="main" class="container">
-      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
-      <%= @inner_content %>
-    </main>
-  </body>
-</html>
-----
-
-And let's change the `index.html.eex` file to:
-
-.lib/hello_world_web/templates/page/index.html.eex
-[source,html]
-----
-<h1>Hello world!</h1>
-
-<table>
-  <tr>
-    <td>Host:</td><td><%= @conn.host %></td></tr>
-    <td>Port:</td><td><%= @conn.port %></td></tr>
-  </tr>
-</table>
-----
-
-Again a manual reload is not necessary. Phoenix takes care of that.
-
-image::hello-world-conn-example.png[http://localhost:4000]
-
-You see that `render(conn, "index.html")` from the controller made sure 
-we have access to the `conn` struct. We only have to add a `@` which makes 
-it a '@conn' in the template.
-
-hmmm... than we probably can pipe other information too from the controller 
-into the template. Let's try this:
-
-.lib/hello_world_web/controllers/page_controller.ex
-[source,elixir]
-----
-defmodule HelloWorldWeb.PageController do
-  use HelloWorldWeb, :controller
-
-  def index(conn, _params) do
-    headline = "This is a test headline" <1>
-
-    conn
-    |> assign(:headline, headline) <2>
-    |> render("index.html")
-  end
-end
-----
-<1> We define the variable headline.
-<2> We use `Plug.Conn.assign/2` to pipe the `headline` variable into the `conn` struct. 
-This will make `@headline` available in the template. We can use `assign/2` insteat of `Plug.Conn.assign/2` because `Phoenix.Controller` imports `Plug.Conn` automatically.
-
-.lib/hello_world_web/templates/page/index.html.eex
-[source,html]
-----
-<h1><%= @headline %></h1> <1>
-
-<table>
-  <tr>
-    <td>Host:</td><td><%= @conn.host %></td></tr>
-    <td>Port:</td><td><%= @conn.port %></td></tr>
-  </tr>
-</table>
-----
-<1> Here we use the `@headline` variable.
-
-After saving that you will see a difference in the browser:
-
-image::hello-world-conn-assign-example.png[http://localhost:4000]
-
-[[static-clock]]
-## Static Clock
-
-Until now our page is very static. The easiest way to add something always 
-changing is to display the current time. We setup the needed programming 
-logic in the controller:
-
-.lib/hello_world_web/controllers/page_controller.ex
-[source,elixir]
-----
-defmodule HelloWorldWeb.PageController do
-  use HelloWorldWeb, :controller
-
-  def index(conn, _params) do
-    headline = "This is a test headline"
-    {:ok, timestamp} = DateTime.now("Etc/UTC") <1>
-
-    conn
-    |> assign(:headline, headline)
-    |> assign(:timestamp, timestamp)
-    |> render("index.html")
-  end
-end
-----
-<1> More information about 'DateTime.now/1' at https://hexdocs.pm/elixir/DateTime.html#now/2
-
-After that we change the content of the template to display `@timestamp`.
-
-.lib/hello_world_web/templates/page/index.html.eex
-[source,html]
-----
-<h1><%= @headline %></h1>
-
-<pre>Timestamp: <%= @timestamp %></pre> <1>
-
-<table>
-  <tr>
-    <td>Host:</td><td><%= @conn.host %></td></tr>
-    <td>Port:</td><td><%= @conn.port %></td></tr>
-  </tr>
-</table>
-----
-<1> The time will not be formated. And you'll see that I wrote this part of the
-book on a Sunday morning.
-
-Now we see the current time in the browser. Reload as often as you like to 
-see the differences.
-
-image::hello-world-time-now.png[http://localhost:4000]
-
-And just for fun have a look at the log:
-
-[source,bash]
-----
-[info] GET /
-[debug] Processing with HelloWorldWeb.PageController.index/2
-  Parameters: %{}
-  Pipelines: [:browser]
-[info] Sent 200 in 434µs <1>
-----
-<1> WOW! I'll never get tired of reading those low µs numbers in a Phoenix log.
-
-[[ping-pong]]
-## Ping-Pong
-
-The web consists of webpages which link to each other. So the next step on our
-venture is to create a `http://localhost:4000/ping` and
-`http://localhost:4000/pong` and connect the both of them via links.
-
-Our first stop is the `lib/hello_world_web/router.ex` file. Here we have to 
-define how the webpages are accessable.
-
-.lib/hello_world_web/router.ex
-[source,elixir]
-----
-defmodule HelloWorldWeb.Router do
-  [...]
-
-  scope "/", HelloWorldWeb do
-    pipe_through :browser
-
-    get "/", PageController, :index
-    get "/ping", PageController, :ping <1>
-    get "/pong", PageController, :pong <2>
-  end
-
-  [...]
-----
-<1> Sets the route for `http://localhost:4000/ping`
-<2> Sets the route for `http://localhost:4000/pong`
-
-We haven't created any template yet but let's try to open the page 
-`http://localhost:4000/ping` in the browser:
-
-image::pagecontroller_ping_is_undefined.png[http://localhost:4000/ping]
-
-NOTE: Yes, those error pages look scary. But 9 out of 10 times they say right 
-away what is missing or where you should start to search for the bug.
-
-Phoenix takes us by the hand and says 
-`function HelloWorldWeb.PageController.ping/2 is undefined or private`. 
-That means we have to open the `PageController` in the editor and add those 
-functions:
-
-.lib/hello_world_web/controllers/page_controller.ex
-[source,elixir]
-----
-defmodule HelloWorldWeb.PageController do
-  use HelloWorldWeb, :controller
-
-  def index(conn, _params) do
-    headline = "This is a test headline"
-    {:ok, timestamp} = DateTime.now("Etc/UTC") <1>
-
-    conn
-    |> assign(:headline, headline)
-    |> assign(:timestamp, timestamp)
-    |> render("index.html")
-  end
-
-  def ping(conn, _params) do <1>
-    render(conn, "ping.html")
-  end
-
-  def pong(conn, _params) do <2>
-    render(conn, "pong.html")
-  end
-end
-----
-<1> Voilá, the `ping/2` function.
-<2> And the `pong/2` function.
-
-Saving that file will result in new error:
-
-image::could_not_render_ping_html.png[http://localhost:4000]
-
-The error message says `Could not render "ping.html" for HelloWorldWeb.PageView,
-please ... define a template at "lib/hello_world_web/templates/page/*"`. That's
-easy. We create a new template `lib/hello_world_web/templates/page/ping.html.eex`.
-
-.lib/hello_world_web/templates/page/ping.html.eex
-[source,html]
-----
-<h1>Ping</h1>
-----
-
-Perfect. What a nice pong we have created page:
-
-image::ping.png[http://localhost:4000/ping]
-
-The missing pong part is easy:
-
-.lib/hello_world_web/templates/page/pong.html.eex
-[source,html]
-----
-<h1>Pong</h1>
-----
-
-But for Ping-Pong we need a `href` link between both pages. We could add
-one manually with `<a href="/pong">Pong</a>` but that would not be very clean. 
-
-Let's have a look at the existing routes for the PageController. For that 
-we either stop the Phoenix server with `CTRL-C` (twice!) or we open an other 
-terminal.
-
-[source,bash]
-----
-$ mix phx.routes | grep PageController
-    page_path  GET  /       HelloWorldWeb.PageController :index
-    page_path  GET  /ping   HelloWorldWeb.PageController :ping
-    page_path  GET  /pong   HelloWorldWeb.PageController :pong <1>
-----
-<1> For us important is the `page_path` and the `:pong`.
-
-With that information we can use the `link` helper (which is already 
-awailable) to create that link:
-indexterm:["Link"]
-
-.lib/hello_world_web/templates/page/ping.html.eex
-[source,html]
-----
-<h1>Ping</h1>
-
-<p>
-<%= link "Pong!", to: Routes.page_path(@conn, :pong) %> <1>
-</p>
-----
-<1> `page_path` and `:pong` become `Routes.page_path(@conn, :pong)` for this.
-
-We do the same on the pong page:
-
-.lib/hello_world_web/templates/page/pong.html.eex
-[source,html]
-----
-<h1>Pong</h1>
-
-<p>
-<%= link "Ping!", to: Routes.page_path(@conn, :ping) %> <1>
-</p>
-----
-
-image::ping_with_pong_link.png[http://localhost:4000/ping]
-
-Now you can play HTML Ping-Pong.
-
-[[game-controller]]
-### Move Ping-Pong to a GameController
-
-I am happy with our HTML ping-pong game but having it in the `PageController`
-doesn't feel right. We should create a `GameController` and move it to that new 
-home. 
-
-First we change the routes:
-
-.lib/hello_world_web/router.ex
-[source,elixir]
-----
-defmodule HelloWorldWeb.Router do
-  [...]
-
-  scope "/", HelloWorldWeb do
-    pipe_through :browser
-
-    get "/", PageController, :index
-
-    get "/game/ping", GameController, :ping <1>
-    get "/game/pong", GameController, :pong
-  end
-
-  [...]
-----
-<1> Of course we don't have to change the URL path but to I think `/game/ping` makes sense. It calls `:ping` in the `GameController`.
-
-We have to create a new `lib/hello_world_web/controllers/game_controller.ex`
-file and move `ping/2` and `pong/2` from the `PageController` to it.
-
-.lib/hello_world_web/controllers/game_controller.ex
-[source,elixir]
-----
-defmodule HelloWorldWeb.GameController do
-  use HelloWorldWeb, :controller
-
-  def ping(conn, _params) do
-    render(conn, "ping.html")
-  end
-
-  def pong(conn, _params) do
-    render(conn, "pong.html")
-  end  
-end
-----
-
-And here the cleaned up PageController:
-
-.lib/hello_world_web/controllers/page_controller.ex
-[source,elixir]
-----
-defmodule HelloWorldWeb.PageController do
-  use HelloWorldWeb, :controller
-
-  def index(conn, _params) do
-    headline = "This is a test headline"
-    {:ok, timestamp} = DateTime.now("Etc/UTC")
-
-    conn
-    |> assign(:headline, headline)
-    |> assign(:timestamp, timestamp)
-    |> render("index.html")
-  end 
-end
-----
-
-Lastly we have to create a new template directory and move the templates from
-the `page` to the new `game` directory:
-
-[source,bash]
-----
-$ mkdir lib/hello_world_web/templates/game
-$ mv lib/hello_world_web/templates/page/p?ng.html.eex lib/hello_world_web/templates/game/
-$ tree lib/hello_world_web/templates/
-lib/hello_world_web/templates/
-├── game
-│   ├── ping.html.eex
-│   └── pong.html.eex
-├── layout
-│   └── app.html.eex
-└── page
-    └── index.html.eex
-
-3 directories, 4 files
-----
-
-We haven't talked about the Views yet and I am not going to do so now. Let's just say 
-that we need a View to have access to a template. Therefor we need to create a new `GameView`.
-
-.lib/hello_world_web/views/game_view.ex
-[source,elixir]
-----
-defmodule HelloWorldWeb.GameView do
-  use HelloWorldWeb, :view
-end
-----
-
-Now everything should just work. Let's open `http://localhost:4000/game/ping` in the browser.
-
-image::game_ping_no_action_pong.png[http://localhost:4000/game/ping]
-
-Ups ... the error says "no action :pong for
-HelloWorldWeb.Router.Helpers.page_path/2.". Ahh! We haven't updated the links in
-the templates. They still show to the now not existing `pong` action in the
-`PageController`. Easy fix:
-
-.lib/hello_world_web/templates/game/ping.html.eex
-[source,html]
-----
-<h1>Ping</h1>
-
-<p>
-<%= link "Pong!", to: Routes.game_path(@conn, :pong) %>
-</p>
-----
-
-.lib/hello_world_web/templates/game/pong.html.eex
-[source,html]
-----
-<h1>Pong</h1>
-
-<p>
-<%= link "Ping!", to: Routes.game_path(@conn, :ping) %>
-</p>
-----
-
-Now everything is working:
-
-image::ping_game_controller.png[http://localhost:4000/game/ping]
-
-## Roundup new Pages
-
-In Phoenix for every webpage we have to take care of these components:
-
-- A route in the `lib/hello_world_web/router.ex`
-- A controller (e.g. `lib/hello_world_web/controllers/page_controller.ex`)
-- An action (function) in that controller (e.g. `ping/2`)
-- A view (e.g. `lib/hello_world_web/views/game_view.ex`)
-- A template (e.g. `lib/hello_world_web/templates/game/ping.html.eex`)
-
-[[static-files]]
-## Static files
-indexterm:["Static files"]
-
-Of course any webapplication doesn't only have dynamic webpages but also 
-some static files. The best example would be a `robots.txt`or a `favicon.ico` 
-file. There is the `assets/static/` directory where we can put those files. 
-By default the following files are already in that directory:
-
-[source,bash]
-----
-$ tree assets/static/
-assets/static/
-├── favicon.ico
-├── images
-│   └── phoenix.png
-└── robots.txt
-----
-
-They get delivered by the webserver without any additional interaction 
-within the Phoenix application. But adding a file to that directory is 
-not enough. You have to whitelist it. Assuming we add a `ads.txt` 
-file into the `assets/static/` directory. Than we have to update the 
-`lib/hello_world_web/endpoint.ex` file accordingly:
-
-.lib/hello_world_web/endpoint.ex
-[source,elixir]
-----
-[...]
-
-plug Plug.Static,
-  at: "/",
-  from: :hello_world,
-  gzip: false,
-  only: ~w(css fonts images js favicon.ico robots.txt ads.txt) <1>
-
-[...]
-----
-<1> All static files or directories have to be whitelisted in this list.
-
-### Images
-
-Images are a special case of static files. They can be stored in the 
-`assets/static/images/` directory which is already whitelisted to be ok 
-for static files.
-
-In every fresh Phoenix installation you'll find the Phoenix logo file at 
-`assets/static/images/phoenix.png`. So you can use that with our "Hello world!" 
-application and use `Routes.static_path(@conn, "/images/phoenix.png")` to show 
-it:
-
-.lib/hello_world_web/templates/page/index.html.eex
-[source,html]
-----
-<h1><%= @headline %></h1>
-
-<pre>Timestamp: <%= @timestamp %></pre>
-
-<table>
-  <tr>
-    <td>Host:</td><td><%= @conn.host %></td></tr>
-    <td>Port:</td><td><%= @conn.port %></td></tr>
-  </tr>
-</table>
-
-<img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" /> <1>
-----
-<1> `Routes.static_path/2` returns the complete route of the static file.
-
-image::hello-world-with-phoenix-logo.png[http://localhost:4000/game/ping]
+Feel free to change the content of `app.html.eex` and `index.html.eex`. In
+development mode each save of such a file triggers a reload of the page in the
+browser.
