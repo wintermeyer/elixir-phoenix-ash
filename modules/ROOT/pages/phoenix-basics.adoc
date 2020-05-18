@@ -73,6 +73,7 @@ with `mix phx.server`
 
 [source,bash]
 ----
+$ cd demo
 $ mix phx.server
 Compiling 13 files (.ex) <1>
 Generated demo app
@@ -131,6 +132,9 @@ lib/demo_web/templates/
 └── page
     └── index.html.eex
 ----
+
+NOTE: It is no coincedence that the subdirectory is called `demo_web`. Because
+we named our application `demo` that name will be used at multiple places.
 
 Let's have a look into `index.html.eex` which contains the core part of the page.
 
@@ -225,6 +229,79 @@ But a bit of HTML boilerplate is missing and can be found in `lib/demo_web/templ
 
 IMPORTANT: https://hexdocs.pm/eex/EEx.html[Embedded Elixir] (`.eex`) uses the `<% %>` syntax to embedd Elixir code in HTML. `<% %>` runs the Elixir code within. `<%= %>` runs the Elixir code and includes the result of that as HTML in the template.
 
-Feel free to change the content of `app.html.eex` and `index.html.eex`. In
-development mode each save of such a file triggers a reload of the page in the
-browser.
+Feel free to change the content of `app.html.eex` and `index.html.eex` while
+having http://localhost:4000 opened in a browser. In development mode each save
+of those files triggers a reload of the page in the browser.
+
+## Hello World!
+
+The aim of this section is to create a new dynamic page which is available at
+http://localhost:4000/hello and displays the text "Hello World!". We start with
+the base setup:
+
+[source,bash]
+----
+$ mix phx.new demo --no-ecto
+[...]
+$ cd demo
+----
+
+Routes are defined in `lib/demo_web/router.ex`. Let's have a look and add a new
+route for our hello world page.
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+defmodule DemoWeb.Router do
+  use DemoWeb, :router
+
+  [...]
+
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/hello", PageController, :hello <1>
+  end
+
+  [...]
+----
+<1> We use the same `PageController` as the `:index` action for our new `:hello` action (function).
+
+Because the route calls the `:hello` action in the `PageController` we have to
+add a `hello/2` function in `page_controller.ex`:
+
+.lib/demo_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.PageController do
+  use DemoWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+
+  def hello(conn, _params) do <1>
+    render(conn, "hello.html")
+  end
+end
+----
+<1> The new `hello/2` function renders the `hello.html` template.
+
+Last step: We have to create a template file. Please do so and include this 
+source code into it:
+
+.lib/demo_web/templates/page/hello.html.eex
+[source,html]
+----
+<h1>Hello World!</h1>
+----
+
+Now open http://localhost:4000/hello in your browser:
+
+image::hello-world.png[http://localhost:4000/hello]
+
+### Hello World with it's own controller
+
+In the last section we added the `:hello` action to the already existing `PageController`. Let's assume that we need our own controller for this page. What would change?
+
