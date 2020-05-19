@@ -1,3 +1,3 @@
-# Phoenix Framework Beginner's Guide
+# Phoenix Beginner's Guide
 
 We use https://antora.org to convert the AsciiDoc to HTML.
