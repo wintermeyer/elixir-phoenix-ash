@@ -303,5 +303,88 @@ image::hello-world.png[http://localhost:4000/hello]
 
 ### Hello World with it's own controller
 
-In the last section we added the `:hello` action to the already existing `PageController`. Let's assume that we need our own controller for this page. What would change?
+In the last section we added the `:hello` action to the already existing `PageController`. But in many case it makes sense to create a seperate controller. Let's do that so you know how to.
+
+We start with changing the route:
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+defmodule DemoWeb.Router do
+  use DemoWeb, :router
+
+  [...]
+
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/hello", ExampleController, :hello <1>
+  end
+
+  [...]
+----
+<1> Yes, `ExampleController` is not a candiate for best controller name of the year. Good catch!
+
+Let's be lazy and ask Phoenix what to do next. We open http://localhost:4000/hello in the browser:
+
+image::hello-world-examplecontroller-is-undefined.png[http://localhost:4000/hello]
+
+It says `function DemoWeb.ExampleController.init/1 is undefined` which leads us to the next missing piece: A controller. That file needs to be named `example_controller.ex` and is has to be saved in the `lib/demo_web/controllers` directory. Here is the content of it:
+
+.lib/demo_web/controllers/example_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.ExampleController do <1>
+  use DemoWeb, :controller
+
+  def hello(conn, _params) do
+    render(conn, "hello.html")
+  end
+end
+----
+<1> Important: `DemoWeb.ExampleController`
+
+After a reload we get a new error message: `function DemoWeb.ExampleView.render/2 is undefined`. So we need to create a view file:
+
+.lib/demo_web/views/example_view.ex
+[source,elixir]
+----
+defmodule DemoWeb.ExampleView do <1>
+  use DemoWeb, :view
+end
+----
+<1> Important to use the right name here (e.g. 'ExampleView').
+
+A reload and we get our final error message:
+
+image::hello-world-could-not-render-hello-html.png[http://localhost:4000/hello]
+
+The template is missing. But that is an easy fix:
+
+.lib/demo_web/templates/example/hello.html.eex
+[source,html]
+----
+<h1>Hello World!</h1>
+----
+
+And here is our good to go webpage:
+
+image::hello-world.png[http://localhost:4000/hello]
+
+#### Checklist for a new page
+
+Everytime you want to create a new action in a new controller you have to take care of these steps:
+
+- Create a route in `lib/demo_web/router.ex`
+- Create a controller with the name `lib/demo_web/controllers/example_controller.ex`
+- Create an action in that controller which matches the route
+- Create a view with the name `lib/demo_web/views/example_view.ex`
+- Create a template with the name `lib/demo_web/templates/page/hello.html.eex`
+
+Phoenix will always lead you through the way. If something is missing it will say so in the error message.
+
+WARNING: Obviously `demo_web`, `example_controller.ex`, `example_view.ex` and `hello.html.eex` are just names which fit for our "Hello World!" example. You have to adjust them for your case.
+
+## Use Variables in the Template
 
