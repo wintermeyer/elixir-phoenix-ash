@@ -55,7 +55,7 @@ Fetch and install dependencies? [Yn] Y <2>
 [...]
 We are almost there! The following steps are missing:
 
-    $ cd hello_world
+    $ cd demo
 
 Start your Phoenix app with:
 
@@ -233,6 +233,7 @@ Feel free to change the content of `app.html.eex` and `index.html.eex` while
 having http://localhost:4000 opened in a browser. In development mode each save
 of those files triggers a reload of the page in the browser.
 
+[[hello-world]]
 ## Hello World!
 
 The aim of this section is to create a new dynamic page which is available at
@@ -387,7 +388,8 @@ Phoenix will always lead you through the way. If something is missing it will sa
 
 WARNING: Obviously `demo_web`, `example_controller.ex`, `example_view.ex` and `hello.html.eex` are just names which fit for our "Hello World!" example. You have to adjust them for your case.
 
-## Move data from the controller into the template
+[[conn-struct]]
+## The `conn` Struct
 
 According to the
 https://en.wikipedia.org/wiki/Model–view–controller[Model-View-Controller] (MVC)
@@ -541,7 +543,7 @@ That is quite a bit of information in the `@conn` struct. Here is the complete c
 
 We can use the `playground.html.eex` to display specific parts of that:
 
-.lib/hello_world_web/templates/page/playground.html.eex
+.lib/demo_web/templates/page/playground.html.eex
 [source,html]
 ----
 <table>
@@ -620,3 +622,166 @@ To access that we change the `playground.html.eex` template:
 <2> But normaly we access it via the shortform `@headline`. The `@`-version is accessable for all subcontent of `@conn.assigns`.
 
 image::playground-conn-assigns-headline.png[http://localhost:4000/playground]
+
+[[static-clock]]
+### Static Clock
+
+The current application always displays the same content. The easiest way to 
+change that is to display the time. For that we add a `timestamp` variable in the controller and display it in the template:
+
+.lib/hello_world_web/controllers/page_controller.ex
+[source,elixir]
+----
+[...]
+def playground(conn, _params) do
+  headline = "This is a test headline"
+  {:ok, timestamp} = DateTime.now("Etc/UTC")
+
+  conn
+  |> assign(:headline, headline)
+  |> assign(:timestamp, timestamp)
+  |> render("playground.html")
+end
+[...]
+----
+
+.lib/hello_world_web/templates/page/playground.html.eex
+[source,html]
+----
+<h1><%= @headline %></h1>
+
+<table>
+  <tr>
+    <td>Etc/UTC</td>
+    <td><%= @timestamp %></td>
+  </tr>
+</table>
+----
+
+image::playground-timestamp.png[http://localhost:4000/playground]
+
+[[links]]
+## Links
+
+The web consists of webpages which link to each other. So the next step on our
+venture for the ultimate Phoenix application is a game of ping-pong. `http://localhost:4000/ping` will display a link to 
+`http://localhost:4000/pong` and vice versa.
+
+[source,bash]
+----
+$ mix phx.new game --no-ecto
+[...]
+$ cd game
+$ mix phx.server
+----
+
+First we have to set the routes for ping and pong:
+
+.lib/game_web/router.ex
+[source,elixir]
+----
+defmodule GameWeb.Router do
+  [...]
+
+  scope "/", GameWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/ping", PageController, :ping <1>
+    get "/pong", PageController, :pong <2>
+  end
+
+  [...]
+----
+<1> Sets the route for `http://localhost:4000/ping`
+<2> Sets the route for `http://localhost:4000/pong`
+
+Next we add the actions to the PageController:
+
+.lib/game_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule GameWeb.PageController do
+  use GameWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+
+  def ping(conn, _params) do
+    render(conn, "ping.html")
+  end
+
+  def pong(conn, _params) do
+    render(conn, "pong.html")
+  end
+end
+----
+
+And the `ping.html.eex` template:
+
+.lib/hello_world_web/templates/page/ping.html.eex
+[source,html]
+----
+<h1>Ping</h1>
+----
+
+Perfect. What a nice ping we have created page:
+
+image::ping.png[http://localhost:4000/ping]
+
+The missing pong counter part is easy:
+
+.lib/hello_world_web/templates/page/pong.html.eex
+[source,html]
+----
+<h1>Pong</h1>
+----
+
+But for Ping-Pong we need a `href` link between both pages. We could add
+one manually with `<a href="/pong">Pong</a>` but that would not be very clean. 
+Since we have a router in Phoenix we can use that to create clean routes for 
+our links.
+
+We either have to stop the Phoenix server (`CTRL-C` twice!) or open a new terminal with the same direction to run a `mix phx.routes` which returns all known routes. 
+Because we are only interested in the routes for `PageController` we `grep` for those:
+
+[source,bash]
+----
+$ mix phx.routes | grep PageController
+  page_path  GET  /       GameWeb.PageController :index
+  page_path  GET  /ping   GameWeb.PageController :ping <1>
+  page_path  GET  /pong   GameWeb.PageController :pong
+----
+<1> For us important is the `page_path` and the `:ping` and `:pong`.
+
+With that information we can use the
+https://hexdocs.pm/phoenix_html/Phoenix.HTML.Link.html[link helper] to create that link: 
+indexterm:["Link"]
+
+.lib/game_web/templates/page/ping.html.eex
+[source,html]
+----
+<h1>Ping</h1>
+
+<p>
+<%= link "Pong!", to: Routes.page_path(@conn, :pong) %> <1>
+</p>
+----
+<1> `page_path` and `:pong` action become `Routes.page_path(@conn, :pong)`
+
+We do the same on the pong page:
+
+.lib/game_web/templates/page/pong.html.eex
+[source,html]
+----
+<h1>Pong</h1>
+
+<p>
+<%= link "Ping!", to: Routes.page_path(@conn, :ping) %> <1>
+</p>
+----
+
+image::ping_with_pong_link.png[http://localhost:4000/ping]
+
+Now you can play HTML Ping-Pong.
