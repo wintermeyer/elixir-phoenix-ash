@@ -244,6 +244,7 @@ the base setup:
 $ mix phx.new demo --no-ecto
 [...]
 $ cd demo
+$ mix phx.server
 ----
 
 Routes are defined in `lib/demo_web/router.ex`. Let's have a look and add a new
@@ -372,7 +373,7 @@ And here is our good to go webpage:
 
 image::hello-world.png[http://localhost:4000/hello]
 
-#### Checklist for a new page
+### Checklist for a new page
 
 Everytime you want to create a new action in a new controller you have to take care of these steps:
 
@@ -386,5 +387,236 @@ Phoenix will always lead you through the way. If something is missing it will sa
 
 WARNING: Obviously `demo_web`, `example_controller.ex`, `example_view.ex` and `hello.html.eex` are just names which fit for our "Hello World!" example. You have to adjust them for your case.
 
-## Use Variables in the Template
+## Move data from the controller into the template
 
+According to the
+https://en.wikipedia.org/wiki/Model–view–controller[Model-View-Controller] (MVC)
+architecture we do our programming stuff in the controller and use the template
+just to display the results. Therefor we need a mechanism to transport this data
+from the controller into the template. That mechanism is the `conn` struct. Let's have a look into it:
+
+[source,bash]
+----
+$ mix phx.new demo --no-ecto
+[...]
+$ cd demo
+$ mix phx.server
+----
+
+A new route to inspect the content of `conn` and we add a second route for a playground page:
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+defmodule DemoWeb.Router do
+  use DemoWeb, :router
+
+  [...]
+
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/inspect", PageController, :inspect <1>
+    get "/playground", PageController, :playground
+  end
+
+  [...]
+----
+<1> For now we put it into the `PageController`.
+
+In the page controller we add an `inspect` and a `playground` action:
+
+.lib/demo_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.PageController do
+  use DemoWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+
+  def inspect(conn, _params) do
+    render(conn, "inspect.html")
+  end
+
+  def playground(conn, _params) do
+    render(conn, "playground.html")
+  end
+end
+----
+
+And finally this piece of code into the `inspect.html.eex` template:
+
+.lib/demo_web/templates/page/inspect.html.eex
+[source,html]
+----
+<pre>
+<%= inspect(@conn, pretty: true) %> <1>
+</pre>
+----
+<1> We have access to `conn` in the template by calling it `@conn`.
+
+Please open http://localhost:4000/inspect in your browser:
+
+image::inspect_conn.png[http://localhost:4000/inspect]
+
+That is quite a bit of information in the `@conn` struct. Here is the complete content:
+
+[source,elixir]
+----
+%Plug.Conn{
+  adapter: {Plug.Cowboy.Conn, :...},
+  assigns: %{layout: {DemoWeb.LayoutView, "app.html"}},
+  before_send: [#Function<0.39862366/1 in Plug.CSRFProtection.call/2>,
+   #Function<2.67121911/1 in Phoenix.Controller.fetch_flash/2>,
+   #Function<0.29283909/1 in Plug.Session.before_send/2>,
+   #Function<0.24098476/1 in Plug.Telemetry.call/2>,
+   #Function<0.67312369/1 in Phoenix.LiveReloader.before_send_inject_reloader/2>],
+  body_params: %{},
+  cookies: %{},
+  halted: false,
+  host: "localhost",
+  method: "GET",
+  owner: #PID<0.855.0>,
+  params: %{},
+  path_info: ["inspect"],
+  path_params: %{},
+  port: 4000,
+  private: %{
+    DemoWeb.Router => {[], %{}},
+    :phoenix_action => :inspect,
+    :phoenix_controller => DemoWeb.PageController,
+    :phoenix_endpoint => DemoWeb.Endpoint,
+    :phoenix_flash => %{},
+    :phoenix_format => "html",
+    :phoenix_layout => {DemoWeb.LayoutView, :app},
+    :phoenix_request_logger => {"request_logger", "request_logger"},
+    :phoenix_router => DemoWeb.Router,
+    :phoenix_template => "inspect.html",
+    :phoenix_view => DemoWeb.PageView,
+    :plug_session => %{},
+    :plug_session_fetch => :done
+  },
+  query_params: %{},
+  query_string: "",
+  remote_ip: {127, 0, 0, 1},
+  req_cookies: %{},
+  req_headers: [
+    {"accept",
+     "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"},
+    {"accept-encoding", "gzip, deflate, br"},
+    {"accept-language", "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7"},
+    {"connection", "keep-alive"},
+    {"host", "localhost:4000"},
+    {"sec-fetch-dest", "document"},
+    {"sec-fetch-mode", "navigate"},
+    {"sec-fetch-site", "none"},
+    {"sec-fetch-user", "?1"},
+    {"upgrade-insecure-requests", "1"},
+    {"user-agent",
+     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"}
+  ],
+  request_path: "/inspect",
+  resp_body: nil,
+  resp_cookies: %{},
+  resp_headers: [
+    {"cache-control", "max-age=0, private, must-revalidate"},
+    {"x-request-id", "FhBrYjjxnpjbwzAAAAxD"},
+    {"x-frame-options", "SAMEORIGIN"},
+    {"x-xss-protection", "1; mode=block"},
+    {"x-content-type-options", "nosniff"},
+    {"x-download-options", "noopen"},
+    {"x-permitted-cross-domain-policies", "none"},
+    {"cross-origin-window-policy", "deny"}
+  ],
+  scheme: :http,
+  script_name: [],
+  secret_key_base: :...,
+  state: :unset,
+  status: nil
+}
+----
+
+We can use the `playground.html.eex` to display specific parts of that:
+
+.lib/hello_world_web/templates/page/playground.html.eex
+[source,html]
+----
+<table>
+  <tr><td>Host:</td><td><%= @conn.host %></td></tr>
+  <tr><td>Port:</td><td><%= @conn.port %></td></tr>
+</table>
+----
+
+Please open http://localhost:4000/playground to see the result.
+
+image::playground-0.png[http://localhost:4000/playground]
+
+Let me show you now how to use `conn` to transport additional data:
+
+.lib/demo_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.PageController do
+  use DemoWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+
+  def inspect(conn, _params) do
+    conn
+    |> assign(:headline, "This is a test headline") <1>
+    |> render("inspect.html")
+  end
+
+  def playground(conn, _params) do
+    headline = "This is a test headline"
+
+    conn
+    |> assign(:headline, headline) <2>
+    |> render("playground.html")
+  end
+end
+
+----
+<1> With `assign/3` we can add new variables to the conn struct.
+<2> Same result but a different coding style.
+
+On http://localhost:4000/inspect we see this:
+
+[source,elixir]
+----
+%Plug.Conn{
+  adapter: {Plug.Cowboy.Conn, :...},
+  assigns: %{
+    headline: "This is a test headline",
+    layout: {DemoWeb.LayoutView, "app.html"}
+  },
+[...]
+----
+
+To access that we change the `playground.html.eex` template:
+
+.lib/hello_world_web/templates/page/playground.html.eex
+[source,html]
+----
+<h1><%= @headline %></h1>
+
+<table>
+  <tr>
+    <td>@conn.assigns.headline</td>
+    <td><%= @conn.assigns.headline %></td> <1>
+  </tr>
+  <tr>
+    <td>@headline</td>
+    <td><%= @headline %></td> <2>
+  </tr>
+</table>
+----
+<1> We can access the value of `headline` through the longer `@conn.assigns.headline`.
+<2> But normaly we access it via the shortform `@headline`. The `@`-version is accessable for all subcontent of `@conn.assigns`.
+
+image::playground-conn-assigns-headline.png[http://localhost:4000/playground]
