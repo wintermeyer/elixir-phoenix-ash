@@ -388,6 +388,29 @@ Phoenix will always lead you through the way. If something is missing it will sa
 
 WARNING: Obviously `demo_web`, `example_controller.ex`, `example_view.ex` and `hello.html.eex` are just names which fit for our "Hello World!" example. You have to adjust them for your case.
 
+For our example the directory and file structure looks like this:
+
+[source,bash]
+----
+$ tree lib/demo_web/{cont*,temp*,view*}
+lib/demo_web/controllers
+├── example_controller.ex
+└── page_controller.ex
+lib/demo_web/templates
+├── example
+│   └── hello.html.eex
+├── layout
+│   └── app.html.eex
+└── page
+    └── index.html.eex
+lib/demo_web/views
+├── error_helpers.ex
+├── error_view.ex
+├── example_view.ex
+├── layout_view.ex
+└── page_view.ex
+----
+
 [[conn-struct]]
 ## The `conn` Struct
 
