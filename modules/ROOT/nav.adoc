@@ -1,4 +1,4 @@
-* xref:preface.adoc[Preface]
+* xref:index.adoc#preface[Preface]
 * xref:elixir-introduction.adoc[Elixir Introduction]
 * xref:phoenix-basics.adoc[Phoenix Basics]
 ** xref:phoenix-basics.adoc#the-base-setup[The Base Setup]

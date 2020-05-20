@@ -873,6 +873,7 @@ You can use `Routes.static_path(@conn, "/images/phoenix.png")` to address the im
 [[css]]
 ## CSS
 
-As written in the xref:preface.adoc[preface]: We do not waste time in this book 
-with making our webpages pretty. But in case you want to add some CSS into your demo application you can do so by consulting the file `assets/css/app.scss`
+As written in the xref:index.adoc#preface[Preface]: We do not waste time in this
+book with making our webpages pretty. But in case you want to add some CSS into
+your demo application you can do so by consulting the file `assets/css/app.scss`
  
