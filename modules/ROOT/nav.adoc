@@ -8,6 +8,7 @@
 ** xref:phoenix-basics.adoc#links[Links]
 ** xref:phoenix-basics.adoc#static-files[Static files]
 *** xref:phoenix-basics.adoc#images[Images]
+** xref:phoenix-basics.adoc#css[CSS]
 * xref:phoenix-liveview-basics.adoc[LiveView Basics]
 ** xref:phoenix-liveview-basics.adoc#light-switch[Light Switch]
 ** xref:phoenix-liveview-basics.adoc#clock[Clock]
