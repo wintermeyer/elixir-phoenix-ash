@@ -77,7 +77,7 @@ light bulb. All this without reloading the page and without any JavaScript.
 
 First we have to add the route:
 
-lib/hello_world_web/router.ex
+.lib/hello_world_web/router.ex
 [source,elixir]
 ----
 defmodule DemoWeb.Router do
@@ -100,7 +100,7 @@ defmodule DemoWeb.Router do
 LiveView modules are located in the `lib/demo_web/live/` directory. There we have to create 
 our new `LightLive` module:
 
-lib/demo_web/live/light_live.ex
+.lib/demo_web/live/light_live.ex
 [source,elixir]
 ----
 defmodule DemoWeb.LightLive do
@@ -137,7 +137,7 @@ happen we first have to replace the current word with a variable and we have to 
 that variable to the socket struct (which is used to transport that information). We assign 
 the initial state of the variable `light_bulb_status` in the `mount/3` function.
 
-lib/demo_web/live/light_live.ex
+.lib/demo_web/live/light_live.ex
 [source,elixir]
 ----
 defmodule DemoWeb.LightLive do
@@ -162,7 +162,7 @@ The browser automatically reloads but the page's content hasn't changed. Only we
 is not a static content any more.
 
 To turn on the light bulb we need a button:
-
+.
 [source,elixir]
 ----
 def render(assigns) do
@@ -180,7 +180,7 @@ image::liveview-on-button.png[http://localhost:4000/light]
 
 But clicking on the button doesn't do anything. We have to add a `handle_event/3` function for the `on` event:
 
-lib/demo_web/live/light_live.ex
+.lib/demo_web/live/light_live.ex
 [source,elixir]
 ----
 defmodule DemoWeb.LightLive do
@@ -238,7 +238,7 @@ image::liveview-on-button-after-clicking.png[http://localhost:4000/light]
 But it would be nice to add a second button so that we can switch the light off 
 again. In addition we have to add an other event handler for the `off` event:
 
-lib/demo_web/live/light_live.ex
+.lib/demo_web/live/light_live.ex
 [source,elixir]
 ----
 defmodule DemoWeb.LightLive do
@@ -279,7 +279,7 @@ Now we have a webpage with two buttons which work to turn the imaginary light on
 and off. But I don't like that both buttons are active all the time. That is bad
 UX. Let's fix that:
 
-lib/demo_web/live/light_live.ex
+.lib/demo_web/live/light_live.ex
 [source,elixir]
 ----
 defmodule DemoWeb.LightLive do
@@ -358,7 +358,7 @@ $ cd clock
 
 The first thing is always to add a new route for the LiveView:
 
-lib/clock_web/router.ex
+.lib/clock_web/router.ex
 [source,elixir]
 ----
 defmodule ClockWeb.Router do
@@ -377,7 +377,7 @@ defmodule ClockWeb.Router do
 ----
 <1> Our new clock will be available at http://localhost:4000/clock
 
-lib/clock_web/live/clock_live.ex
+.lib/clock_web/live/clock_live.ex
 [source,elixir]
 ----
 defmodule ClockWeb.ClockLive do
@@ -440,7 +440,7 @@ $ mix phx.new demo --live --no-ecto
 $ cd demo
 ----
 
-lib/demo_web/router.ex
+.lib/demo_web/router.ex
 [source,elixir]
 ----
 scope "/", DemoWeb do
@@ -455,7 +455,7 @@ end
 Now we have to create the `lib/demo_web/live/counter_live.ex` file and fill it
 with live:
 
-lib/demo_web/live/counter_live.ex
+.lib/demo_web/live/counter_live.ex
 [source,elixir]
 ----
 defmodule DemoWeb.CounterLive do
@@ -500,7 +500,7 @@ image::liveview_counter.png[http://localhost:4000/counter]
 indexterm:["assign (LiveView)", "update (LiveView)"]
 
 In the counter example we use this code with an `update/3` function:
-
+.
 [source,elixir]
 ----
 def handle_event("inc", _, socket) do
@@ -512,7 +512,7 @@ end
 We could achieve the same result with this code which uses the `assign/3`
 function. But for that we'd have to get the value of `counter` via the 
 `socket` struct:
-
+.
 [source,elixir]
 ----
 def handle_event("inc", _, socket) do
@@ -538,7 +538,7 @@ $ cd travelagent
 
 We begin with the route of the new page:
 
-lib/travelagent_web/router.ex
+.lib/travelagent_web/router.ex
 [source,elixir]
 ----
 [...]
@@ -554,7 +554,7 @@ end
 Next we need to create a module which holds that list of airports and a search 
 function. We'll put this into `lib/travelagent/airports.ex`
 
-lib/travelagent/airports.ex
+.lib/travelagent/airports.ex
 [source,elixir]
 ----
 defmodule Travelagent.Airports do
@@ -634,7 +634,7 @@ lib/travelagent_web/live/search_live.html.leex
 
 Lastly the TravelagentWeb.SearchLive module:
 
-lib/travelagent_web/live/search_live.ex
+.lib/travelagent_web/live/search_live.ex
 [source,elixir]
 ----
 defmodule TravelagentWeb.SearchLive do
