@@ -808,3 +808,64 @@ We do the same on the pong page:
 image::ping_with_pong_link.png[http://localhost:4000/ping]
 
 Now you can play HTML Ping-Pong.
+
+[[static-files]]
+## Static files
+indexterm:["Static files"]
+
+Of course any webapplication doesn't only have dynamic webpages but also 
+some static files. The best example would be a `robots.txt`or a `favicon.ico` 
+file. There is the `assets/static/` directory where we can put those files. 
+By default the following files are already in that directory:
+
+[source,bash]
+----
+$ tree assets/static/
+assets/static/
+├── favicon.ico
+├── images
+│   └── phoenix.png
+└── robots.txt
+----
+
+They get delivered by the production webserver without any additional
+interaction with the Phoenix application. In development there is obviously some
+interaction but that has a small footprint. 
+
+But adding a file to that directory is not enough. You have to whitelist it
+otherwise Phoenix doesn't know what you want. Assuming we add a `ads.txt` file
+into the `assets/static/` directory. Than we have to update the
+`lib/hello_world_web/endpoint.ex` file accordingly:
+
+.lib/hello_world_web/endpoint.ex
+[source,elixir]
+----
+[...]
+
+plug Plug.Static,
+  at: "/",
+  from: :hello_world,
+  gzip: false,
+  only: ~w(css fonts images js favicon.ico robots.txt ads.txt) <1>
+
+[...]
+----
+<1> All static files or directories have to be whitelisted in this list.
+
+[[images]]
+### Images
+
+Images are a special case of static files. They can be stored in the 
+`assets/static/images/` directory which is by default whitelisted to include   
+static files.
+
+In every fresh Phoenix installation you'll find the Phoenix logo file stored at
+`assets/static/images/phoenix.png`. That image is used in the default `app.html.eex` and there we can have a look how to access that image from within `.eex`:
+
+[source,bash]
+----
+$ grep "phoenix.png" lib/demo_web/templates/layout/app.html.eex 
+<img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
+----
+
+You can use `Routes.static_path(@conn, "/images/phoenix.png")` to address the image in any `.eex`.
