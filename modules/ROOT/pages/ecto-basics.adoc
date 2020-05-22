@@ -146,3 +146,5 @@ bookstore_dev=# \q <3>
 The migration created that table and added columns. But it added more columns than 
 we asked for. It added `id`, `inserted_at` and `updated_at`. But that is all right. 
 We will see what they are for in a minute.
+
+#Work in progess#

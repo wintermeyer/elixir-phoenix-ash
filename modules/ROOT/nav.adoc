@@ -15,4 +15,8 @@
 ** xref:phoenix-liveview-basics.adoc#counter[Counter]
 ** xref:phoenix-liveview-basics.adoc#aiport-code-search[Airport Code Search]
 ** xref:phoenix-liveview-basics.adoc#autocomplete[Autocomplete]
+* xref:router.adoc[Router]
+** xref:router.adoc#mix-phx-routes[Display all existing routes]
+** xref:router.adoc#router-params[Params]
+*** xref:router.adoc#router-query-string[Query Strings]
 * xref:ecto-basics.adoc[Ecto Basics]

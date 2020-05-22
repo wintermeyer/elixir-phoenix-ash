@@ -26,6 +26,8 @@ Phoenix v1.5.1
 ----
 ====
 
+NOTE: In some old webpages you'll find `mix phoenix.new` instead of `mix phx.new`. That is outdated. Since Phoenix version 1.3 the syntax is `mix phx.whatever`. 
+
 ## Development Environment
 
 By default Phoenix offers three different environments:

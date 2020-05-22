@@ -1,0 +1,266 @@
+[[router]]
+# Router
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
+
+We have used https://hexdocs.pm/phoenix/Phoenix.Router.html[Phoenix.Router]
+plenty of times in xref:phoenix-basics.adoc[Phoenix Basics] and you already
+understand the concept. So this is just a small chapter with some useful
+details.
+
+All code in this chapter will result form this base application:
+
+[source,bash]
+----
+$ mix phx.new demo --no-ecto --no-dashboard <1>
+$ cd demo
+----
+<1> We don't include the dashboard to clean up our router setup. Otherwise a million routes would leave just to a dashboard which is not discussed in this chapter.
+
+This results in a minimal router setup:
+
+.lib/demo_web/router.ex
+----
+defmodule DemoWeb.Router do
+  use DemoWeb, :router
+
+  pipeline :browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_flash
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
+  pipeline :api do
+    plug :accepts, ["json"]
+  end
+
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+  end
+end
+----
+
+For us relevant is just the last `/` part.
+
+[[mix-phx-routes]]
+## Display existing routes
+
+With the command `mix phx.routes` you get a list of all defined routes. In our vanilla demo system this is the output:
+
+[source,bash]
+----
+$ mix phx.routes
+Compiling 13 files (.ex)
+Generated demo app
+page_path  GET  /                    DemoWeb.PageController :index <1>
+websocket  WS   /socket/websocket    DemoWeb.UserSocket <2>
+----
+<1> This route is for a HTTP GET request for the root path - which gets matched by `/` - of our application. It triggers the `:index` action in the `DemoWeb.PageController` controller.
+<2> No need to discuss `websockets` in this chapter. #I will remove that line in following exampless to clean up the output.#
+
+NOTE: In more complex applications with a dashboard the output of `mix phx.routes` gets quite a bit longer. Then `mix phx.routes | grep "whatever-you-search"` becomes a very handy tool on the command line.
+
+[[router-params]]
+## Params
+
+Often you have some sort of ID in the URL or other params you need to access in your application. And sometimes you want that to be handled in the router.
+
+We create a product view in our `demo` application to show how it's working. We
+have to touch/create three files to make this happen:
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+[...]
+
+scope "/", DemoWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+  get "/products/:id", ProductController, :show <1>
+end
+
+[...]
+----
+<1> We ask the router to match everything at that position to the parameter `:id`.
+
+.lib/demo_web/controllers/product_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.ProductController do
+  use DemoWeb, :controller
+
+  def show(conn, %{"id" => id}) do <1>
+    conn 
+    |> assign(:id, id)
+    |> render("show.html")
+  end
+end
+----
+<1> We match the `id` in the params.
+
+.lib/demo_web/views/product_view.ex
+[source,elixir]
+----
+defmodule DemoWeb.ProductView do
+  use DemoWeb, :view
+end
+----
+
+.lib/demo_web/templates/product/show.html.eex
+[source,elixir]
+----
+<h1>ID: <%= @id %></h1> <1>
+----
+<1> Just a simple display. Normally we would have fetched the product with that id from our database and display it.
+
+If you open http://localhost:4000/products/1 with your browser you'll see this 
+log entry:
+
+[source,bash]
+----
+[info] GET /products/1
+[debug] Processing with DemoWeb.ProductController.show/2
+  Parameters: %{"id" => "1"}
+  Pipelines: [:browser]
+[info] Sent 200 in 373µs
+----
+
+And just as a final proof the screenshot:
+
+image::router-products-1.png[http://localhost:4000/products/1]
+
+[[router-query-string]]
+### Query String
+
+Query Strings don't belong in the router but are handled very similar to the 
+above params in the controller.
+
+Let's assume we want to add the query string "color=blue" to our product request: 
+http://localhost:4000/products/1?color=blue
+
+We can't match for it in the router but Phoenix does realize what happens:
+
+[source,bash]
+----
+[info] GET /products/1
+[debug] Processing with DemoWeb.ProductController.show/2
+  Parameters: %{"color" => "blue", "id" => "1"} <1>
+  Pipelines: [:browser]
+[info] Sent 200 in 600µs
+----
+<1> Both parameter become part of the `params` map.
+
+Without doing anything in the router the query string parameter `color` finds it's way into the controller. But we have to change the the controller a bit:
+
+.lib/demo_web/controllers/product_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.ProductController do
+  use DemoWeb, :controller
+
+  def show(conn, %{"id" => id, "color" => color}) do <1>
+    conn 
+    |> assign(:id, id)
+    |> assign(:color, color) <2>
+    |> render("show.html")
+  end
+
+  def show(conn, %{"id" => id}) do <3>
+    conn 
+    |> assign(:id, id)
+    |> render("show.html")
+  end  
+end
+----
+<1> This `show/2` function matches if there is an `:id` and a `:color` parameter.
+<2> In addition to `:id` we have to assign `:color` too.
+<3> This `show/2` function matches if there is only an `:id` parameter.
+
+Lastly we have to change the template:
+
+.lib/demo_web/controllers/product_controller.ex
+[source,elixir]
+----
+<h1>ID: <%= @id %></h1>
+
+<%= if assigns[:color] do %> <1>
+<p>Color: <%= @color %></p>
+<% end %>
+----
+<1> Because we call this template from two different functions we have to take care of the case when the color assign hasn't taken place. The alternative would be a different template for each function.
+
+image::router-params-color.png[http://localhost:4000/products/1?color=blue]
+
+## Multilevel Paths
+
+In the previous easy code examples we always put the routes on the first level.
+But of course you can use sublevel paths too. Here's an example:
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+[...]
+scope "/", DemoWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+  get "/test/huhu", PageController, :index
+  get "/an-other-test/abc/def/", PageController, :index
+end
+[...]
+----
+
+No surprise here:
+
+[source,bash]
+----
+$ mix phx.routes
+Compiling 1 file (.ex)
+page_path  GET  /                         DemoWeb.PageController :index
+page_path  GET  /test/huhu                DemoWeb.PageController :index
+page_path  GET  /an-other-test/abc/def    DemoWeb.PageController :index
+----
+
+[[route-wildcards]]
+## Wildcards
+
+You don't have to define the route excactly. You can use the `*` wildcard too.
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+[...]
+scope "/", DemoWeb do
+  pipe_through :browser
+
+  get "/", PageController, :index
+  get "/names/st*an", PageController, :index
+end
+[...]
+----
+
+This route matches `/names/stefan` and `/names/stephan`:
+
+[source,bash]
+----
+[info] GET /names/stefan
+[debug] Processing with DemoWeb.PageController.index/2
+  Parameters: %{"an" => ["stefan"]} <1>
+  Pipelines: [:browser]
+[debug] Plug.Session could not verify incoming session cookie. This may happen when the session settings change or a stale cookie is sent.
+[info] Sent 200 in 4ms
+[info] GET /names/stephan
+[debug] Processing with DemoWeb.PageController.index/2
+  Parameters: %{"an" => ["stephan"]}
+  Pipelines: [:browser]
+[debug] Plug.Session could not verify incoming session cookie. This may happen when the session settings change or a stale cookie is sent.
+[info] Sent 200 in 1ms
+----
+<1> The parameter `an` which is automatically named as the last match segment contains the whole match. You can use that to to some interesting things.
+
+
+
