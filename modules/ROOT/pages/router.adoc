@@ -14,7 +14,7 @@ All code in this chapter will result form this base application:
 $ mix phx.new demo --no-ecto --no-dashboard <1>
 $ cd demo
 ----
-<1> We don't include the dashboard to clean up our router setup. Otherwise a million routes would leave just to a dashboard which is not discussed in this chapter.
+<1> We don't include the https://hexdocs.pm/phoenix_live_dashboard/Phoenix.LiveDashboard.html[Phoenix.LiveDashboard] (--no-dashboard) to keep our router setup tidy. Otherwise a million routes would leave just to the real-time performance monitoring dashboard which is not a topic in this chapter.
 
 This results in a minimal router setup:
 
@@ -180,6 +180,8 @@ end
 <2> In addition to `:id` we have to assign `:color` too.
 <3> This `show/2` function matches if there is only an `:id` parameter.
 
+IMPORTANT: The order of the `show/2` functions in the controller is very important. If we use the other order for this specific example the `%{"id" => id, "color" => color}` would never match because `%{"id" => id}` always matches first if it's the first function.
+
 Lastly we have to change the template:
 
 .lib/demo_web/controllers/product_controller.ex
@@ -195,6 +197,51 @@ Lastly we have to change the template:
 
 image::router-params-color.png[http://localhost:4000/products/1?color=blue]
 
+A view on the routes:
+
+[source,bash]
+----
+$ mix phx.routes
+Compiling 1 file (.ex)
+   page_path  GET  /                                      DemoWeb.PageController :index
+product_path  GET  /products/:id                          DemoWeb.ProductController :show
+----
+
+### Link with params
+
+Assuming you'd like to link to the next product ID this would be the template:
+
+.lib/demo_web/controllers/product_controller.ex
+[source,elixir]
+----
+<h1>ID: <%= @id %></h1>
+
+<%= if assigns[:color] do %> <1>
+<p>Color: <%= @color %></p>
+<% end %>
+
+<%= link "Next", to: Routes.product_path(@conn, :show, String.to_integer(@id) + 1) %> <1>
+----
+<1> We use the `DemoWeb.ProductController :show` route and add the `id` to it. To increase the current `@id` we have to call `String.to_integer/1` first.
+
+### Link with query
+
+Assuming you'd like to link to the first product with the query "color=orange" you'd have to use this code:
+
+.lib/demo_web/controllers/product_controller.ex
+[source,elixir]
+----
+<h1>ID: <%= @id %></h1>
+
+<%= if assigns[:color] do %> <1>
+<p>Color: <%= @color %></p>
+<% end %>
+
+<%= link "First product in orange", to: Routes.product_path(@conn, :show, 1, color: "orange") %> <1>
+----
+<1> This results in a link to `http://localhost:4000/products/1?color=orange`
+
+[[router-multilevel-paths]]
 ## Multilevel Paths
 
 In the previous easy code examples we always put the routes on the first level.
@@ -207,8 +254,6 @@ But of course you can use sublevel paths too. Here's an example:
 scope "/", DemoWeb do
   pipe_through :browser
 
-  get "/", PageController, :index
-  get "/test/huhu", PageController, :index
   get "/an-other-test/abc/def/", PageController, :index
 end
 [...]
@@ -220,12 +265,10 @@ No surprise here:
 ----
 $ mix phx.routes
 Compiling 1 file (.ex)
-page_path  GET  /                         DemoWeb.PageController :index
-page_path  GET  /test/huhu                DemoWeb.PageController :index
 page_path  GET  /an-other-test/abc/def    DemoWeb.PageController :index
 ----
 
-[[route-wildcards]]
+[[router-wildcards]]
 ## Wildcards
 
 You don't have to define the route excactly. You can use the `*` wildcard too.
@@ -237,7 +280,6 @@ You don't have to define the route excactly. You can use the `*` wildcard too.
 scope "/", DemoWeb do
   pipe_through :browser
 
-  get "/", PageController, :index
   get "/names/st*an", PageController, :index
 end
 [...]
@@ -251,16 +293,15 @@ This route matches `/names/stefan` and `/names/stephan`:
 [debug] Processing with DemoWeb.PageController.index/2
   Parameters: %{"an" => ["stefan"]} <1>
   Pipelines: [:browser]
-[debug] Plug.Session could not verify incoming session cookie. This may happen when the session settings change or a stale cookie is sent.
 [info] Sent 200 in 4ms
 [info] GET /names/stephan
 [debug] Processing with DemoWeb.PageController.index/2
   Parameters: %{"an" => ["stephan"]}
   Pipelines: [:browser]
-[debug] Plug.Session could not verify incoming session cookie. This may happen when the session settings change or a stale cookie is sent.
 [info] Sent 200 in 1ms
 ----
 <1> The parameter `an` which is automatically named as the last match segment contains the whole match. You can use that to to some interesting things.
 
+## Misc
 
-
+No need to replicate the official documentation in this chapter. By now you understand the concept of `Phoenix.Router`. You'll find solutions for all the special cases which are not handled in this chapter in the official documentation at https://hexdocs.pm/phoenix/Phoenix.Router.html

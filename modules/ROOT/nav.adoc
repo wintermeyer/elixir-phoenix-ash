@@ -18,5 +18,7 @@
 * xref:router.adoc[Router]
 ** xref:router.adoc#mix-phx-routes[Display all existing routes]
 ** xref:router.adoc#router-params[Params]
-*** xref:router.adoc#router-query-string[Query Strings]
+** xref:router.adoc#router-query-string[Query Strings]
+** xref:router.adoc#router-multilevel-paths[Multilevel Paths]
+** xref:router.adoc#router-wildcards[Wildcards]
 * xref:ecto-basics.adoc[Ecto Basics]

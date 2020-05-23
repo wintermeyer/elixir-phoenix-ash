@@ -811,6 +811,24 @@ image::ping_with_pong_link.png[http://localhost:4000/ping]
 
 Now you can play HTML Ping-Pong.
 
+NOTE: You'll find the syntax for links with specific params or queries in the
+xref:router.adoc[Router chapter].
+
+### Link Class
+
+Sometimes your design team wants to add a specific CSS class to a link. Here's how you do that:
+
+.lib/game_web/templates/page/pong.html.eex
+[source,html]
+----
+<h1>Pong</h1>
+
+<p>
+<%= link "Ping!", to: Routes.page_path(@conn, :ping, class: "btn") %> <1>
+</p>
+----
+<1> Just add a `class: "whatever"` to the link helper.
+
 [[static-files]]
 ## Static files
 indexterm:["Static files"]
