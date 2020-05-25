@@ -21,4 +21,4 @@
 ** xref:router.adoc#router-query-string[Query Strings]
 ** xref:router.adoc#router-multilevel-paths[Multilevel Paths]
 ** xref:router.adoc#router-wildcards[Wildcards]
-* xref:ecto-basics.adoc[Ecto Basics]
+* xref:index.adoc#training[Remote Training]

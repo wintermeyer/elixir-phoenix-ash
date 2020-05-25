@@ -3,23 +3,21 @@
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Ecto is a persistence framework for Elixir. That is a fancy way of saying that
-we use Ecto to talk to a SQL database. Phoenix works fine without Ecto and Ecto
-is used in many other Elixir applications which are not Phoenix based.
-
-This chapter will introduce you to the basics of Ecto. 
+we use Ecto to talk to a SQL database. This chapter will introduce you to the
+basics of Ecto in the Phoenix context.
 
 [IMPORTANT] 
 ====
-We are going to use a https://www.postgresql.org[PostgreSQL]
-database. Ecto works fine with other databases too (e.g.
-https://mariadb.com[MariaDB]) but most Phoenix developers prefer PostgreSQL. For
-this book we assume that you have a PostgreSQL user on your development which was 
-granted the right to create a database and which has the following credentials:
+We are going to use a https://www.postgresql.org[PostgreSQL] database. Ecto
+works fine with other databases too (e.g. https://mariadb.com[MariaDB]) but most
+Phoenix developers prefer PostgreSQL. For this book we assume that you have a
+PostgreSQL user on your development system which was granted the right to create
+a database and which has the following credentials:
 
 - user: postgres
 - password: postgres
 
-Simply because those are the default values for the development system in Phoenix.
+Because those are the default values for the development system in Phoenix.
 ====
 
 ## Create Data
@@ -43,9 +41,10 @@ https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html).
 As a first resource we want to create a table with authors. In the Phoenix world
 we have to put that new resource `authors` into a context.
 
-NOTE: A context is an API boundary for one or more resources. Don't loose any
-sleep on the question what a context is. You'll get a feeling about it. Good
-naming of contexts is important but not right now in the learning process.
+NOTE: A context is an API boundary for one or more resources. It was included in
+Phoenix with version 1.3. Don't loose any sleep on the question what a context
+is. You'll get a feeling about it. Good naming of contexts is important but not
+at this stadium of your Ecto learning process.
 
 [source,bash]
 ----
@@ -101,8 +100,8 @@ config :bookstore, Bookstore.Repo,
 [...]
 ----
 
-TIP: In case you want to drop this database you can do that with the command
-`mix ecto.drop`
+TIP: In case you want to drop this database (e.g. to re-run the
+`mix ecto.create` command) you can do so with the command `mix ecto.drop`
 
 Now we can run the migration.
 
@@ -139,12 +138,40 @@ bookstore_dev=# SELECT column_name FROM information_schema.columns WHERE TABLE_N
 
 bookstore_dev=# \q <3>
 ----
-<1> `psql` is the command line client for PostgreSQL. If you are not familiar with it: Don't try this at home.
+<1> `psql` is the command line client for PostgreSQL. If you are not familiar with it: Don't try this at home!
 <2> This command lists all column names of the table `authors`.
 <3> `\q` is the command to quit the command line client.
 
-The migration created that table and added columns. But it added more columns than 
-we asked for. It added `id`, `inserted_at` and `updated_at`. But that is all right. 
-We will see what they are for in a minute.
+The migration created that table and added columns. But it added more columns
+than we asked for. It added `id`, `inserted_at` and `updated_at`. But that is
+all right. We will see what they are for in a minute.
+
+### Create an author
+
+The module `Bookstore.Store` was created by `mix phx.gen.context`. It contains a couple of useful functions. One of it is `create_author/1`. Here is the code for that function:
+
+.lib/bookstore/store.ex
+[source,elixir]
+----
+@doc """
+Creates a author.
+
+## Examples
+
+    iex> create_author(%{field: value}) <1>
+    {:ok, %Author{}}
+
+    iex> create_author(%{field: bad_value})
+    {:error, %Ecto.Changeset{}}
+
+"""
+def create_author(attrs \\ %{}) do
+  %Author{}
+  |> Author.changeset(attrs)
+  |> Repo.insert()
+end
+----
+<1> Very useful documentation for the function. While browsing through `Bookstore.Store` your should always read the `@doc` documentation.
+
 
 #Work in progess#

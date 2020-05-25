@@ -70,8 +70,9 @@ https://stackoverflow.com[stackoverflow.com] and send me an email with the link
 to that question. By that I can answer it for you and for everybody else who 
 has the same problem in the future.
 
+[[training]]
 === Training and Consulting
 
-I offer Phoenix Framework beginners training and consulting. Onside and remote.
-Please send me an email to sw@wintermeyer-consulting.de for an offer.
+I offer a 1 and 2-day remote Phoenix beginners training. During the training we work via remote pair programing (https://marketplace.visualstudio.com/items?itemName=MS-vsliveshare.vsliveshare-pack[Visual Studio with the Live Share extension]). Very good way to get up to speed. No previous knowledge needed. OK, you need to have basic programming and HTML knowledge. Please send me an email to sw@wintermeyer-consulting.de for further information.
 
+Onside training is possible too. But that depends on the local Corona travel restrictions.

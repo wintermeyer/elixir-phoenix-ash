@@ -6,6 +6,8 @@ site:
 content:
   sources:
   - url: .
+    edit_url: false
+
   # - url: git@github.com:wintermeyer/phoenix-book.git
   #   branches: master
   #   # setting edit_url to false disables the Edit this Page link for any page that originates from this repository
