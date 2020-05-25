@@ -3,13 +3,13 @@
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 https://www.phoenixframework.org[Phoenix]'s learning curve is steep. I am not
-going to sugar coat this book with a "this is easy" start. Many new Phoenix
-developers have never worked with https://elixir-lang.org[Elixir] and it being
-often their first functional programming language doesn't help either.
+sugar coating this book with a "this is easy" start. But I made it as easy and
+straight forward as possible. Buckle up if https://elixir-lang.org[Elixir] is
+your first functional programming language.
 
 I learn best from "Hello World!" like examples. I do not care about abstract
 ideas or programming theories. Give me a good and clean example and I make sense
-of it for me. If you like this kind of teaching you are reading the right book.
+of it. If you like this kind of teaching you are reading the right book.
 Otherwise it is not too late for returning it.
 
 * **This book teaches by presenting bite size code examples.** I created those
@@ -17,11 +17,12 @@ Otherwise it is not too late for returning it.
   addition I add callouts with explanations next to the important source code
   lines.
 * **This book is a step by step guide. We start at zero.** As few
-  chicken-egg-problems as possible. You are expected to understand the basics of
-  programming and HTML but other than that you don't have to have any knowledge
-  of Phoenix or Elixir.
+  chicken-egg-problems are inescapable but I keep that to a minimum. You are
+  expected to understand the basics of programming and HTML but other than that
+  you don't have to have any knowledge of Phoenix or Elixir.
 * **I will not hesitate to oversimply stuff.** My aim is to get you productive
-  in the quickest time possible. There are other resources to learn the details.
+  in the quickest time possible. There are other resources to learn the details
+  (e.g. the magic of OTP).
 * The web-applications in this book are not intended to become eye candy. We will
   not waste time and energy to make stuff beautiful.
 
@@ -71,8 +72,8 @@ to that question. By that I can answer it for you and for everybody else who
 has the same problem in the future.
 
 [[training]]
-=== Training and Consulting
+=== Training
 
 I offer a 1 and 2-day remote Phoenix beginners training. During the training we work via remote pair programing (https://marketplace.visualstudio.com/items?itemName=MS-vsliveshare.vsliveshare-pack[Visual Studio with the Live Share extension]). Very good way to get up to speed. No previous knowledge needed. OK, you need to have basic programming and HTML knowledge. Please send me an email to sw@wintermeyer-consulting.de for further information.
 
-Onside training is possible too. But that depends on the local Corona travel restrictions.
+Onside trainings are possible too. But that depends on the local Corona travel restrictions.
