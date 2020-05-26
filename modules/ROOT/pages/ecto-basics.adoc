@@ -20,65 +20,24 @@ a database and which has the following credentials:
 Because those are the default values for the development system in Phoenix.
 ====
 
-## Create Data
+## Create a Database
 
-Before we can query data we have to create it and before that we have to tell
-Ecto what data model we are using. Because we are ending up using Ecto in
-Phoenix anyway I am using a basic Phoenix application to walk you through the
-process. Let's create a small bookstore:
+Before we can do anything we have to create a database. Let's create a small
+bookstore database:
 
 [source,bash]
 ----
 $ mix phx.new bookstore
 [...]
 $ cd bookstore
-----
-
-To generate the needed files we can use the `mix phx.gen.context` generator
-(more info about it at
-https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html).
-
-As a first resource we want to create a table with authors. In the Phoenix world
-we have to put that new resource `authors` into a context.
-
-NOTE: A context is an API boundary for one or more resources. It was included in
-Phoenix with version 1.3. Don't loose any sleep on the question what a context
-is. You'll get a feeling about it. Good naming of contexts is important but not
-at this stadium of your Ecto learning process.
-
-[source,bash]
-----
-$ mix phx.gen.context Store Author authors first_name last_name twitter_account
-* creating lib/bookstore/store/author.ex
-* creating priv/repo/migrations/20200516093442_create_authors.exs
-* creating lib/bookstore/store.ex
-* injecting lib/bookstore/store.ex
-* creating test/bookstore/store_test.exs
-* injecting test/bookstore/store_test.exs
-
-Remember to update your repository by running migrations:
-
-    $ mix ecto.migrate
-----
-
-The last output of that command is a bit misleading right now. If we do a `mix ecto.migrate` we get this repeating error message:
-
-[source,bash]
-----
-$ mix ecto.migrate
-Compiling 16 files (.ex)
-Generated bookstore app
-
-11:42:00.676 [error] Postgrex.Protocol (#PID<0.384.0>) failed to connect: ** (Postgrex.Error) FATAL 3D000 (invalid_catalog_name) database "bookstore_dev" does not exist
-----
-
-Ecto wants to connect to a database but there is none. We have to create it first with the comment `mix ecto.create`.
-
-[source,bash]
-----
 $ mix ecto.create
+Compiling 14 files (.ex)
+Generated bookstore app
 The database for Bookstore.Repo has been created
 ----
+
+TIP: In case you want to drop this database (e.g. to re-run the
+`mix ecto.create` command) you can do so with the command `mix ecto.drop`
 
 The configuration for this development database can be found in the file
 `config/dev.exs`. Please change that in case you use a different database or
@@ -100,20 +59,72 @@ config :bookstore, Bookstore.Repo,
 [...]
 ----
 
-TIP: In case you want to drop this database (e.g. to re-run the
-`mix ecto.create` command) you can do so with the command `mix ecto.drop`
+## Create a Table
 
-Now we can run the migration.
+The generator `mix phx.gen.context` (https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html) can be used to create a context with a couple of useful functions around an Ecto schema. 
+
+NOTE: You can do everything a generator does manually but it is faster and results in fewer errors if you use a generator.
+
+As a first resource we want to create a table with authors. In the Phoenix world
+we have to put that new resource `authors` into a context.
+
+NOTE: A context is an API boundary for one or more resources. It was included in
+Phoenix with version 1.3. Don't loose any sleep on the question what exactly a
+context is. You'll get a feeling about it soon. Good naming of contexts is
+important but not at this stadium of your Ecto learning process.
+
+[source,bash]
+----
+$ mix phx.gen.context Store Author authors first_name last_name twitter_account
+* creating lib/bookstore/store/author.ex
+* creating priv/repo/migrations/20200526112425_create_authors.exs
+* creating lib/bookstore/store.ex
+* injecting lib/bookstore/store.ex
+* creating test/bookstore/store_test.exs
+* injecting test/bookstore/store_test.exs
+
+Remember to update your repository by running migrations:
+
+    $ mix ecto.migrate
+----
+
+Migrations are used to keep track with the process of generating or changing your database. If you are in a team of multiple developers migrations are the tool so that you don't pull each others carpets.
+
+The migration the generator created is stored in the file `priv/repo/migrations/20200526112425_create_authors.exs`. What is does is pretty clear once you have a look into it:
+
+.priv/repo/migrations/20200526112425_create_authors.exs
+[source,elixir]
+----
+defmodule Bookstore.Repo.Migrations.CreateAuthors do
+  use Ecto.Migration
+
+  def change do
+    create table(:authors) do
+      add :first_name, :string
+      add :last_name, :string
+      add :twitter_account, :string
+
+      timestamps() <1>
+    end
+
+  end
+end
+----
+<1> `timestamps()` generates the fields `updated_at` and `inserted_at`. Both are updated with the current timestamp during creation of a dataset. Afterwards only `updated_at` is updated with the current timestamp when ever Ecto changes that dataset.
+
+To run the migration we call `mix ecto.migrate`:
 
 [source,bash]
 ----
 $ mix ecto.migrate
+Compiling 2 files (.ex)
+Generated bookstore app
 
-11:53:48.162 [info]  == Running 20200516093442 Bookstore.Repo.Migrations.CreateAuthors.change/0 forward
+13:30:35.437 [info]  == Running 20200526112425 Bookstore.Repo.Migrations.CreateAuthors.change/0 forward
 
-11:53:48.164 [info]  create table authors
+13:30:35.440 [info]  create table authors
 
-11:53:48.177 [info]  == Migrated 20200516093442 in 0.0s
+13:30:35.458 [info]  == Migrated 20200526112425 in 0.0s
 ----
 
 The migration script created the table `authors` in the database `bookstore_dev`. 
@@ -142,11 +153,97 @@ bookstore_dev=# \q <3>
 <2> This command lists all column names of the table `authors`.
 <3> `\q` is the command to quit the command line client.
 
-The migration created that table and added columns. But it added more columns
-than we asked for. It added `id`, `inserted_at` and `updated_at`. But that is
-all right. We will see what they are for in a minute.
+The migration created that table and added the columns.
+
+TIP: You can undo the last command with `mix ecto.rollback`.
+
+`phx.gen.context` generated in addition to the migration the schema in `lib/bookstore/store/author.ex` and the context module `lib/bookstore/store.ex`. We'll tackle both in the next section.
 
 ### Create an author
+
+We have a database and a table. We just need to create our first set of data. To do so we have to open the `iex`. Within a Phoenix project we can do this with the command `iex -S mix phx.server`. It loads the whole Phoenix project:
+
+[source,bash]
+----
+Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
+
+[info] Running BookstoreWeb.Endpoint with cowboy 2.7.0 at 0.0.0.0:4000 (http)
+[info] Access BookstoreWeb.Endpoint at http://localhost:4000
+Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> <1>
+----
+<1> Actually you will see a couple of more messages here which are related to the asset pipeline (e.g. CSS and JavaScript). No need to bother with that now.
+
+The context module `lib/bookstore/store.ex` includes the `create_author/1` function which we use to create a new author:
+
+[source,elixir]
+----
+iex(2)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
+[debug] QUERY OK db=3.8ms decode=1.5ms queue=2.5ms idle=1355.7ms
+INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-26 11:54:37], ~N[2020-05-26 11:54:37]]
+{:ok,
+ %Bookstore.Store.Author{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+   first_name: "Dave",
+   id: 1,
+   inserted_at: ~N[2020-05-26 11:54:37],
+   last_name: "Thomas",
+   twitter_account: "pragdave",
+   updated_at: ~N[2020-05-26 11:54:37]
+ }}
+----
+
+If the insert in the table was successful the function returns a `{:ok, %Bookstore.Store.Author{}}` tuple. If we try to create an empty dataset this happens:
+
+[source,elixir]
+----
+iex(3)> Bookstore.Store.create_author(%{})
+{:error,
+ #Ecto.Changeset<
+   action: :insert,
+   changes: %{},
+   errors: [
+     first_name: {"can't be blank", [validation: :required]},
+     last_name: {"can't be blank", [validation: :required]},
+     twitter_account: {"can't be blank", [validation: :required]}
+   ],
+   data: #Bookstore.Store.Author<>,
+   valid?: false
+ >}
+ -----
+
+The function returns a `{:error, #Ecto.Changeset ...}` tuple and it lists the reasons in the `errors` list:
+
+ - first_name: {"can't be blank", [validation: :required]}
+ - last_name: {"can't be blank", [validation: :required]}
+ - twitter_account: {"can't be blank", [validation: :required]}
+
+To understand that we have to look into `lib/bookstore/store/author.ex`
+
+.lib/bookstore/store/author.ex
+[source,elixir]
+----
+defmodule Bookstore.Store.Author do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "authors" do
+    field :first_name, :string
+    field :last_name, :string
+    field :twitter_account, :string
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(author, attrs) do
+    author
+    |> cast(attrs, [:first_name, :last_name, :twitter_account])
+    |> validate_required([:first_name, :last_name, :twitter_account])
+  end
+end
+----
+
 
 The module `Bookstore.Store` was created by `mix phx.gen.context`. It contains a couple of useful functions. One of it is `create_author/1`. Here is the code for that function:
 
