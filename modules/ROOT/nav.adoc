@@ -27,5 +27,8 @@
 ** xref:ecto-basics.adoc#ecto-create-dataset[Create a Dataset]
 ** xref:ecto-basics.adoc#validations[Validations]
 *** xref:ecto-basics.adoc#ecto-uniqueness[Uniqueness Validations]
+** xref:ecto-basics.adoc#ecto-seeds[Seeds]
+** xref:ecto-basics.adoc#ecto-list[list_*]
+
 
 * xref:index.adoc#training[Remote Training]

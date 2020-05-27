@@ -696,4 +696,120 @@ INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALU
 <1> We get an error for `full_name`. 
 ====
 
+[[ecto-seeds]]
+## Seeds
+
+Often you need the database prefilled with data for your application. That's
+what seeds are for. By default they are in the file `priv/repo/seeds.exs`. For
+our bookstore we can work with these seeds:
+
+.priv/repo/seeds.exs
+[source,elixir]
+----
+alias Bookstore.Store
+
+Store.create_author(%{
+  first_name: "Dave", 
+  last_name: "Thomas", 
+  twitter_account: "pragdave"
+})
+Store.create_author(%{
+  first_name: "James", 
+  last_name: "Gray", 
+  twitter_account: "jeg2"
+})
+Store.create_author(%{
+  first_name: "Ulisses",
+  last_name: "Almeida",
+  twitter_account: "ulissesalmeida"
+})
+----
+
+To populate the database we call 
+
+[source,elixir]
+----
+$ mix run priv/repo/seeds.exs
+[debug] QUERY ERROR db=11.1ms queue=1.1ms idle=5.3ms
+INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 11:47:40], ~N[2020-05-27 11:47:40]]
+[debug] QUERY OK db=1.9ms queue=1.4ms idle=36.1ms
+INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["James", "Gray", "jeg2", ~N[2020-05-27 11:47:40], ~N[2020-05-27 11:47:40]]
+[debug] QUERY OK db=1.0ms queue=0.7ms idle=39.8ms
+INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Ulisses", "Almeida", "ulissesalmeida", ~N[2020-05-27 11:47:40], ~N[2020-05-27 11:47:40]]
+----
+
+TIP: During development the command `mix ecto.reset` is often very useful. It resets the database (drop, create and migrate) and runs the seeds.
+
+[[ecto-list]]
+## list_*
+
+The generated `Bookstore.Store` offers a `list_authors` function which simply
+returns a list of all authors in the table:
+
+[source,elixir]
+----
+$ iex -S mix phx.server
+[...]
+iex(2)> Bookstore.Store.list_authors
+[debug] QUERY OK source="authors" db=11.5ms decode=1.3ms queue=1.2ms idle=889.7ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 []
+[
+  %Bookstore.Store.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    first_name: "Dave",
+    id: 1,
+    inserted_at: ~N[2020-05-27 11:48:17],
+    last_name: "Thomas",
+    twitter_account: "pragdave",
+    updated_at: ~N[2020-05-27 11:48:17]
+  },
+  %Bookstore.Store.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    first_name: "James",
+    id: 2,
+    inserted_at: ~N[2020-05-27 11:48:17],
+    last_name: "Gray",
+    twitter_account: "jeg2",
+    updated_at: ~N[2020-05-27 11:48:17]
+  },
+  %Bookstore.Store.Author{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    first_name: "Ulisses",
+    id: 3,
+    inserted_at: ~N[2020-05-27 11:48:17], 
+    last_name: "Almeida",
+    twitter_account: "ulissesalmeida",
+    updated_at: ~N[2020-05-27 11:48:17]
+  }
+]
+----
+
+Obviously we can use all the mechnisms of a list with this result:
+
+[source,elixir]
+----
+iex(2)> authors = Bookstore.Store.list_authors
+[...]
+iex(3)> [first_author | _] = authors <1>
+[...]
+iex(4)> first_author
+%Bookstore.Store.Author{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+  first_name: "Dave",
+  id: 1,
+  inserted_at: ~N[2020-05-27 11:48:17],
+  last_name: "Thomas",
+  twitter_account: "pragdave",
+  updated_at: ~N[2020-05-27 11:48:17]
+}
+iex(5)> for author <- authors do
+...(5)> IO.puts author.last_name
+...(5)> end
+Thomas
+Gray
+Almeida
+[:ok, :ok, :ok]
+----
+<1> With pattern matching we take the first item of the list (the head) and assign it to `first_author`.
+
 #Work in progess#
