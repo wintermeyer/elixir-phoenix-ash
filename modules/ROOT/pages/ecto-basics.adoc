@@ -640,4 +640,60 @@ INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALU
 <3> The first Dave Thomas is created.
 <4> A second Dave Thomas can not be created.
 
+[TIP]
+====
+Here's a slightly different approach for those of you who say that an error for
+`:first_name` is not ideal.
+
+.priv/repo/migrations/20200527071855_add_full_name_index.exs
+[source,elixir]
+----
+defmodule Bookstore.Repo.Migrations.AddFullNameIndex do
+  use Ecto.Migration
+
+  def change do
+    create unique_index(:authors, [:first_name, :last_name], name: :full_name) <1>
+  end
+end
+----
+<1> We tell Ecto which name the index should have.
+
+.lib/bookstore/store/author.ex
+[source,elixir]
+----
+[...]
+  def changeset(author, attrs) do
+    author
+    |> cast(attrs, [:first_name, :last_name, :twitter_account])
+    |> validate_required([:last_name])
+    |> validate_length(:first_name, max: 255)
+    |> validate_length(:last_name, max: 255)
+    |> validate_length(:twitter_account, max: 15)
+    |> unique_constraint(:twitter_account)
+    |> unique_constraint(:full_name, name: :full_name) <1>
+  end
+[...]
+----
+<1> The unique_constraint uses `:full_name`.
+
+[source,elixir]
+----
+iex(3)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas"})                             
+[debug] QUERY ERROR db=2.1ms queue=0.7ms idle=1.5e3ms
+INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Dave", "Thomas", ~N[2020-05-27 11:19:42], ~N[2020-05-27 11:19:42]]
+{:error,
+ #Ecto.Changeset<
+   action: :insert,
+   changes: %{first_name: "Dave", last_name: "Thomas"},
+   errors: [
+     full_name: {"has already been taken",
+      [constraint: :unique, constraint_name: "full_name"]} <1>
+   ],
+   data: #Bookstore.Store.Author<>,
+   valid?: false
+ >}
+----
+<1> We get an error for `full_name`. 
+====
+
 #Work in progess#
