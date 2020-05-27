@@ -20,6 +20,7 @@ a database and which has the following credentials:
 Because those are the default values for the development system in Phoenix.
 ====
 
+[[ecto-create-database]]
 ## Create a Database
 
 Before we can do anything we have to create a database. Let's create a small
@@ -59,6 +60,7 @@ config :bookstore, Bookstore.Repo,
 [...]
 ----
 
+[[ecto-create-table]]
 ## Create a Table
 
 The generator `mix phx.gen.context` (https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html) can be used to create a context with a couple of useful functions around an Ecto schema. 
@@ -159,9 +161,14 @@ TIP: You can undo the last command with `mix ecto.rollback`.
 
 `phx.gen.context` generated in addition to the migration the schema in `lib/bookstore/store/author.ex` and the context module `lib/bookstore/store.ex`. We'll tackle both in the next section.
 
-### Create an author
+IMPORTANT: Migration files include a timestamp. Obviously you are doing this at
+a later time than I. So you have to adjust the file names in this chapter
+accordingly. No copy and paste for migrationfile's names.
 
-We have a database and a table. We just need to create our first set of data. To do so we have to open the `iex`. Within a Phoenix project we can do this with the command `iex -S mix phx.server`. It loads the whole Phoenix project:
+[[ecto-create-dataset]]
+### Create a Dataset
+
+We have a database and a table. But we still need to create our first set of data. To do that we have to open the `iex`. Within a Phoenix project we can do this with the command `iex -S mix phx.server`. It loads the whole Phoenix project. Actually it starts the webserver too but right now we only use the `iex`.
 
 [source,bash]
 ----
@@ -193,7 +200,13 @@ INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at",
  }}
 ----
 
-If the insert in the table was successful the function returns a `{:ok, %Bookstore.Store.Author{}}` tuple. If we try to create an empty dataset this happens:
+NOTE: Feel free to do a `alias Bookstore.Store` at the beginning and than the shorter `Store.create_author()`.
+
+If the insert in the table was successful the function returns a `{:ok, %Bookstore.Store.Author{}}` tuple. 
+
+IMPORTANT: Assuming you'd like to assign the new author to the variable `author`. How would you do that because `create_author/1` results in a tuple and not an author? Pattern matching! You'd do something like this: `{:ok, author} = Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})``
+
+If we try to create an empty dataset this happens:
 
 [source,elixir]
 ----
@@ -210,15 +223,17 @@ iex(3)> Bookstore.Store.create_author(%{})
    data: #Bookstore.Store.Author<>,
    valid?: false
  >}
- -----
+----
 
-The function returns a `{:error, #Ecto.Changeset ...}` tuple and it lists the reasons in the `errors` list:
+The `create_author/1` function returns a `{:error, #Ecto.Changeset ...}` tuple
+and it lists the reasons in the `errors` list:
 
- - first_name: {"can't be blank", [validation: :required]}
- - last_name: {"can't be blank", [validation: :required]}
- - twitter_account: {"can't be blank", [validation: :required]}
+ - `first_name: {"can't be blank", [validation: :required]}`
+ - `last_name: {"can't be blank", [validation: :required]}`
+ - `twitter_account: {"can't be blank", [validation: :required]}`
 
-To understand that we have to look into `lib/bookstore/store/author.ex`
+Some sort of data validation happens. To understand that we have to look into
+`lib/bookstore/store/author.ex`
 
 .lib/bookstore/store/author.ex
 [source,elixir]
@@ -227,7 +242,7 @@ defmodule Bookstore.Store.Author do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "authors" do
+  schema "authors" do <1>
     field :first_name, :string
     field :last_name, :string
     field :twitter_account, :string
@@ -236,39 +251,316 @@ defmodule Bookstore.Store.Author do
   end
 
   @doc false
+  def changeset(author, attrs) do <2>
+    author
+    |> cast(attrs, [:first_name, :last_name, :twitter_account]) <3>
+    |> validate_required([:first_name, :last_name, :twitter_account]) <4>
+  end
+end
+----
+<1> This is the schema of the `authors` model.
+<2> https://hexdocs.pm/ecto/Ecto.Changeset.html[Ecto.Changeset] is a mechanism to filter, cast and validate the data.
+<3> https://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4[cast/4] casts the input. Only fields which are listed in the list can make it through. Everything else is thrown away right there.
+<4> Here's the reason why `Bookstore.Store.create_author(%{})` resulted in an error. The function https://hexdocs.pm/ecto/Ecto.Changeset.html#validate_required/3[validate_required/3] checks weather all the list items are included.
+
+[[ecto-validations]]
+## Validations
+
+Changesets are the gatekeepers of Ecto. Let's add some validations to our author changeset as an example:
+
+.lib/bookstore/store/author.ex
+[source,elixir]
+----
+[...]
   def changeset(author, attrs) do
     author
     |> cast(attrs, [:first_name, :last_name, :twitter_account])
-    |> validate_required([:first_name, :last_name, :twitter_account])
+    |> validate_required([:last_name]) <1>
+    |> validate_length(:first_name, max: 255) <2>
+    |> validate_length(:last_name, max: 255) <3>
+    |> validate_length(:twitter_account, max: 15) <4>
+  end
+[...]
+----
+<1> We make sure that a dataset has a `last_name`. But it doesn't have to have a `first_name` or a `twitter_account`.
+<2> If a `first_name` is used it can not be longer than 255 characters.
+<2> A `last_name` can not be longer than 255 characters.
+<2> If a `twitter_account` is used it can not be longer than 15 characters (the max limit for Twitter handles).
+
+So now we get a different error message:
+
+[source,elxir]
+----
+iex(4)> Bookstore.Store.create_author(%{})
+{:error,
+ #Ecto.Changeset<
+   action: :insert,
+   changes: %{},
+   errors: [last_name: {"can't be blank", [validation: :required]}],
+   data: #Bookstore.Store.Author<>,
+   valid?: false
+ >}
+----
+
+But let's try to add an author with a missing `first_name`:
+
+[source,elxir]
+----
+iex(6)> Bookstore.Store.create_author(%{last_name: "Thomas", twitter_account: "pragdave"})                    
+[debug] QUERY OK db=1.0ms queue=0.5ms idle=1349.0ms
+INSERT INTO "authors" ("last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Thomas", "pragdave", ~N[2020-05-27 05:37:46], ~N[2020-05-27 05:37:46]]
+{:ok,
+ %Bookstore.Store.Author{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+   first_name: nil,
+   id: 3,
+   inserted_at: ~N[2020-05-27 05:37:46],
+   last_name: "Thomas",
+   twitter_account: "pragdave",
+   updated_at: ~N[2020-05-27 05:37:46]
+ }}
+----
+
+No surprise here. It works. 
+
+A list of available validations can be found at https://hexdocs.pm/ecto/Ecto.Changeset.html
+
+[[ecto-uniqueness]]
+### Uniqueness Validation
+
+In the last section we created two datasets with the same Twitter account. That
+shouldn't happen because it is unique. We have to add a validation for that.
+
+A uniqueness validation needs a uniqueness database index. Since we haven't
+added an index during the creation of the `authors` table we have to add a
+migration to do it now:
+
+[source,bash]
+----
+$ mix ecto.gen.migration add_twitter_account_index
+Compiling 1 file (.ex)
+* creating priv/repo/migrations/20200527054827_add_twitter_account_index.exs
+----
+
+The generator created the migration file. But we have to fill it with live. 
+Please update it with the following.
+
+.priv/repo/migrations/20200527054827_add_twitter_account_index.exs
+[source,elixir]
+----
+defmodule Bookstore.Repo.Migrations.AddTwitterAccountIndex do
+  use Ecto.Migration
+
+  def change do
+    create unique_index(:authors, [:twitter_account])
   end
 end
 ----
 
+We can run this migration with `mix ecto.migrate`:
 
-The module `Bookstore.Store` was created by `mix phx.gen.context`. It contains a couple of useful functions. One of it is `create_author/1`. Here is the code for that function:
+[source,bash]
+----
+$ mix ecto.migrate
 
-.lib/bookstore/store.ex
+07:55:14.846 [info]  == Running 20200527054827 Bookstore.Repo.Migrations.AddTwitterAccountIndex.change/0 forward
+
+07:55:14.849 [info]  create index authors_twitter_account_index
+** (Postgrex.Error) ERROR 23505 (unique_violation) could not create unique index "authors_twitter_account_index"
+
+    table: authors
+    constraint: authors_twitter_account_index
+
+Key (twitter_account)=(pragdave) is duplicated.
+[...]
+----
+
+Ups! Because we have two entries with the same `twitter_account` the unqiue
+index can not be created. We can solve this in the following ways:
+
+- Delete one entry in the table and re-run the migration.
+- Do a `mix ecto.drop`, `mix ecto.create` and `mix ecto.migrate`. Obviously that 
+destroys the existing data. Since this is a development system there is little harm.
+- Do a `mix ecto.reset`. Which does all the above. Plus it populates the database with seeds if you have them. We don't have seeds yet.
+
+We take the shortcut `mix ecto.reset`:
+
+[source,bash]
+----
+$ mix ecto.reset
+The database for Bookstore.Repo has been dropped <1>
+The database for Bookstore.Repo has been created <2>
+
+08:02:33.469 [info]  == Running 20200526112425 Bookstore.Repo.Migrations.CreateAuthors.change/0 forward
+
+08:02:33.471 [info]  create table authors
+
+08:02:33.481 [info]  == Migrated 20200526112425 in 0.0s <3>
+
+08:02:33.540 [info]  == Running 20200527054827 Bookstore.Repo.Migrations.AddTwitterAccountIndex.change/0 forward
+
+08:02:33.541 [info]  create index authors_twitter_account_index
+
+08:02:33.543 [info]  == Migrated 20200527054827 in 0.0s <4>
+----
+<1> `mix ecto.drop` drops the database.
+<2> `mix ecto.create` creates a new database.
+<3> Runs the first migration. The one with 20200526112425 in it's filename.
+<4> Runs the second migration. The one with 20200527054827 in it's filename. This one creates the index.
+
+The uniqueness index in the table does make sure that we can't add a second
+author with the same Twitter account to the table but this constraint violation
+would raise an exception. Better than nothing but not what we want. We want an
+an error to our changeset. So we have to add one more line to the changeset:
+
+.lib/bookstore/store/author.ex
 [source,elixir]
 ----
-@doc """
-Creates a author.
+[...]
+  def changeset(author, attrs) do
+    author
+    |> cast(attrs, [:first_name, :last_name, :twitter_account])
+    |> validate_required([:last_name])
+    |> validate_length(:first_name, max: 255)
+    |> validate_length(:last_name, max: 255)
+    |> validate_length(:twitter_account, max: 15)
+    |> unique_constraint(:twitter_account) <1>
+  end
+[...]
+----
+<1> The https://hexdocs.pm/ecto/Ecto.Changeset.html#unique_constraint/3[unique_constrain/3] validation which will add an error to our changeset.
 
-## Examples
+Time to check our work. Please fire up `iex -S mix phx.server` and follow me:
 
-    iex> create_author(%{field: value}) <1>
-    {:ok, %Author{}}
+[source,elixir]
+----
+iex(2)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
+[debug] QUERY OK db=3.0ms decode=1.4ms queue=1.4ms idle=1965.4ms
+INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 06:17:18], ~N[2020-05-27 06:17:18]]
+{:ok,
+ %Bookstore.Store.Author{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+   first_name: "Dave",
+   id: 1,
+   inserted_at: ~N[2020-05-27 06:17:18],
+   last_name: "Thomas",
+   twitter_account: "pragdave",
+   updated_at: ~N[2020-05-27 06:17:18]
+ }} <1>
+iex(3)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
+[debug] QUERY ERROR db=8.1ms queue=2.3ms idle=1590.4ms
+INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 06:17:20], ~N[2020-05-27 06:17:20]]
+{:error,
+ #Ecto.Changeset<
+   action: :insert,
+   changes: %{
+     first_name: "Dave",
+     last_name: "Thomas",
+     twitter_account: "pragdave"
+   },
+   errors: [
+     twitter_account: {"has already been taken",
+      [constraint: :unique, constraint_name: "authors_twitter_account_index"]}
+   ],
+   data: #Bookstore.Store.Author<>,
+   valid?: false
+ >} <2>
+iex(4)>
+----
+<1> Works nicely. It results in a `{:ok, %Bookstore.Store.Author()}` which tells
+us that the dataset is saved.
+<2> Works too. The second attempt to create an entry with the same data results in `{:error, #Ecto.Changeset}`. The `errors` tell us that `twitter_account: {"has already been taken", [constraint: :unique, constraint_name: "authors_twitter_account_index"]}`.
 
-    iex> create_author(%{field: bad_value})
-    {:error, %Ecto.Changeset{}}
+#### Uniqueness over multiple fields
 
-"""
-def create_author(attrs \\ %{}) do
-  %Author{}
-  |> Author.changeset(attrs)
-  |> Repo.insert()
+Sometimes you need to assue a uniqueness not just over one but over multiple fields. To show how this is done I assume that our `authors` table should not contain two authors with the same full name (e.g. no two `Dave Thomas` or `Stefan Wintermeyer`). To achieve that we have to check `fist_name` and `last_name` in combination. We have to do that in the database with a combined index.
+
+[source,bash]
+----
+$ mix ecto.gen.migration add_full_name_index
+* creating priv/repo/migrations/20200527071855_add_full_name_index.exs
+----
+
+.priv/repo/migrations/20200527071855_add_full_name_index.exs
+[source,elixir]
+----
+defmodule Bookstore.Repo.Migrations.AddFullNameIndex do
+  use Ecto.Migration
+
+  def change do
+    create unique_index(:authors, [:first_name, :last_name]) <1>
+  end
 end
 ----
-<1> Very useful documentation for the function. While browsing through `Bookstore.Store` your should always read the `@doc` documentation.
+<1> Creates a concatinated index of the fields `first_name` and `last_name`.
 
+.lib/bookstore/store/author.ex
+[source,elixir]
+----
+[...]
+  def changeset(author, attrs) do
+    author
+    |> cast(attrs, [:first_name, :last_name, :twitter_account])
+    |> validate_required([:last_name])
+    |> validate_length(:first_name, max: 255)
+    |> validate_length(:last_name, max: 255)
+    |> validate_length(:twitter_account, max: 15)
+    |> unique_constraint(:twitter_account)
+    |> unique_constraint([:first_name, :last_name]) <1>
+  end
+[...]
+----
+<1> This `unique_constraint/1` will trigger an error message instead of an exception without it.
+
+[source,elixir]
+----
+$ mix ecto.reset <1>
+Compiling 1 file (.ex)
+The database for Bookstore.Repo has been dropped
+The database for Bookstore.Repo has been created
+[...]
+09:45:21.380 [info]  create index authors_first_name_last_name_index
+
+09:45:21.382 [info]  == Migrated 20200527071855 in 0.0s
+
+$ iex -S mix phx.server
+[...]
+iex(1)> alias Bookstore.Store <2>
+Bookstore.Store
+iex(2)> Store.create_author(%{first_name: "Dave", last_name: "Thomas"}) <3>
+[debug] QUERY OK db=5.2ms decode=2.6ms queue=1.5ms idle=1377.6ms
+INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Dave", "Thomas", ~N[2020-05-27 08:35:29], ~N[2020-05-27 08:35:29]]
+{:ok,
+ %Bookstore.Store.Author{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+   first_name: "Dave",
+   id: 1,
+   inserted_at: ~N[2020-05-27 08:35:29],
+   last_name: "Thomas",
+   twitter_account: nil,
+   updated_at: ~N[2020-05-27 08:35:29]
+ }}
+iex(3)> Store.create_author(%{first_name: "Dave", last_name: "Thomas"}) <4>
+[debug] QUERY ERROR db=9.1ms queue=1.3ms idle=1548.4ms
+INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Dave", "Thomas", ~N[2020-05-27 08:35:31], ~N[2020-05-27 08:35:31]]
+{:error,
+ #Ecto.Changeset<
+   action: :insert,
+   changes: %{first_name: "Dave", last_name: "Thomas"},
+   errors: [
+     first_name: {"has already been taken",
+      [
+        constraint: :unique,
+        constraint_name: "authors_first_name_last_name_index"
+      ]}
+   ],
+   data: #Bookstore.Store.Author<>,
+   valid?: false
+ >}
+----
+<1> Reset our database.
+<2> Set an alias to `Bookstore.Store` to saves us some precious time to type the command.
+<3> The first Dave Thomas is created.
+<4> A second Dave Thomas can not be created.
 
 #Work in progess#

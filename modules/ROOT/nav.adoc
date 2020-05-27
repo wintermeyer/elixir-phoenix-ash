@@ -22,4 +22,10 @@
 ** xref:router.adoc#router-multilevel-paths[Multilevel Paths]
 ** xref:router.adoc#router-wildcards[Wildcards]
 * xref:ecto-basics.adoc[Ecto Basics]
+** xref:ecto-basics.adoc#ecto-create-database[Create a Database]
+** xref:ecto-basics.adoc#ecto-create-table[Create a Table]
+** xref:ecto-basics.adoc#ecto-create-dataset[Create a Dataset]
+** xref:ecto-basics.adoc#validations[Validations]
+*** xref:ecto-basics.adoc#ecto-uniqueness[Uniqueness Validations]
+
 * xref:index.adoc#training[Remote Training]
