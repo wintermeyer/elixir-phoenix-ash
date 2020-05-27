@@ -166,7 +166,7 @@ a later time than I. So you have to adjust the file names in this chapter
 accordingly. No copy and paste for migrationfile's names.
 
 [[ecto-create-dataset]]
-### Create a Dataset
+## Create a Dataset
 
 We have a database and a table. But we still need to create our first set of data. To do that we have to open the `iex`. Within a Phoenix project we can do this with the command `iex -S mix phx.server`. It loads the whole Phoenix project. Actually it starts the webserver too but right now we only use the `iex`.
 
@@ -284,8 +284,8 @@ Changesets are the gatekeepers of Ecto. Let's add some validations to our author
 ----
 <1> We make sure that a dataset has a `last_name`. But it doesn't have to have a `first_name` or a `twitter_account`.
 <2> If a `first_name` is used it can not be longer than 255 characters.
-<2> A `last_name` can not be longer than 255 characters.
-<2> If a `twitter_account` is used it can not be longer than 15 characters (the max limit for Twitter handles).
+<3> A `last_name` can not be longer than 255 characters.
+<4> If a `twitter_account` is used it can not be longer than 15 characters (the max limit for Twitter handles).
 
 So now we get a different error message:
 
