@@ -157,21 +157,43 @@ bookstore_dev=# \q <3>
 
 The migration created that table and added the columns.
 
-TIP: You can undo the last command with `mix ecto.rollback`.
+[TIP]
+====
+You can undo a migration with a rollback:
+
+[source,bash]
+----
+$ mix ecto.rollback
+
+12:48:54.388 [info]  == Running 20200526112425 Bookstore.Repo.Migrations.CreateAuthors.change/0 backward
+
+12:48:54.390 [info]  drop table authors
+
+12:48:54.398 [info]  == Migrated 20200526112425 in 0.0s
+----
+
+In case you test the rollback now you have to run the migration again 
+afterwards.
+====
 
 `phx.gen.context` generated in addition to the migration the schema in `lib/bookstore/store/author.ex` and the context module `lib/bookstore/store.ex`. We'll tackle both in the next section.
 
-IMPORTANT: Migration files include a timestamp. Obviously you are doing this at
-a later time than I. So you have to adjust the file names in this chapter
-accordingly. No copy and paste for migrationfile's names.
+WARNING: Migration filenames include a timestamp. Obviously you are doing this at
+a later time than I. So you have to adjust the filenames in this chapter
+accordingly. No copy and paste for migration filenames!
 
 [[ecto-create-dataset]]
 ## Create a Dataset
 
-We have a database and a table. But we still need to create our first set of data. To do that we have to open the `iex`. Within a Phoenix project we can do this with the command `iex -S mix phx.server`. It loads the whole Phoenix project. Actually it starts the webserver too but right now we only use the `iex`.
+We have a database and a table. But we still need to create our first set of
+data. To do that we have to open the `iex`. Within a Phoenix project we can do
+this with the command `iex -S mix phx.server`. It loads the whole Phoenix
+project. Actually it starts the webserver too (you see it sorting out the assets
+during startup) but right now we only use the `iex`.
 
 [source,bash]
 ----
+$ iex -S mix phx.server
 Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
 
 [info] Running BookstoreWeb.Endpoint with cowboy 2.7.0 at 0.0.0.0:4000 (http)
@@ -200,11 +222,69 @@ INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at",
  }}
 ----
 
-NOTE: Feel free to do a `alias Bookstore.Store` at the beginning and than the shorter `Store.create_author()`.
+TIP: Use `alias Bookstore.Store` at the beginning of an `iex` session and
+afterwards `Store.create_author()` to save typing time. Often makes code easier
+to read.
 
-If the insert in the table was successful the function returns a `{:ok, %Bookstore.Store.Author{}}` tuple. 
+[NOTE]
+====
+If you wander what `create_author/1` exactly does: 
 
-IMPORTANT: Assuming you'd like to assign the new author to the variable `author`. How would you do that because `create_author/1` results in a tuple and not an author? Pattern matching! You'd do something like this: `{:ok, author} = Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})``
+.lib/bookstore/store.ex
+[source,elixir]
+----
+[...]
+alias Bookstore.Repo
+alias Bookstore.Store.Author
+[...]
+def create_author(attrs \\ %{}) do
+  %Author{}
+  |> Author.changeset(attrs) <1>
+  |> Repo.insert() <2>
+end
+[...]
+----
+<1> Creates a new Author changeset with the attributes.
+<2> Uses `Repo` to insert the changeset into the table.
+====
+
+If the insert in the table was successful the function returns a
+`{:ok, %Bookstore.Store.Author{}}` tuple.
+
+[TIP]
+====
+Assuming you'd like to assign the new author to the variable `author`. How would you do that? `create_author/1` results in a tuple and not an Author. Pattern matching for the rescue! Example: 
+
+[source,elixir]
+----
+iex(2)> {:ok, author} = Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
+[debug] QUERY OK db=3.4ms decode=1.5ms queue=1.3ms idle=1013.5ms
+INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 11:00:19], ~N[2020-05-27 11:00:19]]
+{:ok,
+ %Bookstore.Store.Author{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+   first_name: "Dave",
+   id: 1,
+   inserted_at: ~N[2020-05-27 11:00:19],
+   last_name: "Thomas",
+   twitter_account: "pragdave",
+   updated_at: ~N[2020-05-27 11:00:19]
+ }}
+iex(3)> author
+%Bookstore.Store.Author{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+  first_name: "Dave",
+  id: 1,
+  inserted_at: ~N[2020-05-27 11:00:19],
+  last_name: "Thomas",
+  twitter_account: "pragdave",
+  updated_at: ~N[2020-05-27 11:00:19]
+}
+----
+====
+
+[[ecto-validations]]
+## Validations
 
 If we try to create an empty dataset this happens:
 
@@ -232,8 +312,8 @@ and it lists the reasons in the `errors` list:
  - `last_name: {"can't be blank", [validation: :required]}`
  - `twitter_account: {"can't be blank", [validation: :required]}`
 
-Some sort of data validation happens. To understand that we have to look into
-`lib/bookstore/store/author.ex`
+It seems that some sort of data validation happens. To understand that we have
+to look into `lib/bookstore/store/author.ex`
 
 .lib/bookstore/store/author.ex
 [source,elixir]
@@ -263,9 +343,6 @@ end
 <3> https://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4[cast/4] casts the input. Only fields which are listed in the list can make it through. Everything else is thrown away right there.
 <4> Here's the reason why `Bookstore.Store.create_author(%{})` resulted in an error. The function https://hexdocs.pm/ecto/Ecto.Changeset.html#validate_required/3[validate_required/3] checks weather all the list items are included.
 
-[[ecto-validations]]
-## Validations
-
 Changesets are the gatekeepers of Ecto. Let's add some validations to our author changeset as an example:
 
 .lib/bookstore/store/author.ex
@@ -287,7 +364,7 @@ Changesets are the gatekeepers of Ecto. Let's add some validations to our author
 <3> A `last_name` can not be longer than 255 characters.
 <4> If a `twitter_account` is used it can not be longer than 15 characters (the max limit for Twitter handles).
 
-So now we get a different error message:
+Now we get a different error message:
 
 [source,elxir]
 ----
@@ -342,8 +419,7 @@ Compiling 1 file (.ex)
 * creating priv/repo/migrations/20200527054827_add_twitter_account_index.exs
 ----
 
-The generator created the migration file. But we have to fill it with live. 
-Please update it with the following.
+The generator created the migration file. But we have to fill it with live:
 
 .priv/repo/migrations/20200527054827_add_twitter_account_index.exs
 [source,elixir]
@@ -357,7 +433,7 @@ defmodule Bookstore.Repo.Migrations.AddTwitterAccountIndex do
 end
 ----
 
-We can run this migration with `mix ecto.migrate`:
+Run the migration:
 
 [source,bash]
 ----
@@ -434,7 +510,9 @@ Time to check our work. Please fire up `iex -S mix phx.server` and follow me:
 
 [source,elixir]
 ----
-iex(2)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
+$ iex -S mix phx.server
+[...]
+iex(1)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
 [debug] QUERY OK db=3.0ms decode=1.4ms queue=1.4ms idle=1965.4ms
 INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 06:17:18], ~N[2020-05-27 06:17:18]]
 {:ok,
@@ -447,7 +525,7 @@ INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at",
    twitter_account: "pragdave",
    updated_at: ~N[2020-05-27 06:17:18]
  }} <1>
-iex(3)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
+iex(2)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
 [debug] QUERY ERROR db=8.1ms queue=2.3ms idle=1590.4ms
 INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 06:17:20], ~N[2020-05-27 06:17:20]]
 {:error,
@@ -465,13 +543,12 @@ INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at",
    data: #Bookstore.Store.Author<>,
    valid?: false
  >} <2>
-iex(4)>
 ----
 <1> Works nicely. It results in a `{:ok, %Bookstore.Store.Author()}` which tells
 us that the dataset is saved.
 <2> Works too. The second attempt to create an entry with the same data results in `{:error, #Ecto.Changeset}`. The `errors` tell us that `twitter_account: {"has already been taken", [constraint: :unique, constraint_name: "authors_twitter_account_index"]}`.
 
-#### Uniqueness over multiple fields
+### Uniqueness over multiple fields
 
 Sometimes you need to assue a uniqueness not just over one but over multiple fields. To show how this is done I assume that our `authors` table should not contain two authors with the same full name (e.g. no two `Dave Thomas` or `Stefan Wintermeyer`). To achieve that we have to check `fist_name` and `last_name` in combination. We have to do that in the database with a combined index.
 
