@@ -758,7 +758,7 @@ INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at",
 TIP: During development the command `mix ecto.reset` is often very useful. It resets the database (drop, create and migrate) and runs the seeds.
 
 [[ecto-list]]
-## list_*
+## Return all Entries of a Table
 
 The generated `Bookstore.Store` offers a `list_authors` function which simply
 returns a list of all authors in the table:
@@ -828,6 +828,68 @@ Almeida
 [:ok, :ok, :ok]
 ----
 <1> With pattern matching we take the first item of the list (the head) and assign it to `first_author`.
+
+[[ecto-get]]
+## Fetch one Entry of a Table by ID
+
+If you know the `id` an dataset and you want to fetch it use `get_author!/1` which got generated in the `Bookstore.Store` module. Let me first show you how to use it:
+
+[source,elixir]
+----
+iex(2)> Bookstore.Store.get_author!(1)
+[debug] QUERY OK source="authors" db=16.1ms decode=1.5ms queue=6.3ms idle=1543.4ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [1]
+%Bookstore.Store.Author{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+  first_name: "Dave",
+  id: 1,
+  inserted_at: ~N[2020-05-27 11:48:17],
+  last_name: "Thomas",
+  twitter_account: "pragdave",
+  updated_at: ~N[2020-05-27 11:48:17]
+}
+----
+
+And here is the very short code of it:
+
+.lib/bookstore/store.ex
+[source,elixir]
+----
+defmodule Bookstore.Store do
+[...]
+  alias Bookstore.Repo
+  alias Bookstore.Store.Author
+
+[...]
+  def get_author!(id), do: Repo.get!(Author, id)
+[...]
+----
+
+NOTE: One can argue that `get_author!(id)` is not easier/better than `Repo.get!(Author, id)`.
+
+[IMPORTANT]
+====
+Functions which end with a `!` (exclamation point) raise an exception if something goes wrong. Let me show you this with `get/2` and `get!/2` for an `id` we don't have in our table:
+
+[source,elixir]
+----
+iex(5)> Repo.get(Author, 10000) <1>
+nil
+[debug] QUERY OK source="authors" db=3.7ms idle=132.4ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [10000]
+iex(6)> Repo.get!(Author, 10000) <2>
+[debug] QUERY OK source="authors" db=3.6ms idle=1004.2ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [10000]
+** (Ecto.NoResultsError) expected at least one result but got none in query:
+
+from a0 in Bookstore.Store.Author,
+  where: a0.id == ^10000
+
+    (ecto 3.4.4) lib/ecto/repo/queryable.ex:122: Ecto.Repo.Queryable.one!/3
+----
+<1> Nothing happens. The ID 10000 doesn't exist in the table. The function returns `nil`.
+<2> All hell breaks loose. As dramatic as this sounds it is often the better way because it will result in a 404 page in your application. It's easier to catch bugs and you can be sure not to display something wrong.
+====
 
 ## Accociations
 
