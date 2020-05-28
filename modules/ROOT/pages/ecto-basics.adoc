@@ -4,7 +4,18 @@ Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Ecto is a persistence framework for Elixir. That is a fancy way of saying that
 we use Ecto to talk to a SQL database. This chapter will introduce you to the
-basics of Ecto in the Phoenix context.
+very basics of Ecto in the Phoenix context.
+
+You'll learn:
+
+- How to create a database and a table.
+- How to insert data into that table.
+- How to list all data from that table.
+- How to get a dataset from that table by it's ID.
+- How to update a dataset. 
+- How to delete a dataset.
+- Basic search queries.
+- Basic associations (e.g. one-to-many)
 
 [IMPORTANT] 
 ====
@@ -19,6 +30,12 @@ a database and which has the following credentials:
 
 Because those are the default values for the development system in Phoenix.
 ====
+
+NOTE: Ecto is a huge topic. In one chapter I can only scratch it's
+surface. If you want to dive into it deeper you should read the book 
+https://pragprog.com/book/wmecto/programming-ecto[Programming Ecto] by
+https://twitter.com/darinwilson[Darin Wilson]. Also
+https://www.youtube.com/results?search_query=Darin+Wilson+Ecto+Elixir[search for Darin's Ecto talks on YouTube].
 
 [[ecto-create-database]]
 ## Create a Database
@@ -811,5 +828,9 @@ Almeida
 [:ok, :ok, :ok]
 ----
 <1> With pattern matching we take the first item of the list (the head) and assign it to `first_author`.
+
+## Accociations
+
+https://hexdocs.pm/ecto/2.2.11/associations.html
 
 #Work in progess#

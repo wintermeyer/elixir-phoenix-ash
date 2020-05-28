@@ -1750,7 +1750,7 @@ iex(2)> Example.countdown(4) <6>
 <1> If `countdown/1` is called with the argument `1` this is the best match.
 <2> We call `IO.puts("1")` to print 1 to STDOUT.
 <3> If `countdown/1` is called with an integer bigger than 1 as an argument this function matches.
-<4> We either have to use `Integer.to_string(n)` (we could to a "#{n}" too) to print that integer to STDOUT.
+<4> We have to use `Integer.to_string(n)` to print the integer to STDOUT.
 <5> We recursively decrese `n` by 1 and call `countdown/1` with that new number.
 <6> It works!
 
