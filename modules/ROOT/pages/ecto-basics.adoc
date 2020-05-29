@@ -4,7 +4,8 @@ Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Ecto is a persistence framework for Elixir. That is a fancy way of saying that
 we use Ecto to talk to a SQL database. This chapter will introduce you to the
-very basics of Ecto in the Phoenix context.
+very basics of Ecto in the Phoenix context. Which means that when ever available 
+we use functions that were created by Phoenix generators.
 
 You'll learn:
 
@@ -888,8 +889,65 @@ from a0 in Bookstore.Store.Author,
     (ecto 3.4.4) lib/ecto/repo/queryable.ex:122: Ecto.Repo.Queryable.one!/3
 ----
 <1> Nothing happens. The ID 10000 doesn't exist in the table. The function returns `nil`.
-<2> All hell breaks loose. As dramatic as this sounds it is often the better way because it will result in a 404 page in your application. It's easier to catch bugs and you can be sure not to display something wrong.
+<2> All hell breaks loose. As dramatic as an execption sounds it is often the better way because it will result in a 404 page for your webapplication. It's easier to catch bugs and you can be sure not to display something wrong.
 ====
+
+[[ecto-update]]
+## Update an Entry
+
+If you want to change a dataset you have to first assign it to a variable. Assuming 
+we want to update the `twitter_account` or the dataset with the `id` 1 with nil we'd do the following:
+
+[source,elixir]
+----
+$ iex -S mix phx.server
+[...]
+iex(2)> alias Bookstore.Store <1>
+Bookstore.Store
+iex(3)> alias Bookstore.Store.Author
+Bookstore.Store.Author
+iex(4)> author = Store.get_author!(1) <2>
+[debug] QUERY OK source="authors" db=8.3ms decode=1.1ms queue=0.9ms idle=1955.5ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [1]
+%Bookstore.Store.Author{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+  first_name: "Dave",
+  id: 1,
+  inserted_at: ~N[2020-05-27 11:48:17],
+  last_name: "Thomas",
+  twitter_account: "pragdave",
+  updated_at: ~N[2020-05-27 11:48:17]
+}
+iex(5)> Store.update_author(author, %{twitter_account: nil}) <3>
+[debug] QUERY OK db=2.2ms queue=3.6ms idle=1569.2ms
+UPDATE "authors" SET "twitter_account" = $1, "updated_at" = $2 WHERE "id" = $3 [nil, ~N[2020-05-28 10:54:55], 1]
+{:ok,
+ %Bookstore.Store.Author{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+   first_name: "Dave",
+   id: 1,
+   inserted_at: ~N[2020-05-27 11:48:17],
+   last_name: "Thomas",
+   twitter_account: nil,
+   updated_at: ~N[2020-05-28 10:54:55]
+ }}
+iex(6)> Store.get_author!(1) <4>
+[debug] QUERY OK source="authors" db=4.8ms idle=659.0ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [1]
+%Bookstore.Store.Author{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+  first_name: "Dave",
+  id: 1,
+  inserted_at: ~N[2020-05-27 11:48:17],
+  last_name: "Thomas",
+  twitter_account: nil,
+  updated_at: ~N[2020-05-28 10:54:55]
+}
+----
+<1> We set these aliases to make our live a bit easier. No technical reason.
+<2> We fetch the dataset with the ID 1 and assign it to the variable `author`.
+<3> `update_author/2` updates the `twitter_account` field in the database. You can read the SQL command.
+<4> Just checking if it worked.
 
 ## Accociations
 
