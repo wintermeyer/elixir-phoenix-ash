@@ -3,19 +3,18 @@
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 https://www.phoenixframework.org[Phoenix]'s learning curve is steep. I am not
-sugar coating this book with a "this is easy" start. But I made it as easy and
-straight forward as possible. Buckle up if https://elixir-lang.org[Elixir] is
-your first functional programming language.
+sugar coating this book with a "this is easy" start. Buckle up if
+https://elixir-lang.org[Elixir] is your first functional programming language.
 
 I learn best from "Hello World!" like examples. I do not care about abstract
 ideas or programming theories. Give me a good and clean example and I make sense
-of it. If you like this kind of teaching you are reading the right book.
-Otherwise it is not too late for returning it.
+of it. If you like this kind of teaching you are reading the right book. Please
+follow the code bread crumbs I use to teach.
 
-* **This book teaches by presenting bite size code examples.** I created those
-  examples in a way that you can understand them by reading it's code. In
-  addition I add callouts with explanations next to the important source code
-  lines.
+* **This book teaches by presenting bite size code examples. Think of them as
+  bread crumbs which lead you.** I created those examples in a way that you can
+  understand them by reading it's code. In addition I add callouts with
+  explanations next to the important source code lines.
 * **This book is a step by step guide. We start at zero.** As few
   chicken-egg-problems are inescapable but I keep that to a minimum. You are
   expected to understand the basics of programming and HTML but other than that
