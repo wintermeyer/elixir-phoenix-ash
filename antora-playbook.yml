@@ -7,6 +7,7 @@ content:
   sources:
   - url: .
     edit_url: false
+    branches: HEAD
 
   # - url: git@github.com:wintermeyer/phoenix-book.git
   #   branches: master
