@@ -1,7 +1,7 @@
 site:
   title: Phoenix Beginner's Guide
   # the 404 page and sitemap files only get generated when the url property is set
-  url: https://www.wintermeyer-consulting.de/books/phoenix
+  url: https://www.wintermeyer-consulting.de/books/phoenix/1.5/
   start_page: phoenix::index.adoc
 content:
   sources:
