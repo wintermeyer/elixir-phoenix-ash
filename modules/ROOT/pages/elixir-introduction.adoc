@@ -26,7 +26,7 @@ Elixir 1.10.2 (compiled with Erlang/OTP 21)
 [[elixir-introduction-iex]]
 ## Elixir's Interactive Shell (iex)
 
-Your Elixir installation comes with an Elixir's Interactive Shell (`iex`) which we will use for most examples in this chapter. Please go to your command line and
+Your Elixir installation comes with an Elixir's Interactive Shell (`iex`), which we will use for most examples in this chapter. Please go to your command line and
 fire it up:
 indexterm:["iex", "Elixir's Interactive Shell"]
 
@@ -43,7 +43,7 @@ iex(1)> <1>
 IMPORTANT: You have to press `CTRL-C` twice(!) to stop the `iex`.
 
 The `iex` will be your trusted friend during the work with this book and later
-while working with Phoenix. While programming in development mode, you can use it to dive into the core of your Phoenix application. You can do so too while being in production mode but that is the equivalent to an open heart surgery. It can be a lifesaver but you really need to know what you are doing.
+while working with Phoenix. While programming in development mode, you can use it for diving into the core of your Phoenix application. You can do so too while being in production mode but that is the equivalent to open-heart surgery. It can be a lifesaver, but you need to know what you are doing.
 
 TIP: iex offers autocomplete when possible. So when in doubt press `TAB`.
 
@@ -51,7 +51,7 @@ TIP: The iex offers a history too. To recycle the last command, just press on th
 
 ### Help in the iex
 
-The iex has a build in help function `h/1` which gives you access to some
+The iex has a built-in help function `h/1` which gives you access to some
 basic documentation:
 
 [source,elixir]
@@ -64,7 +64,7 @@ iex(2)> h length/1
 
 guard: true
 
-Returns the length of list.
+Returns the length of the list.
 
 Allowed in guard tests. Inlined by the compiler.
 
@@ -74,9 +74,9 @@ Allowed in guard tests. Inlined by the compiler.
     9
 ----
 
-### Run the code examples not in iex
+### Run the code examples outside of iex
 
-If you prefer to run all code examples not in the `iex` you can do so. Just put
+If you prefer to run all code examples outside of iex `iex` you can do so. Just put
 them in a file with the ending `.exs` and call that file from the command file
 with `elixir example.exs`.
 
@@ -97,7 +97,7 @@ Hello world!
 ----
 indexterm:["Hello World!"]
 
-Strings are always encapsulated within double-quotes. In case you need to have
+You should always encapsulate Strings within double-quotes. In case you need to have
 double quotes within a string you have to escape them with backslashes:
 
 [source,elixir]
@@ -145,13 +145,13 @@ BREAK: (a)bort (c)ontinue (p)roc info (i)nfo (l)oaded
 ----
 
 NOTE: If it's OK with you I'll skip the `iex` and the `BREAK` part in the rest
-of this chapter. By that we get more real estate for the essential stuff and less trees
+of this chapter. By that, we get more real estate for the essential stuff, and fewer trees
 have to die to get the book version printed.
 
 [[elixir-introduction-atoms]]
 ## Atoms
 
-An atom just consists of it's own name. In some other programming languages they
+An atom just consists of its name. In some other programming languages, they
 are called symbols. Atoms start with a `:`
 
 [source,elixir]
@@ -162,8 +162,7 @@ iex(2)> :blue
 :blue
 ----
 
-NOTE: Atom names can be written in snake_case or in CamelCase. But the usual Elixir
-convention is to use snake_case.
+NOTE: You should write atoms in snake_case or CamelCase. But the usual Elixir convention is to use snake_case.
 
 ### Booleans are atoms too
 
@@ -203,14 +202,13 @@ false
 indexterm:["Logical Expressions"]
 
 The operators `and`, `or` and `not` can only work with boolean values. The operators
-`&&` (and), `||` (or) and `!` (not) basically do the same but are a bit more free spirited and accept *truthy* and *falsy* values. We will get to that later if needed.
+`&&` (and), `||` (or) and `!` (not) do the same but are a bit more free-spirited and accept *truthy* and *falsy* values. We will get to that later if needed.
 
 [[elixir-introduction-variables]]
 ## Variables
 indexterm:["Variables"]
 
-You already know how variables work from experiences in other programming
-languages. Therefor we can dive right into it. Variable names follow the
+You already know how variables work from experiences in other programming languages. Therefore we can dive right into it. Variable names follow the
 https://en.wikipedia.org/wiki/Snake_case[snake_case] format and start with a
 lower case. Some examples:
 
@@ -265,8 +263,7 @@ indexterm:["<> operator"]
 It can be used to inject a variable into a string which is encapsuled
 within double quotes.
 <4> Elixir's expressive string-interpolation even works with integers.
-String-interpolation is done by the `Kernel.to_string/1` macro which evokes
-`String.Chars`. It can handle integers, floats, some lists (later more on lists)
+String-interpolation is done by the `Kernel.to_string/1` macro which evokes `String.Chars`. It can handle integers, floats, some lists (later more on lists)
 and atoms (later more on atoms) out of the box.
 indexterm:["String-Interpolation"]
 
@@ -1812,7 +1809,7 @@ Unless you are doing this every day you will get to problems where you know that
 recursion is a good solution but you just can't think of a good recursion for it.
 
 Let me share a pro tip for these situations: https://www.google.com and
-https://stackoverflow.com are my life-saver in such situations. No embarrassment!
+https://stackoverflow.com are my lifesaver in such situations. No embarrassment!
 
 During this book we will work with recursions. So you'll get a better feeling for
 it.
