@@ -1476,7 +1476,7 @@ and doesn't overwrite the old memory. Once a function returns a result and there
 
 Why is that important at all? With immutable variables, we can be sure that other processes can not change their values while running parallel tasks.
 That has a massive effect. In the end, it means that your Phoenix application can
-run on multiple CPUs on the same server in parallel. It even means that your Phoenix application can share multiple CPUs on several nodes of a server cluster in your data centre; this makes Elixir extremely scalable and save.
+run on multiple CPUs on the same server in parallel. It even means that your Phoenix application can share multiple CPUs on several nodes of a server cluster in your data center; this makes Elixir extremely scalable and save.
 
 But doesn't that make your application slower? Funny thing: No. This way is faster. It is not efficient to change data in memory.
 
