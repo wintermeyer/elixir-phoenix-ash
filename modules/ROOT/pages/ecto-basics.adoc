@@ -4,36 +4,35 @@ Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Ecto is a persistence framework for Elixir. That is a fancy way of saying that
 we use Ecto to talk to a SQL database. This chapter will introduce you to the
-very basics of Ecto in the Phoenix context. Which means that when ever available 
-we use functions that were created by Phoenix generators.
+very basics of Ecto in the Phoenix context. Which means that whenever available, we use functions that were created by Phoenix generators.
 
 You'll learn:
 
 - How to create a database and a table.
 - How to insert data into that table.
 - How to list all data from that table.
-- How to get a dataset from that table by it's ID.
-- How to update a dataset. 
+- How to get a dataset from that table by its ID.
+- How to update a dataset.
 - How to delete a dataset.
 - Basic search queries.
 - Basic associations (e.g. one-to-many)
 
-[IMPORTANT] 
+[IMPORTANT]
 ====
 We are going to use a https://www.postgresql.org[PostgreSQL] database. Ecto
 works fine with other databases too (e.g. https://mariadb.com[MariaDB]) but most
-Phoenix developers prefer PostgreSQL. For this book we assume that you have a
+Phoenix developers prefer PostgreSQL. For this book, we assume that you have a
 PostgreSQL user on your development system which was granted the right to create
 a database and which has the following credentials:
 
 - user: postgres
 - password: postgres
 
-Because those are the default values for the development system in Phoenix.
+These are the default values for the development system in Phoenix.
 ====
 
-NOTE: Ecto is a huge topic. In one chapter I can only scratch it's
-surface. If you want to dive into it deeper you should read the book 
+NOTE: Ecto is a vast topic. In one chapter, I can only scratch its
+surface. If you want to dive into it more in-depth, you should read the book
 https://pragprog.com/book/wmecto/programming-ecto[Programming Ecto] by
 https://twitter.com/darinwilson[Darin Wilson]. Also
 https://www.youtube.com/results?search_query=Darin+Wilson+Ecto+Elixir[search for Darin's Ecto talks on YouTube].
@@ -41,7 +40,7 @@ https://www.youtube.com/results?search_query=Darin+Wilson+Ecto+Elixir[search for
 [[ecto-create-database]]
 ## Create a Database
 
-Before we can do anything we have to create a database. Let's create a small
+Before we can do anything, we have to create a database. Let's create a small
 bookstore database:
 
 [source,bash]
@@ -81,17 +80,16 @@ config :bookstore, Bookstore.Repo,
 [[ecto-create-table]]
 ## Create a Table
 
-The generator `mix phx.gen.context` (https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html) can be used to create a context with a couple of useful functions around an Ecto schema. 
+The generator `mix phx.gen.context` (https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html) can be used to create a context with a couple of useful functions around an Ecto schema.
 
-NOTE: You can do everything a generator does manually but it is faster and results in fewer errors if you use a generator.
+NOTE: You can do everything a generator does manually, but it is faster and results in fewer errors if you use a generator.
 
-As a first resource we want to create a table with authors. In the Phoenix world
+As a first resource, we want to create a table with authors. In the Phoenix world
 we have to put that new resource `authors` into a context.
 
 NOTE: A context is an API boundary for one or more resources. It was included in
-Phoenix with version 1.3. Don't loose any sleep on the question what exactly a
-context is. You'll get a feeling about it soon. Good naming of contexts is
-important but not at this stadium of your Ecto learning process.
+Phoenix with version 1.3. Don't lose any sleep on the question of what a context is. You'll get a feeling about it soon. Good naming of contexts is
+essential but not at this stadium of your Ecto learning process.
 
 [source,bash]
 ----
@@ -108,7 +106,7 @@ Remember to update your repository by running migrations:
     $ mix ecto.migrate
 ----
 
-Migrations are used to keep track with the process of generating or changing your database. If you are in a team of multiple developers migrations are the tool so that you don't pull each others carpets.
+Migrations are used to keep track of the process of generating or changing your database. If you are in a team of multiple developers, migrations are the tool so that you don't pull each other's carpets.
 
 The migration the generator created is stored in the file `priv/repo/migrations/20200526112425_create_authors.exs`. What is does is pretty clear once you have a look into it:
 
@@ -130,9 +128,9 @@ defmodule Bookstore.Repo.Migrations.CreateAuthors do
   end
 end
 ----
-<1> `timestamps()` generates the fields `updated_at` and `inserted_at`. Both are updated with the current timestamp during creation of a dataset. Afterwards only `updated_at` is updated with the current timestamp when ever Ecto changes that dataset.
+<1> `timestamps()` generates the fields `updated_at` and `inserted_at`. Both are updated with the current timestamp during the creation of a dataset. Afterwards, only `updated_at` is updated with the current timestamp whenever Ecto changes that dataset.
 
-To run the migration we call `mix ecto.migrate`:
+To run the migration, we call `mix ecto.migrate`:
 
 [source,bash]
 ----
@@ -147,7 +145,7 @@ Generated bookstore app
 13:30:35.458 [info]  == Migrated 20200526112425 in 0.0s
 ----
 
-The migration script created the table `authors` in the database `bookstore_dev`. 
+The migration script created the table `authors` in the database `bookstore_dev`.
 But let's double check:
 
 [source,bash]
@@ -157,7 +155,7 @@ psql (12.2)
 Type "help" for help.
 
 bookstore_dev=# SELECT column_name FROM information_schema.columns WHERE TABLE_NAME='authors'; <2>
-   column_name   
+   column_name
 -----------------
  id
  first_name
@@ -169,9 +167,9 @@ bookstore_dev=# SELECT column_name FROM information_schema.columns WHERE TABLE_N
 
 bookstore_dev=# \q <3>
 ----
-<1> `psql` is the command line client for PostgreSQL. If you are not familiar with it: Don't try this at home!
+<1> `psql` is the command-line client for PostgreSQL. If you are not familiar with it: Don't try this at home!
 <2> This command lists all column names of the table `authors`.
-<3> `\q` is the command to quit the command line client.
+<3> `\q` is the command to quit the command-line client.
 
 The migration created that table and added the columns.
 
@@ -190,23 +188,22 @@ $ mix ecto.rollback
 12:48:54.398 [info]  == Migrated 20200526112425 in 0.0s
 ----
 
-In case you test the rollback now you have to run the migration again 
+In case you test the rollback now you have to run the migration again
 afterwards.
 ====
 
 `phx.gen.context` generated in addition to the migration the schema in `lib/bookstore/store/author.ex` and the context module `lib/bookstore/store.ex`. We'll tackle both in the next section.
 
-WARNING: Migration filenames include a timestamp. Obviously you are doing this at
-a later time than I. So you have to adjust the filenames in this chapter
+WARNING: Migration filenames include a timestamp. Obviously, you are doing this at a later time than I. So you have to adjust the filenames in this chapter
 accordingly. No copy and paste for migration filenames!
 
 [[ecto-create-dataset]]
 ## Create a Dataset
 
 We have a database and a table. But we still need to create our first set of
-data. To do that we have to open the `iex`. Within a Phoenix project we can do
+data. To do that we have to open the `iex`. Within a Phoenix project, we can do
 this with the command `iex -S mix phx.server`. It loads the whole Phoenix
-project. Actually it starts the webserver too (you see it sorting out the assets
+project. It starts the webserver too (you see it sorting out the assets
 during startup) but right now we only use the `iex`.
 
 [source,bash]
@@ -246,7 +243,7 @@ to read.
 
 [NOTE]
 ====
-If you wander what `create_author/1` exactly does: 
+If you wander what `create_author/1` exactly does:
 
 .lib/bookstore/store.ex
 [source,elixir]
@@ -266,12 +263,12 @@ end
 <2> Uses `Repo` to insert the changeset into the table.
 ====
 
-If the insert in the table was successful the function returns a
+If the insert in the table was successful, the function returns a
 `{:ok, %Bookstore.Store.Author{}}` tuple.
 
 [TIP]
 ====
-Assuming you'd like to assign the new author to the variable `author`. How would you do that? `create_author/1` results in a tuple and not an Author. Pattern matching for the rescue! Example: 
+Assuming you'd like to assign the new author to the variable `author`. How would you do that? `create_author/1` results in a tuple and not an Author. Pattern matching for the rescue! Example:
 
 [source,elixir]
 ----
@@ -378,9 +375,9 @@ Changesets are the gatekeepers of Ecto. Let's add some validations to our author
 [...]
 ----
 <1> We make sure that a dataset has a `last_name`. But it doesn't have to have a `first_name` or a `twitter_account`.
-<2> If a `first_name` is used it can not be longer than 255 characters.
+<2> If a `first_name` is used, it can not be longer than 255 characters.
 <3> A `last_name` can not be longer than 255 characters.
-<4> If a `twitter_account` is used it can not be longer than 15 characters (the max limit for Twitter handles).
+<4> If a `twitter_account` is used, it can not be longer than 15 characters (the max limit for Twitter handles).
 
 Now we get a different error message:
 
@@ -401,7 +398,7 @@ But let's try to add an author with a missing `first_name`:
 
 [source,elxir]
 ----
-iex(6)> Bookstore.Store.create_author(%{last_name: "Thomas", twitter_account: "pragdave"})                    
+iex(6)> Bookstore.Store.create_author(%{last_name: "Thomas", twitter_account: "pragdave"})
 [debug] QUERY OK db=1.0ms queue=0.5ms idle=1349.0ms
 INSERT INTO "authors" ("last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Thomas", "pragdave", ~N[2020-05-27 05:37:46], ~N[2020-05-27 05:37:46]]
 {:ok,
@@ -416,14 +413,14 @@ INSERT INTO "authors" ("last_name","twitter_account","inserted_at","updated_at")
  }}
 ----
 
-No surprise here. It works. 
+No surprise here. It works.
 
 A list of available validations can be found at https://hexdocs.pm/ecto/Ecto.Changeset.html
 
 [[ecto-uniqueness]]
 ### Uniqueness Validation
 
-In the last section we created two datasets with the same Twitter account. That
+In the last section, we created two datasets with the same Twitter account. That
 shouldn't happen because it is unique. We have to add a validation for that.
 
 A uniqueness validation needs a uniqueness database index. Since we haven't
@@ -469,13 +466,12 @@ Key (twitter_account)=(pragdave) is duplicated.
 [...]
 ----
 
-Ups! Because we have two entries with the same `twitter_account` the unqiue
+Ups! Because we have two entries with the same `twitter_account` the unique
 index can not be created. We can solve this in the following ways:
 
 - Delete one entry in the table and re-run the migration.
-- Do a `mix ecto.drop`, `mix ecto.create` and `mix ecto.migrate`. Obviously that 
-destroys the existing data. Since this is a development system there is little harm.
-- Do a `mix ecto.reset`. Which does all the above. Plus it populates the database with seeds if you have them. We don't have seeds yet.
+- Do a `mix ecto.drop`, `mix ecto.create` and `mix ecto.migrate`. That destroys the existing data. Since this is a development system, there is little harm.
+- Do a `mix ecto.reset` which does all the above. Plus it populates the database with seeds if you have them. We don't have seeds yet.
 
 We take the shortcut `mix ecto.reset`:
 
@@ -502,10 +498,8 @@ The database for Bookstore.Repo has been created <2>
 <3> Runs the first migration. The one with 20200526112425 in it's filename.
 <4> Runs the second migration. The one with 20200527054827 in it's filename. This one creates the index.
 
-The uniqueness index in the table does make sure that we can't add a second
-author with the same Twitter account to the table but this constraint violation
-would raise an exception. Better than nothing but not what we want. We want an
-an error to our changeset. So we have to add one more line to the changeset:
+The uniqueness index in the table does make sure that we can't add a second author with the same Twitter account to the table, but this constraint violation
+would raise an exception. Better than nothing but not what we want. We want an error to our changeset. So we have to add one more line to the changeset:
 
 .lib/bookstore/store/author.ex
 [source,elixir]
@@ -568,7 +562,7 @@ us that the dataset is saved.
 
 ### Uniqueness over multiple fields
 
-Sometimes you need to assue a uniqueness not just over one but over multiple fields. To show how this is done I assume that our `authors` table should not contain two authors with the same full name (e.g. no two `Dave Thomas` or `Stefan Wintermeyer`). To achieve that we have to check `fist_name` and `last_name` in combination. We have to do that in the database with a combined index.
+Sometimes you need to assure a uniqueness not just over one but over multiple fields. To show how this is done, I assume that our `authors` table should not contain two authors with the same full name (e.g. no two `Dave Thomas` or `Stefan Wintermeyer`). To achieve that we have to check `fist_name` and `last_name` in combination. We have to do that in the database with a combined index.
 
 [source,bash]
 ----
@@ -612,7 +606,7 @@ end
 $ mix ecto.reset <1>
 Compiling 1 file (.ex)
 The database for Bookstore.Repo has been dropped
-The database for Bookstore.Repo has been created
+The database for Bookstore.Repo has been created.
 [...]
 09:45:21.380 [info]  create index authors_first_name_last_name_index
 
@@ -654,7 +648,7 @@ INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALU
  >}
 ----
 <1> Reset our database.
-<2> Set an alias to `Bookstore.Store` to saves us some precious time to type the command.
+<2> Set a `Bookstore.Store` alias to saves us some precious time to type the command.
 <3> The first Dave Thomas is created.
 <4> A second Dave Thomas can not be created.
 
@@ -696,7 +690,7 @@ end
 
 [source,elixir]
 ----
-iex(3)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas"})                             
+iex(3)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas"})
 [debug] QUERY ERROR db=2.1ms queue=0.7ms idle=1.5e3ms
 INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Dave", "Thomas", ~N[2020-05-27 11:19:42], ~N[2020-05-27 11:19:42]]
 {:error,
@@ -711,14 +705,14 @@ INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALU
    valid?: false
  >}
 ----
-<1> We get an error for `full_name`. 
+<1> We get an error for `full_name`.
 ====
 
 [[ecto-seeds]]
 ## Seeds
 
 Often you need the database prefilled with data for your application. That's
-what seeds are for. By default they are in the file `priv/repo/seeds.exs`. For
+what seeds are for. By default, they are in the file `priv/repo/seeds.exs`. For
 our bookstore we can work with these seeds:
 
 .priv/repo/seeds.exs
@@ -727,13 +721,13 @@ our bookstore we can work with these seeds:
 alias Bookstore.Store
 
 Store.create_author(%{
-  first_name: "Dave", 
-  last_name: "Thomas", 
+  first_name: "Dave",
+  last_name: "Thomas",
   twitter_account: "pragdave"
 })
 Store.create_author(%{
-  first_name: "James", 
-  last_name: "Gray", 
+  first_name: "James",
+  last_name: "Gray",
   twitter_account: "jeg2"
 })
 Store.create_author(%{
@@ -743,7 +737,7 @@ Store.create_author(%{
 })
 ----
 
-To populate the database we call 
+To populate the database we call.
 
 [source,elixir]
 ----
@@ -756,7 +750,7 @@ INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at",
 INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Ulisses", "Almeida", "ulissesalmeida", ~N[2020-05-27 11:47:40], ~N[2020-05-27 11:47:40]]
 ----
 
-TIP: During development the command `mix ecto.reset` is often very useful. It resets the database (drop, create and migrate) and runs the seeds.
+TIP: During development, the command `mix ecto.reset` is often very useful. It resets the database (drop, create and migrate) and runs the seeds.
 
 [[ecto-list]]
 ## Return all Entries of a Table
@@ -794,7 +788,7 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
     __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
     first_name: "Ulisses",
     id: 3,
-    inserted_at: ~N[2020-05-27 11:48:17], 
+    inserted_at: ~N[2020-05-27 11:48:17],
     last_name: "Almeida",
     twitter_account: "ulissesalmeida",
     updated_at: ~N[2020-05-27 11:48:17]
@@ -802,7 +796,7 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
 ]
 ----
 
-Obviously we can use all the mechnisms of a list with this result:
+We can use all the mechanisms of a list with this result:
 
 [source,elixir]
 ----
@@ -851,7 +845,7 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
 }
 ----
 
-And here is the very short code of it:
+And here is the concise code of it:
 
 .lib/bookstore/store.ex
 [source,elixir]
@@ -889,13 +883,13 @@ from a0 in Bookstore.Store.Author,
     (ecto 3.4.4) lib/ecto/repo/queryable.ex:122: Ecto.Repo.Queryable.one!/3
 ----
 <1> Nothing happens. The ID 10000 doesn't exist in the table. The function returns `nil`.
-<2> All hell breaks loose. As dramatic as an execption sounds it is often the better way because it will result in a 404 page for your webapplication. It's easier to catch bugs and you can be sure not to display something wrong.
+<2> All hell breaks loose. As dramatic as an exception sounds, it is often the better way because it will result in a 404 page for your web application. It's easier to catch bugs, and you can be sure not to display something wrong.
 ====
 
 [[ecto-update]]
 ## Update an Entry
 
-If you want to change a dataset you have to first assign it to a variable. Assuming 
+If you want to change a dataset, you'd have to assign it to a variable first. Assuming
 we want to update the `twitter_account` or the dataset with the `id` 1 with nil we'd do the following:
 
 [source,elixir]
@@ -944,7 +938,7 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
   updated_at: ~N[2020-05-28 10:54:55]
 }
 ----
-<1> We set these aliases to make our live a bit easier. No technical reason.
+<1> We set these aliases to make our lives a bit easier. No technical reason.
 <2> We fetch the dataset with the ID 1 and assign it to the variable `author`.
 <3> `update_author/2` updates the `twitter_account` field in the database. You can read the SQL command.
 <4> Just checking if it worked.
