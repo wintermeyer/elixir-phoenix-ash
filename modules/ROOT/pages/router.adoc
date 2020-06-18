@@ -14,7 +14,7 @@ All code in this chapter will result form this base application:
 $ mix phx.new demo --no-ecto --no-dashboard <1>
 $ cd demo
 ----
-<1> We don't include the https://hexdocs.pm/phoenix_live_dashboard/Phoenix.LiveDashboard.html[Phoenix.LiveDashboard] (--no-dashboard) to keep our router setup tidy. Otherwise a million routes would leave just to the real-time performance monitoring dashboard which is not a topic in this chapter.
+<1> We don't include the https://hexdocs.pm/phoenix_live_dashboard/Phoenix.LiveDashboard.html[Phoenix.LiveDashboard] (--no-dashboard) to keep our router setup tidy. Otherwise, a million routes would leave just to the real-time performance monitoring dashboard, which is not a topic in this chapter.
 
 This results in a minimal router setup:
 
@@ -43,7 +43,7 @@ defmodule DemoWeb.Router do
 end
 ----
 
-For us relevant is just the last `/` part.
+For us, relevant is just the last `/` part.
 
 [[mix-phx-routes]]
 ## Display existing routes
@@ -61,15 +61,14 @@ websocket  WS   /socket/websocket    DemoWeb.UserSocket <2>
 <1> This route is for a HTTP GET request for the root path - which gets matched by `/` - of our application. It triggers the `:index` action in the `DemoWeb.PageController` controller.
 <2> No need to discuss `websockets` in this chapter. #I will remove that line in following exampless to clean up the output.#
 
-NOTE: In more complex applications with a dashboard the output of `mix phx.routes` gets quite a bit longer. Then `mix phx.routes | grep "whatever-you-search"` becomes a very handy tool on the command line.
+NOTE: In more complex applications with a dashboard, the output of `mix phx.routes` gets quite a bit longer. Then `mix phx.routes | grep "whatever-you-search"` becomes a convenient tool on the command line.
 
 [[router-params]]
 ## Params
 
-Often you have some sort of ID in the URL or other params you need to access in your application. And sometimes you want that to be handled in the router.
+Often you have some sort of ID in the URL or other params you need to access in your application. And sometimes you want that to handle that in the router.
 
-We create a product view in our `demo` application to show how it's working. We
-have to touch/create three files to make this happen:
+We create a product view of our `demo` application to show how it's working. We have to touch/create three files to make this happen:
 
 .lib/demo_web/router.ex
 [source,elixir]
@@ -94,7 +93,7 @@ defmodule DemoWeb.ProductController do
   use DemoWeb, :controller
 
   def show(conn, %{"id" => id}) do <1>
-    conn 
+    conn
     |> assign(:id, id)
     |> render("show.html")
   end
@@ -117,7 +116,7 @@ end
 ----
 <1> Just a simple display. Normally we would have fetched the product with that id from our database and display it.
 
-If you open http://localhost:4000/products/1 with your browser you'll see this 
+If you open http://localhost:4000/products/1 with your browser you'll see this
 log entry:
 
 [source,bash]
@@ -136,10 +135,9 @@ image::router-products-1.png[http://localhost:4000/products/1]
 [[router-query-string]]
 ### Query String
 
-Query Strings don't belong in the router but are handled very similar to the 
-above params in the controller.
+Query Strings don't belong in the router but are handled very similarly to the above params in the controller.
 
-Let's assume we want to add the query string "color=blue" to our product request: 
+Let's assume we want to add the query string "color=blue" to our product request:
 http://localhost:4000/products/1?color=blue
 
 We can't match for it in the router but Phoenix does realize what happens:
@@ -154,7 +152,7 @@ We can't match for it in the router but Phoenix does realize what happens:
 ----
 <1> Both parameter become part of the `params` map.
 
-Without doing anything in the router the query string parameter `color` finds it's way into the controller. But we have to change the the controller a bit:
+Without doing anything in the router, the query string parameter `color` finds it's way into the controller. But we have to change the controller a bit:
 
 .lib/demo_web/controllers/product_controller.ex
 [source,elixir]
@@ -163,24 +161,24 @@ defmodule DemoWeb.ProductController do
   use DemoWeb, :controller
 
   def show(conn, %{"id" => id, "color" => color}) do <1>
-    conn 
+    conn
     |> assign(:id, id)
     |> assign(:color, color) <2>
     |> render("show.html")
   end
 
   def show(conn, %{"id" => id}) do <3>
-    conn 
+    conn
     |> assign(:id, id)
     |> render("show.html")
-  end  
+  end
 end
 ----
 <1> This `show/2` function matches if there is an `:id` and a `:color` parameter.
 <2> In addition to `:id` we have to assign `:color` too.
 <3> This `show/2` function matches if there is only an `:id` parameter.
 
-IMPORTANT: The order of the `show/2` functions in the controller is very important. If we use the other order for this specific example the `%{"id" => id, "color" => color}` would never match because `%{"id" => id}` always matches first if it's the first function.
+IMPORTANT: The order of the `show/2` functions in the controller is significant. If we use the other order for this specific example the `%{"id" => id, "color" => color}` would never match because `%{"id" => id}` always matches first if it's the first function.
 
 Lastly we have to change the template:
 
@@ -244,8 +242,8 @@ Assuming you'd like to link to the first product with the query "color=orange" y
 [[router-multilevel-paths]]
 ## Multilevel Paths
 
-In the previous easy code examples we always put the routes on the first level.
-But of course you can use sublevel paths too. Here's an example:
+In the previous easy code examples, we always put the routes on the first level.
+But of course, you can use sublevel paths too. Here's an example:
 
 .lib/demo_web/router.ex
 [source,elixir]
@@ -271,7 +269,7 @@ page_path  GET  /an-other-test/abc/def    DemoWeb.PageController :index
 [[router-wildcards]]
 ## Wildcards
 
-You don't have to define the route excactly. You can use the `*` wildcard too.
+You don't have to define the route precisely. You can use the `*` wildcard too.
 
 .lib/demo_web/router.ex
 [source,elixir]
@@ -304,4 +302,4 @@ This route matches `/names/stefan` and `/names/stephan`:
 
 ## Misc
 
-No need to replicate the official documentation in this chapter. By now you understand the concept of `Phoenix.Router`. You'll find solutions for all the special cases which are not handled in this chapter in the official documentation at https://hexdocs.pm/phoenix/Phoenix.Router.html
+There's no need to replicate the official documentation in this chapter. By now, you understand the concept of `Phoenix.Router`. You'll find solutions for all the exceptional cases which are not handled in this chapter in the official documentation at https://hexdocs.pm/phoenix/Phoenix.Router.html
