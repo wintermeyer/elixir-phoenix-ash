@@ -1897,8 +1897,7 @@ go for the next chapter of this book. Have fun!
 If you want to dive more into Elixir than I recommend the following
 books:
 
-- https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir[Learn Functional Programming with Elixir] by Ulisses Almeida ([@ulissesalmeida
-](https://twitter.com/ulissesalmeida))
+- https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir[Learn Functional Programming with Elixir] by Ulisses Almeida ([@ulissesalmeida](https://twitter.com/ulissesalmeida)
 +
 In my opinion, the best beginners book for Elixir.
 - https://twitter.com/pragdave)[Programming Elixir 1.6](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas ([@pragdave]
