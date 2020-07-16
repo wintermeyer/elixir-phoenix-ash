@@ -452,27 +452,30 @@ interacting with the outer scoped one.
 ## Modules and Functions
 indexterm:["Modules", "Functions"]
 
-Anonymous functions are useful, but using just them to build a significant software
-project would become messy very fast. We need a better way to structure our
-code. Let me introduce you to Modules. We organize a collection of functions with modules.
+Anonymous functions are useful, but using just them to build a significant
+software project would become messy very fast. We need a better way to structure
+our code. Let me introduce you to Modules. We organize a collection of functions
+with modules.
 
 [source,elixir]
 ----
 iex(1)> defmodule Store do <1>
 ...(1)>   def total_price(price, amount) do <2>
-...(1)>     price * amount
+...(1)>     price * amount <3>
 ...(1)>   end
 ...(1)> end
 {:module, Store,
  <<70, 79, 82, 49, 0, 0, 5, 4, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 133, 0,
    0, 0, 14, 12, 69, 108, 105, 120, 105, 114, 46, 83, 116, 111, 114, 101, 8, 95,
    95, 105, 110, 102, 111, 95, 95, 7, ...>>, {:total_price, 2}}
-iex(2)> Store.total_price(10,7) <3>
+iex(2)> Store.total_price(10,7) <4>
 70
 ----
 <1> `defmodule` is the keyword to define a module. The name of a modul starts with a capital letter.
 <2> `def` is the keyword to define a function within a module.
-<3> A function of a given module can be called from outside the module with this syntax.
+<3> The return value of a function is the return value of the last expression in
+the function.
+<4> A function of a given module can be called from outside the module with this syntax.
 
 `defmodule` and `def` use a `do ... end` construct to begin and end.
 
@@ -508,7 +511,9 @@ iex(3)> Area.square(4)
 ### Private Functions
 indexterm:["Private functions"]
 
-Sometimes you want to define a function within a module without exposing it to the outside world. You can do this with a private function which gets declared with `devp`:
+Sometimes you want to define a function within a module without exposing it to
+the outside world. You can do this with a private function which gets declared
+with `defp`:
 
 [source,elixir]
 ----
@@ -661,9 +666,9 @@ iex(7)> area(1,5) <3>
 <2> I try to run `area/1`, but that triggered an error because I didn't import it.
 <3> Just works fine.
 
-NOTE: Whenever you just use a given function without a module name before that
-module has already been imported by Elixir (e.g. the `Kernel` module gets
-imported automatically).
+NOTE: Whenever you just use a given function without a module name before it,
+that means that the module has already been imported by Elixir (e.g. the
+`Kernel` module gets imported automatically).
 
 #### Import Hierarchical Modules
 
@@ -713,6 +718,16 @@ iex(5)> Area.square(99)
 ----
 <1> Set an alias for `Calculator.Area` as `Area`.
 <2> A shortcurt for that specific case. Same result but less to type.
+
+### Use
+indexterm:["Use"]
+
+`use` allows a module to inject code into the current module, such as importing
+modules, defining new functions, setting a module's state, etc.
+
+In many of the tests in your Phoenix application, you will see `use
+ExUnit.Case`, which performs certain checks, sets some module attributes and
+imports needed modules.
 
 ### The Pipe Operator (|>)
 indexterm:["Pipe Operator", "|>"]
