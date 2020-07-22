@@ -975,13 +975,70 @@ NOTE: You can not change the value of an outer scoped variable, but you can read
 it. And you can create a new inner scope variable with the same name without
 interacting with the outer scoped one.
 
-## Maps and Structs
+## Keyword Lists, Maps and Structs
+indexterm:["Keyword Lists, Maps and Structs"]
 
 List and Tuples don't provide the functionality to access values with a key. We
-can achieve that functionality with Maps and Structs.
+can achieve that functionality with keyword lists, maps and structs.
+
+### Keyword Lists
+indexterm:["Keyword Lists"]
+
+Keyword lists are key-value data structures, in which keys are atoms and keys
+can appear more than once.
+
+[source,elixir]
+----
+iex(1)> user = [{:name, "joe"}, {:age, 23}] <1>
+[name: "joe", age: 23]
+iex(2)> user = [name: "joe", age: 23] <2>
+[name: "joe", age: 23]
+iex(3)> user[:name] <3>
+"joe"
+iex(4)> new_user = [name: "fred"] ++ user
+[name: "fred", name: "joe", age: 23]
+iex(5)> new_user[:name] <4>
+"fred"
+----
+<1> Keyword lists are lists of 2-item tuples, with the first item of each tuple
+being an atom.
+<2> This `[_key_: _value_]` syntax is more commonly used (this expression is
+the same as the list of tuples above).
+<3> The keyword list name followed by the key name in brackets returns a value
+for the given key.
+<4> If there are duplicate keys in a keyword list, the first one is fetched on
+lookup.
+
+In your Phoenix application, you will see a keyword list used as the last
+argument in the `render/3` function:
+
+[source,elixir]
+----
+render(conn, "show.html", message: "Hello", username: "Mary") <1>
+----
+<1> `[message: "Hello", username: "Mary"]` is a keyword list. As you can see
+from this example, the brackets are optional.
+
+#### Keyword List Functions
+indexterm:["Keyword List Functions"]
+
+The https://hexdocs.pm/elixir/Keyword.html[Keyword module] offers functions for
+working with keyword lists.
+
+Here are a few examples:
+
+[source,elixir]
+----
+iex(1)> Keyword.get([age: 34, height: 155], :height)
+155
+iex(2)> Keyword.delete([length: 78, width: 104], :length)
+[width: 104] <1>
+----
+<1> After deleting the `:length`, the keyword list just contains the `:width`
+key-value pair.
 
 ### Maps
-indexterm:["Map"]
+indexterm:["Maps"]
 
 Maps provide a way to store and retrieve key-value pairs. The `%{}` syntax
 creates a Map.
@@ -994,10 +1051,16 @@ iex(2)> product_prices["Orange"] <2>
 0.7
 iex(3)> product_prices["Banana"] <3>
 nil
+iex(4)> product_prices = %{"Apple" => 0.5, "Orange" => 0.7, "Apple" => 1}
+warning: key "Apple" will be overridden in map
+  iex:4
+
+%{"Apple" => 1, "Orange" => 0.7} <4>
 ----
 <1> We create a new map and bind it to the variable `product_prices`.
 <2> The map name followed by the key name in brackets returns a value for the given key.
 <3> This returns nil if a given key doesn't exist.
+<4> Unlike keyword lists, maps cannot contain duplicate keys.
 
 But keys don't have to be a specific type. Everything can be a key and a value:
 
