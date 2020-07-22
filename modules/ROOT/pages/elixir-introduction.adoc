@@ -25,7 +25,7 @@ Elixir 1.10.2 (compiled with Erlang/OTP 21)
 [[elixir-introduction-iex]]
 ## Elixir's Interactive Shell (iex)
 
-Your Elixir installation comes with an Elixir's Interactive Shell (`iex`), which
+Your Elixir installation comes with Elixir's Interactive Shell (`iex`), which
 we will use for most of the examples in this chapter. Please go to your command
 line and fire it up:
 indexterm:["iex", "Elixir's Interactive Shell"]
@@ -47,6 +47,7 @@ while working with Phoenix. While programming in development mode, you can use
 it for diving into the core of your Phoenix application. You can do so too while
 being in production mode but that is the equivalent to open-heart surgery. It
 can be a lifesaver, but you need to know what you are doing.
+
 TIP: iex offers autocomplete when possible. So when in doubt press `TAB`.
 
 TIP: iex offers a history too. To access the last command, just press on the
@@ -116,7 +117,7 @@ indexterm:["BREAK menu"]
 ## Basic Calculations
 
 We can use the types `integer` (integer numbers) and `float` (real numbers) to
-do all sorts of calcuations. We can use the usual operators (+, -, etc.). Here
+do all sorts of calculations. We can use the usual operators (+, -, etc.). Here
 are couple of examples:
 
 [source,elixir]
@@ -164,8 +165,8 @@ NOTE: You should write atoms in snake_case or CamelCase. The usual Elixir conven
 [[elixir-introduction-logical-expressions]]
 ## Logical Expressions
 
-A type `boolean` can store the values `true` and `false`. Together with `and`,
-`or` and `not` those can create expressions:
+A type `boolean` can store the values `true` or `false`. These can be used with
+the operators `and`, `or` and `not`:
 
 [source,elixir]
 ----
@@ -247,215 +248,16 @@ By default, it can handle integers, floats, some lists (later more on lists) and
 atoms.
 indexterm:["String-Interpolation"]
 
-## Anonymous Functions
-indexterm:["Functions", "Anonymous Functions"]
-
-Functions are the methods in a functional programming language to handle subprograms.
-Let me show you an example:
-
-[source,elixir]
-----
-iex(1)> greeting = fn name -> "Hello #{name}!" end <1>
-#Function<7.126501267/1 in :erl_eval.expr/5>
-iex(2)> greeting.("Bob") <2>
-"Hello Bob!"
-iex(3)> greeting.("Alice")
-"Hello Alice!"
-iex(4)> square_area = fn(a) -> a * a end <3>
-#Function<7.126501267/1 in :erl_eval.expr/5>
-iex(5)> square_area.(10)
-100
-----
-<1> We create a function and bind it to the variable `greeting`.
-* `fn` tells Elixir that you want to define a function.
-* `name` is a parameter we can use to inject values.
-* `->` is the operator to indicate the following expression is the body of the function.
-* `end` indicates the end of the function.
-<2> We use the `.` (dot) operator to run the function (the dot operator is only
-needed when running anonymous functions).
-<3> Feel free to use parentheses: `fn(a)`
-
-These simple functions are called *anonymous functions*. They have no global
-name and must be bound to a variable.
-
-Most times anonmous functions are simple one liners. But they don't have to be:
-
-[source,elixir]
-----
-iex(1)> circular_area = fn radius ->
-...(1)>   pi = 3.14159265359
-...(1)>   pi * radius * radius
-...(1)> end
-#Function<7.126501267/1 in :erl_eval.expr/5>
-iex(2)> circular_area.(3)
-28.274333882310003
-----
-
-Sometimes it makes sense to create a function without an argument:
-
-[source,elixir]
-----
-iex(1)> tomorrow = fn -> Date.add(Date.utc_today(), 1) end <1>
-#Function<21.126501267/0 in :erl_eval.expr/5>
-iex(2)> tomorrow.() <2>
-~D[2020-05-07]
-iex(3)> Date.utc_today() <3>
-~D[2020-05-06]
-iex(4)> tomorrow <4>
-#Function<21.126501267/0 in :erl_eval.expr/5>
-----
-<1> Yes, we haven't discussed `Date.add` or `Date.utc_today()` yet. But you are
-smart enough to figure out what they do.
-<2> Call the function `tomorrow` without a parameter.
-<3> Just double check.
-<4> Calling `tomorrow` without the dot operator (`.`) will not run the function.
-
-Sometimes you need a function with multiple arguments. Those are seperated by commas:
-
-[source,elixir]
-----
-iex(1)> area = fn a, b -> a * b end <1>
-#Function<13.126501267/2 in :erl_eval.expr/5>
-iex(2)> area.(2,8)
-16
-iex(3)> volumne = fn a, b, c -> a * b * c end
-#Function<19.126501267/3 in :erl_eval.expr/5>
-iex(4)> volumne.(10,10,10) <2>
-1000
-----
-<1> Two parameters (a and b).
-<2> Three parameters (a, b and c).
-
-NOTE: A function can not have more than 255 parameters. As a rule of thumb, try
-to use no more than five parameters. If you have more parameters, it is often an
-indicator that you should refactor your code.
-
-### Functions are First-Class Citizens
-
-In Elixir, functions can be used like any other variable. For example, they can
-be can be passed to other functions as parameters, or a function can return
-another function.
-
-A function that takes another function as one of its parameters is called a
-higher-order function.
-
-In the following example, we filter a list so that it only returns even numbers:
-
-[source,elixir]
-----
-iex(1)> numbers = [1,2,3,4,5,6,7,8,9]
-[1, 2, 3, 4, 5, 6, 7, 8, 9]
-iex(2)> Enum.filter(numbers, fn num -> rem(num, 2) == 0 end) <1>
-[2, 4, 6, 8]
-----
-<1> This `rem/2` function calculates the remainder of dividing the first
-argument by the second.
-
-## The & operator
-indexterm:["& operator", "Capture operator", "Capture syntax"]
-
-You will likely stumble upon the `&` operator while searching for
-solutions for Elixir problems. It is called the *capture operator*, and it is
-used to create anonymous functions.
-
-[source,elixir]
-----
-iex(1)> maybe_numbers = [1, nil, 4, nil, 5]
-[1, nil, 4, nil, 5]
-iex(2)> Enum.filter(maybe_numbers, &is_integer(&1)) <1>
-[1, 4, 5]
-iex(3)> Enum.filter(maybe_numbers, &is_integer/1) <2>
-[1, 4, 5]
-iex(4)> Enum.sort([1, 2, 3], &(&1 >= &2)) <3>
-[3, 2, 1]
-----
-<1> `&1` refers to the first parameter.
-<2> The same as the previous function, but with a different syntax. The `/1`
-after `is_integer` means that the function takes one parameter.
-<3> You can use multiple parameters too (e.g. `&1`, `&2`).
-
-Sometimes it is more convenient use the `&` operator, but there are times when
-it makes the expression more difficult to read.
-
-## Variable Scopes
-indexterm:["Scopes", "Variable Scopes"]
-
-In every programming language variables have some sort of scope. Let's have a
-look into some code to figure out how variables in Elixir are scoped:
-
-[source,elixir]
-----
-iex(1)> area = 5 <1>
-5
-iex(2)> IO.puts(area)
-5
-:ok
-iex(3)> square_area = fn a -> <2>
-...(3)>   area = a * a <3>
-...(3)>   area
-...(3)> end
-#Function<7.126501267/1 in :erl_eval.expr/5>
-iex(4)> square_area.(10) <4>
-100
-iex(5)> IO.puts(area) <5>
-5
-:ok
-----
-<1> We bind the value of 5 to the variable `area`.
-<2> We define an anonymous function.
-<3> Within this function we bind the result of our calculation to another variable `area`.
-<4> Run the function with an argument of 10. That would mean that the `area` in the function gets set to the value 100.
-<5> The original `area` hasn't changed a bit. Because it is in a different scope.
-
-The `area` within the function is in an inner scope. The original `area` is in an outer scope.
-
-But it gets a bit more complex:
-
-[source,elixir]
-----
-iex(1)> pi = 3.14159265359 <1>
-3.14159265359
-iex(2)> circular_area = fn radius -> pi * radius * radius end <2>
-#Function<7.126501267/1 in :erl_eval.expr/5>
-iex(3)> circular_area.(10)
-314.15926535899996
-----
-<1> We bind the value 3.14159265359 to the variable with the name `pi`.
-<2> We create an anonymous function which uses the variable `pi` to make the calculation.
-
-So we can read the outer scope variable from within the function. So lets check if we can change it too:
-
-[source,elixir]
-----
-iex(1)> pi = 3.14159265359 <1>
-3.14159265359
-iex(2)> circular_area = fn radius ->
-...(2)>   pi = 3.14 <2>
-...(2)>   pi * radius * radius
-...(2)> end
-#Function<7.126501267/1 in :erl_eval.expr/5>
-iex(3)> circular_area.(10) <3>
-314.0
-iex(4)> IO.puts(pi) <4>
-3.14159265359
-:ok
-----
-<1> We bind the value 3.14159265359 to the variable with the name `pi`.
-<2> We bind the inner scoped variable `pi` with the value 3.14.
-<3> The 3.14 and not the 3.14159265359 gets used.
-<4> The outer scoped `pi` is not changed.
-
-NOTE: You can not change the value of an outer scoped variable, but you can read
-it. And you can create a new inner scope variable with the same name without
-interacting with the outer scoped one.
-
 ## Modules and Functions
 indexterm:["Modules", "Functions"]
 
-Anonymous functions are useful, but using just them to build a significant
-software project would become messy very fast. We need a better way to structure
-our code. Let me introduce you to Modules. We organize a collection of functions
-with modules.
+So far, we have looked at basic calculations and types in isolation. However, if
+we want to create an application, we will need to combine these calculations and
+types in a structured way. To see how this is done, we need to look at modules
+and functions.
+
+In Elixir, code is organized into modules, and each module is a collection of
+functions.
 
 [source,elixir]
 ----
@@ -467,46 +269,51 @@ iex(1)> defmodule Store do <1>
 {:module, Store,
  <<70, 79, 82, 49, 0, 0, 5, 4, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 133, 0,
    0, 0, 14, 12, 69, 108, 105, 120, 105, 114, 46, 83, 116, 111, 114, 101, 8, 95,
-   95, 105, 110, 102, 111, 95, 95, 7, ...>>, {:total_price, 2}}
-iex(2)> Store.total_price(10,7) <4>
+   95, 105, 110, 102, 111, 95, 95, 7, ...>>, {:total_price, 2}} <4>
+iex(2)> Store.total_price(10,7) <5>
 70
 ----
-<1> `defmodule` is the keyword to define a module. The name of a modul starts with a capital letter.
+<1> `defmodule` is the keyword to define a module. The name of a module starts with a capital letter.
 <2> `def` is the keyword to define a function within a module.
 <3> The return value of a function is the return value of the last expression in
 the function.
-<4> A function of a given module can be called from outside the module with this syntax.
+<4> The return value of creating the module. To save space, we will abbreviate
+this output in the next examples.
+<5> A function of a given module can be called from outside the module with this syntax.
 
 `defmodule` and `def` use a `do ... end` construct to begin and end.
 
-IMPORTANT: Module names use CamelCase which starts with a capital letter.
-Function names use snake_case, which begin with a lower case letter.
+IMPORTANT: Module names use CamelCase starting with a capital letter. Function
+names use snake_case.
 
-Normaly a module contains more than one function:
+TIP: you can also define a module in a separate file (with the `.exs`
+extension), and then call the function with `iex _filename_.exs`.
+
+As an example, save the following module to `math.exs`.
 
 [source,elixir]
 ----
-iex(1)> defmodule Area do <1>
-...(1)>   def rectangle(a, b) do <2>
-...(1)>     a * b
-...(1)>   end
-...(1)>
-...(1)>   def square(a) do <3>
-...(1)>     a * a
-...(1)>   end
-...(1)> end
-{:module, Area,
- <<70, 79, 82, 49, 0, 0, 5, 156, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 137,
-   0, 0, 0, 15, 11, 69, 108, 105, 120, 105, 114, 46, 65, 114, 101, 97, 8, 95,
-   95, 105, 110, 102, 111, 95, 95, 7, 99, ...>>, {:square, 1}}
-iex(2)> Area.rectangle(4,5)
-20
-iex(3)> Area.square(4)
-16
+defmodule Math do
+  def sum(x, y) do
+    x + y
+  end
+
+  def difference(x, y) do
+    x - y
+  end
+end
 ----
-<1> We call this module 'Area'.
-<2> The function `rectangle/2` calculates the area of a rectangle.
-<3> The function `square/1` calculates the area of a square.
+
+Then, if you run `iex math.exs`, you can access the functions in the Math module
+in iex.
+
+[source,elixir]
+----
+iex(1)> Math.sum(1, 2)
+3
+iex(2)> Math.difference(3, 1)
+2
+----
 
 ### Private Functions
 indexterm:["Private functions"]
@@ -526,10 +333,7 @@ iex(1)> defmodule Area do
 ...(1)>     3.14
 ...(1)>   end
 ...(1)> end
-{:module, Area,
- <<70, 79, 82, 49, 0, 0, 5, 104, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 130,
-   0, 0, 0, 15, 11, 69, 108, 105, 120, 105, 114, 46, 65, 114, 101, 97, 8, 95,
-   95, 105, 110, 102, 111, 95, 95, 7, 99, ...>>, {:pi, 0}}
+{:module, Area, ...
 iex(2)> Area.circle(10) <2>
 314.0
 iex(3)> Area.pi <3>
@@ -537,18 +341,20 @@ iex(3)> Area.pi <3>
     Area.pi()
 ----
 <1> The function `pi/0` is a private function.
-<2> The function `circle/1` can be called from the outsite. It can use the private function `pi/0` from within the module.
-<3> The function `pi/0` can not be called from the outsite.
+<2> The function `circle/1` can be called from outside the module. It can use
+the private function `pi/0` from within the module.
+<3> The function `pi/0` can not be called from outside the module.
 
 ### Function Arity
 indexterm:["Function Arity", "Arity"]
 
-In the last couple of sentences, you probably recognized the names of a
-functions with the number of parameters following. `pi/0` let to `defp pi do`
-and `circle/1` to `circle(radius)`. We call this number **arity**. Arity is kind
-of a big thing in Elixir. Why? Because not just the function name but also the
-arity defines a function. If we want to create a module which calculates the
-area of rectangles, it could look like this:
+In the last couple of sentences, you probably recognized that the names of
+functions were followed by the number of parameters. We refer to the `pi`
+function as `pi/0` and the `circle` function as `circle/1`. We call this number
+**arity**. Arity is kind of a big thing in Elixir. Why? Because not just the
+function name but also the arity defines a function. For example, the
+`Rectangle` module below has two functions with the same name, but different
+arity, and so they are treated as different functions:
 
 [source,elixir]
 ----
@@ -561,13 +367,10 @@ iex(1)> defmodule Rectangle do
 ...(1)>     a * b
 ...(1)>   end
 ...(1)> end
-{:module, Rectangle,
- <<70, 79, 82, 49, 0, 0, 5, 108, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 130,
-   0, 0, 0, 14, 16, 69, 108, 105, 120, 105, 114, 46, 82, 101, 99, 116, 97, 110,
-   103, 108, 101, 8, 95, 95, 105, 110, 102, ...>>, {:area, 2}}
+{:module, Rectangle, ...
 iex(2)> Rectangle.area(9) <3>
 81
-iex(3)> Rectangle.area(4,5) <4>
+iex(3)> Rectangle.area(4, 5) <4>
 20
 ----
 <1> The function `area/1` with an arity of 1 accepts one parameter.
@@ -590,10 +393,7 @@ iex(1)> defmodule Calculator.Area do
 ...(1)>     a * a
 ...(1)>   end
 ...(1)> end
-{:module, Calculator.Area,
- <<70, 79, 82, 49, 0, 0, 4, 232, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
-   0, 0, 0, 14, 22, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
-   97, 116, 111, 114, 46, 65, 114, 101, 97, ...>>, {:square, 1}}
+{:module, Calculator.Area, ...
 iex(2)> Calculator.Area.square(5)
 25
 ----
@@ -609,14 +409,7 @@ iex(1)> defmodule Calculator do
 ...(1)>     end
 ...(1)>   end
 ...(1)> end
-{:module, Calculator,
- <<70, 79, 82, 49, 0, 0, 3, 164, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 124,
-   0, 0, 0, 12, 17, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
-   97, 116, 111, 114, 8, 95, 95, 105, 110, ...>>,
- {:module, Calculator.Area,
-  <<70, 79, 82, 49, 0, 0, 4, 232, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
-    0, 0, 0, 14, 22, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
-    97, 116, 111, 114, 46, ...>>, {:square, 1}}}
+{:module, Calculator, ...
 iex(2)> Calculator.Area.square(5)
 25
 ----
@@ -638,10 +431,7 @@ iex(1)> defmodule Rectangle do
 ...(1)>     a * b
 ...(1)>   end
 ...(1)> end
-{:module, Rectangle,
- <<70, 79, 82, 49, 0, 0, 5, 108, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 130,
-   0, 0, 0, 14, 16, 69, 108, 105, 120, 105, 114, 46, 82, 101, 99, 116, 97, 110,
-   103, 108, 101, 8, 95, 95, 105, 110, 102, ...>>, {:area, 2}}
+{:module, Rectangle, ...
 iex(2)> import Rectangle <1>
 Rectangle
 iex(3)> area(5) <2>
@@ -681,10 +471,7 @@ iex(1)> defmodule Calculator.Area do
 ...(1)>     a * a
 ...(1)>   end
 ...(1)> end
-{:module, Calculator.Area,
- <<70, 79, 82, 49, 0, 0, 4, 232, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
-   0, 0, 0, 14, 22, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
-   97, 116, 111, 114, 46, 65, 114, 101, 97, ...>>, {:square, 1}}
+{:module, Calculator.Area, ...
 iex(2)> import Calculator.Area
 Calculator.Area
 iex(3)> square(5)
@@ -703,10 +490,7 @@ iex(1)> defmodule Calculator.Area do
 ...(1)>     a * a
 ...(1)>   end
 ...(1)> end
-{:module, Calculator.Area,
- <<70, 79, 82, 49, 0, 0, 4, 232, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
-   0, 0, 0, 14, 22, 69, 108, 105, 120, 105, 114, 46, 67, 97, 108, 99, 117, 108,
-   97, 116, 111, 114, 46, 65, 114, 101, 97, ...>>, {:square, 1}}
+{:module, Calculator.Area, ...
 iex(2)> alias Calculator.Area, as: Area <1>
 Calculator.Area
 iex(3)> Area.square(99)
@@ -729,7 +513,7 @@ In many of the tests in your Phoenix application, you will see `use
 ExUnit.Case`, which performs certain checks, sets some module attributes and
 imports needed modules.
 
-### The Pipe Operator (|>)
+## The Pipe Operator (|>)
 indexterm:["Pipe Operator", "|>"]
 
 Quite often one wants to chain a couple of different functions in a row. Let's
@@ -945,6 +729,196 @@ iex(6)> tuple_size(d)
 4
 ----
 
+## Higher-Order Functions
+
+In Elixir, functions can be used like any other variable. For example, they can
+be passed to other functions as parameters.
+
+A function that takes another function as one of its parameters is called a
+higher-order function, and these are very commonly used in Elixir.
+
+When passing a function to a higher-order function, we need to use an anonymous
+function, and that is what we will look at next.
+
+### Anonymous Functions
+indexterm:["Functions", "Anonymous Functions"]
+
+Anonymous functions are functions that are defined without any name.
+
+You define anonymous functions using the `fn` keyword:
+
+[source,elixir]
+----
+iex(1)> greeting = fn(name) -> "Hello #{name}!" end <1>
+#Function<7.126501267/1 in :erl_eval.expr/5>
+iex(2)> greeting.("Bob") <2>
+"Hello Bob!"
+iex(3)> greeting.("Alice")
+"Hello Alice!"
+iex(4)> square_area = fn a -> a * a end <3>
+#Function<7.126501267/1 in :erl_eval.expr/5>
+iex(5)> square_area.(10)
+100
+iex(6)> area = fn width, length -> width * length end <4>
+#Function<13.126501267/2 in :erl_eval.expr/5>
+iex(7)> area.(2,8)
+16
+----
+<1> We create an anonymous function and bind it to the variable `greeting`.
+* `fn` tells Elixir that you want to define a function.
+* `name` is a parameter we can use to inject values.
+* `->` is the operator to indicate the following expression is the body of the function.
+* `end` indicates the end of the function.
+<2> We need to use the `.` (dot) operator to run anonymous functions.
+<3> You don't have to surround the function arguments with parentheses. They
+are optional.
+<4> Like regular functions, anonymous functions can be called with multiple
+arguments. The arguments are separated by commas.
+
+Most of the time anonymous functions are simple one liners. But they don't have to be:
+
+[source,elixir]
+----
+iex(1)> circular_area = fn radius ->
+...(1)>   pi = 3.14159265359
+...(1)>   pi * radius * radius
+...(1)> end
+#Function<7.126501267/1 in :erl_eval.expr/5>
+iex(2)> circular_area.(3)
+28.274333882310003
+----
+
+Let's now look at using anonymous functions with higher-order functions:
+
+[source,elixir]
+----
+iex(1)> numbers = [1,2,3,4,5,6,7,8,9]
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+iex(2)> Enum.filter(numbers, fn num -> rem(num, 2) == 0 end) <1>
+[2, 4, 6, 8]
+iex(6)> Enum.map(numbers, fn x -> x * x end) <2>
+[1, 4, 9, 16, 25, 36, 49, 64, 81]
+----
+<1> `Enum.filter` filters a list and returns those elements for which the
+function returns true. The `rem/2` function calculates the remainder after
+integer division.
+<2> `Enum.map` calls the given function for every item in the list and returns a
+new list.
+
+### The & operator
+indexterm:["& operator", "Capture operator", "Capture syntax"]
+
+Another way of creating anonymous functions is to use the `&` operator, which
+is called the *capture operator*.
+
+[source,elixir]
+----
+iex(1)> second = &Enum.at(&1, 1) <1>
+#Function<44.97283095/1 in :erl_eval.expr/5>
+iex(2)> second.([1,2,3,4]) <2>
+2
+iex(3)> is_negative? = &(&1 < 0)
+#Function<44.97283095/1 in :erl_eval.expr/5>
+iex(4)> is_negative?.(-1)
+true
+----
+<1> `&1` refers to the first parameter.
+<2> Again, we need to use the `.` (dot) operator to run anonymous functions.
+
+And here are examples of using the capture operator with higher-order functions.
+
+[source,elixir]
+----
+iex(1)> maybe_numbers = [1, nil, 4, nil, 5]
+[1, nil, 4, nil, 5]
+iex(2)> Enum.filter(maybe_numbers, &is_integer(&1)) <1>
+[1, 4, 5]
+iex(3)> Enum.filter(maybe_numbers, &is_integer/1) <2>
+[1, 4, 5]
+iex(4)> Enum.sort([1, 2, 3], &(&1 >= &2)) <3>
+[3, 2, 1]
+----
+<1> `&1` refers to the first parameter.
+<2> The same as the previous function, but with a different syntax. The `/1`
+after `is_integer` means that the function takes one parameter.
+<3> You can use multiple parameters too (e.g. `&1`, `&2`).
+
+Sometimes it is more convenient to use the `&` operator, but there are times
+when it makes the expression more difficult to read.
+
+### Variable Scopes
+indexterm:["Scopes", "Variable Scopes"]
+
+In every programming language variables have some sort of scope. Let's have a
+look into some code to figure out how variables in Elixir are scoped:
+
+[source,elixir]
+----
+iex(1)> area = 5 <1>
+5
+iex(2)> IO.puts(area)
+5
+:ok
+iex(3)> square_area = fn a -> <2>
+...(3)>   area = a * a <3>
+...(3)>   area
+...(3)> end
+#Function<7.126501267/1 in :erl_eval.expr/5>
+iex(4)> square_area.(10) <4>
+100
+iex(5)> IO.puts(area) <5>
+5
+:ok
+----
+<1> We bind the value of 5 to the variable `area`.
+<2> We define an anonymous function.
+<3> Within this function we bind the result of our calculation to another variable `area`.
+<4> Run the function with an argument of 10. That would mean that the `area` in the function gets set to the value 100.
+<5> The original `area` hasn't changed a bit. Because it is in a different scope.
+
+The `area` within the function is in an inner scope. The original `area` is in an outer scope.
+
+But it gets a bit more complex:
+
+[source,elixir]
+----
+iex(1)> pi = 3.14159265359 <1>
+3.14159265359
+iex(2)> circular_area = fn radius -> pi * radius * radius end <2>
+#Function<7.126501267/1 in :erl_eval.expr/5>
+iex(3)> circular_area.(10)
+314.15926535899996
+----
+<1> We bind the value 3.14159265359 to the variable with the name `pi`.
+<2> We create an anonymous function which uses the variable `pi` to make the calculation.
+
+So we can read the outer scope variable from within the function. So lets check
+if we can change it too:
+
+[source,elixir]
+----
+iex(1)> pi = 3.14159265359 <1>
+3.14159265359
+iex(2)> circular_area = fn radius ->
+...(2)>   pi = 3.14 <2>
+...(2)>   pi * radius * radius
+...(2)> end
+#Function<7.126501267/1 in :erl_eval.expr/5>
+iex(3)> circular_area.(10) <3>
+314.0
+iex(4)> IO.puts(pi) <4>
+3.14159265359
+:ok
+----
+<1> We bind the value 3.14159265359 to the variable with the name `pi`.
+<2> We bind the inner scoped variable `pi` with the value 3.14.
+<3> The 3.14 and not the 3.14159265359 gets used.
+<4> The outer scoped `pi` is not changed.
+
+NOTE: You can not change the value of an outer scoped variable, but you can read
+it. And you can create a new inner scope variable with the same name without
+interacting with the outer scoped one.
+
 ## Maps and Structs
 
 List and Tuples don't provide the functionality to access values with a key. We
@@ -1032,7 +1006,8 @@ iex(9)> c = Map.put(product_prices, :potato, 0.2) <7>
 ----
 <1> `Map.to_list/1` converts a map into a keyword list.
 <2> `Map.values/1` returns the values of a map.
-<3> `Map.split/2` splits a given map into two new maps. The first one contains all the key-value pairs which are requested by a list (e.g. `[:orange, :apple]`)
+<3> `Map.split/2` splits a given map into two new maps. The first one contains
+all the key-value pairs which are requested by a list (e.g. `[:orange, :apple]`)
 <4> `Map.delete/2` deletes a specific key-value pair from a map.
 <5> `Map.drop/2` deletes a list of key-value pairs from a map.
 <6> `Map.merge/2` merges two maps.
@@ -1049,10 +1024,7 @@ define a struct you have to use the `defstruct` construct:
 iex(1)> defmodule Product do <1>
 ...(1)>   defstruct name: nil, price: 0 <2>
 ...(1)> end
-{:module, Product,
- <<70, 79, 82, 49, 0, 0, 6, 192, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 184,
-   0, 0, 0, 18, 14, 69, 108, 105, 120, 105, 114, 46, 80, 114, 111, 100, 117, 99,
-   116, 8, 95, 95, 105, 110, 102, 111, 95, ...>>, %Product{name: nil, price: 0}}
+{:module, Product, ...
 iex(2)> %Product{}
 %Product{name: nil, price: 0}
 iex(3)> apple = %Product{name: "Apple", price: 0.5} <3>
@@ -1254,10 +1226,7 @@ iex(1)> defmodule Area do
 ...(1)>     circle(:normal, radius)
 ...(1)>   end
 ...(1)> end
-{:module, Area,
- <<70, 79, 82, 49, 0, 0, 6, 40, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
-   0, 0, 0, 15, 11, 69, 108, 105, 120, 105, 114, 46, 65, 114, 101, 97, 8, 95,
-   95, 105, 110, 102, 111, 95, 95, 7, 99, ...>>, {:circle, 1}}
+{:module, Area, ...
 iex(2)> Area.circle(:exact, 4)
 50.26548245744
 iex(3)> Area.circle(:normal, 4)
@@ -1292,10 +1261,7 @@ iex(1)> defmodule Law do
 ...(1)>     raise ArgumentError, "age should be an integer"
 ...(1)>   end
 ...(1)> end
-{:module, Law,
- <<70, 79, 82, 49, 0, 0, 5, 32, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 138,
-   0, 0, 0, 15, 10, 69, 108, 105, 120, 105, 114, 46, 76, 97, 119, 8, 95, 95,
-   105, 110, 102, 111, 95, 95, 7, 99, 111, ...>>, {:can_vote?, 1}}
+{:module, Law, ...
 iex(2)> Law.can_vote?(15)
 false
 iex(3)> Law.can_vote?(20)
@@ -1338,10 +1304,7 @@ iex(1)> defmodule Morse do
 ...(1)>     end
 ...(1)>   end
 ...(1)> end
-{:module, Morse,
- <<70, 79, 82, 49, 0, 0, 6, 240, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 141,
-   0, 0, 0, 14, 12, 69, 108, 105, 120, 105, 114, 46, 77, 111, 114, 115, 101, 8,
-   95, 95, 105, 110, 102, 111, 95, 95, 7, ...>>, {:morse_to_number, 1}}
+{:module, Morse, ...
 iex(2)> Morse.morse_to_number("-....") <4>
 6
 ----
@@ -1387,18 +1350,27 @@ indexterm:["Immutability"]
 
 Probably you have already heard about immutability in Elixir. What's that about?
 
-A variable points to a specific part of the memory where the data is stored. In many programming languages that data can be changed to update a variable. In Elixir, you can't change it. So that doesn't mean that you can't rebind a variable to a different value but that this new value gets a new piece of memory
-and doesn't overwrite the old memory. Once a function returns a result and therefore, has finished its work, everything gets garbage collected (wiped blank).
+A variable points to a specific part of the memory where the data is stored. In
+many programming languages that data can be changed to update a variable. In
+Elixir, you can't change it. So that doesn't mean that you can't rebind a
+variable to a different value but that this new value gets a new piece of memory
+and doesn't overwrite the old memory. Once a function returns a result and
+therefore, has finished its work, everything gets garbage collected (wiped
+blank).
 
-Why is that important at all? With immutable variables, we can be sure that other processes can not change their values while running parallel tasks.
-That has a massive effect. In the end, it means that your Phoenix application can
-run on multiple CPUs on the same server in parallel. It even means that your Phoenix application can share multiple CPUs on several nodes of a server cluster in your data center; this makes Elixir extremely scalable and save.
+Why is that important at all? With immutable variables, we can be sure that
+other processes can not change their values while running parallel tasks.  That
+has a massive effect. In the end, it means that your Phoenix application can run
+on multiple CPUs on the same server in parallel. It even means that your Phoenix
+application can share multiple CPUs on several nodes of a server cluster in your
+data center; this makes Elixir extremely scalable and save.
 
-But doesn't that make your application slower? Funny thing: No. This way is faster. It is not efficient to change data in memory.
+But doesn't that make your application slower? Funny thing: No. This way is
+faster. It is not efficient to change data in memory.
 
 But don't worry. It is not as complicated as it sounds. Everytime you use a
-variable it uses the value of that moment in time. It will not be effected/changed
-afterwords:
+variable it uses the value of that moment in time. It will not be
+effected/changed afterwords:
 
 [source,elixir]
 ----
@@ -1615,10 +1587,7 @@ iex(1)> defmodule Example do
 ...(1)>     countdown(n - 1) <5>
 ...(1)>   end
 ...(1)> end
-{:module, Example,
- <<70, 79, 82, 49, 0, 0, 5, 188, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 166,
-   0, 0, 0, 17, 14, 69, 108, 105, 120, 105, 114, 46, 69, 120, 97, 109, 112, 108,
-   101, 8, 95, 95, 105, 110, 102, 111, 95, ...>>, {:countdown, 1}}
+{:module, Example, ...
 iex(2)> Example.countdown(4) <6>
 4
 3
@@ -1646,10 +1615,7 @@ iex(1)> defmodule Example do
 ...(1)>     head + sum(tail) <3>
 ...(1)>   end
 ...(1)> end
-{:module, Example,
- <<70, 79, 82, 49, 0, 0, 5, 12, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 127,
-   0, 0, 0, 14, 14, 69, 108, 105, 120, 105, 114, 46, 69, 120, 97, 109, 112, 108,
-   101, 8, 95, 95, 105, 110, 102, 111, 95, ...>>, {:sum, 1}}
+{:module, Example, ...
 iex(2)> Example.sum([10, 8, 12, 150]) <4>
 180
 iex(3)> [head | tail] = [150] <5>
@@ -1677,10 +1643,7 @@ iex(1)> defmodule Example do
 ...(1)>     [head * 2 | double(tail)] <2>
 ...(1)>   end
 ...(1)> end
-{:module, Example,
- <<70, 79, 82, 49, 0, 0, 5, 40, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 130,
-   0, 0, 0, 14, 14, 69, 108, 105, 120, 105, 114, 46, 69, 120, 97, 109, 112, 108,
-   101, 8, 95, 95, 105, 110, 102, 111, 95, ...>>, {:double, 1}}
+{:module, Example, ...
 iex(2)> Ex
 Example      Exception
 iex(2)> Example.double([10, 5, 999])
@@ -1691,7 +1654,9 @@ iex(2)> Example.double([10, 5, 999])
 
 ### How to tackle a recursion
 
-Unless you are doing this every day, you will get to problems where you know that recursion is a good solution, but you just can't think of a good recursion for it.
+Unless you are doing this every day, you will get to problems where you know
+that recursion is a good solution, but you just can't think of a good recursion
+for it.
 
 Let me share a pro tip for these situations: https://www.google.com and
 https://stackoverflow.com are my lifesavers in such cases. No embarrassment!
@@ -1789,7 +1754,10 @@ $ mix start
 Hello world!
 ----
 
-Obviously `mix` as a topic is much more complicated. In this section, I just wanted to show you the very basic idea of `mix` so that you know where to search if you want to know what happens if you do a `mix server` with a Phoenix application.
+Obviously `mix` as a topic is much more complicated. In this section, I just
+wanted to show you the very basic idea of `mix` so that you know where to search
+if you want to know what happens if you do a `mix server` with a Phoenix
+application.
 
 ## mix format
 indexterm:["mix tasks", "task"]
@@ -1813,9 +1781,9 @@ go for the next chapter of this book. Have fun!
 If you want to dive more into Elixir than I recommend the following
 books:
 
-- https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir[Learn Functional Programming with Elixir] by Ulisses Almeida ([@ulissesalmeida](https://twitter.com/ulissesalmeida)
+- https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir[Learn Functional Programming with Elixir] by Ulisses Almeida (https://twitter.com/ulissesalmeida[@ulissesalmeida])
 +
 In my opinion, the best beginners book for Elixir.
-- https://twitter.com/pragdave)[Programming Elixir 1.6](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas ([@pragdave]
+- [Programming Elixir 1.6](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas (https://twitter.com/pragdave[@pragdave])
 +
 Dave - as always - wrote a very book which shines a light into many details.
