@@ -118,7 +118,7 @@ indexterm:["BREAK menu"]
 
 We can use the types `integer` (integer numbers) and `float` (real numbers) to
 do all sorts of calculations. We can use the usual operators (+, -, etc.). Here
-are couple of examples:
+are a few examples:
 
 [source,elixir]
 ----
@@ -137,30 +137,6 @@ iex(4)> 10 * 1000000000000000
 iex(5)> 23 / 3
 7.666666666666667
 ----
-
-[[elixir-introduction-atoms]]
-## Atoms
-
-An atom is a constant whose name is its value. In some other programming
-languages, these are known as symbols. Atoms start with a `:`
-
-Atoms are often used to tag values and messages. For example, functions that
-might fail often have the return values `{:ok, value}` or `{:error, message}`.
-
-Atoms are also used to reference modules from Erlang libraries.
-
-[source,elixir]
-----
-iex(1)> :red
-:red
-iex(2)> :blue
-:blue
-iex(3)> is_atom(:blue) <1>
-true
-----
-<1> The function `is_atom()` can be used to check if something is an atom.
-
-NOTE: You should write atoms in snake_case or CamelCase. The usual Elixir convention is to use snake_case.
 
 [[elixir-introduction-logical-expressions]]
 ## Logical Expressions
@@ -216,38 +192,6 @@ iex(4)> Radius = 2
 sense later. Binding values to variables is a bit more complicated than it seems
 right now.
 
-[[elixir-introduction-strings]]
-## Strings
-indexterm:["Strings"]
-
-We already used a string in the <<elixir-introduction-hello-world,Hello World>> example.
-The following examples show how strings can be used with variables:
-
-[source,elixir]
-----
-iex(1)> first_name = "Stefan" <1>
-"Stefan"
-iex(2)> last_name = "Wintermeyer"
-"Wintermeyer"
-iex(3)> name = first_name <> " " <> last_name <2>
-"Stefan Wintermeyer"
-iex(4)> greeting = "Hello #{first_name}!" <3>
-"Hello Stefan!"
-iex(5)> counter = 23
-23
-iex(6)> "Count: #{counter}" <4>
-"Count: 23"
-----
-<1> We assign the string "Stefan" to the variable with the name `first_name`.
-<2> The `<>` operator can be used to concatinate strings.
-indexterm:["<> operator"]
-<3> `#{}` is used to interpolate strings. It can be used to inject a variable
-into a string.
-<4> Elixir's string interpolation also works with integers.
-By default, it can handle integers, floats, some lists (later more on lists) and
-atoms.
-indexterm:["String-Interpolation"]
-
 ## Modules and Functions
 indexterm:["Modules", "Functions"]
 
@@ -286,8 +230,8 @@ this output in the next examples.
 IMPORTANT: Module names use CamelCase starting with a capital letter. Function
 names use snake_case.
 
-TIP: you can also define a module in a separate file (with the `.exs`
-extension), and then call the function with `iex _filename_.exs`.
+You can also define a module in a separate file (with the `.exs` extension),
+and then call the function with `iex _filename_.exs`.
 
 As an example, save the following module to `math.exs`.
 
@@ -316,7 +260,7 @@ iex(2)> Math.difference(3, 1)
 ----
 
 ### Private Functions
-indexterm:["Private functions"]
+indexterm:["Private Functions"]
 
 Sometimes you want to define a function within a module without exposing it to
 the outside world. You can do this with a private function which gets declared
@@ -513,6 +457,86 @@ In many of the tests in your Phoenix application, you will see `use
 ExUnit.Case`, which performs certain checks, sets some module attributes and
 imports needed modules.
 
+[[elixir-introduction-atoms]]
+## Atoms
+
+An atom is a constant whose name is its value. In some other programming
+languages, these are known as symbols. Atoms start with a `:`
+
+Atoms are often used to tag values and messages. For example, functions that
+might fail often have the return values `{:ok, value}` or `{:error, message}`.
+
+Atoms are also used to reference modules from Erlang libraries.
+
+[source,elixir]
+----
+iex(1)> :red
+:red
+iex(2)> :blue
+:blue
+iex(3)> is_atom(:blue) <1>
+true
+----
+<1> The function `is_atom()` can be used to check if something is an atom.
+
+NOTE: You should write atoms in snake_case or CamelCase. The usual Elixir convention is to use snake_case.
+
+[[elixir-introduction-strings]]
+## Strings
+indexterm:["Strings"]
+
+We already used a string in the <<elixir-introduction-hello-world,Hello World>> example.
+The following examples show how strings can be used with variables:
+
+[source,elixir]
+----
+iex(1)> first_name = "Stefan" <1>
+"Stefan"
+iex(2)> last_name = "Wintermeyer"
+"Wintermeyer"
+iex(3)> name = first_name <> " " <> last_name <2>
+"Stefan Wintermeyer"
+iex(4)> greeting = "Hello #{first_name}!" <3>
+"Hello Stefan!"
+iex(5)> counter = 23
+23
+iex(6)> "Count: #{counter}" <4>
+"Count: 23"
+----
+<1> We assign the string "Stefan" to the variable with the name `first_name`.
+<2> The `<>` operator can be used to concatinate strings.
+indexterm:["<> operator"]
+<3> `#{}` is used to interpolate strings. It can be used to inject a variable
+into a string.
+<4> Elixir's string interpolation also works with integers.
+By default, it can handle integers, floats, some lists (later more on lists) and
+atoms.
+indexterm:["String-Interpolation"]
+
+### String Functions
+indexterm:["String Functions"]
+
+The https://hexdocs.pm/elixir/String.html[String module] contains functions for
+working with strings. Here are some examples:
+
+[source,elixir]
+----
+iex(1)> String.downcase("SToP SHoutING!")
+"stop shouting!"
+iex(2)> String.split("no fist is big enough to hide the sky") <1>
+["no", "fist", "is", "big", "enough", "to", "hide", "the", "sky"]
+iex(3)> String.split("mail@example.com", "@") <2>
+["mail", "example.com"]
+iex(4)> String.to_integer("555")
+555
+----
+<1> `String.split/1` divides a string into substrings at each whitespace.
+<2> `String.split/2` is similar to `String.split/1`, but it also allows you to
+define what pattern to use when splitting the string.
+
+TIP: remember that you can also access the documentation for the String module
+in iex by running `h String`.
+
 ## The Pipe Operator (|>)
 indexterm:["Pipe Operator", "|>"]
 
@@ -661,6 +685,37 @@ iex(4)> length([])
 0
 ----
 
+#### List Functions
+indexterm:["List Functions"]
+
+When working with lists, you will often use functions from the
+https://hexdocs.pm/elixir/Enum.html[Enum module]. There is also a
+https://hexdocs.pm/elixir/Enum.html[List module], which contains a few useful
+list functions.
+
+Here are a few examples:
+
+[source,elixir]
+----
+iex(1)> numbers = [1, 5, 3, 7, 2, 3, 9, 5, 3]
+[1, 5, 3, 7, 2, 3, 9, 5, 3]
+iex(2)> Enum.max(numbers) <1>
+9
+iex(3)> Enum.sort(numbers) <2>
+[1, 2, 3, 3, 3, 5, 5, 7, 9]
+iex(4)> words = ["nothing", "like", "the", "sun"]
+["nothing", "like", "the", "sun"]
+iex(5)> Enum.join(words, " ")
+"nothing like the sun"
+iex(6)> List.last(words)
+"sun"
+----
+<1> `Enum.max/1` returns the maximum value in a list.
+<2> `Enum.sort/1` returns a new list with the values sorted in ascending order.
+
+We will see more examples from the `Enum` module when we look at higher-order
+functions later in this introduction.
+
 ### Tuples
 indexterm:["Tuples"]
 
@@ -697,9 +752,10 @@ iex(3)> elem(result, 0) <2>
 <2> The count starts with 0 for the first element.
 
 #### Tuple Functions
-indexterm:["Tuple functions"]
+indexterm:["Tuple Functions"]
 
-The following functions are useful when you handle data with tuples:
+The https://hexdocs.pm/elixir/Tuple.html[Tuple module] contains functions for
+working with tuples. Here are some examples:
 
 * `Tuple.append/2` adds an element to a tuple.
 indexterm:["append/2", "Tuple.append/2"]
@@ -799,10 +855,10 @@ iex(2)> Enum.filter(numbers, fn num -> rem(num, 2) == 0 end) <1>
 iex(6)> Enum.map(numbers, fn x -> x * x end) <2>
 [1, 4, 9, 16, 25, 36, 49, 64, 81]
 ----
-<1> `Enum.filter` filters a list and returns those elements for which the
+<1> `Enum.filter/2` filters a list and returns those elements for which the
 function returns true. The `rem/2` function calculates the remainder after
 integer division.
-<2> `Enum.map` calls the given function for every item in the list and returns a
+<2> `Enum.map/2` calls the given function for every item in the list and returns a
 new list.
 
 ### The & operator
@@ -977,9 +1033,10 @@ iex(3)> product_prices.banana <3>
 <3> If you use the dot operator and the key does not exist, an error is raised.
 
 #### Map Functions
+indexterm:["Map Functions"]
 
-The Map module offers many useful functions. For a complete list have a look at
-https://hexdocs.pm/elixir/Map.html
+The https://hexdocs.pm/elixir/Map.html[Map module] offers many useful functions
+for working with maps.
 
 Here are just a few examples:
 
