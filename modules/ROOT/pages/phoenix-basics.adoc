@@ -143,9 +143,11 @@ lib/demo_web/templates/
     └── index.html.eex
 ----
 
-NOTE: It is no coincidence that the subdirectory is called `demo_web`. Because we named our application `demo` that name will be used in multiple places.
+NOTE: As we named our application `demo`, the subdirectory in which templates
+are stored is called `demo_web`.
 
-Let's have a look into `index.html.eex` which contains the core part of the page.
+Let's have a look into `index.html.eex`, which contains the main content of the
+page.
 
 .lib/demo_web/templates/page/index.html.eex
 [source,html]
@@ -229,8 +231,7 @@ But a bit of HTML boilerplate is missing, and that can be found in `lib/demo_web
   </body>
 </html>
 ----
-<1> You might want to change the language here in case this webpage is going to
-be in another language than English.
+<1> If the webpage is not in English, you will need to change the language here.
 <2> You probably want to change this to a better `<title>`.
 <3> Phoenix's asset management takes care of the CSS and JavaScript. No need to
 worry about that for now.
@@ -238,10 +239,9 @@ worry about that for now.
 <5> This part renders so called flash messages. We'll get to those later.
 <6> This is the line where the template's content gets included.
 
-IMPORTANT: https://hexdocs.pm/eex/EEx.html[Embedded Elixir] (`.eex`) uses the
-`<% %>` syntax to embed Elixir code in HTML. `<% %>` runs the Elixir code
-within. `<%= %>` runs the Elixir code and includes the result of that as HTML in
-the template.
+IMPORTANT: Embedded Elixir (`.eex`) uses the `<% %>` syntax to embed Elixir
+code in HTML. `<% %>` runs the Elixir code within. `<%= %>` runs the Elixir
+code and includes the result of that as HTML in the template.
 
 Feel free to change the content of `app.html.eex` and `index.html.eex` while
 having http://localhost:4000 opened in a browser. In development mode, each save
@@ -305,7 +305,7 @@ end
 <1> The new `hello/2` function renders the `hello.html` template.
 
 Last step: We have to create a template file. Please do so and include this
-source code into it:
+source code in it:
 
 .lib/demo_web/templates/page/hello.html.eex
 [source,html]
@@ -368,7 +368,8 @@ end
 router code above, where the `ExampleController` is under the `DemoWeb` namespace.
 
 After a reload we get a new error message: `function
-DemoWeb.ExampleView.render/2 is undefined`, so we need to create a view file:
+DemoWeb.ExampleView.render/2 is undefined`, so we need to create a view file,
+called `example_view.ex`, and add it to the `lib/demo_web/views` directory:
 
 .lib/demo_web/views/example_view.ex
 [source,elixir]
@@ -405,13 +406,15 @@ Every time you want to create a new action in a new controller, you have to take
 - Create a view with the name `lib/demo_web/views/example_view.ex`
 - Create a template with the name `lib/demo_web/templates/page/hello.html.eex`
 
-Phoenix will always lead you through the way. If something is missing it will say so in the error message.
+Phoenix will always lead you through the way. If something is missing, it will
+say so in the error message.
 
-WARNING: Obviously `demo_web`, `example_controller.ex`, `example_view.ex` and
-`hello.html.eex` are just names which fit our "Hello World!" example. You will
-have to change them according to your needs.
+NOTE: Obviously `demo_web`, `example_controller.ex`, `example_view.ex` and
+`hello.html.eex` are just names which fit our "Hello World!" example. In your
+own app, you will need to come up with more descriptive names.
 
-In our example, the directory and file structure looks like this:
+In our example, the directory and file structure of the `demo_web` subdirectory
+looks like this:
 
 [source,bash]
 ----
@@ -441,7 +444,8 @@ According to the
 https://en.wikipedia.org/wiki/Model–view–controller[Model-View-Controller] (MVC)
 architecture, we do our programming stuff in the controller and use the template
 just to display the results. Therefore we need a mechanism to transport this data
-from the controller into the template. That mechanism is the `conn` struct. Let's have a look into it:
+from the controller into the template. That mechanism is the `conn` struct.
+Let's have a look at it:
 
 [source,bash]
 ----
@@ -452,7 +456,8 @@ $ mix phx.server
 ----
 <1> We create a new phoenix app.
 
-We add a new route to inspect the contents of `conn`, and we add a second route for a playground page:
+We add a new route to inspect the contents of `conn`, and we add a second route
+for a playground page:
 
 .lib/demo_web/router.ex
 [source,elixir]
@@ -472,7 +477,7 @@ defmodule DemoWeb.Router do
 
   [...]
 ----
-<1> For now we put it this route into the `PageController`.
+<1> For now, we add this route to the `PageController`.
 
 In the page controller, we add an `inspect` and a `playground` action:
 
@@ -511,7 +516,7 @@ Please open http://localhost:4000/inspect in your browser:
 
 image::inspect_conn.png[http://localhost:4000/inspect]
 
-That is quite a bit of information in the `conn` struct. Here is the complete content:
+There is quite a lot of information in the `conn` struct. Here is the complete content:
 
 [source,elixir]
 ----
@@ -590,7 +595,7 @@ That is quite a bit of information in the `conn` struct. Here is the complete co
 
 We can use the `playground` route to display specific parts of the `conn` struct.
 
-Add the following code the `playground.html.eex` file:
+Add the following code to the `playground.html.eex` file:
 
 .lib/demo_web/templates/page/playground.html.eex
 [source,html]
@@ -633,7 +638,8 @@ defmodule DemoWeb.PageController do
 end
 
 ----
-<1> With `assign/3` we can add new variables to the conn struct.
+<1> With `assign/3` we can add data to the `assigns` map in the conn struct.
+The `assigns` map is where we normally put shared data.
 <2> This achieves the same result, but with a different coding style.
 
 On http://localhost:4000/inspect we see this:
@@ -667,8 +673,10 @@ To access that, we need to change the `playground.html.eex` template:
   </tr>
 </table>
 ----
-<1> We can access the value of `headline` through the longer `@conn.assigns.headline`.
-<2> But normally, we access it via the shortform `@headline`. The `@`-version is accessable for all subcontent of `@conn.assigns`.
+<1> We can access the value of `headline` through the longer
+`@conn.assigns.headline`.
+<2> But normally, we access it via the shortform `@headline`. All the values in
+the `assigns` map can be accessed using the `@` prefix.
 
 image::playground-conn-assigns-headline.png[http://localhost:4000/playground]
 
@@ -676,8 +684,8 @@ image::playground-conn-assigns-headline.png[http://localhost:4000/playground]
 ### Static Clock
 
 The current application always displays the same content. The easiest way to
-change that is to display the time. For that, we add a `timestamp` variable in
-the controller and display it in the template:
+change that is to display the current time. For that, we are going to add a
+`timestamp` variable in the controller and display it in the template:
 
 .lib/hello_world_web/controllers/page_controller.ex
 [source,elixir]
@@ -694,6 +702,8 @@ def playground(conn, _params) do
 end
 [...]
 ----
+
+And we need to update the template as well:
 
 .lib/hello_world_web/templates/page/playground.html.eex
 [source,html]
@@ -714,7 +724,8 @@ image::playground-timestamp.png[http://localhost:4000/playground]
 ## Links
 
 The web consists of webpages which link to each other. So the next step on our
-venture for the ultimate Phoenix application is a game of ping-pong. `http://localhost:4000/ping` will display a link to
+venture for the ultimate Phoenix application is a game of ping-pong.
+`http://localhost:4000/ping` will display a link to
 `http://localhost:4000/pong` and vice versa.
 
 [source,bash]
@@ -769,7 +780,7 @@ defmodule GameWeb.PageController do
 end
 ----
 
-And the `ping.html.eex` template:
+And create the `ping.html.eex` template:
 
 .lib/hello_world_web/templates/page/ping.html.eex
 [source,html]
@@ -777,11 +788,12 @@ And the `ping.html.eex` template:
 <h1>Ping</h1>
 ----
 
-Perfect. What a nice ping we have created page:
+Perfect. What a nice ping page we have created:
 
 image::ping.png[http://localhost:4000/ping]
 
-The missing pong counterpart is easy:
+The missing pong counterpart is easy. First, create the `pong.html.eex`
+template:
 
 .lib/hello_world_web/templates/page/pong.html.eex
 [source,html]
@@ -789,13 +801,14 @@ The missing pong counterpart is easy:
 <h1>Pong</h1>
 ----
 
-But for Ping-Pong, we need a `href` link between both pages. We could add
-one manually with `<a href="/pong">Pong</a>` but that would not be very clean.
-Since we have a router in Phoenix, we can use that to create clean routes for our links.
+Something is missing, though. As this is Ping-Pong, we need to add `href` links
+to both pages linking to each other. We could add these manually with `<a
+href="/pong">Pong</a>` but that would not be very clean.  Since we have a
+router in Phoenix, we can use that to create clean routes for our links.
 
 We either have to stop the Phoenix server (`CTRL-C` twice!) or open a new
-terminal with the same direction to run a `mix phx.routes` which returns all
-known routes.  Because we are only interested in the routes for `PageController`
+terminal in the same directory to run `mix phx.routes` which returns all
+known routes. Because we are only interested in the routes for `PageController`
 we `grep` for those:
 
 [source,bash]
@@ -862,7 +875,7 @@ how you can do that:
 ## Static files
 indexterm:["Static files"]
 
-Static files, such as CSS or JavaScript files, images, etc., are stored in the
+Static files, such as images, the `robots.txt` file, etc., are stored in the
 `assets/static/` directory. By default the following files are already in that
 directory:
 
@@ -882,7 +895,7 @@ interaction, but that has a small footprint.
 
 If you want to add a new static file to your application, you first need to add
 the file to the `assets/static/` directory. Then, you need to make sure that the
-file is whitelisted in the `plug Plug.Static` function in the
+file is allowlisted in the `plug Plug.Static` function in the
 `lib/hello_world_web/endpoint.ex`:
 
 .lib/hello_world_web/endpoint.ex
@@ -898,13 +911,13 @@ plug Plug.Static,
 
 [...]
 ----
-<1> All static files or directories have to be whitelisted here.
+<1> All static files or directories have to be allowlisted here.
 
 [[images]]
 ### Images
 
 Images are a particular case of static files. They can be stored in the
-`assets/static/images/` directory which is by default already whitelisted.
+`assets/static/images/` directory which is by default already allowlisted.
 
 In every fresh Phoenix installation you'll find the Phoenix logo file stored at
 `assets/static/images/phoenix.png`. That image is used in the default
