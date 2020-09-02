@@ -81,18 +81,23 @@ config :bookstore, Bookstore.Repo,
 [[ecto-create-table]]
 ## Create a Table
 
-The generator `mix phx.gen.context`
-(https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html) can be used to
-create a context with some useful functions for working with an Ecto schema.
+For this example, we are going to use the `mix phx.gen.context`
+generator(https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html), which
+creates a database table and adds files that are useful for working with the
+new table.
 
-NOTE: You can do everything a generator does manually, but it is faster and results in fewer errors if you use a generator.
+NOTE: You can do everything a generator does manually, but it is faster and
+results in fewer errors if you use a generator.
 
 As a first resource, we want to create a table with authors. In the Phoenix
 world, we have to put that new resource `authors` into a context.
 
-NOTE: A context is an API boundary for one or more resources. It was included in
-Phoenix with version 1.3. Don't lose any sleep on the question of what a context is. You'll get a feeling about it soon. Good naming of contexts is
-essential but not at this stage of your Ecto learning process.
+NOTE: A context(https://hexdocs.pm/phoenix/contexts.html) is an API boundary for
+one or more resources. Since version 1.3 of Phoenix, it has been recommended to
+organize the code that interfaces with the database using contexts, as this can
+help make the code easier to test, maintain and refactor. At this stage, don't
+worry if you find the idea of contexts difficult to understand. You will soon
+get a feel for them as you work through the examples.
 
 [source,bash]
 ----
@@ -108,6 +113,9 @@ Remember to update your repository by running migrations:
 
     $ mix ecto.migrate
 ----
+
+[[ecto-migrations]]
+### Migrations
 
 Migrations are used to keep track of the process of generating or changing your
 database. This makes it a lot easier to keep all the databases, of other
@@ -229,7 +237,8 @@ iex(1)> <1>
 <1> Actually you will see a couple of more messages here which are related to
 the assets pipeline (e.g. CSS and JavaScript). No need to bother with that now.
 
-The context module in `lib/bookstore/store.ex` includes the `create_author/1` function which we use to create a new author:
+The context module in `lib/bookstore/store.ex` includes the `create_author/1`
+function which we use to create a new author:
 
 [source,elixir]
 ----
@@ -272,7 +281,9 @@ end
 [...]
 ----
 <1> Creates a new Author changeset with the attributes.
-<2> Uses `Bookstore.Repo` to insert the changeset into the table.
+Changesets(https://hexdocs.pm/ecto/Ecto.Changeset.html) are structs that can be
+used to filter, cast and validate the data.
+<2> Uses `Bookstore.Repo` to insert the changeset into the database table.
 ====
 
 If the insert in the table was successful, the function returns a
@@ -360,20 +371,18 @@ defmodule Bookstore.Store.Author do
   end
 
   @doc false
-  def changeset(author, attrs) do <2>
+  def changeset(author, attrs) do
     author
-    |> cast(attrs, [:first_name, :last_name, :twitter_account]) <3>
-    |> validate_required([:first_name, :last_name, :twitter_account]) <4>
+    |> cast(attrs, [:first_name, :last_name, :twitter_account]) <2>
+    |> validate_required([:first_name, :last_name, :twitter_account]) <3>
   end
 end
 ----
 <1> This is the schema of the `authors` model.
-<2> https://hexdocs.pm/ecto/Ecto.Changeset.html[Ecto.Changeset] is a mechanism
-to filter, cast and validate the data.
-<3> https://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4[cast/4] casts the input.
+<2> https://hexdocs.pm/ecto/Ecto.Changeset.html#cast/4[cast/4] casts the input.
 Only fields which are listed in the list can make it through. Everything else is
-thrown away right there.
-<4> Here's the reason why `Bookstore.Store.create_author(%{})` resulted in an
+thrown away right here.
+<3> Here's the reason why `Bookstore.Store.create_author(%{})` resulted in an
 error. The function
 https://hexdocs.pm/ecto/Ecto.Changeset.html#validate_required/3[validate_required/3]
 checks whether all the list items are included.
@@ -445,8 +454,11 @@ In the last section, we created two datasets with the same Twitter account. That
 shouldn't happen because it is unique. We have to add a validation for that.
 
 A uniqueness validation needs a uniqueness database index. Since we haven't
-added an index during the creation of the `authors` table we have to add a
-migration to do it now:
+added an index during the creation of the `authors` table, we have to add a
+migration to do it now.
+
+To add a migration, we first need to create a migration file using the `mix
+ecto.gen.migration` command:
 
 [source,bash]
 ----
@@ -455,8 +467,8 @@ Compiling 1 file (.ex)
 * creating priv/repo/migrations/20200527054827_add_twitter_account_index.exs
 ----
 
-The generator created the migration file, and we have to add a function to
-create a unique index:
+Next, we have to edit the generated file, adding a function to create a unique
+index:
 
 .priv/repo/migrations/20200527054827_add_twitter_account_index.exs
 [source,elixir]
@@ -470,7 +482,7 @@ defmodule Bookstore.Repo.Migrations.AddTwitterAccountIndex do
 end
 ----
 
-Run the migration:
+And finally, we need to run the migration:
 
 [source,bash]
 ----
@@ -497,9 +509,9 @@ index can not be created. We can solve this in the following ways:
   doing this.
 - Do a `mix ecto.reset`, which is an alias (defined in the `mix.exs` file) for
   the above set of commands. It also populates the database with seeds if you
-  have them. We don't have seeds yet.
+  have them. We don't have any seeds yet.
 
-We use the alias `mix ecto.reset`:
+We will use the alias `mix ecto.reset`:
 
 [source,bash]
 ----
@@ -838,7 +850,8 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
 ]
 ----
 
-We can use all the mechanisms of a list with this result:
+As `list_authors/0` returns a list, we can treat the result just like any other
+list:
 
 [source,elixir]
 ----
@@ -888,7 +901,7 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
 }
 ----
 
-And here is the concise code of it:
+And here is an overview of the code for `get_author!/1`:
 
 .lib/bookstore/store.ex
 [source,elixir]
@@ -902,8 +915,6 @@ defmodule Bookstore.Store do
   def get_author!(id), do: Repo.get!(Author, id)
 [...]
 ----
-
-NOTE: One can argue that `get_author!(id)` is not easier/better than `Repo.get!(Author, id)`.
 
 [IMPORTANT] ==== Functions which end with a `!` (exclamation point) raise an
 exception if something goes wrong. Let me show you this with `get/2` and
