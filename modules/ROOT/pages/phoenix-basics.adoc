@@ -866,10 +866,10 @@ how you can do that:
 <h1>Pong</h1>
 
 <p>
-<%= link "Ping!", to: Routes.page_path(@conn, :ping, class: "btn") %> <1>
+<%= link "Ping!", to: Routes.page_path(@conn, :ping), class: "btn" %> <1>
 </p>
 ----
-<1> Just add a `class: "whatever"` to the link helper.
+<1> Just add `class: "_class-name_"` to the link helper.
 
 [[static-files]]
 ## Static files
