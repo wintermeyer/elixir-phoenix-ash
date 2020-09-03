@@ -3,18 +3,22 @@
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 We have used https://hexdocs.pm/phoenix/Phoenix.Router.html[Phoenix.Router]
-plenty of times in xref:phoenix-basics.adoc[Phoenix Basics] and you already
-understand the concept. So this is just a small chapter with some useful
-details.
+plenty of times in xref:phoenix-basics.adoc[Phoenix Basics], and you probably
+already understand the basics. So this is just a small chapter with some useful
+extra details.
 
-All code in this chapter will result form this base application:
+All code in this chapter will result from this base application:
 
 [source,bash]
 ----
 $ mix phx.new demo --no-ecto --no-dashboard <1>
 $ cd demo
 ----
-<1> We don't include the https://hexdocs.pm/phoenix_live_dashboard/Phoenix.LiveDashboard.html[Phoenix.LiveDashboard] (--no-dashboard) to keep our router setup tidy. Otherwise, a million routes would leave just to the real-time performance monitoring dashboard, which is not a topic in this chapter.
+<1> We don't include the
+https://hexdocs.pm/phoenix_live_dashboard/Phoenix.LiveDashboard.html[Phoenix.LiveDashboard]
+(--no-dashboard) to keep our router setup tidy. Otherwise, there will be many
+routes created just for the real-time performance monitoring dashboard, which
+is not a topic in this chapter.
 
 This results in a minimal router setup:
 
@@ -43,12 +47,14 @@ defmodule DemoWeb.Router do
 end
 ----
 
-For us, relevant is just the last `/` part.
+At this stage, we will concentrate on the last function, which starts with
+`scope "/"`.
 
 [[mix-phx-routes]]
 ## Display existing routes
 
-With the command `mix phx.routes` you get a list of all defined routes. In our vanilla demo system this is the output:
+Running the command `mix phx.routes` will return a list of all defined routes.
+In our vanilla demo system, this is the output:
 
 [source,bash]
 ----
@@ -58,17 +64,22 @@ Generated demo app
 page_path  GET  /                    DemoWeb.PageController :index <1>
 websocket  WS   /socket/websocket    DemoWeb.UserSocket <2>
 ----
-<1> This route is for a HTTP GET request for the root path - which gets matched by `/` - of our application. It triggers the `:index` action in the `DemoWeb.PageController` controller.
-<2> No need to discuss `websockets` in this chapter. #I will remove that line in following exampless to clean up the output.#
+<1> This route is for a HTTP GET request for the root path - which gets matched
+by `/` - of our application. It triggers the `:index` action in the
+`DemoWeb.PageController` controller.
+<2> No need to discuss `websockets` in this chapter. #I will remove that line
+in following examples to clean up the output.#
 
-NOTE: In more complex applications with a dashboard, the output of `mix phx.routes` gets quite a bit longer. Then `mix phx.routes | grep "whatever-you-search"` becomes a convenient tool on the command line.
+NOTE: In more complex applications with a dashboard, the output of `mix
+phx.routes` gets quite a bit longer. Then `mix phx.routes | grep
+"_search-item_"` is a useful way of filtering the output.
 
 [[router-params]]
 ## Params
 
-Often you have some sort of ID in the URL or other params you need to access in your application. And sometimes you want that to handle that in the router.
-
-We create a product view of our `demo` application to show how it's working. We have to touch/create three files to make this happen:
+There are many times when you will want to set a parameter, such as ID, in the
+route. The following example will look at how we can set the parameter in the
+router, and how we can access it in the controller.
 
 .lib/demo_web/router.ex
 [source,elixir]
@@ -84,7 +95,8 @@ end
 
 [...]
 ----
-<1> We ask the router to match everything at that position to the parameter `:id`.
+<1> We ask the router to match everything at that position to the parameter
+`:id`.
 
 .lib/demo_web/controllers/product_controller.ex
 [source,elixir]
@@ -94,12 +106,15 @@ defmodule DemoWeb.ProductController do
 
   def show(conn, %{"id" => id}) do <1>
     conn
-    |> assign(:id, id)
+    |> assign(:id, id) <2>
     |> render("show.html")
   end
 end
 ----
 <1> We match the `id` in the params.
+<2> In this example, we just add the id to the `assigns` map. Normally, we
+would have fetched the product with that ID from the database and manipulated
+the data before rendering the template.
 
 .lib/demo_web/views/product_view.ex
 [source,elixir]
@@ -114,10 +129,10 @@ end
 ----
 <h1>ID: <%= @id %></h1> <1>
 ----
-<1> Just a simple display. Normally we would have fetched the product with that id from our database and display it.
+<1> Just a simple display.
 
-If you open http://localhost:4000/products/1 with your browser you'll see this
-log entry:
+If you open http://localhost:4000/products/1 in your browser, you'll see this
+log entry in the terminal:
 
 [source,bash]
 ----
@@ -128,19 +143,20 @@ log entry:
 [info] Sent 200 in 373µs
 ----
 
-And just as a final proof the screenshot:
+And here is the screenshot:
 
 image::router-products-1.png[http://localhost:4000/products/1]
 
 [[router-query-string]]
 ### Query String
 
-Query Strings don't belong in the router but are handled very similarly to the above params in the controller.
+To handle query strings, we do not need to add anything to the router. We just
+need to make some small changes to the controller.
 
-Let's assume we want to add the query string "color=blue" to our product request:
-http://localhost:4000/products/1?color=blue
-
-We can't match for it in the router but Phoenix does realize what happens:
+For example, if we add the query string "color=blue" to our product request
+(http://localhost:4000/products/1?color=blue) and open this URL in the browser,
+we can see from the log entry (shown below) that Phoenix has automatically
+added `color` to the `params` (parameters) map.
 
 [source,bash]
 ----
@@ -150,9 +166,11 @@ We can't match for it in the router but Phoenix does realize what happens:
   Pipelines: [:browser]
 [info] Sent 200 in 600µs
 ----
-<1> Both parameter become part of the `params` map.
+<1> Both parameters have been added to the `params` map.
 
-Without doing anything in the router, the query string parameter `color` finds it's way into the controller. But we have to change the controller a bit:
+Without adding anything to the router, the query string parameter `color` can
+be accessed in the controller, but we need to make a few changes to the
+controller:
 
 .lib/demo_web/controllers/product_controller.ex
 [source,elixir]
@@ -178,7 +196,10 @@ end
 <2> In addition to `:id` we have to assign `:color` too.
 <3> This `show/2` function matches if there is only an `:id` parameter.
 
-IMPORTANT: The order of the `show/2` functions in the controller is significant. If we use the other order for this specific example the `%{"id" => id, "color" => color}` would never match because `%{"id" => id}` always matches first if it's the first function.
+IMPORTANT: The order of the `show/2` functions in the controller is
+significant. If we use the other order for this specific example the `%{"id" =>
+id, "color" => color}` would never match because `%{"id" => id}` always matches
+first if it's the first function.
 
 Lastly we have to change the template:
 
@@ -191,11 +212,13 @@ Lastly we have to change the template:
 <p>Color: <%= @color %></p>
 <% end %>
 ----
-<1> Because we call this template from two different functions we have to take care of the case when the color assign hasn't taken place. The alternative would be a different template for each function.
+<1> Because we call this template from two different functions we have to take
+care of the case when the color assigns hasn't taken place. Alternatively,
+we could use a different template for each function.
 
 image::router-params-color.png[http://localhost:4000/products/1?color=blue]
 
-A view on the routes:
+A view of the routes:
 
 [source,bash]
 ----
@@ -220,11 +243,13 @@ Assuming you'd like to link to the next product ID this would be the template:
 
 <%= link "Next", to: Routes.product_path(@conn, :show, String.to_integer(@id) + 1) %> <1>
 ----
-<1> We use the `DemoWeb.ProductController :show` route and add the `id` to it. To increase the current `@id` we have to call `String.to_integer/1` first.
+<1> We use the `DemoWeb.ProductController :show` route and add the `id` to it.
+To increase the current `@id` we have to call `String.to_integer/1` first.
 
 ### Link with query
 
-Assuming you'd like to link to the first product with the query "color=orange" you'd have to use this code:
+And if you would like to link to the first product with the query
+"color=orange", you would use this code:
 
 .lib/demo_web/controllers/product_controller.ex
 [source,elixir]
@@ -237,13 +262,13 @@ Assuming you'd like to link to the first product with the query "color=orange" y
 
 <%= link "First product in orange", to: Routes.product_path(@conn, :show, 1, color: "orange") %> <1>
 ----
-<1> This results in a link to `http://localhost:4000/products/1?color=orange`
+<1> This returns a link to `http://localhost:4000/products/1?color=orange`
 
 [[router-multilevel-paths]]
 ## Multilevel Paths
 
 In the previous easy code examples, we always put the routes on the first level.
-But of course, you can use sublevel paths too. Here's an example:
+But of course, you can use paths with sublevels too. Here's an example:
 
 .lib/demo_web/router.ex
 [source,elixir]
@@ -298,8 +323,12 @@ This route matches `/names/stefan` and `/names/stephan`:
   Pipelines: [:browser]
 [info] Sent 200 in 1ms
 ----
-<1> The parameter `an` which is automatically named as the last match segment contains the whole match. You can use that to to some interesting things.
+<1> The parameter is automatically named `an`, and it contains the whole match.
+You can use that to do some interesting things.
 
 ## Misc
 
-There's no need to replicate the official documentation in this chapter. By now, you understand the concept of `Phoenix.Router`. You'll find solutions for all the exceptional cases which are not handled in this chapter in the official documentation at https://hexdocs.pm/phoenix/Phoenix.Router.html
+There's no need to replicate the official documentation in this chapter. By
+now, you understand the concept of `Phoenix.Router`. You'll find solutions for
+all the exceptional cases which are not handled in this chapter in the official
+documentation at https://hexdocs.pm/phoenix/Phoenix.Router.html
