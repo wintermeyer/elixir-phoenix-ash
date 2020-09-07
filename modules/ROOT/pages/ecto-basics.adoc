@@ -941,7 +941,6 @@ from a0 in Bookstore.Store.Author,
 your Phoenix application, if this happens in a function called by a controller,
 phoenix will automatically display a 404 page (this functionality depends on
 `phoenix_ecto`, which is included in this example app).
-====
 
 [[ecto-update]]
 ## Update an Entry
