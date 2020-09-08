@@ -235,7 +235,7 @@ Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
 iex(1)> <1>
 ----
 <1> Actually you will see a couple of more messages here which are related to
-the assets pipeline (e.g. CSS and JavaScript). No need to bother with that now.
+the assets pipeline (e.g. CSS and JavaScript). No need to bother with those now.
 
 The context module in `lib/bookstore/store.ex` includes the `create_author/1`
 function which we use to create a new author:
@@ -806,10 +806,20 @@ TIP: During development, the command `mix ecto.reset` is often very useful. It
 resets the database (drops, creates and migrates the database) and runs the
 seeds.
 
-[[ecto-list]]
-## Return all Entries of a Table
+[[ecto-query]]
+## Querying the Database
 
-The generated `Bookstore.Store` module offers a `list_authors` function which
+After adding data to the database table, we now want to be able to fetch any
+data that we need.
+
+In this section, we will look at fetching all of a table's entries, fetching a
+single entry using the ID (primary key) and fetching a single entry using one
+or more attributes.
+
+[[ecto-list]]
+### Return all of a Table's Entries
+
+The generated `Bookstore.Store` module offers a `list_authors/0` function which
 simply returns a list of all authors in the table:
 
 [source,elixir]
@@ -850,37 +860,66 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
 ]
 ----
 
-As `list_authors/0` returns a list, we can treat the result just like any other
-list:
+If we look at the code for `list_authors/0`, we can see that it uses Ecto's
+`Repo.all/1` to fetch the data:
+
+.lib/bookstore/store.ex
+[source,elixir]
+----
+defmodule Bookstore.Store do
+[...]
+  alias Bookstore.Repo
+  alias Bookstore.Store.Author
+
+[...]
+  def list_authors do
+    Repo.all(Author) <1>
+  end
+[...]
+----
+<1> `Repo.all/1` requires one argument, which should be a 'queryable' data
+structure (at this stage, there's no need to worry about what 'queryable'
+means). In this case, it is the name of the module where the schema is defined.
+
+As `list_authors/0` returns a list, we can use pattern matching to get item(s)
+from the output:
 
 [source,elixir]
 ----
-iex(2)> authors = Bookstore.Store.list_authors
+iex(1)> authors = Bookstore.Store.list_authors
 [...]
-iex(3)> [first_author | _] = authors <1>
+iex(2)> [first_author | _] = authors <1>
 [...]
-iex(4)> first_author
+iex(3)> first_author
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
   id: 1,
-  inserted_at: ~N[2020-05-27 11:48:17],
+  inserted_at: ~N[2020-09-04 02:40:21],
   last_name: "Thomas",
   twitter_account: "pragdave",
-  updated_at: ~N[2020-05-27 11:48:17]
+  updated_at: ~N[2020-09-04 02:40:21]
 }
-iex(5)> for author <- authors do
-...(5)> IO.puts author.last_name
-...(5)> end
-Thomas
-Gray
-Almeida
-[:ok, :ok, :ok]
+iex(4)> [first_author, second_author | _] = authors <2>
+[...]
+iex(5)> second_author
+%Bookstore.Store.Author{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+  first_name: "James",
+  id: 2,
+  inserted_at: ~N[2020-09-04 02:40:21],
+  last_name: "Gray",
+  twitter_account: "jeg2",
+  updated_at: ~N[2020-09-04 02:40:21]
+}
 ----
-<1> With pattern matching we take the first item of the list (the head) and assign it to `first_author`.
+<1> With pattern matching we take the first item of the list (the head) and
+assign it to `first_author`.
+<2> And on this line, we can get the second item of the list and assign it to
+`second_author`.
 
 [[ecto-get]]
-## Fetch one Entry of a Table by ID
+### Fetch Entries by ID
 
 If you know the `id` of a dataset and you want to fetch it, use `get_author!/1`,
 which is in the `Bookstore.Store` module. Let me first show you how to use it:
@@ -901,20 +940,17 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
 }
 ----
 
-And here is an overview of the code for `get_author!/1`:
+And let's look at the code for `get_author!/1`. Here, we see that it uses
+Ecto's `Repo.get!/2` to fetch the single entry:
 
 .lib/bookstore/store.ex
 [source,elixir]
 ----
-defmodule Bookstore.Store do
 [...]
-  alias Bookstore.Repo
-  alias Bookstore.Store.Author
-
-[...]
-  def get_author!(id), do: Repo.get!(Author, id)
+  def get_author!(id), do: Repo.get!(Author, id) <1>
 [...]
 ----
+<1> The second argument for `Repo.get!` is the entry's ID.
 
 [IMPORTANT] ==== Functions which end with a `!` (exclamation point) raise an
 exception if something goes wrong. Let me show you this with `get/2` and
@@ -941,6 +977,83 @@ from a0 in Bookstore.Store.Author,
 your Phoenix application, if this happens in a function called by a controller,
 phoenix will automatically display a 404 page (this functionality depends on
 `phoenix_ecto`, which is included in this example app).
+
+[[ecto-get-by]]
+### Fetch Entries by Attribute
+
+There are many times when we want to fetch an entry using one or more of the
+entry's attributes. One way of doing this is to use the `Repo.get_by!/2`
+function.
+
+For example, let's create a function to fetch an entry using the author's
+twitter account name:
+
+.lib/bookstore/store.ex
+[source,elixir]
+----
+[...]
+  def get_author_by_twitter!(twitter_account) do <1>
+    Repo.get_by!(Author, twitter_account: twitter_account) <2>
+  end
+[...]
+----
+<1> We have added a `!` to the end of this function (as it is using
+`Repo.get_by!`) to make it clear that it will raise an exception if no results
+are found. As mentioned earlier, if this happens, Phoenix will handle the
+exception and render a 404 page.
+<2> The second argument for `Repo.get_by!` should be a keyword list or map.
+
+And here is the output for `get_author_by_twitter!/1`:
+
+[source,elixir]
+----
+iex(1)> Bookstore.Store.get_author_by_twitter!("jeg2")
+[debug] QUERY OK source="authors" db=6.1ms decode=0.8ms queue=1.1ms idle=1649.9ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."twitter_account" = $1) ["jeg2"]
+%Bookstore.Store.Author{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+  first_name: "James",
+  id: 2,
+  inserted_at: ~N[2020-09-04 02:40:21],
+  last_name: "Gray",
+  twitter_account: "jeg2",
+  updated_at: ~N[2020-09-04 02:40:21]
+}
+----
+
+We can also use `Repo.get_by!/2` to fetch an entry based on multiple attributes.
+In the next example, we will create a function that returns an entry based on
+the `first_name` and `last_name`.
+
+.lib/bookstore/store.ex
+[source,elixir]
+----
+[...]
+  def get_author_by_first_name_last_name!(first_name, last_name) do
+    Repo.get_by!(Author, first_name: first_name, last_name: last_name) <1>
+  end
+[...]
+----
+<1> Again, the second argument for `Repo.get_by!` is a keyword list, this time
+containing two entries (for `first_name` and `last_name`).
+
+This is the output if the entry is found:
+
+[source,elixir]
+----
+iex(1)> Bookstore.Store.get_author_by_first_name_last_name!("Ulisses", "Almeida")
+[debug] QUERY OK source="authors" db=6.3ms decode=0.7ms queue=1.0ms idle=405.5ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE ((a0."first_name" = $1) AND (a0."last_name" = $2)) ["Ulisses", "Almeida"]
+%Bookstore.Store.Author{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+  first_name: "Ulisses",
+  id: 3,
+  inserted_at: ~N[2020-09-04 02:40:21],
+  last_name: "Almeida",
+  twitter_account: "ulissesalmeida",
+  updated_at: ~N[2020-09-04 02:40:21]
+}
+----
 
 [[ecto-update]]
 ## Update an Entry
@@ -1000,8 +1113,260 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
 <3> `update_author/2` updates the `twitter_account` field in the database. You can read the SQL command.
 <4> Just checking if it worked.
 
-## Accociations
+[[ecto-associations]]
+## Associations
 
+In this section, we will look at how to define and work with associations between schemas.
+
+There are three kinds of associations that we can use: one-to-one, one-to-many
+and many-to-many. In the following example, we will look at the one-to-many
+association. We will create an association in which each author is associated
+with many books.
+
+First, we need to generate a migration file to create the `books` table:
+
+[source,bash]
+----
+$ mix ecto.gen.migration create_books
+Compiling 1 file (.ex)
+* creating priv/repo/migrations/20200907084536_create_books.exs
+----
+
+Next, we need to edit the migration file to create the `books` table and to add
+a reference to the `author`:
+
+.priv/repo/migrations/20200907084536_create_books.exs
+[source,elixir]
+----
+defmodule Bookstore.Repo.Migrations.CreateBooks do
+  use Ecto.Migration
+
+  def change do
+    create table(:books) do
+      add :title, :string
+      add :author_id, references(:authors) <1>
+
+      timestamps()
+    end
+  end
+end
+----
+<1> This adds an `author_id` column to the `books` table which references an
+entry in the `authors` table.
+
+Now run the migration by calling `mix ecto.migrate`:
+
+We now need to add a `Bookstore.Store.Book` module with the schema for the
+`books` table:
+
+.lib/bookstore/store/book.ex
+[source,elixir]
+----
+defmodule Bookstore.Store.Book do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  alias Bookstore.Store.Author
+
+  schema "books" do
+    field :title, :string
+    belongs_to :author, Author <1>
+
+    timestamps()
+  end
+
+  @doc false
+  def changeset(book, attrs) do
+    book
+    |> cast(attrs, [:title, :author_id])
+    |> validate_required([:title, :author_id])
+  end
+end
+----
+<1> The `belongs_to` macro makes the associated schema accessible through the
+book.
+
+We also need to make a small change to the `Bookstore.Store.Author` module:
+
+.lib/bookstore/store/book.ex
+[source,elixir]
+----
+[...]
+  schema "authors" do
+    [...]
+    has_many :books, Book <1>
+    [...]
+  end
+[...]
+----
+<1> `has_many` lets us access the books through the author.
+
+[[ecto-querying-associations]]
+### Querying Associations
+
+We have created the one-to-many association between `authors` and `books`, and
+we have updated the schemas, so we can now start adding new `books` to the
+database. To do this, we will add a `create_book` function to the
+`Bookstore.Store` context module:
+
+.lib/bookstore/store.ex
+[source,elixir]
+----
+[...]
+  alias Bookstore.Store.Book
+
+  def create_book(attrs) do
+    %Book{}
+    |> Book.changeset(attrs)
+    |> Repo.insert()
+  end
+[...]
+----
+
+Now we are ready to try this out in `iex`:
+
+[source,elixir]
+----
+iex(1)> Bookstore.Store.create_book(%{title: "Programming Elixir", author_id: 1})
+[debug] QUERY OK db=8.0ms decode=1.7ms queue=2.8ms idle=1669.3ms
+INSERT INTO "books" ("author_id","title","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" [1, "Programming Elixir", ~N[2020-09-08 01:17:34], ~N[2020-09-08 01:17:34]]
+{:ok,
+ %Bookstore.Store.Book{
+   __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+   author: #Ecto.Association.NotLoaded<association :author is not loaded>,
+   author_id: 1,
+   id: 4,
+   inserted_at: ~N[2020-09-08 01:17:34],
+   title: "Programming Elixir",
+   updated_at: ~N[2020-09-08 01:17:34]
+ }}
+----
+
+We now want to write some queries to fetch this data from the database.
+We will add two functions to the `Bookstore.Store` context module - one that
+returns a list of an author's books and one that fetches a book by querying the
+title.
+
+.lib/bookstore/store.ex
+[source,elixir]
+----
+[...]
+  def list_books_by_author(author) do
+    Book
+    |> where(author_id: ^author.id) <1>
+    |> Repo.all()
+  end
+[...]
+  def get_book_by_title!(title) do
+    Repo.get_by!(Book, title: title)
+  end
+[...]
+----
+<1> When using external values in query expressions, we need to prefix the
+value with a `^` sign. We will look at the `where` macro later, when we start
+using more complex queries.
+
+Let's see how these queries work in `iex`:
+
+[source,elixir]
+----
+iex(1)> author = Bookstore.Store.get_author_by_twitter!("pragdave") <1>
+[debug] QUERY OK source="authors" db=6.0ms decode=0.8ms queue=1.3ms idle=1390.3ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."twitter_account" = $1) ["pragdave"]
+%Bookstore.Store.Author{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+  books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+  first_name: "Dave",
+  id: 1,
+  inserted_at: ~N[2020-09-08 01:56:38],
+  last_name: "Thomas",
+  twitter_account: "pragdave",
+  updated_at: ~N[2020-09-08 01:56:38]
+}
+iex(2)> Bookstore.Store.list_books_by_author(author)
+[debug] QUERY OK source="books" db=1.3ms queue=1.4ms idle=1802.0ms
+SELECT b0."id", b0."title", b0."author_id", b0."inserted_at", b0."updated_at" FROM "books" AS b0 WHERE (b0."author_id" = $1) [1]
+[
+  %Bookstore.Store.Book{
+    __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+    author: #Ecto.Association.NotLoaded<association :author is not loaded>, <2>
+    author_id: 1,
+    id: 1,
+    inserted_at: ~N[2020-09-08 01:56:51],
+    title: "Programming Elixir",
+    updated_at: ~N[2020-09-08 01:56:51]
+  }
+]
+iex(3)> Bookstore.Store.get_book_by_title!("Programming Elixir")
+[debug] QUERY OK source="books" db=1.6ms queue=3.6ms idle=969.6ms
+SELECT b0."id", b0."title", b0."author_id", b0."inserted_at", b0."updated_at" FROM "books" AS b0 WHERE (b0."title" = $1) ["Programming Elixir"]
+%Bookstore.Store.Book{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+  author: #Ecto.Association.NotLoaded<association :author is not loaded>,
+  author_id: 1,
+  id: 1,
+  inserted_at: ~N[2020-09-08 01:56:51],
+  title: "Programming Elixir",
+  updated_at: ~N[2020-09-08 01:56:51]
+}
+----
+<1> We fetch the `author` as we need to use it in the `list_books_by_author/1` function.
+<2> By default, the associated data (in this case, the `author` data) is not
+loaded. In the next subsection, we will look at how to load this data.
+
+[[ecto-preloading-associated-data]]
+### Preloading Associated Data
+
+As can be seen in the examples above, the data for an associated table is not
+loaded by default. To request this data, we need to preload it, using either
+`Ecto.Query.preload` or `Ecto.Repo.preload`. In this subsection, we will use
+`Ecto.Repo.preload`, which allows us to preload structs after they have been
+fetched from the database.
+
+Let's open up `iex` and see how preloading data works:
+
+[source,elixir]
+----
+iex(1)> elixir_book = Bookstore.Store.get_book_by_title!("Programming Elixir") <1>
+[debug] QUERY OK source="books" db=5.9ms decode=0.7ms queue=1.1ms idle=809.0ms
+SELECT b0."id", b0."title", b0."author_id", b0."inserted_at", b0."updated_at" FROM "books" AS b0 WHERE (b0."title" = $1) ["Programming Elixir"]
+%Bookstore.Store.Book{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+  author: #Ecto.Association.NotLoaded<association :author is not loaded>,
+  author_id: 1,
+  id: 1,
+  inserted_at: ~N[2020-09-08 01:56:51],
+  title: "Programming Elixir",
+  updated_at: ~N[2020-09-08 01:56:51]
+}
+iex(2)> Bookstore.Repo.preload(elixir_book, :author) <2>
+[debug] QUERY OK source="authors" db=0.5ms queue=0.8ms idle=151.0ms
+SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at", a0."id" FROM "authors" AS a0 WHERE (a0."id" = $1) [1]
+%Bookstore.Store.Book{
+  __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
+  author: %Bookstore.Store.Author{ <3>
+    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
+    books: #Ecto.Association.NotLoaded<association :books is not loaded>,
+    first_name: "Dave",
+    id: 1,
+    inserted_at: ~N[2020-09-08 01:56:38],
+    last_name: "Thomas",
+    twitter_account: "pragdave",
+    updated_at: ~N[2020-09-08 01:56:38]
+  },
+  author_id: 1,
+  id: 1,
+  inserted_at: ~N[2020-09-08 01:56:51],
+  title: "Programming Elixir",
+  updated_at: ~N[2020-09-08 01:56:51]
+}
+----
+<1> We first fetch the `book` with the title "Programming Elixir".
+<2> We use a single atom to preload a single association. To preload multiple
+associations, we would use a list of atoms.
+<3> We can now see the associated (`author`) data.
+
+For more information about associations, see
 https://hexdocs.pm/ecto/2.2.11/associations.html
 
 #Work in progess#
