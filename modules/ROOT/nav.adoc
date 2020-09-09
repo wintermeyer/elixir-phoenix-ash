@@ -28,8 +28,8 @@
 ** xref:ecto-basics.adoc#validations[Validations]
 *** xref:ecto-basics.adoc#ecto-uniqueness[Uniqueness Validations]
 ** xref:ecto-basics.adoc#ecto-seeds[Seeds]
-** xref:ecto-basics.adoc#ecto-list[Return all Entries of a Table]
-** xref:ecto-basics.adoc#ecto-get[Return one Entry of a Table by ID]
-
+** xref:ecto-basics.adoc#ecto-query[Querying the Database]
+** xref:ecto-basics.adoc#ecto-update[Update an Entry]
+** xref:ecto-basics.adoc#ecto-associations[Associations]
 
 * xref:index.adoc#training[Remote Training]
