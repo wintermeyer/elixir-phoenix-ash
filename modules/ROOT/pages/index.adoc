@@ -70,14 +70,14 @@ database and operating system). If possible, first create a question on
 https://stackoverflow.com[stackoverflow.com] and send me an email with the link
 to that question. With that, I can answer it for you and other users.
 
-[[training]]
-=== Training
+[[remote-training]]
+=== Remote Training
 
-I offer a one and two-day remote Phoenix beginners training course. During the
+I offer a one and two-day remote Phoenix beginners training. During the
 training, we'll work via remote pair programing
 (https://marketplace.visualstudio.com/items?itemName=MS-vsliveshare.vsliveshare-pack[Visual
 Studio with the Live Share extension]). This is an excellent way to get up to
-speed. No previous knowledge is needed (OK, you need to have basic programming
-and HTML knowledge). Please send me an email to sw@wintermeyer-consulting.de for further information.
+speed. No previous Elixir knowledge is needed. You just need basic programming and 
+HTML knowledge. Please send me an email to sw@wintermeyer-consulting.de for further information.
 
 Onsite training is possible too. But that depends on the local coronavirus travel restrictions.
