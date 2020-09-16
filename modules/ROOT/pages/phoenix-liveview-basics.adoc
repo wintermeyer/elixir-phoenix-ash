@@ -2,22 +2,28 @@
 # Phoenix LiveView Basics
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-LiveView is an exciting alternative to a single-page application (SPA) written with JavaScript which communicates with the server via JSON and changes the content of the page by themself. Adding a JavaScript Framework to create a SPA adds another element to your technology stack, which has consequences.
-Creating the same functionality with LiveView keeps your technology stack light, and you don't add one more programming language (JavaScript) to your development process.
+LiveView, according to the
+https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html[documentation],
+"provides rich, real-time user experiences with server-rendered HTML".
+This means that you can create modern, interactive UIs without writing any
+JavaScript.
 
-NOTE: Feel free to skip this chapter if you are not interested in single-page applications. You can come back at any time.
+NOTE: Feel free to skip this chapter if you are not interested in developing
+apps with real-time user experiences. You can come back at any time.
 
-Of course, LiveView does use JavaScript to do its magic, but that is done for you. You don't have to code any JavaScript yourself. The good to go LiveView
-JavaScript connects via a WebSocket to your Phoenix application and both communicate with each other. On the JavaScript side, this is as light weighted as possible and uses much fewer client resources than most JavaScript frameworks.
+Under the hood, LiveView maintains a WebSocket connection between the client and
+server sides. It also uses JavaScript, but this is as lightweight as possible
+and uses a lot fewer resources than most JavaScript frameworks.
 
-One need thing about LiveView is that on the initial request Phoenix delivers a regular HTML page which includes all the design and content you want it to have.
-So the user doesn't have to wait for JavaScript to do its work to have a good webpage. As a side effect, all search engines can use it right away without having to rely on JavaScript.
+One cool thing about LiveView is that on the initial request Phoenix delivers a
+regular HTML page which includes all the design and content you want it to have,
+so the user doesn't have to wait for the JavaScript to load to have a good
+webpage. As a side effect, all search engines can use it right away without
+having to rely on JavaScript.
 
-During this chapter, I'll show you a couple of examples. They are meant to give you an idea of the possibilities. If LiveView is the right choice for your project, you'll have to invest more time afterwards with experiments and the
-lecture of
-
-- https://github.com/phoenixframework/phoenix_live_view[Phoenix LiveView GitHub Repo]
-- https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html
+During this chapter, I'll show you a few examples. They are meant to give you an
+idea of the possibilities. If LiveView is the right choice for your project,
+you'll have to invest more time experimenting with it afterwards.
 
 [[light-switch]]
 ## Light Switch
@@ -54,12 +60,15 @@ You can also run your app inside IEx (Interactive Elixir) as:
 
     $ iex -S mix phx.server
 ----
-<1> '--live' adds all the needed stuff to use LiveView out of the box. For this example, we don't need Ecto.
-<2> Always `Y` and depending on your internet connection a good time for a cup of coffee.
+<1> '--live' adds all the needed stuff to use LiveView out of the box. For this
+example, we don't need Ecto.
+<2> Click `Y` and, depending on your internet connection, maybe grab a cup of
+coffee.
 
-The aim of this demo is a new webpage with the path `/light` which offers a
-status of a virtual light bulb and a switch functionality to turn on/off that
-light bulb. All this without reloading the page and without any JavaScript.
+The aim of this demo is to create a new webpage with the path `/light` which
+offers a status of a virtual light bulb and a switch functionality to turn that
+light bulb on and off - all this without reloading the page and without writing
+any JavaScript.
 
 First we have to add the route:
 
@@ -80,11 +89,13 @@ defmodule DemoWeb.Router do
 
   [...]
 ----
-<1> Because we created the app with the `--live` switch the default root path is already a live view. Therefore the `live` macro is used here (at the beginning of the line) instead of the traditional `get`.
+<1> Because we created the app with the `--live` switch the default root path is
+already a live view. Therefore the `live` macro is used here (at the beginning
+of the line) instead of the traditional `get`.
 <2> This is the new `light` route which leads to the `LightLive` module.
 
-LiveView modules are located in the `lib/demo_web/live/` directory. There we have to create
-our new `LightLive` module:
+LiveView modules are located in the `lib/demo_web/live/` directory. There we
+have to create our new `LightLive` module:
 
 .lib/demo_web/live/light_live.ex
 [source,elixir]
@@ -98,26 +109,33 @@ defmodule DemoWeb.LightLive do
     """
   end
 end
-<1> The `render/1` function renders the template. We use the `~L` sigil to define the template.
 ----
+<1> The `render/1` function renders the template. We use the `~L` sigil to
+define the template.
 
 [IMPORTANT]
 ====
-We use the `~L` sigil to store the template code in this controller. It is
-easier for this document. For bigger templates, it makes more
-sense to store them in their file. That would be a LiveEEx Templates
-(`.leex` extension) and would be named `lib/demo_web/live/light_live.html.leex`
-in this case and include `<h1>The light is off.</h1>`. When you have that file, you don't need the `render/1` function at all.
+In this case, we use the `~L` sigil to define the template, but for bigger
+templates, it makes more sense to create a separate template file, which would
+be a LiveEEx template (using the `.leex` extension) and be stored in the
+`lib/demo_web/live` directory. If you use a separate template file, the
+`render/1` function is not needed (see the Airport Code Search section for an
+example).
 
 Have a look at https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html for more information.
 ====
 indexterm:["LiveEEx Templates"]
 
-Now we can open the browser and open the URL `http://localhost:4000/light`
+Now, let's open the URL `http://localhost:4000/light` in the browser.
 
 image::liveview-static.png[http://localhost:4000/light]
 
-We aim to change the world `off` to `on` and trigger that by a button. For that to happen, we first have to replace the current word with a variable, and we have to assign that variable to the socket struct (which is used to transport that information). We assign the initial state of the variable `light_bulb_status` in the `mount/3` function.
+We want to be able to change the word `off` to `on`. To do that, we need to make
+two changes to the `light_live.ex` file:
+
+1. Replace the word `off` with a variable.
+2. Assign that variable to the socket struct (which is used to transport that
+information). To update the socket struct, we need to define the `mount/3` function.
 
 .lib/demo_web/live/light_live.ex
 [source,elixir]
@@ -137,13 +155,15 @@ defmodule DemoWeb.LightLive do
   end
 end
 ----
-<1> Out of all the posssible parameters of `mount/3` we only need the `socket` struct for our example.
-<2> We assign the value `off` to the variable `light_bulb_status`
+<1> Out of all the posssible parameters of `mount/3` we only need the `socket`
+struct for our example.
+<2> We set the initial value of the variable `light_bulb_status` to `off`.
 
-The browser automatically reloads, but the page's content hasn't changed. Only we know that the `off` is not a static content any more.
+The browser automatically reloads, but the page's content hasn't changed. We do
+know, though, that the `off` is no longer static content.
 
 To turn on the light bulb we need a button:
-.
+
 [source,elixir]
 ----
 def render(assigns) do
@@ -153,13 +173,15 @@ def render(assigns) do
   """
 end
 ----
-<1> The button tag includes `phx-click="on"` which is special Phoenix code to trigger an event.
+<1> The button tag includes `phx-click="on"` which is special Phoenix code to
+trigger an event.
 
 Now we see the button on the webpage:
 
 image::liveview-on-button.png[http://localhost:4000/light]
 
-But clicking on the button doesn't do anything. We have to add a `handle_event/3` function for the `on` event:
+But clicking on the button doesn't do anything. We have to add a
+`handle_event/3` function for the `on` event:
 
 .lib/demo_web/live/light_live.ex
 [source,elixir]
@@ -188,7 +210,8 @@ defmodule DemoWeb.LightLive do
   end
 end
 ----
-<1> We don't need the `_value` parameter. Just the first parameter to match the function and the socket struct.
+<1> We don't need the `_value` parameter. Just the first parameter to match the
+function and the socket struct.
 <2> We set the `light_bulb_status` variable to `on`.
 
 [NOTE]
@@ -201,22 +224,15 @@ def handle_event("on", _value, socket) do
   {:noreply, assign(socket, :light_bulb_status, "on")}
 end
 ```
-
-Same argument works for the `mount/3` function:
-
-```
-def mount(_params, _session, socket) do
-  {:ok, assign(socket, :light_bulb_status, "off")}
-end
-```
 ====
 
-No, we can load the page having the light `off`. After clicking on the button
+Now, we can load the page having the light `off`. After clicking on the button
 the text updates to `on`.
 
 image::liveview-on-button-after-clicking.png[http://localhost:4000/light]
 
-But it would be nice to add a second button so that we can switch the light off again. Also, we have to add another event handler for the `off` event:
+But it would be nice to add a second button so that we can switch the light off
+again. Also, we have to add another event handler for the `off` event:
 
 .lib/demo_web/live/light_live.ex
 [source,elixir]
@@ -256,7 +272,7 @@ end
 ----
 
 Now we have a webpage with two buttons which work to turn the imaginary light on
-and off. But I don't like that both buttons are active all the time. That is bad
+and off. However, I don't like that both buttons are active all the time. That is bad
 UX. Let's fix that:
 
 .lib/demo_web/live/light_live.ex
@@ -304,13 +320,15 @@ defmodule DemoWeb.LightLive do
   end
 end
 ----
-<1> We assign a value for the `on_button_status` and `off_button_status` in order to make the on button active and the off button inactive at the start.
-<2> We use the `@off_button_status` to disable the off button right at the beginning.
+<1> We assign a value for the `on_button_status` and `off_button_status` in
+order to make the on button active and the off button inactive at the start.
+<2> We use the `@off_button_status` to disable the off button right at the
+beginning.
 <3> We toggle the values of the buttons.
 
-We are all set. The buttons work in the way a user would like them to work. All
-without writing a single line of JavaScript. Phoenix LiveView takes care of all
-that. We can concentrate on the application development with Elixir.
+We are all set. The buttons work in the way a user would like them to work and
+all without writing a single line of JavaScript. Phoenix LiveView takes care of
+all the updates. We can concentrate on the application development with Elixir.
 
 Please open your browser at http://localhost:4000/light and give it a try.
 
@@ -319,8 +337,8 @@ image::liveview-working-on-off-button.png[http://localhost:4000/light]
 [[clock]]
 ## Clock
 
-The clock is an example of content that is pushed and triggered by the server.
-No interaction by the user. It displays the current server time on a webpage.
+The clock is an example of content that is pushed and triggered by the server,
+without any user interaction. It displays the current server time on a webpage.
 
 We start with a fresh Phoenix application:
 
@@ -395,22 +413,31 @@ defmodule ClockWeb.ClockLive do
   end
 end
 ----
-<1> `mount/3` gets called twice. The first time when the initial HTTP-Request gets answered. That would be the initial webpage. And a second time when the LiveView JavaScript client has connected to the WebSocket. We want to start our timer at that second request.
-<2> This is a bit of Erlang code which fires up a timer which calls the `tick/1` method every 1,000 milliseconds.
-<3> The `assign_current_time/1` function gets called to add the `now` value to the `socket` struct.
-<4> `handle_info/2` gets called by the 1-second timer to update the value of `now`.
+<1> `mount/3` gets called twice. The first time when the initial HTTP-Request
+gets answered. That would be the initial webpage. And a second time when the
+LiveView JavaScript client has connected to the WebSocket. We want to start our
+timer at that second request.
+<2> This uses the Erlang `:timer` module to fire up a timer which calls the
+`tick/1` function every 1,000 milliseconds.
+<3> The `assign_current_time/1` function gets called to add the `now` value to
+the `socket` struct.
+<4> `handle_info/2` gets called by the 1-second timer to update the value of
+`now`.
 <5> `Time.utc_now()` returns the current time on the server.
-<6> This pipeline is just used so that the time is displayed without the milliseconds.
+<6> This pipeline is just used so that the time is displayed without the
+milliseconds.
 <7> Returns a `socket` struct.
 
-Fire up the webserver with `mix phx.server` and open http://localhost:4000/clock in your browser.
+Fire up the webserver with `mix phx.server` and open http://localhost:4000/clock
+in your browser.
 
 image::liveview-clock.png[http://localhost:4000/clock]
 
 [[counter]]
 ## Counter
 
-This LiveView example will generate a counter website. It starts at 0, and each time you click on a button, it will increase by one.
+This LiveView example will generate a simple counter. It starts at 0, and each
+time you click on a button, it will increase by one.
 
 [source,bash]
 ----
@@ -464,11 +491,12 @@ defmodule DemoWeb.CounterLive do
   end
 end
 ----
-<1> We assign the value of 0 to `counter`.
+<1> We set the initial value of `counter` to 0.
 <2> Display the value of `@counter`.
 <3> Increase by 1 button.
 <4> Reset the counter to 0 button.
-<5> `update/3` is used to call a capture function to increase the value of the `counter` by 1.
+<5> `update/3` is used to call a capture function to increase the value of the
+`counter` by 1.
 <6> We reset the `counter` to 0 here.
 
 Please open your browser at http://localhost:4000/counter and give it a try.
@@ -478,8 +506,9 @@ image::liveview_counter.png[http://localhost:4000/counter]
 ### assign vs update
 indexterm:["assign (LiveView)", "update (LiveView)"]
 
-In the counter example we use this code with an `update/3` function:
-.
+In the counter example, we use the `update/3` function to set the new counter
+value:
+
 [source,elixir]
 ----
 def handle_event("inc", _, socket) do
@@ -488,10 +517,9 @@ def handle_event("inc", _, socket) do
 end
 ----
 
-We could achieve the same result with this code which uses the `assign/3`
-function. But for that we'd have to get the value of `counter` via the
-`socket` struct:
-.
+We could achieve the same result by using the `assign/3` function, but to do
+that we would first have to get the value of `counter` from the `socket` struct:
+
 [source,elixir]
 ----
 def handle_event("inc", _, socket) do
@@ -501,7 +529,7 @@ def handle_event("inc", _, socket) do
 end
 ----
 
-Both versions work fine. Of course, `update/3` is a bit more elegant. But you will get no medal for using it. Use the function you feel more comfortable with.
+Both versions work fine, but in this case, `update/3` is a bit more elegant.
 
 [[aiport-code-search]]
 ## Airport Code Search
@@ -529,7 +557,8 @@ end
 [...]
 ----
 
-Next, we need to create a module which holds that list of airports and a search function. We'll put this into `lib/travelagent/airports.ex`
+Next, we need to create a module which holds a list of airport codes / names and
+a search function. We'll put this into `lib/travelagent/airports.ex`
 
 .lib/travelagent/airports.ex
 [source,elixir]
@@ -567,8 +596,9 @@ defmodule Travelagent.Airports do
 end
 ----
 <1> A search for an empty string results in an empty list.
-<2> `search_by_code/1` searches for airport code's fragments and full codes.
-<3> We hardcode a list of German airports here. In a real application, this would be longer and probably database driven.
+<2> `search_by_code/1` searches for the first letter(s) in an airport code.
+<3> We hardcode a list of German airports here. In a real application, this
+would include more data and probably be database driven.
 
 This time we don't use the `~L` sigil in the controller but a LiveEEx Template
 file:
@@ -606,10 +636,13 @@ lib/travelagent_web/live/search_live.html.leex
   </table>
 <% end %>
 ----
-<1> I think it is always a curtesy to the user to set the first input field to `autofocus`. And we add an `autocomplete="off"` just to be sure that the browser doesn't interact with us.
-<2> When search results in a list of airport a table with the results will be displayed.
+<1> I think it is always a curtesy to the user to set the first input field to
+`autofocus`. And we add an `autocomplete="off"` just to be sure that the browser
+doesn't disturb the user.
+<2> When the search returns a non-empty list, a table with the results will be
+displayed.
 
-Lastly the TravelagentWeb.SearchLive module:
+Lastly, we need to update the TravelagentWeb.SearchLive module:
 
 .lib/travelagent_web/live/search_live.ex
 [source,elixir]
@@ -643,9 +676,11 @@ defmodule TravelagentWeb.SearchLive do
   end
 end
 ----
-<1> One can argue if this `alias` is needed here. It results in a shorter line of code later on.
-<2> We assign the `airport_code` to empty and assign an empty list to `airports`.
-<3> We auto-uppercased each letter in the search string.
+<1> One can argue if this `alias` is needed here. It results in a shorter line
+of code later on.
+<2> We assign the `airport_code` to empty and assign an empty list to
+`airports`.
+<3> We auto-uppercase each letter in the search string.
 <4> The uppercased search string gets returned to the view.
 <5> The result of the search gets returned to the view.
 
@@ -659,7 +694,8 @@ image::liveview_airport_search.png[http://localhost:4000/search]
 It would be nice to have some sort of autocomplete functionality for the airport
 code search. So that when I start to enter an `h` I'll get all airports which
 codes begin with an `h`. Without having to click on the `Search Airport` button.
-Lucky us we only have to do a couple of changes in the LiveEEx Template file.
+Luckily for us, we only have to make a couple of changes in the LiveEEx Template
+file to achieve this.
 
 lib/travelagent_web/live/search_live.html.leex
 [source,html]
@@ -693,7 +729,8 @@ lib/travelagent_web/live/search_live.html.leex
   </table>
 <% end %>
 ----
-<1> We just have to use `phx-change` for the form. This means that each change triggers `handle_event/3`.
+<1> We just have to use `phx-change` for the form. This means that each change
+triggers `handle_event/3`.
 
 Please open your browser at http://localhost:4000/search and give it a try.
 

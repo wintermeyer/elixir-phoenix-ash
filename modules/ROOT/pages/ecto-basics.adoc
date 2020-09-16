@@ -82,7 +82,7 @@ config :bookstore, Bookstore.Repo,
 ## Create a Table
 
 For this example, we are going to use the `mix phx.gen.context`
-generator(https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html), which
+https://hexdocs.pm/phoenix/Mix.Tasks.Phx.Gen.Context.html[generator], which
 creates a database table and adds files that are useful for working with the
 new table.
 
@@ -92,7 +92,7 @@ results in fewer errors if you use a generator.
 As a first resource, we want to create a table with authors. In the Phoenix
 world, we have to put that new resource `authors` into a context.
 
-NOTE: A context(https://hexdocs.pm/phoenix/contexts.html) is an API boundary for
+NOTE: A https://hexdocs.pm/phoenix/contexts.html[context] is an API boundary for
 one or more resources. Since version 1.3 of Phoenix, it has been recommended to
 organize the code that interfaces with the database using contexts, as this can
 help make the code easier to test, maintain and refactor. At this stage, don't
@@ -281,7 +281,7 @@ end
 [...]
 ----
 <1> Creates a new Author changeset with the attributes.
-Changesets(https://hexdocs.pm/ecto/Ecto.Changeset.html) are structs that can be
+https://hexdocs.pm/ecto/Ecto.Changeset.html[Changesets] are structs that can be
 used to filter, cast and validate the data.
 <2> Uses `Bookstore.Repo` to insert the changeset into the database table.
 ====
