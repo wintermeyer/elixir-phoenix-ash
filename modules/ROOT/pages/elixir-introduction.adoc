@@ -36,7 +36,7 @@ $ iex
 Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
 
 Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
-iex(1)> <1>
+iex> <1>
 ----
 <1> This is your iex prompt.
 
@@ -60,7 +60,7 @@ basic documentation:
 
 [source,elixir]
 ----
-iex(2)> h length/1
+iex> h length/1
 
                                 def length(list)
 
@@ -86,7 +86,7 @@ The classic! But never the less very important. You can use the function
 
 [source,elixir]
 ----
-iex(1)> IO.puts("Hello world!")
+iex> IO.puts("Hello world!")
 Hello world!
 :ok
 ----
@@ -100,10 +100,10 @@ backslashes:
 
 [source,elixir]
 ----
-iex(2)> IO.puts("With double quotes: \"Hello world!\"")
+iex> IO.puts("With double quotes: \"Hello world!\"")
 With double quotes: "Hello world!"
 :ok
-iex(3)>
+iex>
 BREAK: (a)bort (c)ontinue (p)roc info (i)nfo (l)oaded
        (v)ersion (k)ill (D)b-tables (d)istribution
 ^C<1>
@@ -126,15 +126,15 @@ $ iex
 Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
 
 Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
-iex(1)> 1 + 1
+iex> 1 + 1
 2
-iex(2)> 1.1 + 1
+iex> 1.1 + 1
 2.1
-iex(3)> 2 - 1
+iex> 2 - 1
 1
-iex(4)> 10 * 1000000000000000
+iex> 10 * 1000000000000000
 10000000000000000
-iex(5)> 23 / 3
+iex> 23 / 3
 7.666666666666667
 ----
 
@@ -146,13 +146,13 @@ the operators `and`, `or` and `not`:
 
 [source,elixir]
 ----
-iex(1)> true and true
+iex> true and true
 true
-iex(2)> false and false
+iex> false and false
 false
-iex(3)> true or false
+iex> true or false
 true
-iex(4)> not true
+iex> not true
 false
 ----
 indexterm:["Logical Expressions"]
@@ -172,11 +172,11 @@ lower case. Some examples:
 
 [source,elixir]
 ----
-iex(1)> length = 10 <1>
+iex> length = 10 <1>
 10
-iex(2)> width = 23
+iex> width = 23
 23
-iex(3)> area = length * width
+iex> area = length * width
 230
 ----
 <1> We use the operator `=` to bind the value 10 to the variable with the name `length`.
@@ -185,7 +185,7 @@ If you start a variable name with a capital error you will get an error:
 
 [source,elixir]
 ----
-iex(4)> Radius = 2
+iex> Radius = 2
 ** (MatchError) no match of right hand side value: 2 <1>
 ----
 <1> Yes, `MatchError` is a rather strange error message here. It will make more
@@ -205,23 +205,23 @@ functions.
 
 [source,elixir]
 ----
-iex(1)> defmodule Store do <1>
-...(1)>   def total_price(price, amount) do <2>
-...(1)>     price * amount <3>
-...(1)>   end
-...(1)> end
+iex> defmodule Store do <1>
+...>   def total_price(price, amount) do <2>
+...>     price * amount <3>
+...>   end
+...> end
 {:module, Store,
  <<70, 79, 82, 49, 0, 0, 5, 4, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 133, 0,
    0, 0, 14, 12, 69, 108, 105, 120, 105, 114, 46, 83, 116, 111, 114, 101, 8, 95,
    95, 105, 110, 102, 111, 95, 95, 7, ...>>, {:total_price, 2}} <4>
-iex(2)> Store.total_price(10,7) <5>
+iex> Store.total_price(10,7) <5>
 70
 ----
 <1> `defmodule` is the keyword to define a module. The name of a module starts with a capital letter.
 <2> `def` is the keyword to define a function within a module.
 <3> The return value of a function is the return value of the last expression in
 the function.
-<4> The return value of creating the module. To save space, we will abbreviate
+<4> The return value of creating the module. To save space, we will not show
 this output in the next examples.
 <5> A function of a given module can be called from outside the module with this syntax.
 
@@ -253,9 +253,9 @@ in iex.
 
 [source,elixir]
 ----
-iex(1)> Math.sum(1, 2)
+iex> Math.sum(1, 2)
 3
-iex(2)> Math.difference(3, 1)
+iex> Math.difference(3, 1)
 2
 ----
 
@@ -268,19 +268,19 @@ with `defp`:
 
 [source,elixir]
 ----
-iex(1)> defmodule Area do
-...(1)>   def circle(radius) do
-...(1)>     pi() * radius * radius
-...(1)>   end
-...(1)>
-...(1)>   defp pi do <1>
-...(1)>     3.14
-...(1)>   end
-...(1)> end
-{:module, Area, ...
-iex(2)> Area.circle(10) <2>
+iex> defmodule Area do
+...>   def circle(radius) do
+...>     pi() * radius * radius
+...>   end
+...>
+...>   defp pi do <1>
+...>     3.14
+...>   end
+...> end
+
+iex> Area.circle(10) <2>
 314.0
-iex(3)> Area.pi <3>
+iex> Area.pi <3>
 ** (UndefinedFunctionError) function Area.pi/0 is undefined or private
     Area.pi()
 ----
@@ -302,19 +302,19 @@ arity, and so they are treated as different functions:
 
 [source,elixir]
 ----
-iex(1)> defmodule Rectangle do
-...(1)>   def area(a) do <1>
-...(1)>     a * a
-...(1)>   end
-...(1)>
-...(1)>   def area(a, b) do <2>
-...(1)>     a * b
-...(1)>   end
-...(1)> end
-{:module, Rectangle, ...
-iex(2)> Rectangle.area(9) <3>
+iex> defmodule Rectangle do
+...>   def area(a) do <1>
+...>     a * a
+...>   end
+...>
+...>   def area(a, b) do <2>
+...>     a * b
+...>   end
+...> end
+
+iex> Rectangle.area(9) <3>
 81
-iex(3)> Rectangle.area(4, 5) <4>
+iex> Rectangle.area(4, 5) <4>
 20
 ----
 <1> The function `area/1` with an arity of 1 accepts one parameter.
@@ -332,13 +332,13 @@ This can be done by adding `.` between the Module names:
 
 [source,elixir]
 ----
-iex(1)> defmodule Calculator.Area do
-...(1)>   def square(a) do
-...(1)>     a * a
-...(1)>   end
-...(1)> end
-{:module, Calculator.Area, ...
-iex(2)> Calculator.Area.square(5)
+iex> defmodule Calculator.Area do
+...>   def square(a) do
+...>     a * a
+...>   end
+...> end
+
+iex> Calculator.Area.square(5)
 25
 ----
 
@@ -346,15 +346,15 @@ It is just a shortcut. You could also nest the Modules:
 
 [source,elixir]
 ----
-iex(1)> defmodule Calculator do
-...(1)>   defmodule Area do
-...(1)>     def square(a) do
-...(1)>       a * a
-...(1)>     end
-...(1)>   end
-...(1)> end
-{:module, Calculator, ...
-iex(2)> Calculator.Area.square(5)
+iex> defmodule Calculator do
+...>   defmodule Area do
+...>     def square(a) do
+...>       a * a
+...>     end
+...>   end
+...> end
+
+iex> Calculator.Area.square(5)
 25
 ----
 
@@ -366,19 +366,19 @@ have to use their fully qualified name.
 
 [source,elixir]
 ----
-iex(1)> defmodule Rectangle do
-...(1)>   def area(a) do
-...(1)>     a * a
-...(1)>   end
-...(1)>
-...(1)>   def area(a, b) do
-...(1)>     a * b
-...(1)>   end
-...(1)> end
-{:module, Rectangle, ...
-iex(2)> import Rectangle <1>
+iex> defmodule Rectangle do
+...>   def area(a) do
+...>     a * a
+...>   end
+...>
+...>   def area(a, b) do
+...>     a * b
+...>   end
+...> end
+
+iex> import Rectangle <1>
 Rectangle
-iex(3)> area(5) <2>
+iex> area(5) <2>
 25
 ----
 <1> Here we `import Rectangle` to have all the functions of that module at our fingertips.
@@ -388,12 +388,12 @@ And you can also just import special functions from that module:
 
 [source,elixir]
 ----
-iex(3)> import Rectangle, only: [area: 2] <1>
+iex> import Rectangle, only: [area: 2] <1>
 Rectangle
-iex(4)> area(1) <2>
+iex> area(1) <2>
 ** (CompileError) iex:7: undefined function area/1
 
-iex(7)> area(1,5) <3>
+iex> area(1,5) <3>
 5
 ----
 <1> Let's just import `area/2` but not all the other functions of that module.
@@ -410,15 +410,15 @@ Often your want to import hierachical modules. Here's how:
 
 [source,elixir]
 ----
-iex(1)> defmodule Calculator.Area do
-...(1)>   def square(a) do
-...(1)>     a * a
-...(1)>   end
-...(1)> end
-{:module, Calculator.Area, ...
-iex(2)> import Calculator.Area
+iex> defmodule Calculator.Area do
+...>   def square(a) do
+...>     a * a
+...>   end
+...> end
+
+iex> import Calculator.Area
 Calculator.Area
-iex(3)> square(5)
+iex> square(5)
 25
 ----
 
@@ -429,19 +429,19 @@ indexterm:["Alias"]
 
 [source,elixir]
 ----
-iex(1)> defmodule Calculator.Area do
-...(1)>   def square(a) do
-...(1)>     a * a
-...(1)>   end
-...(1)> end
-{:module, Calculator.Area, ...
-iex(2)> alias Calculator.Area, as: Area <1>
+iex> defmodule Calculator.Area do
+...>   def square(a) do
+...>     a * a
+...>   end
+...> end
+
+iex> alias Calculator.Area, as: Area <1>
 Calculator.Area
-iex(3)> Area.square(99)
+iex> Area.square(99)
 9801
-iex(4)> alias Calculator.Area <2>
+iex> alias Calculator.Area <2>
 Calculator.Area
-iex(5)> Area.square(99)
+iex> Area.square(99)
 9801
 ----
 <1> Set an alias for `Calculator.Area` as `Area`.
@@ -470,11 +470,11 @@ Atoms are also used to reference modules from Erlang libraries.
 
 [source,elixir]
 ----
-iex(1)> :red
+iex> :red
 :red
-iex(2)> :blue
+iex> :blue
 :blue
-iex(3)> is_atom(:blue) <1>
+iex> is_atom(:blue) <1>
 true
 ----
 <1> The function `is_atom()` can be used to check if something is an atom.
@@ -490,17 +490,17 @@ The following examples show how strings can be used with variables:
 
 [source,elixir]
 ----
-iex(1)> first_name = "Stefan" <1>
+iex> first_name = "Stefan" <1>
 "Stefan"
-iex(2)> last_name = "Wintermeyer"
+iex> last_name = "Wintermeyer"
 "Wintermeyer"
-iex(3)> name = first_name <> " " <> last_name <2>
+iex> name = first_name <> " " <> last_name <2>
 "Stefan Wintermeyer"
-iex(4)> greeting = "Hello #{first_name}!" <3>
+iex> greeting = "Hello #{first_name}!" <3>
 "Hello Stefan!"
-iex(5)> counter = 23
+iex> counter = 23
 23
-iex(6)> "Count: #{counter}" <4>
+iex> "Count: #{counter}" <4>
 "Count: 23"
 ----
 <1> We assign the string "Stefan" to the variable with the name `first_name`.
@@ -521,13 +521,13 @@ working with strings. Here are some examples:
 
 [source,elixir]
 ----
-iex(1)> String.downcase("SToP SHoutING!")
+iex> String.downcase("SToP SHoutING!")
 "stop shouting!"
-iex(2)> String.split("no fist is big enough to hide the sky") <1>
+iex> String.split("no fist is big enough to hide the sky") <1>
 ["no", "fist", "is", "big", "enough", "to", "hide", "the", "sky"]
-iex(3)> String.split("mail@example.com", "@") <2>
+iex> String.split("mail@example.com", "@") <2>
 ["mail", "example.com"]
-iex(4)> String.to_integer("555")
+iex> String.to_integer("555")
 555
 ----
 <1> `String.split/1` divides a string into substrings at each whitespace.
@@ -546,11 +546,11 @@ with `String.capitalize/1` afterwards. Here's the code to do that:
 
 [source,elixir]
 ----
-iex(1)> String.reverse("house") <1>
+iex> String.reverse("house") <1>
 "esuoh"
-iex(2)> String.capitalize("esuoh") <2>
+iex> String.capitalize("esuoh") <2>
 "Esuoh"
-iex(3)> String.capitalize(String.reverse("house")) <3>
+iex> String.capitalize(String.reverse("house")) <3>
 "Esuoh"
 ----
 <1> `String.reverse/1` reverses the string.
@@ -564,7 +564,7 @@ It is a piece of syntactic sugar. Have a look:
 
 [source,elixir]
 ----
-iex(4)> String.reverse("house") |> String.capitalize() <1>
+iex> String.reverse("house") |> String.capitalize() <1>
 "Esuoh"
 ----
 <1> The pipe operator `|>` passes the result of the first function to the first
@@ -574,7 +574,7 @@ Of course you can use multiple pipe operators:
 
 [source,elixir]
 ----
-iex(5)> String.reverse("house") |> String.capitalize() |> String.slice(0, 3)
+iex> String.reverse("house") |> String.capitalize() |> String.slice(0, 3)
 "Esu"
 ----
 
@@ -602,11 +602,11 @@ enclosed in brackets (`[]`):
 
 [source,elixir]
 ----
-iex(1)> [1, 2, 3, 4]
+iex> [1, 2, 3, 4]
 [1, 2, 3, 4]
-iex(2)> ["a", "b", "c"]
+iex> ["a", "b", "c"]
 ["a", "b", "c"]
-iex(3)> [1, "b", true, false, :blue, "house"]
+iex> [1, "b", true, false, :blue, "house"]
 [1, "b", true, false, :blue, "house"]
 ----
 
@@ -614,11 +614,11 @@ The operators `++` and `--` can be used to concatenate and substract lists from 
 
 [source,elixir]
 ----
-iex(1)> [1, 2] ++ [2, 4] <1>
+iex> [1, 2] ++ [2, 4] <1>
 [1, 2, 2, 4]
-iex(2)> [1, 2] ++ [1] <2>
+iex> [1, 2] ++ [1] <2>
 [1, 2, 1]
-iex(3)> [1, "a", 2, false, true] -- ["a", 2] <3>
+iex> [1, "a", 2, false, true] -- ["a", 2] <3>
 [1, false, true]
 ----
 <1> Makes total sense.
@@ -634,13 +634,13 @@ and tail (the rest) of a list. The following examples show how the functions
 
 [source,elixir]
 ----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"] <1>
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"] <1>
 ["apple", "orange", "banana", "pineapple"]
-iex(2)> hd(shopping_list) <2>
+iex> hd(shopping_list) <2>
 "apple"
-iex(3)> tl(shopping_list) <3>
+iex> tl(shopping_list) <3>
 ["orange", "banana", "pineapple"]
-iex(4)> shopping_list <4>
+iex> shopping_list <4>
 ["apple", "orange", "banana", "pineapple"]
 ----
 <1> We define a list and bind it to the variable `shopping_list`.
@@ -652,15 +652,15 @@ Let's see what happens with empty lists or lists which just have one element:
 
 [source,elixir]
 ----
-iex(6)> hd([]) <1>
+iex> hd([]) <1>
 ** (ArgumentError) argument error
     :erlang.hd([])
-iex(6)> tl([]) <2>
+iex> tl([]) <2>
 ** (ArgumentError) argument error
     :erlang.tl([])
-iex(6)> hd(["grapefruit"]) <3>
+iex> hd(["grapefruit"]) <3>
 "grapefruit"
-iex(7)> tl(["grapefruit"]) <4>
+iex> tl(["grapefruit"]) <4>
 []
 ----
 <1> You can't get the head of an empty list.
@@ -675,13 +675,13 @@ The function `length/1` tells how many elements a list contains:
 
 [source,elixir]
 ----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"]
 ["apple", "orange", "banana", "pineapple"]
-iex(2)> length(shopping_list)
+iex> length(shopping_list)
 4
-iex(3)> length([1, 2])
+iex> length([1, 2])
 2
-iex(4)> length([])
+iex> length([])
 0
 ----
 
@@ -697,17 +697,17 @@ Here are a few examples:
 
 [source,elixir]
 ----
-iex(1)> numbers = [1, 5, 3, 7, 2, 3, 9, 5, 3]
+iex> numbers = [1, 5, 3, 7, 2, 3, 9, 5, 3]
 [1, 5, 3, 7, 2, 3, 9, 5, 3]
-iex(2)> Enum.max(numbers) <1>
+iex> Enum.max(numbers) <1>
 9
-iex(3)> Enum.sort(numbers) <2>
+iex> Enum.sort(numbers) <2>
 [1, 2, 3, 3, 3, 5, 5, 7, 9]
-iex(4)> words = ["nothing", "like", "the", "sun"]
+iex> words = ["nothing", "like", "the", "sun"]
 ["nothing", "like", "the", "sun"]
-iex(5)> Enum.join(words, " ")
+iex> Enum.join(words, " ")
 "nothing like the sun"
-iex(6)> List.last(words)
+iex> List.last(words)
 "sun"
 ----
 <1> `Enum.max/1` returns the maximum value in a list.
@@ -724,11 +724,11 @@ elements are enclosed in curly braces (`{}`):
 
 [source,elixir]
 ----
-iex(1)> {1, 2, 3} <1>
+iex> {1, 2, 3} <1>
 {1, 2, 3}
-iex(2)> {:ok, "test"} <2>
+iex> {:ok, "test"} <2>
 {:ok, "test"}
-iex(3)> {true, :apple, 234, "house", 3.14} <3>
+iex> {true, :apple, 234, "house", 3.14} <3>
 {true, :apple, 234, "house", 3.14}
 ----
 <1> A tuple which contains three integers.
@@ -741,11 +741,11 @@ function:
 
 [source,elixir]
 ----
-iex(1)> result = {:ok, "Lorem ipsum"}
+iex> result = {:ok, "Lorem ipsum"}
 {:ok, "Lorem ipsum"}
-iex(2)> elem(result, 1) <1>
+iex> elem(result, 1) <1>
 "Lorem ipsum"
-iex(3)> elem(result, 0) <2>
+iex> elem(result, 0) <2>
 :ok
 ----
 <1> The function `elem/2` gives us a fast access to each element of a tuple.
@@ -771,17 +771,17 @@ Examples:
 
 [source,elixir]
 ----
-iex(1)> results = {:ok, "Lorem ipsum"}
+iex> results = {:ok, "Lorem ipsum"}
 {:ok, "Lorem ipsum"}
-iex(2)> b = Tuple.append(results, "Test")
+iex> b = Tuple.append(results, "Test")
 {:ok, "Lorem ipsum", "Test"}
-iex(3)> c = Tuple.delete_at(b, 1)
+iex> c = Tuple.delete_at(b, 1)
 {:ok, "Test"}
-iex(4)> d = Tuple.insert_at(b, 1, "ipsum")
+iex> d = Tuple.insert_at(b, 1, "ipsum")
 {:ok, "ipsum", "Lorem ipsum", "Test"}
-iex(5)> new_list = Tuple.to_list(d)
+iex> new_list = Tuple.to_list(d)
 [:ok, "ipsum", "Lorem ipsum", "Test"]
-iex(6)> tuple_size(d)
+iex> tuple_size(d)
 4
 ----
 
@@ -805,19 +805,19 @@ You define anonymous functions using the `fn` keyword:
 
 [source,elixir]
 ----
-iex(1)> greeting = fn(name) -> "Hello #{name}!" end <1>
+iex> greeting = fn(name) -> "Hello #{name}!" end <1>
 #Function<7.126501267/1 in :erl_eval.expr/5>
-iex(2)> greeting.("Bob") <2>
+iex> greeting.("Bob") <2>
 "Hello Bob!"
-iex(3)> greeting.("Alice")
+iex> greeting.("Alice")
 "Hello Alice!"
-iex(4)> square_area = fn a -> a * a end <3>
+iex> square_area = fn a -> a * a end <3>
 #Function<7.126501267/1 in :erl_eval.expr/5>
-iex(5)> square_area.(10)
+iex> square_area.(10)
 100
-iex(6)> area = fn width, length -> width * length end <4>
+iex> area = fn width, length -> width * length end <4>
 #Function<13.126501267/2 in :erl_eval.expr/5>
-iex(7)> area.(2,8)
+iex> area.(2,8)
 16
 ----
 <1> We create an anonymous function and bind it to the variable `greeting`.
@@ -835,12 +835,12 @@ Most of the time anonymous functions are simple one liners. But they don't have 
 
 [source,elixir]
 ----
-iex(1)> circular_area = fn radius ->
-...(1)>   pi = 3.14159265359
-...(1)>   pi * radius * radius
-...(1)> end
+iex> circular_area = fn radius ->
+...>   pi = 3.14159265359
+...>   pi * radius * radius
+...> end
 #Function<7.126501267/1 in :erl_eval.expr/5>
-iex(2)> circular_area.(3)
+iex> circular_area.(3)
 28.274333882310003
 ----
 
@@ -848,11 +848,11 @@ Let's now look at using anonymous functions with higher-order functions:
 
 [source,elixir]
 ----
-iex(1)> numbers = [1,2,3,4,5,6,7,8,9]
+iex> numbers = [1,2,3,4,5,6,7,8,9]
 [1, 2, 3, 4, 5, 6, 7, 8, 9]
-iex(2)> Enum.filter(numbers, fn num -> rem(num, 2) == 0 end) <1>
+iex> Enum.filter(numbers, fn num -> rem(num, 2) == 0 end) <1>
 [2, 4, 6, 8]
-iex(6)> Enum.map(numbers, fn x -> x * x end) <2>
+iex> Enum.map(numbers, fn x -> x * x end) <2>
 [1, 4, 9, 16, 25, 36, 49, 64, 81]
 ----
 <1> `Enum.filter/2` filters a list and returns those elements for which the
@@ -869,13 +869,13 @@ is called the *capture operator*.
 
 [source,elixir]
 ----
-iex(1)> second = &Enum.at(&1, 1) <1>
+iex> second = &Enum.at(&1, 1) <1>
 #Function<44.97283095/1 in :erl_eval.expr/5>
-iex(2)> second.([1,2,3,4]) <2>
+iex> second.([1,2,3,4]) <2>
 2
-iex(3)> is_negative? = &(&1 < 0)
+iex> is_negative? = &(&1 < 0)
 #Function<44.97283095/1 in :erl_eval.expr/5>
-iex(4)> is_negative?.(-1)
+iex> is_negative?.(-1)
 true
 ----
 <1> `&1` refers to the first parameter.
@@ -885,13 +885,13 @@ And here are examples of using the capture operator with higher-order functions.
 
 [source,elixir]
 ----
-iex(1)> maybe_numbers = [1, nil, 4, nil, 5]
+iex> maybe_numbers = [1, nil, 4, nil, 5]
 [1, nil, 4, nil, 5]
-iex(2)> Enum.filter(maybe_numbers, &is_integer(&1)) <1>
+iex> Enum.filter(maybe_numbers, &is_integer(&1)) <1>
 [1, 4, 5]
-iex(3)> Enum.filter(maybe_numbers, &is_integer/1) <2>
+iex> Enum.filter(maybe_numbers, &is_integer/1) <2>
 [1, 4, 5]
-iex(4)> Enum.sort([1, 2, 3], &(&1 >= &2)) <3>
+iex> Enum.sort([1, 2, 3], &(&1 >= &2)) <3>
 [3, 2, 1]
 ----
 <1> `&1` refers to the first parameter.
@@ -910,19 +910,19 @@ look into some code to figure out how variables in Elixir are scoped:
 
 [source,elixir]
 ----
-iex(1)> area = 5 <1>
+iex> area = 5 <1>
 5
-iex(2)> IO.puts(area)
+iex> IO.puts(area)
 5
 :ok
-iex(3)> square_area = fn a -> <2>
-...(3)>   area = a * a <3>
-...(3)>   area
-...(3)> end
+iex> square_area = fn a -> <2>
+...>   area = a * a <3>
+...>   area
+...> end
 #Function<7.126501267/1 in :erl_eval.expr/5>
-iex(4)> square_area.(10) <4>
+iex> square_area.(10) <4>
 100
-iex(5)> IO.puts(area) <5>
+iex> IO.puts(area) <5>
 5
 :ok
 ----
@@ -938,11 +938,11 @@ But it gets a bit more complex:
 
 [source,elixir]
 ----
-iex(1)> pi = 3.14159265359 <1>
+iex> pi = 3.14159265359 <1>
 3.14159265359
-iex(2)> circular_area = fn radius -> pi * radius * radius end <2>
+iex> circular_area = fn radius -> pi * radius * radius end <2>
 #Function<7.126501267/1 in :erl_eval.expr/5>
-iex(3)> circular_area.(10)
+iex> circular_area.(10)
 314.15926535899996
 ----
 <1> We bind the value 3.14159265359 to the variable with the name `pi`.
@@ -953,16 +953,16 @@ if we can change it too:
 
 [source,elixir]
 ----
-iex(1)> pi = 3.14159265359 <1>
+iex> pi = 3.14159265359 <1>
 3.14159265359
-iex(2)> circular_area = fn radius ->
-...(2)>   pi = 3.14 <2>
-...(2)>   pi * radius * radius
-...(2)> end
+iex> circular_area = fn radius ->
+...>   pi = 3.14 <2>
+...>   pi * radius * radius
+...> end
 #Function<7.126501267/1 in :erl_eval.expr/5>
-iex(3)> circular_area.(10) <3>
+iex> circular_area.(10) <3>
 314.0
-iex(4)> IO.puts(pi) <4>
+iex> IO.puts(pi) <4>
 3.14159265359
 :ok
 ----
@@ -989,15 +989,15 @@ can appear more than once.
 
 [source,elixir]
 ----
-iex(1)> user = [{:name, "joe"}, {:age, 23}] <1>
+iex> user = [{:name, "joe"}, {:age, 23}] <1>
 [name: "joe", age: 23]
-iex(2)> user = [name: "joe", age: 23] <2>
+iex> user = [name: "joe", age: 23] <2>
 [name: "joe", age: 23]
-iex(3)> user[:name] <3>
+iex> user[:name] <3>
 "joe"
-iex(4)> new_user = [name: "fred"] ++ user
+iex> new_user = [name: "fred"] ++ user
 [name: "fred", name: "joe", age: 23]
-iex(5)> new_user[:name] <4>
+iex> new_user[:name] <4>
 "fred"
 ----
 <1> Keyword lists are lists of 2-item tuples, with the first item of each tuple
@@ -1029,9 +1029,9 @@ Here are a few examples:
 
 [source,elixir]
 ----
-iex(1)> Keyword.get([age: 34, height: 155], :height)
+iex> Keyword.get([age: 34, height: 155], :height)
 155
-iex(2)> Keyword.delete([length: 78, width: 104], :length)
+iex> Keyword.delete([length: 78, width: 104], :length)
 [width: 104] <1>
 ----
 <1> After deleting the `:length`, the keyword list just contains the `:width`
@@ -1045,13 +1045,13 @@ creates a Map.
 
 [source,elixir]
 ----
-iex(1)> product_prices = %{"Apple" => 0.5, "Orange" => 0.7} <1>
+iex> product_prices = %{"Apple" => 0.5, "Orange" => 0.7} <1>
 %{"Apple" => 0.5, "Orange" => 0.7}
-iex(2)> product_prices["Orange"] <2>
+iex> product_prices["Orange"] <2>
 0.7
-iex(3)> product_prices["Banana"] <3>
+iex> product_prices["Banana"] <3>
 nil
-iex(4)> product_prices = %{"Apple" => 0.5, "Orange" => 0.7, "Apple" => 1}
+iex> product_prices = %{"Apple" => 0.5, "Orange" => 0.7, "Apple" => 1}
 warning: key "Apple" will be overridden in map
   iex:4
 
@@ -1066,9 +1066,9 @@ But keys don't have to be a specific type. Everything can be a key and a value:
 
 [source,elixir]
 ----
-iex(1)> %{"one" => 1, "two" => "abc", 3 => 7, true => "asdf"} <1>
+iex> %{"one" => 1, "two" => "abc", 3 => 7, true => "asdf"} <1>
 %{3 => 7, true => "asdf", "one" => 1, "two" => "abc"}
-iex(2)> %{"one" => 1, true => "asdf", true => "z"} <2>
+iex> %{"one" => 1, true => "asdf", true => "z"} <2>
 warning: key true will be overridden in map
   iex:2
 
@@ -1084,11 +1084,11 @@ Using atoms as keys in maps gives you access to some nifty features:
 
 [source,elixir]
 ----
-iex(1)> product_prices = %{apple: 0.5, orange: 0.7} <1>
+iex> product_prices = %{apple: 0.5, orange: 0.7} <1>
 %{apple: 0.5, orange: 0.7}
-iex(2)> product_prices.apple <2>
+iex> product_prices.apple <2>
 0.5
-iex(3)> product_prices.banana <3>
+iex> product_prices.banana <3>
 ** (KeyError) key :banana not found in: %{apple: 0.5, orange: 0.7}
 ----
 <1> With atoms as keys you can use this syntax which is a bit easier to read and less work to type.
@@ -1105,23 +1105,23 @@ Here are just a few examples:
 
 [source,elixir]
 ----
-iex(1)> product_prices = %{apple: 0.5, orange: 0.7, coconut: 1}
+iex> product_prices = %{apple: 0.5, orange: 0.7, coconut: 1}
 %{apple: 0.5, coconut: 1, orange: 0.7}
-iex(2)> Map.to_list(product_prices) <1>
+iex> Map.to_list(product_prices) <1>
 [apple: 0.5, coconut: 1, orange: 0.7]
-iex(3)> Map.values(product_prices) <2>
+iex> Map.values(product_prices) <2>
 [0.5, 1, 0.7]
-iex(4)> Map.split(product_prices, [:orange, :apple]) <3>
+iex> Map.split(product_prices, [:orange, :apple]) <3>
 {%{apple: 0.5, orange: 0.7}, %{coconut: 1}}
-iex(5)> a = Map.delete(product_prices, :orange) <4>
+iex> a = Map.delete(product_prices, :orange) <4>
 %{apple: 0.5, coconut: 1}
-iex(6)> b = Map.drop(product_prices, [:apple, :orange]) <5>
+iex> b = Map.drop(product_prices, [:apple, :orange]) <5>
 %{coconut: 1}
-iex(7)> additional_prices = %{banana: 0.4, pineapple: 1.2}
+iex> additional_prices = %{banana: 0.4, pineapple: 1.2}
 %{banana: 0.4, pineapple: 1.2}
-iex(8)> Map.merge(product_prices, additional_prices) <6>
+iex> Map.merge(product_prices, additional_prices) <6>
 %{apple: 0.5, banana: 0.4, coconut: 1, orange: 0.7, pineapple: 1.2}
-iex(9)> c = Map.put(product_prices, :potato, 0.2) <7>
+iex> c = Map.put(product_prices, :potato, 0.2) <7>
 %{apple: 0.5, coconut: 1, orange: 0.7, potato: 0.2}
 ----
 <1> `Map.to_list/1` converts a map into a keyword list.
@@ -1141,19 +1141,19 @@ define a struct you have to use the `defstruct` construct:
 
 [source,elixir]
 ----
-iex(1)> defmodule Product do <1>
-...(1)>   defstruct name: nil, price: 0 <2>
-...(1)> end
-{:module, Product, ...
-iex(2)> %Product{}
+iex> defmodule Product do <1>
+...>   defstruct name: nil, price: 0 <2>
+...> end
+
+iex> %Product{}
 %Product{name: nil, price: 0}
-iex(3)> apple = %Product{name: "Apple", price: 0.5} <3>
+iex> apple = %Product{name: "Apple", price: 0.5} <3>
 %Product{name: "Apple", price: 0.5}
-iex(4)> apple
+iex> apple
 %Product{name: "Apple", price: 0.5}
-iex(5)> apple.price
+iex> apple.price
 0.5
-iex(6)> orange = %Product{name: "Orange"} <4>
+iex> orange = %Product{name: "Orange"} <4>
 %Product{name: "Orange", price: 0}
 ----
 <1> We define a new struct with the name `Product` and the keys `name` and `price`.
@@ -1166,14 +1166,14 @@ A struct guarantees that only the defined fields are allowed:
 
 [source,elixir]
 ----
-iex(7)> apple.description <1>
+iex> apple.description <1>
 ** (KeyError) key :description not found in: %Product{name: "Apple", price: 0.5}
 
-iex(7)> banana = %Product{name: "Banana", weight: 0.1} <2>
+iex> banana = %Product{name: "Banana", weight: 0.1} <2>
 ** (KeyError) key :weight not found
     expanding struct: Product.__struct__/1
     iex:7: (file)
-iex(7)>
+iex>
 ----
 <1> Since we didn't define a `description` field in the Struct, we cannot access it.
 <2> Same with a new struct. There is no `weight` field defined. Therefore we can not set it.
@@ -1189,17 +1189,17 @@ knowing it, for binding values to variables.
 
 [source,elixir]
 ----
-iex(1)> a = 10 <1>
+iex> a = 10 <1>
 10
-iex(2)> a
+iex> a
 10
-iex(3)> {b, c} = {10, 15} <2>
+iex> {b, c} = {10, 15} <2>
 {10, 15}
-iex(4)> b
+iex> b
 10
-iex(5)> c
+iex> c
 15
-iex(6)> {d, e} = 100
+iex> {d, e} = 100
 ** (MatchError) no match of right hand side value: 100 <3>
 ----
 <1> This is actually a pattern match. The left side of `=` will be matched to the right site if possible.
@@ -1211,29 +1211,29 @@ list. Because there is a special syntax for that:
 
 [source,elixir]
 ----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"] <1>
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"] <1>
 ["apple", "orange", "banana", "pineapple"]
-iex(2)> [head | tail] = shopping_list <2>
+iex> [head | tail] = shopping_list <2>
 ["apple", "orange", "banana", "pineapple"]
-iex(3)> head
+iex> head
 "apple"
-iex(4)> tail
+iex> tail
 ["orange", "banana", "pineapple"]
-iex(5)> [a | b] = tail <3>
+iex> [a | b] = tail <3>
 ["orange", "banana", "pineapple"]
-iex(6)> a
+iex> a
 "orange"
-iex(7)> b
+iex> b
 ["banana", "pineapple"]
-iex(8)> [first_product, second_product | tail] = shopping_list <4>
+iex> [first_product, second_product | tail] = shopping_list <4>
 ["apple", "orange", "banana", "pineapple"]
-iex(9)> first_product
+iex> first_product
 "apple"
-iex(10)> second_product
+iex> second_product
 "orange"
-iex(11)> tail
+iex> tail
 ["banana", "pineapple"]
-iex(12)> [first_product | [second_product | tail]] = shopping_list <5>
+iex> [first_product | [second_product | tail]] = shopping_list <5>
 ["apple", "orange", "banana", "pineapple"]
 ----
 <1> We match a list to the variable `shopping_list`.
@@ -1247,15 +1247,15 @@ it directly:
 
 [source,elixir]
 ----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"]
 ["apple", "orange", "banana", "pineapple"]
-iex(2)> [a, b, c, d] = shopping_list
+iex> [a, b, c, d] = shopping_list
 ["apple", "orange", "banana", "pineapple"]
-iex(3)> a
+iex> a
 "apple"
-iex(4)> b
+iex> b
 "orange"
-iex(5)> [e, f, g] = shopping_list <1>
+iex> [e, f, g] = shopping_list <1>
 ** (MatchError) no match of right hand side value: ["apple", "orange", "banana", "pineapple"]
 ----
 <1> Just checking. You get an `MatchError` if Elixir can't match both sides.
@@ -1267,17 +1267,17 @@ You can match just against the values you are interested in:
 
 [source,elixir]
 ----
-iex(1)> product_prices = %{apple: 0.5, orange: 0.7, pineapple: 1}
+iex> product_prices = %{apple: 0.5, orange: 0.7, pineapple: 1}
 %{apple: 0.5, orange: 0.7, pineapple: 1}
-iex(2)> %{orange: price} = product_prices <1>
+iex> %{orange: price} = product_prices <1>
 %{apple: 0.5, orange: 0.7, pineapple: 1}
-iex(3)> price
+iex> price
 0.7
-iex(4)> %{orange: price1, apple: price2} = product_prices <2>
+iex> %{orange: price1, apple: price2} = product_prices <2>
 %{apple: 0.5, orange: 0.7, pineapple: 1}
-iex(5)> price1
+iex> price1
 0.7
-iex(6)> price2
+iex> price2
 0.5
 ----
 <1> We can just match one value.
@@ -1290,11 +1290,11 @@ Easiest explained with a code example:
 
 [source,elixir]
 ----
-iex(1)> user = "Stefan Wintermeyer"
+iex> user = "Stefan Wintermeyer"
 "Stefan Wintermeyer"
-iex(2)> "Stefan " <> last_name = user
+iex> "Stefan " <> last_name = user
 "Stefan Wintermeyer"
-iex(3)> last_name
+iex> last_name
 "Wintermeyer"
 ----
 
@@ -1311,15 +1311,15 @@ variable to be bound to anything.
 
 [source,elixir]
 ----
-iex(1)> shopping_list = ["apple", "orange", "banana", "pineapple"]
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"]
 ["apple", "orange", "banana", "pineapple"]
-iex(2)> [first_product | _tail] = shopping_list <1>
+iex> [first_product | _tail] = shopping_list <1>
 ["apple", "orange", "banana", "pineapple"]
-iex(3)> first_product
+iex> first_product
 "apple"
-iex(4)> [head | _] = shopping_list <2>
+iex> [head | _] = shopping_list <2>
 ["apple", "orange", "banana", "pineapple"]
-iex(5)> head
+iex> head
 "apple"
 ----
 <1> We pattern match the head of `shopping_list` to `first_product`. But we don't need the tail, and we indicate that by prefixing it with a `_`.
@@ -1333,25 +1333,25 @@ Pattern matching is used everywhere in Elixir. You can even use it with Function
 
 [source,elixir]
 ----
-iex(1)> defmodule Area do
-...(1)>   def circle(:exact, radius) do <1>
-...(1)>     3.14159265359 * radius * radius
-...(1)>   end
-...(1)>
-...(1)>   def circle(:normal, radius) do <2>
-...(1)>     3.14 * radius * radius
-...(1)>   end
-...(1)>
-...(1)>   def circle(radius) do <3>
-...(1)>     circle(:normal, radius)
-...(1)>   end
-...(1)> end
-{:module, Area, ...
-iex(2)> Area.circle(:exact, 4)
+iex> defmodule Area do
+...>   def circle(:exact, radius) do <1>
+...>     3.14159265359 * radius * radius
+...>   end
+...>
+...>   def circle(:normal, radius) do <2>
+...>     3.14 * radius * radius
+...>   end
+...>
+...>   def circle(radius) do <3>
+...>     circle(:normal, radius)
+...>   end
+...> end
+
+iex> Area.circle(:exact, 4)
 50.26548245744
-iex(3)> Area.circle(:normal, 4)
+iex> Area.circle(:normal, 4)
 50.24
-iex(4)> Area.circle(4)
+iex> Area.circle(4)
 50.24
 ----
 <1> We define a `circle/2` function which matches if the first argument is the atom `:exact`.
@@ -1368,25 +1368,25 @@ Here are just some examples to show you the concept. Guards start with `when`:
 
 [source,elixir]
 ----
-iex(1)> defmodule Law do
-...(1)>   def can_vote?(age) when is_integer(age) and age > 17 do <1>
-...(1)>     true
-...(1)>   end
-...(1)>
-...(1)>   def can_vote?(age) when is_integer(age) do <2>
-...(1)>     false
-...(1)>   end
-...(1)>
-...(1)>   def can_vote?(_age) do <3>
-...(1)>     raise ArgumentError, "age should be an integer"
-...(1)>   end
-...(1)> end
-{:module, Law, ...
-iex(2)> Law.can_vote?(15)
+iex> defmodule Law do
+...>   def can_vote?(age) when is_integer(age) and age > 17 do <1>
+...>     true
+...>   end
+...>
+...>   def can_vote?(age) when is_integer(age) do <2>
+...>     false
+...>   end
+...>
+...>   def can_vote?(_age) do <3>
+...>     raise ArgumentError, "age should be an integer"
+...>   end
+...> end
+
+iex> Law.can_vote?(15)
 false
-iex(3)> Law.can_vote?(20)
+iex> Law.can_vote?(20)
 true
-iex(4)> Law.can_vote?("test") <4>
+iex> Law.can_vote?("test") <4>
 ** (ArgumentError) age should be an integer
     iex:4: Law.can_vote?/1
 ----
@@ -1407,25 +1407,25 @@ numbers to integers:
 
 [source,elixir]
 ----
-iex(1)> defmodule Morse do
-...(1)>   def morse_to_number(input) do
-...(1)>     case input do <1>
-...(1)>       "-----" -> 0 <2>
-...(1)>       ".----" -> 1
-...(1)>       "..---" -> 2
-...(1)>       "...--" -> 3
-...(1)>       "....-" -> 4
-...(1)>       "....." -> 5
-...(1)>       "-...." -> 6
-...(1)>       "--..." -> 7
-...(1)>       "---.." -> 8
-...(1)>       "----." -> 9
-...(1)>       _ -> :error <3>
-...(1)>     end
-...(1)>   end
-...(1)> end
-{:module, Morse, ...
-iex(2)> Morse.morse_to_number("-....") <4>
+iex> defmodule Morse do
+...>   def morse_to_number(input) do
+...>     case input do <1>
+...>       "-----" -> 0 <2>
+...>       ".----" -> 1
+...>       "..---" -> 2
+...>       "...--" -> 3
+...>       "....-" -> 4
+...>       "....." -> 5
+...>       "-...." -> 6
+...>       "--..." -> 7
+...>       "---.." -> 8
+...>       "----." -> 9
+...>       _ -> :error <3>
+...>     end
+...>   end
+...> end
+
+iex> Morse.morse_to_number("-....") <4>
 6
 ----
 <1> After `case` comes the value we want to check.
@@ -1443,15 +1443,15 @@ not`. The following examples will show how to use them:
 
 [source,elixir]
 ----
-iex(1)> if 1 == 1 do
-...(1)>   "Bingo!"
-...(1)> else
-...(1)>   "Negative"
-...(1)> end
+iex> if 1 == 1 do
+...>   "Bingo!"
+...> else
+...>   "Negative"
+...> end
 "Bingo!"
-iex(2)> unless true do
-...(2)>   "Never"
-...(2)> end
+iex> unless true do
+...>   "Never"
+...> end
 nil
 ----
 
@@ -1459,7 +1459,7 @@ Sometimes you see a one-line short form:
 
 [source,elixir]
 ----
-iex(3)> if 1 == 1, do: "Bingo!"
+iex> if 1 == 1, do: "Bingo!"
 "Bingo!"
 ----
 
@@ -1494,30 +1494,30 @@ effected/changed afterwords:
 
 [source,elixir]
 ----
-iex(1)> product = "Orange"
+iex> product = "Orange"
 "Orange"
-iex(2)> test1 = fn -> IO.puts(product) end <1>
+iex> test1 = fn -> IO.puts(product) end <1>
 #Function<21.126501267/0 in :erl_eval.expr/5>
-iex(3)> product = "Apple"
+iex> product = "Apple"
 "Apple"
-iex(4)> test2 = fn -> IO.puts(product) end
+iex> test2 = fn -> IO.puts(product) end
 #Function<21.126501267/0 in :erl_eval.expr/5>
-iex(5)> product = "Pineapple"
+iex> product = "Pineapple"
 "Pineapple"
-iex(6)> test3 = fn -> IO.puts(product) end
+iex> test3 = fn -> IO.puts(product) end
 #Function<21.126501267/0 in :erl_eval.expr/5>
-iex(7)> product = "Banana"
+iex> product = "Banana"
 "Banana"
-iex(8)> test1.() <2>
+iex> test1.() <2>
 Orange
 :ok
-iex(9)> test2.()
+iex> test2.()
 Apple
 :ok
-iex(10)> test3.()
+iex> test3.()
 Pineapple
 :ok
-iex(11)> IO.puts(product)
+iex> IO.puts(product)
 Banana
 :ok
 ----
@@ -1552,15 +1552,15 @@ indexterm:["Regular expression"]
 
 [source,elixir]
 ----
-iex(1)> regex = ~r/bcd/
+iex> regex = ~r/bcd/
 ~r/bcd/
-iex(2)> "abcde" =~ regex
+iex> "abcde" =~ regex
 true
-iex(3)> "efghi" =~ regex
+iex> "efghi" =~ regex
 false
-iex(4)> regex = ~r/stef/i <1>
+iex> regex = ~r/stef/i <1>
 ~r/stef/i
-iex(5)> "Stefan" =~ regex
+iex> "Stefan" =~ regex
 true
 ----
 <1> Modifiers are supported too. For a complete list have a look at https://hexdocs.pm/elixir/Regex.html
@@ -1572,9 +1572,9 @@ You can use the `~s` sigil to generate a string:
 
 [source,elixir]
 ----
-iex(1)> example = ~s(WOW! "double" and 'single' quotes without escaping)
+iex> example = ~s(WOW! "double" and 'single' quotes without escaping)
 "WOW! \"double\" and 'single' quotes without escaping"
-iex(2)> IO.puts(example)
+iex> IO.puts(example)
 WOW! "double" and 'single' quotes without escaping
 :ok
 ----
@@ -1584,12 +1584,12 @@ separators:
 
 [source,elixir]
 ----
-iex(1)> example_text = ~s"""
-...(1)> This is an example text.
-...(1)> Multiple lines are not a problem.
-...(1)> """
+iex> example_text = ~s"""
+...> This is an example text.
+...> Multiple lines are not a problem.
+...> """
 "This is an example text.\nMultiple lines are not a problem.\n"
-iex(2)> IO.puts(example_text)
+iex> IO.puts(example_text)
 This is an example text.
 Multiple lines are not a problem.
 
@@ -1603,9 +1603,9 @@ The `~w` sigil is a useful way to generate lists of words:
 
 [source,elixir]
 ----
-iex(1)> shopping_cart = ~w(apple orange banana)
+iex> shopping_cart = ~w(apple orange banana)
 ["apple", "orange", "banana"]
-iex(2)> shopping_cart_atoms = ~w(apple orange banana)a <1>
+iex> shopping_cart_atoms = ~w(apple orange banana)a <1>
 [:apple, :orange, :banana]
 ----
 <1> The `a` modifier tells Elixir to generate a list of atoms and not strings.
@@ -1628,13 +1628,13 @@ With the `~D` sigil you can create new `%Date{}` struct:
 
 [source,elixir]
 ----
-iex(1)> birthday = ~D[1973-03-23]
+iex> birthday = ~D[1973-03-23]
 ~D[1973-03-23]
-iex(2)> birthday.day
+iex> birthday.day
 23
-iex(3)> birthday.month
+iex> birthday.month
 3
-iex(4)> birthday.year
+iex> birthday.year
 1973
 ----
 
@@ -1653,9 +1653,9 @@ With the `~T` sigil you can create new `%Time{}` struct:
 
 [source,elixir]
 ----
-iex(1)> now = ~T[09:29:00.0]
+iex> now = ~T[09:29:00.0]
 ~T[09:29:00.0]
-iex(2)> now.hour
+iex> now.hour
 9
 ----
 
@@ -1668,7 +1668,7 @@ With the `~N` sigil you can create new `%NaiveDateTime{}` struct:
 
 [source,elixir]
 ----
-iex(1)> timestamp = ~N[2020-05-08 09:48:00]
+iex> timestamp = ~N[2020-05-08 09:48:00]
 ~N[2020-05-08 09:48:00]
 ----
 
@@ -1681,7 +1681,7 @@ With the `~U` sigil you can create new `%NaiveDateTime{}` struct:
 
 [source,elixir]
 ----
-iex(4)> timestamp = ~U[2029-05-08 09:59:03Z]
+iex> timestamp = ~U[2029-05-08 09:59:03Z]
 ~U[2029-05-08 09:59:03Z]
 ----
 
@@ -1697,18 +1697,18 @@ Let's write a recursive function which provides a countdown:
 
 [source,elixir]
 ----
-iex(1)> defmodule Example do
-...(1)>   def countdown(1) do <1>
-...(1)>     IO.puts "1" <2>
-...(1)>   end
-...(1)>
-...(1)>   def countdown(n) when is_integer(n) and n > 1 do <3>
-...(1)>     IO.puts Integer.to_string(n) <4>
-...(1)>     countdown(n - 1) <5>
-...(1)>   end
-...(1)> end
-{:module, Example, ...
-iex(2)> Example.countdown(4) <6>
+iex> defmodule Example do
+...>   def countdown(1) do <1>
+...>     IO.puts "1" <2>
+...>   end
+...>
+...>   def countdown(n) when is_integer(n) and n > 1 do <3>
+...>     IO.puts Integer.to_string(n) <4>
+...>     countdown(n - 1) <5>
+...>   end
+...> end
+
+iex> Example.countdown(4) <6>
 4
 3
 2
@@ -1726,21 +1726,21 @@ Here's a different example where we calculate the sum of a list of integers:
 
 [source,elixir]
 ----
-iex(1)> defmodule Example do
-...(1)>   def sum([]) do <1>
-...(1)>     0
-...(1)>   end
-...(1)>
-...(1)>   def sum([head | tail]) do <2>
-...(1)>     head + sum(tail) <3>
-...(1)>   end
-...(1)> end
-{:module, Example, ...
-iex(2)> Example.sum([10, 8, 12, 150]) <4>
+iex> defmodule Example do
+...>   def sum([]) do <1>
+...>     0
+...>   end
+...>
+...>   def sum([head | tail]) do <2>
+...>     head + sum(tail) <3>
+...>   end
+...> end
+
+iex> Example.sum([10, 8, 12, 150]) <4>
 180
-iex(3)> [head | tail] = [150] <5>
+iex> [head | tail] = [150] <5>
 [150]
-iex(4)> tail
+iex> tail
 []
 ----
 <1> The sum of an empty list is 0.
@@ -1754,19 +1754,19 @@ we want to double the value of every element of a list:
 
 [source,elixir]
 ----
-iex(1)> defmodule Example do
-...(1)>   def double([]) do <1>
-...(1)>     []
-...(1)>   end
-...(1)>
-...(1)>   def double([head | tail]) do
-...(1)>     [head * 2 | double(tail)] <2>
-...(1)>   end
-...(1)> end
-{:module, Example, ...
-iex(2)> Ex
+iex> defmodule Example do
+...>   def double([]) do <1>
+...>     []
+...>   end
+...>
+...>   def double([head | tail]) do
+...>     [head * 2 | double(tail)] <2>
+...>   end
+...> end
+
+iex> Ex
 Example      Exception
-iex(2)> Example.double([10, 5, 999])
+iex> Example.double([10, 5, 999])
 [20, 10, 1998]
 ----
 <1> We again start with the most simple match. An empty list. That will result in an empty list.

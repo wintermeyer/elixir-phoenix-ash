@@ -232,7 +232,7 @@ Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threa
 [info] Running BookstoreWeb.Endpoint with cowboy 2.7.0 at 0.0.0.0:4000 (http)
 [info] Access BookstoreWeb.Endpoint at http://localhost:4000
 Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
-iex(1)> <1>
+iex> <1>
 ----
 <1> Actually you will see a couple of more messages here which are related to
 the assets pipeline (e.g. CSS and JavaScript). No need to bother with those now.
@@ -242,8 +242,8 @@ function which we use to create a new author:
 
 [source,elixir]
 ----
-iex(2)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
-[debug] QUERY OK db=3.8ms decode=1.5ms queue=2.5ms idle=1355.7ms
+iex> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
+[debug] QUERY OK db=3.8ms decode=1.5ms queue=2.5ms idle=1355.7ms <1>
 INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-26 11:54:37], ~N[2020-05-26 11:54:37]]
 {:ok,
  %Bookstore.Store.Author{
@@ -256,6 +256,8 @@ INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at",
    updated_at: ~N[2020-05-26 11:54:37]
  }}
 ----
+<1> These two debug lines show information about how the query is processed. We
+will not show this output in the other examples in this chapter.
 
 TIP: Use `alias Bookstore.Store` at the beginning of an `iex` session and
 afterwards `Store.create_author()` to save typing time. This can make the code
@@ -297,9 +299,7 @@ matching to the rescue! Example:
 
 [source,elixir]
 ----
-iex(2)> {:ok, author} = Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
-[debug] QUERY OK db=3.4ms decode=1.5ms queue=1.3ms idle=1013.5ms
-INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 11:00:19], ~N[2020-05-27 11:00:19]]
+iex> {:ok, author} = Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
 {:ok,
  %Bookstore.Store.Author{
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
@@ -310,7 +310,7 @@ INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at",
    twitter_account: "pragdave",
    updated_at: ~N[2020-05-27 11:00:19]
  }}
-iex(3)> author
+iex> author
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
@@ -330,7 +330,7 @@ If we try to create an empty dataset this happens:
 
 [source,elixir]
 ----
-iex(3)> Bookstore.Store.create_author(%{})
+iex> Bookstore.Store.create_author(%{})
 {:error,
  #Ecto.Changeset<
    action: :insert,
@@ -413,7 +413,7 @@ Now we get a different error message:
 
 [source,elxir]
 ----
-iex(4)> Bookstore.Store.create_author(%{})
+iex> Bookstore.Store.create_author(%{})
 {:error,
  #Ecto.Changeset<
    action: :insert,
@@ -428,9 +428,7 @@ But let's try to add an author with a missing `first_name`:
 
 [source,elxir]
 ----
-iex(6)> Bookstore.Store.create_author(%{last_name: "Thomas", twitter_account: "pragdave"})
-[debug] QUERY OK db=1.0ms queue=0.5ms idle=1349.0ms
-INSERT INTO "authors" ("last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Thomas", "pragdave", ~N[2020-05-27 05:37:46], ~N[2020-05-27 05:37:46]]
+iex> Bookstore.Store.create_author(%{last_name: "Thomas", twitter_account: "pragdave"})
 {:ok,
  %Bookstore.Store.Author{
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
@@ -565,9 +563,7 @@ Time to check our work. Please fire up `iex -S mix phx.server` and follow me:
 ----
 $ iex -S mix phx.server
 [...]
-iex(1)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
-[debug] QUERY OK db=3.0ms decode=1.4ms queue=1.4ms idle=1965.4ms
-INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 06:17:18], ~N[2020-05-27 06:17:18]]
+iex> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
 {:ok,
  %Bookstore.Store.Author{
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
@@ -578,9 +574,7 @@ INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at",
    twitter_account: "pragdave",
    updated_at: ~N[2020-05-27 06:17:18]
  }} <1>
-iex(2)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
-[debug] QUERY ERROR db=8.1ms queue=2.3ms idle=1590.4ms
-INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 06:17:20], ~N[2020-05-27 06:17:20]]
+iex> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
 {:error,
  #Ecto.Changeset<
    action: :insert,
@@ -664,11 +658,9 @@ The database for Bookstore.Repo has been created.
 
 $ iex -S mix phx.server
 [...]
-iex(1)> alias Bookstore.Store <2>
+iex> alias Bookstore.Store <2>
 Bookstore.Store
-iex(2)> Store.create_author(%{first_name: "Dave", last_name: "Thomas"}) <3>
-[debug] QUERY OK db=5.2ms decode=2.6ms queue=1.5ms idle=1377.6ms
-INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Dave", "Thomas", ~N[2020-05-27 08:35:29], ~N[2020-05-27 08:35:29]]
+iex> Store.create_author(%{first_name: "Dave", last_name: "Thomas"}) <3>
 {:ok,
  %Bookstore.Store.Author{
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
@@ -679,9 +671,7 @@ INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALU
    twitter_account: nil,
    updated_at: ~N[2020-05-27 08:35:29]
  }}
-iex(3)> Store.create_author(%{first_name: "Dave", last_name: "Thomas"}) <4>
-[debug] QUERY ERROR db=9.1ms queue=1.3ms idle=1548.4ms
-INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Dave", "Thomas", ~N[2020-05-27 08:35:31], ~N[2020-05-27 08:35:31]]
+iex> Store.create_author(%{first_name: "Dave", last_name: "Thomas"}) <4>
 {:error,
  #Ecto.Changeset<
    action: :insert,
@@ -742,9 +732,7 @@ end
 
 [source,elixir]
 ----
-iex(3)> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas"})
-[debug] QUERY ERROR db=2.1ms queue=0.7ms idle=1.5e3ms
-INSERT INTO "authors" ("first_name","last_name","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" ["Dave", "Thomas", ~N[2020-05-27 11:19:42], ~N[2020-05-27 11:19:42]]
+iex> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas"})
 {:error,
  #Ecto.Changeset<
    action: :insert,
@@ -794,12 +782,6 @@ To populate the database we call `mix run priv/repo/seeds.exs`.
 [source,elixir]
 ----
 $ mix run priv/repo/seeds.exs
-[debug] QUERY ERROR db=11.1ms queue=1.1ms idle=5.3ms
-INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-27 11:47:40], ~N[2020-05-27 11:47:40]]
-[debug] QUERY OK db=1.9ms queue=1.4ms idle=36.1ms
-INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["James", "Gray", "jeg2", ~N[2020-05-27 11:47:40], ~N[2020-05-27 11:47:40]]
-[debug] QUERY OK db=1.0ms queue=0.7ms idle=39.8ms
-INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Ulisses", "Almeida", "ulissesalmeida", ~N[2020-05-27 11:47:40], ~N[2020-05-27 11:47:40]]
 ----
 
 TIP: During development, the command `mix ecto.reset` is often very useful. It
@@ -826,9 +808,7 @@ simply returns a list of all authors in the table:
 ----
 $ iex -S mix phx.server
 [...]
-iex(2)> Bookstore.Store.list_authors
-[debug] QUERY OK source="authors" db=11.5ms decode=1.3ms queue=1.2ms idle=889.7ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 []
+iex> Bookstore.Store.list_authors
 [
   %Bookstore.Store.Author{
     __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
@@ -886,11 +866,11 @@ from the output:
 
 [source,elixir]
 ----
-iex(1)> authors = Bookstore.Store.list_authors
+iex> authors = Bookstore.Store.list_authors
 [...]
-iex(2)> [first_author | _] = authors <1>
+iex> [first_author | _] = authors <1>
 [...]
-iex(3)> first_author
+iex> first_author
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
@@ -900,9 +880,9 @@ iex(3)> first_author
   twitter_account: "pragdave",
   updated_at: ~N[2020-09-04 02:40:21]
 }
-iex(4)> [first_author, second_author | _] = authors <2>
+iex> [first_author, second_author | _] = authors <2>
 [...]
-iex(5)> second_author
+iex> second_author
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "James",
@@ -926,9 +906,7 @@ which is in the `Bookstore.Store` module. Let me first show you how to use it:
 
 [source,elixir]
 ----
-iex(2)> Bookstore.Store.get_author!(1)
-[debug] QUERY OK source="authors" db=16.1ms decode=1.5ms queue=6.3ms idle=1543.4ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [1]
+iex> Bookstore.Store.get_author!(1)
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
@@ -958,13 +936,9 @@ exception if something goes wrong. Let me show you this with `get/2` and
 
 [source,elixir]
 ----
-iex(5)> Repo.get(Author, 10000) <1>
+iex> Repo.get(Author, 10000) <1>
 nil
-[debug] QUERY OK source="authors" db=3.7ms idle=132.4ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [10000]
-iex(6)> Repo.get!(Author, 10000) <2>
-[debug] QUERY OK source="authors" db=3.6ms idle=1004.2ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [10000]
+iex> Repo.get!(Author, 10000) <2>
 ** (Ecto.NoResultsError) expected at least one result but got none in query:
 
 from a0 in Bookstore.Store.Author,
@@ -1007,9 +981,7 @@ And here is the output for `get_author_by_twitter!/1`:
 
 [source,elixir]
 ----
-iex(1)> Bookstore.Store.get_author_by_twitter!("jeg2")
-[debug] QUERY OK source="authors" db=6.1ms decode=0.8ms queue=1.1ms idle=1649.9ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."twitter_account" = $1) ["jeg2"]
+iex> Bookstore.Store.get_author_by_twitter!("jeg2")
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "James",
@@ -1041,9 +1013,7 @@ This is the output if the entry is found:
 
 [source,elixir]
 ----
-iex(1)> Bookstore.Store.get_author_by_first_name_last_name!("Ulisses", "Almeida")
-[debug] QUERY OK source="authors" db=6.3ms decode=0.7ms queue=1.0ms idle=405.5ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE ((a0."first_name" = $1) AND (a0."last_name" = $2)) ["Ulisses", "Almeida"]
+iex> Bookstore.Store.get_author_by_first_name_last_name!("Ulisses", "Almeida")
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Ulisses",
@@ -1066,13 +1036,11 @@ we would do the following:
 ----
 $ iex -S mix phx.server
 [...]
-iex(2)> alias Bookstore.Store <1>
+iex> alias Bookstore.Store <1>
 Bookstore.Store
-iex(3)> alias Bookstore.Store.Author
+iex> alias Bookstore.Store.Author
 Bookstore.Store.Author
-iex(4)> author = Store.get_author!(1) <2>
-[debug] QUERY OK source="authors" db=8.3ms decode=1.1ms queue=0.9ms idle=1955.5ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [1]
+iex> author = Store.get_author!(1) <2>
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
@@ -1082,9 +1050,7 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
   twitter_account: "pragdave",
   updated_at: ~N[2020-05-27 11:48:17]
 }
-iex(5)> Store.update_author(author, %{twitter_account: nil}) <3>
-[debug] QUERY OK db=2.2ms queue=3.6ms idle=1569.2ms
-UPDATE "authors" SET "twitter_account" = $1, "updated_at" = $2 WHERE "id" = $3 [nil, ~N[2020-05-28 10:54:55], 1]
+iex> Store.update_author(author, %{twitter_account: nil}) <3>
 {:ok,
  %Bookstore.Store.Author{
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
@@ -1095,9 +1061,7 @@ UPDATE "authors" SET "twitter_account" = $1, "updated_at" = $2 WHERE "id" = $3 [
    twitter_account: nil,
    updated_at: ~N[2020-05-28 10:54:55]
  }}
-iex(6)> Store.get_author!(1) <4>
-[debug] QUERY OK source="authors" db=4.8ms idle=659.0ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."id" = $1) [1]
+iex> Store.get_author!(1) <4>
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
@@ -1227,9 +1191,7 @@ Now we are ready to try this out in `iex`:
 
 [source,elixir]
 ----
-iex(1)> Bookstore.Store.create_book(%{title: "Programming Elixir", author_id: 1})
-[debug] QUERY OK db=8.0ms decode=1.7ms queue=2.8ms idle=1669.3ms
-INSERT INTO "books" ("author_id","title","inserted_at","updated_at") VALUES ($1,$2,$3,$4) RETURNING "id" [1, "Programming Elixir", ~N[2020-09-08 01:17:34], ~N[2020-09-08 01:17:34]]
+iex> Bookstore.Store.create_book(%{title: "Programming Elixir", author_id: 1})
 {:ok,
  %Bookstore.Store.Book{
    __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
@@ -1270,9 +1232,7 @@ Let's see how these queries work in `iex`:
 
 [source,elixir]
 ----
-iex(1)> author = Bookstore.Store.get_author_by_twitter!("pragdave") <1>
-[debug] QUERY OK source="authors" db=6.0ms decode=0.8ms queue=1.3ms idle=1390.3ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at" FROM "authors" AS a0 WHERE (a0."twitter_account" = $1) ["pragdave"]
+iex> author = Bookstore.Store.get_author_by_twitter!("pragdave") <1>
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   books: #Ecto.Association.NotLoaded<association :books is not loaded>,
@@ -1283,9 +1243,7 @@ SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inser
   twitter_account: "pragdave",
   updated_at: ~N[2020-09-08 01:56:38]
 }
-iex(2)> Bookstore.Store.list_books_by_author(author)
-[debug] QUERY OK source="books" db=1.3ms queue=1.4ms idle=1802.0ms
-SELECT b0."id", b0."title", b0."author_id", b0."inserted_at", b0."updated_at" FROM "books" AS b0 WHERE (b0."author_id" = $1) [1]
+iex> Bookstore.Store.list_books_by_author(author)
 [
   %Bookstore.Store.Book{
     __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
@@ -1297,9 +1255,7 @@ SELECT b0."id", b0."title", b0."author_id", b0."inserted_at", b0."updated_at" FR
     updated_at: ~N[2020-09-08 01:56:51]
   }
 ]
-iex(3)> Bookstore.Store.get_book_by_title!("Programming Elixir")
-[debug] QUERY OK source="books" db=1.6ms queue=3.6ms idle=969.6ms
-SELECT b0."id", b0."title", b0."author_id", b0."inserted_at", b0."updated_at" FROM "books" AS b0 WHERE (b0."title" = $1) ["Programming Elixir"]
+iex> Bookstore.Store.get_book_by_title!("Programming Elixir")
 %Bookstore.Store.Book{
   __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
   author: #Ecto.Association.NotLoaded<association :author is not loaded>,
@@ -1327,9 +1283,7 @@ Let's open up `iex` and see how preloading data works:
 
 [source,elixir]
 ----
-iex(1)> elixir_book = Bookstore.Store.get_book_by_title!("Programming Elixir") <1>
-[debug] QUERY OK source="books" db=5.9ms decode=0.7ms queue=1.1ms idle=809.0ms
-SELECT b0."id", b0."title", b0."author_id", b0."inserted_at", b0."updated_at" FROM "books" AS b0 WHERE (b0."title" = $1) ["Programming Elixir"]
+iex> elixir_book = Bookstore.Store.get_book_by_title!("Programming Elixir") <1>
 %Bookstore.Store.Book{
   __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
   author: #Ecto.Association.NotLoaded<association :author is not loaded>,
@@ -1339,9 +1293,7 @@ SELECT b0."id", b0."title", b0."author_id", b0."inserted_at", b0."updated_at" FR
   title: "Programming Elixir",
   updated_at: ~N[2020-09-08 01:56:51]
 }
-iex(2)> Bookstore.Repo.preload(elixir_book, :author) <2>
-[debug] QUERY OK source="authors" db=0.5ms queue=0.8ms idle=151.0ms
-SELECT a0."id", a0."first_name", a0."last_name", a0."twitter_account", a0."inserted_at", a0."updated_at", a0."id" FROM "authors" AS a0 WHERE (a0."id" = $1) [1]
+iex> Bookstore.Repo.preload(elixir_book, :author) <2>
 %Bookstore.Store.Book{
   __meta__: #Ecto.Schema.Metadata<:loaded, "books">,
   author: %Bookstore.Store.Author{ <3>
