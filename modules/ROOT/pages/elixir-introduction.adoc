@@ -1521,34 +1521,71 @@ iex> IO.puts(product)
 Banana
 :ok
 ----
-<1> Those anonymous functions may run on totally different CPUs. The life in their own little universe.
-<2> The value of `product` has changed multiple times. But for `test1.()` it is the value from that point in time when we created the function.
+<1> Those anonymous functions can run on totally different CPUs. Each one lives
+in its own little universe.
+<2> The value of `product` has changed multiple times. But for `test1.()` it is
+the value from that point in time when we created the function.
 
 ## Sigils
 indexterm:["Sigils"]
 
-Until now encapsulated Strings in double quotes and we haven't talked about char
-lists at all (IMO not needed for a beginners introduction). But there is one more mechanism to represent texts. They are called `Sigils` and start with a `~` (tilde) character which is followed by one letter which indicates what kind of sigil it is. After that, you can use a couple of different delimiters:
+Sigils are another way of representing literals. They start with a tilde (`~`)
+character, which is followed by a letter, and then there is some content
+surrounded by delimiters.
+
+Let's look at some examples of using the `~s` sigil, which creates a string:
 
 [source,elixir]
 ----
-~r/example text/
-~r|example text|
-~r"example text"
-~r'example text'
-~r(example text)
-~r[example text]
-~r{example text}
-~r<example text>
+iex> ~s(Hello, my friend!) <1>
+"Hello, my friend!"
+iex> ~s(He said, "I hope you are well") <2>
+"He said, \"I hope you are well\""
+iex> ~s/Hello (Goodbye)/ <3>
+"Hello (Goodbye)"
+----
+<1> In this case, we use the `()` delimiters.
+<2> We do not need to escape the double quotes (you will see that they are
+escaped in the output).
+<3> By changing the delimiters, we do not need to escape the parentheses.
+
+There is also a `~S` (uppercase) sigil, which also creates a string, but does
+not support interpolation:
+
+[source,elixir]
+----
+iex> ~s(1 + 1 = #{1 + 1})
+"1 + 1 = 2" <1>
+iex> ~S(1 + 1 = #{1 + 1})
+"1 + 1 = \#{1 + 1}" <2>
+----
+<1> The result of `1 + 1` is returned instead of `#{1 + 1}`.
+<2> The content is returned as it is written, with no interpolation.
+
+There are 8 different delimiters (having different delimiters means that you can
+choose one which reduces the need to escape characters in the content):
+
+[source,elixir]
+----
+~s/example text/
+~s|example text|
+~s"example text"
+~s'example text'
+~s(example text)
+~s[example text]
+~s{example text}
+~s<example text>
 ----
 
-NOTE: Elixir provides different delimiters for sigils so that you can write
-literals without escaped delimiters.
+In the next two subsections, we will see sigils for regular expressions and date
+/ time structs. There are also sigils for creating word lists (`~w`) and
+charlists (`~c`), and it is also possible for you to create your own sigils.
 
 ### Regular expressions
 indexterm:["Regular expression"]
 
-`~r` marks a https://en.wikipedia.org/wiki/Regular_expression[regular expression]:
+`~r` is the sigil used to represent a
+https://en.wikipedia.org/wiki/Regular_expression[regular expression]:
 
 [source,elixir]
 ----
@@ -1565,66 +1602,17 @@ true
 ----
 <1> Modifiers are supported too. For a complete list have a look at https://hexdocs.pm/elixir/Regex.html
 
-### String
-indexterm:["String"]
-
-You can use the `~s` sigil to generate a string:
-
-[source,elixir]
-----
-iex> example = ~s(WOW! "double" and 'single' quotes without escaping)
-"WOW! \"double\" and 'single' quotes without escaping"
-iex> IO.puts(example)
-WOW! "double" and 'single' quotes without escaping
-:ok
-----
-
-Sigils support heredocs too. You can use triple, double, or single quotes as
-separators:
-
-[source,elixir]
-----
-iex> example_text = ~s"""
-...> This is an example text.
-...> Multiple lines are not a problem.
-...> """
-"This is an example text.\nMultiple lines are not a problem.\n"
-iex> IO.puts(example_text)
-This is an example text.
-Multiple lines are not a problem.
-
-:ok
-----
-
-### Word lists
-indexterm:["Word lists"]
-
-The `~w` sigil is a useful way to generate lists of words:
-
-[source,elixir]
-----
-iex> shopping_cart = ~w(apple orange banana)
-["apple", "orange", "banana"]
-iex> shopping_cart_atoms = ~w(apple orange banana)a <1>
-[:apple, :orange, :banana]
-----
-<1> The `a` modifier tells Elixir to generate a list of atoms and not strings.
-
 ### Date and Time
 
-Elixir provides a couple of good to go time-related Struct[structs] which all have their sigil.
+Elixir provides several date / time structs which all have their own sigils.
 
 #### Date
 indexterm:["Date"]
 
-Elixir provides a `%Date{}` struct that contains the following fields:
+Elixir provides a `%Date{}` struct that contains the fields `year`, `month`,
+`day` and `calendar`.
 
-- `year`
-- `month`
-- `day`
-- `calendar`
-
-With the `~D` sigil you can create new `%Date{}` struct:
+With the `~D` sigil, you can create a new `%Date{}` struct:
 
 [source,elixir]
 ----
@@ -1636,20 +1624,19 @@ iex> birthday.month
 3
 iex> birthday.year
 1973
+iex> Date.utc_today()
+~D[2020-09-23] <1>
 ----
+<1> The return value for many of the functions in the `Date` module use the `~D`
+sigil.
 
 #### Time
 indexterm:["Time"]
 
-Elixir provides a `%Time{}` struct that contains the following fields:
+There is a `%Time{}` struct that contains the fields `hour`, `minute`, `second`,
+`microsecond` and `calendar`.
 
-- `hour`
-- `minute`
-- `second`
-- `microsecond`
-- `calendar`
-
-With the `~T` sigil you can create new `%Time{}` struct:
+With the `~T` sigil, you can create a new `%Time{}` struct:
 
 [source,elixir]
 ----
@@ -1657,14 +1644,18 @@ iex> now = ~T[09:29:00.0]
 ~T[09:29:00.0]
 iex> now.hour
 9
+iex> Time.utc_now()
+~T[04:57:25.658722] <1>
 ----
+<1> The return value for many of the functions in the `Time` module use the `~T`
+sigil.
 
 #### NaiveDateTime
 indexterm:["NaiveDateTime"]
 
-The `%NaiveDateTime{}` struct mixes `%Date{}` with `%Time{}`.
+The `%NaiveDateTime{}` struct is a combination of `%Date{}` and `%Time{}`.
 
-With the `~N` sigil you can create new `%NaiveDateTime{}` struct:
+With the `~N` sigil, you can create a new `%NaiveDateTime{}` struct:
 
 [source,elixir]
 ----
@@ -1675,15 +1666,19 @@ iex> timestamp = ~N[2020-05-08 09:48:00]
 #### DateTime
 indexterm:["DateTime"]
 
-The `%DateTime{}` struct adds a timezone to a `%NaiveDateTime{}`.
+The `%DateTime{}` struct adds timezone information to a `%NaiveDateTime{}`.
 
-With the `~U` sigil you can create new `%NaiveDateTime{}` struct:
+You can create a new `%DateTime{}` struct with the `~U` sigil:
 
 [source,elixir]
 ----
 iex> timestamp = ~U[2029-05-08 09:59:03Z]
 ~U[2029-05-08 09:59:03Z]
+iex> DateTime.utc_now()
+~U[2020-09-23 04:58:22.403482Z] <1>
 ----
+<1> The return value for many of the functions in the `DateTime` module use the
+`~U` sigil.
 
 NOTE: Find more information about timezones and DateTime at https://hexdocs.pm/elixir/DateTime.html
 
