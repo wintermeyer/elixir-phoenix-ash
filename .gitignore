@@ -1,4 +1,6 @@
 adoc/*.pdf
 .DS_Store
 sandbox/*
-build/
+/build/
+/node_modules/
+/public/
