@@ -3,8 +3,7 @@
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 https://www.phoenixframework.org[Phoenix]'s learning curve is steep. I am not
-going to sugar-coat this book with a "this is easy" start. Buckle up for an
-interesting ride, especially if https://elixir-lang.org[Elixir] is your first
+going to sugar-coat this book with a "this is easy" start. Buckle up for a bumpy ride, especially if https://elixir-lang.org[Elixir] is your first
 functional programming language.
 
 I learn best from "Hello World!" examples. I do not care about abstract
@@ -20,14 +19,13 @@ follow the code breadcrumbs I use to teach.
   problems are inescapable, but I keep those to a minimum. You should understand
   the basics of programming and HTML. Other than that, you don't have to have
   any knowledge of Phoenix or Elixir.
-* **I will not hesitate to oversimply stuff.** I aim to get you productive in
+* **I will not hesitate to oversimply stuff.** My goal is to get you productive in
   the quickest time possible. There are other resources to learn the details
   (e.g. the magic of OTP).
 * The web-applications in this book are not intended to become eye candy. We will
   not waste time and energy to make them look beautiful.
-
-And we are not going to build one giant application in the course of the book.
-We tackle small problems which make sense within their realm.
+* We are not going to build one giant application in the course of the book.
+  We tackle small problems which make sense within their realm.
 
 IMPORTANT: If a specific chapter or section doesn't interest you: Go ahead and
 skip it. You can come back later if needed.
@@ -42,7 +40,7 @@ Stefan Wintermeyer
 PS: Please do send me feedback about this book by email to
 sw@wintermeyer-consulting.de and follow me on Twitter
 (https://twitter.com/wintermeyer[@wintermeyer]). To receive positive feedback
-from a reader is a happy moment for any author!
+from a reader is a joyful moment for any author!
 
 ## Finding Help
 
@@ -64,20 +62,15 @@ add either `Framework` or `Elixir` to your search queries.
 
 * Send me an email to sw@wintermeyer-consulting.de
 +
-Feel free to send me an email if you can't find the help you need. Please let
-me know your Elixir and Phoenix versions and other useful information (e.g.
-database and operating system). If possible, first create a question on
-https://stackoverflow.com[stackoverflow.com] and send me an email with the link
-to that question. With that, I can answer it for you and other users.
+As a lot resort you can send me an email. Please create a question on 
+https://stackoverflow.com[stackoverflow.com] first and link that question in 
+the email you send me. Please do not expect a quick response.
 
 [[remote-training]]
-=== Remote Training
+=== Remote Elixir and Phoenix Training
 
-I offer a one and two-day remote Phoenix beginners training. During the
-training, we'll work via remote pair programing
-(https://marketplace.visualstudio.com/items?itemName=MS-vsliveshare.vsliveshare-pack[Visual
-Studio with the Live Share extension]). This is an excellent way to get up to
-speed. No previous Elixir knowledge is needed. You just need basic programming and 
-HTML knowledge. Please send me an email to sw@wintermeyer-consulting.de for further information.
-
-Onsite training is possible too. But that depends on the local coronavirus travel restrictions.
+I offer remote and on site Phoenix and Elixir beginners training. 
+No previous Elixir knowledge is needed. You just need basic programming and 
+HTML knowledge. Please send me an email to sw@wintermeyer-consulting.de 
+with some information about the needed training and I'll get back to you with 
+an offer.

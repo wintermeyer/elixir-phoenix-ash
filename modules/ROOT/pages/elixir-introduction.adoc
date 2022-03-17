@@ -2,23 +2,20 @@
 # Elixir Introduction
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-This chapter will teach you the absolute basics of Elixir, just enough for you
+This chapter teaches the basics of Elixir, just enough for you
 to become productive with Phoenix.
-
-Buckle up. It is going to be a bumpy and sometimes dull ride. It's tough to
-teach all the needed Elixir knowledge in just one chapter.
 
 [IMPORTANT]
 .Elixir version
 ====
-All code examples are written and tested for Elixir version 1.10.2.
+All code examples are written and tested for Elixir version 1.13.3.
 Please make sure that you have that or a higher version installed.
 [source,bash]
 ----
 $ elixir -v
-Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
+Erlang/OTP 24 [erts-12.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1]
 
-Elixir 1.10.2 (compiled with Erlang/OTP 21)
+Elixir 1.13.3 (compiled with Erlang/OTP 22)
 ----
 ====
 
@@ -33,14 +30,14 @@ indexterm:["iex", "Elixir's Interactive Shell"]
 [source,elixir]
 ----
 $ iex
-Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
+Erlang/OTP 24 [erts-12.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1]
 
-Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
-iex> <1>
+Interactive Elixir (1.13.3) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> <1>
 ----
 <1> This is your iex prompt.
 
-IMPORTANT: You have to press `CTRL-C` twice (or `CTRL-\` once) to exit `iex`.
+IMPORTANT: Press `CTRL-C` twice (or `CTRL-\` once) to exit `iex`.
 
 The `iex` will be your trusted friend during the work with this book and later
 while working with Phoenix. While programming in development mode, you can use
@@ -48,19 +45,16 @@ it for diving into the core of your Phoenix application. You can do so too while
 being in production mode but that is the equivalent to open-heart surgery. It
 can be a lifesaver, but you need to know what you are doing.
 
-TIP: iex offers autocomplete when possible. So when in doubt press `TAB`.
-
-TIP: iex offers a history too. To access the last command, just press on the
-arrow-up key.
+TIP: iex offers autocomplete (doubt press `TAB`) and a history (press the arrow-up key).
 
 ### Help in the iex shell
 
-iex has a built-in help function `h/1` which gives you access to some
+`iex`` has a built-in help function `h/1` which gives you access to some
 basic documentation:
 
 [source,elixir]
 ----
-iex> h length/1
+iex> h length
 
                                 def length(list)
 
@@ -68,21 +62,22 @@ iex> h length/1
 
 guard: true
 
-Returns the length of the list.
+Returns the length of list.
 
 Allowed in guard tests. Inlined by the compiler.
 
-# Examples
+## Examples
 
     iex> length([1, 2, 3, 4, 5, 6, 7, 8, 9])
     9
 ----
 
+NOTE: The `/1` part of `h/1` signals that this function takes one argument. 
+
 [[elixir-introduction-hello-world]]
 ## Hello world!
 
-The classic! But never the less very important. You can use the function
-`IO.puts()` to print a string to standard output:
+The classic! The function `IO.puts/1` prints a string to standard output:
 
 [source,elixir]
 ----
@@ -92,10 +87,10 @@ Hello world!
 ----
 indexterm:["Hello World!"]
 
-You should always enclose strings within double quotes. If you use single
-quotes, that creates a charlist, which is a different type.
+IMPORTANT: Always enclose strings with double quotes. Single
+           quotes create a charlist, which is a different type.
 
-In case there are double quotes within a string you have to escape them with
+In case you need double quotes within a string you have to escape them with
 backslashes:
 
 [source,elixir]
@@ -103,40 +98,45 @@ backslashes:
 iex> IO.puts("With double quotes: \"Hello world!\"")
 With double quotes: "Hello world!"
 :ok
-iex>
-BREAK: (a)bort (c)ontinue (p)roc info (i)nfo (l)oaded
-       (v)ersion (k)ill (D)b-tables (d)istribution
-^C<1>
 ----
-<1> Don't be afraid of the `BREAK` menu. With the first `Ctrl+C` the `iex`
-displays this list of choices (the `BREAK` menu) and with the second `Ctrl+C`
-you end the `iex` session.
-indexterm:["BREAK menu"]
 
 [[elixir-introduction-basic-calculations]]
 ## Basic Calculations
 
-We can use the types `integer` (integer numbers) and `float` (real numbers) to
-do all sorts of calculations. We can use the usual operators (+, -, etc.). Here
-are a few examples:
+Let's have a look at some basic calculations with the types `integer` (integer numbers) 
+and `float` (real numbers):
 
 [source,elixir]
 ----
-$ iex
-Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
-
-Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
-iex> 1 + 1
+iex(1)> 1 + 1
 2
-iex> 1.1 + 1
+iex(2)> 1.1 + 1
 2.1
-iex> 2 - 1
-1
-iex> 10 * 1000000000000000
-10000000000000000
-iex> 23 / 3
+iex(3)> 23 / 3
 7.666666666666667
 ----
+
+[TIP]
+====
+You can use the `i/1` function to find out the type of an expression. 
+I like to combine that with the `v/1` function which prints the value of an expression. 
+
+[source,elixir]
+----
+iex(1)> 23 / 3
+7.666666666666667
+iex(2)> i v
+Term
+  7.666666666666667
+Data type
+  Float
+Reference modules
+  Float
+Implemented protocols
+  IEx.Info, Inspect, List.Chars, String.Chars
+----
+indexterm:["v/1", "i/1"]
+====
 
 [[elixir-introduction-logical-expressions]]
 ## Logical Expressions
@@ -148,8 +148,6 @@ the operators `and`, `or` and `not`:
 ----
 iex> true and true
 true
-iex> false and false
-false
 iex> true or false
 true
 iex> not true
@@ -159,16 +157,15 @@ indexterm:["Logical Expressions"]
 
 The operators `and`, `or` and `not` can only work with boolean values. The
 operators `&&` (and), `||` (or) and `!` (not) do the same but are a bit more
-free-spirited and accept *truthy* and *falsy* values (false or nil).
+free-spirited and accept *truthy* and *falsy* values (`false`` or `nil``).
 
 [[elixir-introduction-variables]]
 ## Variables
 indexterm:["Variables"]
 
-You already know how variables work from experiences in other programming
-languages. Therefore we can dive right into it. Variable names follow the
+Variable names follow the
 https://en.wikipedia.org/wiki/Snake_case[snake_case] format and start with a
-lower case. Some examples:
+lower case.
 
 [source,elixir]
 ----
@@ -179,9 +176,9 @@ iex> width = 23
 iex> area = length * width
 230
 ----
-<1> We use the operator `=` to bind the value 10 to the variable with the name `length`.
+<1> The operator `=` binds the value 10 to the variable with the name `length`.
 
-If you start a variable name with a capital error you will get an error:
+If you start a variable name with a capital you will get an error:
 
 [source,elixir]
 ----
@@ -211,9 +208,7 @@ iex> defmodule Store do <1>
 ...>   end
 ...> end
 {:module, Store,
- <<70, 79, 82, 49, 0, 0, 5, 4, 66, 69, 65, 77, 65, 116, 85, 56, 0, 0, 0, 133, 0,
-   0, 0, 14, 12, 69, 108, 105, 120, 105, 114, 46, 83, 116, 111, 114, 101, 8, 95,
-   95, 105, 110, 102, 111, 95, 95, 7, ...>>, {:total_price, 2}} <4>
+ <<...>>, {:total_price, 2}} <4>
 iex> Store.total_price(10,7) <5>
 70
 ----
@@ -221,14 +216,13 @@ iex> Store.total_price(10,7) <5>
 <2> `def` is the keyword to define a function within a module.
 <3> The return value of a function is the return value of the last expression in
 the function.
-<4> The return value of creating the module. To save space, we will not show
-this output in the next examples.
+<4> The return value of creating the module.
 <5> A function of a given module can be called from outside the module with this syntax.
 
-`defmodule` and `def` use a `do ... end` construct to begin and end.
+IMPORTANT: `defmodule` and `def` use a `do ... end` construct to begin and end.
 
-IMPORTANT: Module names use CamelCase starting with a capital letter. Function
-names use snake_case.
+NOTE: Module names use `CamelCase` starting with a capital letter. Function
+names use `snake_case`.
 
 You can also define a module in a separate file (with the `.exs` extension),
 and then call the function with `iex _filename_.exs`.
@@ -248,15 +242,19 @@ defmodule Math do
 end
 ----
 
-Then, if you run `iex math.exs`, you can access the functions in the Math module
-in iex.
+Run `iex math.exs` to get access of the functions in the `Math` module
+in `iex`.
 
 [source,elixir]
 ----
-iex> Math.sum(1, 2)
+$ iex math.exs
+Erlang/OTP 24 [erts-12.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1]
+
+Interactive Elixir (1.13.3) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> Math.sum(1, 2)
 3
-iex> Math.difference(3, 1)
-2
+iex(2)> Math.difference(30, 1)
+29
 ----
 
 ### Private Functions
@@ -304,7 +302,7 @@ arity, and so they are treated as different functions:
 ----
 iex> defmodule Rectangle do
 ...>   def area(a) do <1>
-...>     a * a
+...>     area(a, a)
 ...>   end
 ...>
 ...>   def area(a, b) do <2>
@@ -320,13 +318,13 @@ iex> Rectangle.area(4, 5) <4>
 <1> The function `area/1` with an arity of 1 accepts one parameter.
 <2> The function `area/2` with an arity of 2 accepts two parameters. This is
 essentially a different function from `area/1`.
-<3> So to calculate the area of a square you can call `area/1` with just one parameter.
-<4> All non square rectangle areas have to be calculated with `area/2` which accepts two parameters.
+<3> To calculate the area of a square call `area/1` with just one parameter.
+<4> Non square rectangle areas have to be calculated with `area/2` which accepts two parameters.
 
 ### Hierarchical Modules
 
 In a big project, you will have multiple layers of Module namespaces to keep everything in
-some sort of structure.
+a structure you can overlook.
 
 This can be done by adding `.` between the Module names:
 
@@ -453,7 +451,7 @@ indexterm:["Use"]
 `use` allows a module to inject code into the current module, such as importing
 modules, defining new functions, setting a module's state, etc.
 
-In many of the tests in your Phoenix application, you will see `use
+NOTE: In many of the tests in your Phoenix application, you will see `use
 ExUnit.Case`, which performs certain checks, sets some module attributes and
 imports needed modules.
 
@@ -464,9 +462,9 @@ An atom is a constant whose name is its value. In some other programming
 languages, these are known as symbols. Atoms start with a `:`
 
 Atoms are often used to tag values and messages. For example, functions that
-might fail often have the return values `{:ok, value}` or `{:error, message}`.
+might fail often return a tuple like these: `{:ok, value}` or `{:error, message}`.
 
-Atoms are also used to reference modules from Erlang libraries.
+NOTE: Atoms are also used to reference modules from Erlang libraries.
 
 [source,elixir]
 ----
@@ -479,7 +477,7 @@ true
 ----
 <1> The function `is_atom()` can be used to check if something is an atom.
 
-NOTE: You should write atoms in snake_case or CamelCase. The usual Elixir convention is to use snake_case.
+NOTE: You should write atoms in `snake_case` or `CamelCase`. The usual Elixir convention is to use `snake_case`.
 
 [[elixir-introduction-strings]]
 ## Strings
@@ -503,7 +501,7 @@ iex> counter = 23
 iex> "Count: #{counter}" <4>
 "Count: 23"
 ----
-<1> We assign the string "Stefan" to the variable with the name `first_name`.
+<1> We assign the string `"Stefan"` to the variable `first_name`.
 <2> The `<>` operator can be used to concatinate strings.
 indexterm:["<> operator"]
 <3> `#{}` is used to interpolate strings. It can be used to inject a variable
@@ -587,8 +585,8 @@ indexterm:["Lists and Tuples"]
 We store multiple elements in lists and tuples. Lists and tuples look alike but
 are quite different performance-wise.
 
-* Tuples are fast when you have to access its data but slow when you want to change its data. They are stored contiguously in memory. Accessing one element of a tuple or getting the size of it is fast and always takes the same amount of time.
-* Lists are stored as linked lists in memory. One element holds it's own value and a link to the next element. Accessing single elements and the length of lists is a linear operation which takes more time. The longer the list, the more time it takes. But it is fast to add a new element to the end of a list.
+* Tuples (e.g. `{:ok, 12}`) are fast when you have to access its data but slow when you want to change its data. They are stored contiguously in memory. Accessing one element of a tuple or getting the size of it is fast and always takes the same amount of time.
+* Lists (e.g. `[1, 2]`) are stored as linked lists in memory. One element holds it's own value and a link to the next element. Accessing single elements and the length of lists is a linear operation which takes more time. The longer the list, the more time it takes. But it is fast to add a new element to the end of a list.
 
 NOTE: Right now, you don't need to lose sleep over the decision of which one to
 use. Throughout the book, you'll get a feeling which one is best suited for what
@@ -648,7 +646,8 @@ iex> shopping_list <4>
 <3> `tl/1` fetches the rest of the list.
 <4> The `shopping_list` itself hasn't changed.
 
-Let's see what happens with empty lists or lists which just have one element:
+An empty list `[]` does neither have a head nor a tail. To have a head or a tail 
+a list has to have at least one element:
 
 [source,elixir]
 ----
@@ -831,7 +830,8 @@ are optional.
 <4> Like regular functions, anonymous functions can be called with multiple
 arguments. The arguments are separated by commas.
 
-Most of the time anonymous functions are simple one liners. But they don't have to be:
+Most of the time anonymous functions are simple one liners. 
+But they can contain multiple lines of code too:
 
 [source,elixir]
 ----
@@ -844,7 +844,7 @@ iex> circular_area.(3)
 28.274333882310003
 ----
 
-Let's now look at using anonymous functions with higher-order functions:
+Let's see how we can use anonymous functions within higher-order functions:
 
 [source,elixir]
 ----
