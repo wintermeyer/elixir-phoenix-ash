@@ -864,8 +864,9 @@ new list.
 ### The & operator
 indexterm:["& operator", "Capture operator", "Capture syntax"]
 
-Another way of creating anonymous functions is to use the `&` operator, which
-is called the *capture operator*.
+Another - and sometimes easier to work with - way of creating anonymous functions 
+is to use the `&` operator, which is called the *capture operator*. Have 
+a look at this example:
 
 [source,elixir]
 ----
@@ -899,7 +900,7 @@ iex> Enum.sort([1, 2, 3], &(&1 >= &2)) <3>
 after `is_integer` means that the function takes one parameter.
 <3> You can use multiple parameters too (e.g. `&1`, `&2`).
 
-Sometimes it is more convenient to use the `&` operator, but there are times
+WARNING: Sometimes it is more convenient to use the `&` operator, but there are times
 when it makes the expression more difficult to read.
 
 ### Variable Scopes
@@ -971,21 +972,20 @@ iex> IO.puts(pi) <4>
 <3> The 3.14 and not the 3.14159265359 gets used.
 <4> The outer scoped `pi` is not changed.
 
-NOTE: You can not change the value of an outer scoped variable, but you can read
+IMPORTANT: You can not change the value of an outer scoped variable, but you can read
 it. And you can create a new inner scope variable with the same name without
 interacting with the outer scoped one.
 
 ## Keyword Lists, Maps and Structs
 indexterm:["Keyword Lists, Maps and Structs"]
 
-List and Tuples don't provide the functionality to access values with a key. We
-can achieve that functionality with keyword lists, maps and structs.
+List and Tuples don't provide the functionality to access values with a 
+specific key. But keyword lists, maps and structs are here to help.
 
 ### Keyword Lists
 indexterm:["Keyword Lists"]
 
-Keyword lists are key-value data structures, in which keys are atoms and keys
-can appear more than once.
+Keyword lists are key-value data structures, in which atoms are keys.
 
 [source,elixir]
 ----
@@ -1009,15 +1009,18 @@ for the given key.
 <4> If there are duplicate keys in a keyword list, the first one is fetched on
 lookup.
 
+[NOTE]
+====
 In your Phoenix application, you will see a keyword list used as the last
 argument in the `render/3` function:
 
 [source,elixir]
 ----
-render(conn, "show.html", message: "Hello", username: "Mary") <1>
+render(conn, "show.html", message: "Hello", name: "Mary") <1>
 ----
-<1> `[message: "Hello", username: "Mary"]` is a keyword list. As you can see
+<1> `[message: "Hello", name: "Mary"]` is a keyword list. As you can see
 from this example, the brackets are optional.
+====
 
 #### Keyword List Functions
 indexterm:["Keyword List Functions"]
