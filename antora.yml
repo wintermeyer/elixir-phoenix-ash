@@ -1,6 +1,6 @@
 name: phoenix
 title: Phoenix Beginner's Guide
-version: 1.6
+version: 1.7.3
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/nav.adoc

@@ -1,76 +1,47 @@
 [[preface]]
-# Preface
+= Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-https://www.phoenixframework.org[Phoenix]'s learning curve is steep. I am not
-going to sugar-coat this book with a "this is easy" start. Buckle up for a bumpy ride, especially if https://elixir-lang.org[Elixir] is your first
+Embarking on https://www.phoenixframework.org[Phoenix Framework] and
+https://elixir-lang.org[Elixir] is a steep but exciting climb. No sugar-coating
+here; prepare for a thrilling ride, especially if Elixir is your first
 functional programming language.
 
-I learn best from "Hello World!" examples. I do not care about abstract
-ideas or programming theories. Give me a good and clean example, and I can make sense
-of it. If you like this kind of teaching, you are reading the right book. Please
-follow the code breadcrumbs I use to teach.
+If practical "Hello World!" examples are your learning jam, you're in the right
+place. In this book, I offer clear examples, not abstract theories.
 
-* **This book teaches by presenting bite-sized code examples. Think of them as
-  breadcrumbs that'll lead you.** I've created these examples in a way that you
-  can understand by reading the code. I have also added notes with explanations
-  next to the vital source code lines.
-* **This book is a step-by-step guide. We start at zero.** A few chicken and egg
-  problems are inescapable, but I keep those to a minimum. You should understand
-  the basics of programming and HTML. Other than that, you don't have to have
-  any knowledge of Phoenix or Elixir.
-* **I will not hesitate to oversimply stuff.** My goal is to get you productive in
-  the quickest time possible. There are other resources to learn the details
-  (e.g. the magic of OTP).
-* The web-applications in this book are not intended to become eye candy. We will
-  not waste time and energy to make them look beautiful.
-* We are not going to build one giant application in the course of the book.
-  We tackle small problems which make sense within their realm.
+* *Expect bite-sized code examples.* They're your guiding stars, crafted for
+comprehension just by reading the code, with added notes for clarity.
+* *This is a step-by-step guide.* No prior knowledge of Phoenix or Elixir needed.
+Just understand the basics of programming and HTML.
+* *Simplicity is key here.* My goal is to get you productive ASAP. For in-depth
+exploration, there are other resources.
+* Don't expect our example web apps to win beauty contests; we're not investing
+time in aesthetics.
 
-IMPORTANT: If a specific chapter or section doesn't interest you: Go ahead and
-skip it. You can come back later if needed.
+NOTE: If a section doesn't resonate with you, skip it. You can circle back later
+if needed.
 
-The chapter xref:elixir-introduction.adoc[Elixir Introduction]
-offers a jump-start for everybody who hasn't worked with Elixir before. You
-don't have to work through all the examples. But you should read it to get the basic
-ideas of the language.
+xref:elixir-introduction.adoc[Elixir Introduction] is a quick-start guide for
+Elixir newbies. Just read through to catch the language's basics.
 
 Stefan Wintermeyer
 
-PS: Please do send me feedback about this book by email to
+PS: Your feedback would be appreciated. Email me at
 sw@wintermeyer-consulting.de and follow me on Twitter
-(https://twitter.com/wintermeyer[@wintermeyer]). To receive positive feedback
-from a reader is a joyful moment for any author!
+https://twitter.com/wintermeyer[@wintermeyer].
 
-## Finding Help
+== Seeking Help?
 
-During or after reading this book, there will come a time where you'll have a
-problem or a question. Here is my advice for those times:
+* https://stackoverflow.com[StackOverflow]: A great place to ask https://stackoverflow.com/questions/tagged/elixir[Elixir] and https://stackoverflow.com/questions/tagged/phoenix-framework[Phoenix] questions.
+* https://www.google.com[Google]: For Phoenix-related queries, add 'Phoenix
+Framework' or 'Elixir' to refine your search.
+* Email me at sw@wintermeyer-consulting.de: Please post your question on
+StackOverflow first and include the link in your email.
 
-* https://stackoverflow.com
-+
-StackOverflow is my favourite spot to find help. There is a good chance somebody
-has already had the same problems you're struggling with and has received
-answers. If not, you usually get surprisingly fast answers for new questions.
+[[training]]
+=== Elixir and Phoenix Training
 
-* https://www.google.com
-+
-`Phoenix` is not an easy-to-search-for term. There are millions of
-construction companies with Phoenix in their name. These links can help you build a
-house, but they don't offer any programming help at all. You often want to
-add either `Framework` or `Elixir` to your search queries.
-
-* Send me an email to sw@wintermeyer-consulting.de
-+
-As a lot resort you can send me an email. Please create a question on 
-https://stackoverflow.com[stackoverflow.com] first and link that question in 
-the email you send me. Please do not expect a quick response.
-
-[[remote-training]]
-=== Remote Elixir and Phoenix Training
-
-I offer remote and on site Phoenix and Elixir beginners training. 
-No previous Elixir knowledge is needed. You just need basic programming and 
-HTML knowledge. Please send me an email to sw@wintermeyer-consulting.de 
-with some information about the needed training and I'll get back to you with 
-an offer.
+I offer remote and on-site Phoenix and Elixir beginner's training. No prior
+Elixir knowledge needed. Just basic programming and HTML understanding. Please
+contact me at sw@wintermeyer-consulting.de
