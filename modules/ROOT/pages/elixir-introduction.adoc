@@ -88,7 +88,7 @@ module is so essential it gets loaded automatically.
 - `puts/1` is the name of a
 function. The `1` part is called an **arity**. The arity represents the number
 of arguments that function accepts. A module can have multiple functions with
-the same name as long as they all have a different arity.
+the same name as long as they all have a different arity (see <<function-arity>>).
 
 TIP: When writing documentation always use the function name AND the arity! Otherwise it just doesn't make sense for Elixir programmers.
 
@@ -178,14 +178,15 @@ returned because `false || "world"` evaluates to the first *truthy* value, which
 is `"world"`. In the final example, `!nil` gives `true` because `nil` is a
 *falsy* value and `!` flips it to `true`.
 
-
 [[elixir-introduction-variables]]
-## Variables
+== Variables
 indexterm:["Variables"]
 
-Variable names follow the
-https://en.wikipedia.org/wiki/Snake_case[snake_case] format and start with a
-lower case.
+In Elixir, variable names adhere to the 
+https://en.wikipedia.org/wiki/Snake_case[snake_case] format. They start with a 
+lowercase letter, and words are separated by underscores (_). 
+
+Take a look at the following examples:
 
 [source,elixir]
 ----
@@ -193,32 +194,32 @@ iex> length = 10 <1>
 10
 iex> width = 23
 23
-iex> area = length * width
+iex> room_area = length * width
 230
 ----
-<1> The operator `=` binds the value 10 to the variable with the name `length`.
+<1> Here, the `=` operator assigns the value 10 to the variable `length`.
 
-If you start a variable name with a capital you will get an error:
+Variable names starting with an uppercase letter will throw an error:
 
 [source,elixir]
 ----
-iex> Radius = 2
+iex> RoomWidth = 2
 ** (MatchError) no match of right hand side value: 2 <1>
 ----
-<1> Yes, `MatchError` is a rather strange error message here. It will make more
-sense later. Binding values to variables is a bit more complicated than it seems
-right now.
+<1> The `MatchError` might seem strange at this point, but fear not! Its 
+mystery will unravel as we dive deeper into Elixir's realm. The process of 
+assigning values to variables is slightly more complex than it appears. 
+Stick around to discover more.
 
-## Modules and Functions
+== Modules and Functions
 indexterm:["Modules", "Functions"]
 
-So far, we have looked at basic calculations and types in isolation. However, if
-we want to create an application, we will need to combine these calculations and
-types in a structured way. To see how this is done, we need to look at modules
-and functions.
+Our journey so far has equipped us with the knowledge of basic calculations and 
+types. Now, to build a functional application, we need to piece together these 
+elements in a structured manner. This is where modules and functions step in.
 
-In Elixir, code is organized into modules, and each module is a collection of
-functions.
+Elixir organizes code into modules, which essentially are containers for 
+functions. 
 
 [source,elixir]
 ----
@@ -232,24 +233,23 @@ iex> defmodule Store do <1>
 iex> Store.total_price(10,7) <5>
 70
 ----
-<1> `defmodule` is the keyword to define a module. The name of a module starts with a capital letter.
-<2> `def` is the keyword to define a function within a module.
-<3> The return value of a function is the return value of the last expression in
-the function.
-<4> The return value of creating the module.
-<5> A function of a given module can be called from outside the module with this syntax.
+<1> The `defmodule` keyword defines a module. A module name always starts with 
+a capital letter.
+<2> The `def` keyword defines a function within a module.
+<3> The value of the final expression in a function is its return value.
+<4> The output you see here is the return value of the module creation.
+<5> This syntax allows you to call a function of a module from outside that 
+module.
 
-IMPORTANT: `defmodule` and `def` use a `do ... end` construct to begin and end.
+IMPORTANT: `defmodule` and `def` employ a `do ... end` construct to mark 
+beginning and end.
 
-NOTE: Module names use `CamelCase` starting with a capital letter. Function
-names use `snake_case`.
+NOTE: Module names use `CamelCase` and start with a capital letter, while 
+function names adopt the `snake_case`.
 
-You can also define a module in a separate file (with the `.exs` extension),
-and then call the function with `iex _filename_.exs`.
+Let's save the following module to `math.exs` as an example:
 
-As an example, save the following module to `math.exs`.
-
-[source,elixir]
+[source,elixir, :file: math.exs]
 ----
 defmodule Math do
   def sum(x, y) do
@@ -262,27 +262,29 @@ defmodule Math do
 end
 ----
 
-Run `iex math.exs` to get access of the functions in the `Math` module
-in `iex`.
+To access the functions in the `Math` module in the `iex`, we need to load and compile it with `c("math.exs")`.
 
 [source,elixir]
 ----
-$ iex math.exs
-Erlang/OTP 24 [erts-12.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1]
+$ iex
+Erlang/OTP 26 [erts-14.0] [source] [64-bit] [...]
 
-Interactive Elixir (1.13.3) - press Ctrl+C to exit (type h() ENTER for help)
-iex(1)> Math.sum(1, 2)
+Interactive Elixir (1.15.0-rc.1) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> c("math.exs")
+[Math]
+iex(2)> Math.sum(1, 2)
 3
-iex(2)> Math.difference(30, 1)
+iex(3)> Math.difference(30, 1)
 29
+iex(4)>
 ----
 
-### Private Functions
+=== Private Functions
 indexterm:["Private Functions"]
 
-Sometimes you want to define a function within a module without exposing it to
-the outside world. You can do this with a private function which gets declared
-with `defp`:
+There may be times when you wish to encapsulate certain functionalities within 
+a module, making them inaccessible from outside. Elixir facilitates this 
+through private functions, declared using the `defp` keyword:
 
 [source,elixir]
 ----
@@ -302,72 +304,91 @@ iex> Area.pi <3>
 ** (UndefinedFunctionError) function Area.pi/0 is undefined or private
     Area.pi()
 ----
-<1> The function `pi/0` is a private function.
-<2> The function `circle/1` can be called from outside the module. It can use
-the private function `pi/0` from within the module.
-<3> The function `pi/0` can not be called from outside the module.
+<1> `pi/0` is a private function, only accessible within its module.
+<2> `circle/1` is public and can be invoked externally. It can access `pi/0`, 
+since both functions belong to the same module.
+<3> Being private, `pi/0` cannot be accessed from outside its module, hence 
+the `UndefinedFunctionError`.
 
-### Function Arity
+Private functions are excellent for hiding implementation details and reducing 
+the exposed interface of a module. They foster modular design by ensuring 
+that each function only does one thing and that the module only exposes what's 
+necessary for other parts of your application to function.
+
+Consider `defp` as a tool to maintain clean, organized code. It aids in 
+readability and comprehension, making it easier for others (or future you) 
+to understand your code. Just remember, private functions cannot be tested 
+directly, so use them judiciously. Testable public functions should handle 
+most of the application logic, while private functions are more for internal 
+organization of the module.
+
+[[function-arity]]
+=== Function Arity
 indexterm:["Function Arity", "Arity"]
 
-In the last couple of sentences, you probably recognized that the names of
-functions were followed by the number of parameters. We refer to the `pi`
-function as `pi/0` and the `circle` function as `circle/1`. We call this number
-**arity**. Arity is kind of a big thing in Elixir. Why? Because not just the
-function name but also the arity defines a function. For example, the
-`Rectangle` module below has two functions with the same name, but different
-arity, and so they are treated as different functions:
+Arity refers to the number of arguments a function accepts. In Elixir, a
+function is identified by its name and its arity, denoted as `name/arity`. This
+concept is foundational in Elixir because it allows multiple functions with the
+same name but different arities in a single module. These are essentially
+distinct functions because of their varying argument count.
+
+A quick glance at the `Rectangle` module below exemplifies this idea:
 
 [source,elixir]
 ----
 iex> defmodule Rectangle do
-...>   def area(a) do <1>
-...>     area(a, a)
+...>   def area(side) do
+...>     area(side, side)
 ...>   end
 ...>
-...>   def area(a, b) do <2>
-...>     a * b
+...>   def area(length, breadth) do
+...>     length * breadth
 ...>   end
 ...> end
 
-iex> Rectangle.area(9) <3>
-81
-iex> Rectangle.area(4, 5) <4>
+iex> Rectangle.area(3)
+9
+iex> Rectangle.area(4, 5)
 20
 ----
-<1> The function `area/1` with an arity of 1 accepts one parameter.
-<2> The function `area/2` with an arity of 2 accepts two parameters. This is
-essentially a different function from `area/1`.
-<3> To calculate the area of a square call `area/1` with just one parameter.
-<4> Non square rectangle areas have to be calculated with `area/2` which accepts two parameters.
+The `area/1` function accepts one parameter and calculates the area of a square.
+In contrast, the `area/2` function accepts two parameters and computes the area
+of a rectangle. They share the same function name `area` but are considered
+different functions due to their distinct arities.
 
-### Hierarchical Modules
+The arity feature boosts code flexibility by allowing you to define multiple
+functions that perform similar but distinct tasks under the same name.
 
-In a big project, you will have multiple layers of Module namespaces to keep everything in
-a structure you can overlook.
+[[hierarchical-modules]]
+=== Hierarchical Modules
+indexterm:["Hierarchical Modules"]
 
-This can be done by adding `.` between the Module names:
+Organizing your code into a structured and manageable form becomes increasingly
+important as your project grows. In Elixir, you can achieve this using
+hierarchical module names. These hierarchical modules are defined by appending
+sub-module names to the parent module using a `.` delimiter.
 
 [source,elixir]
 ----
 iex> defmodule Calculator.Area do
-...>   def square(a) do
-...>     a * a
+...>   def square(side) do
+...>     side * side
 ...>   end
 ...> end
 
 iex> Calculator.Area.square(5)
 25
 ----
-
-It is just a shortcut. You could also nest the Modules:
+This `.` notation provides a convenient shorthand for defining nested modules.
+The equivalent way of expressing this hierarchy using nested module definition
+would be:
 
 [source,elixir]
 ----
 iex> defmodule Calculator do
 ...>   defmodule Area do
-...>     def square(a) do
-...>       a * a
+...>     def square(side) do
+...>       side * side
 ...>     end
 ...>   end
 ...> end
@@ -375,34 +396,44 @@ iex> defmodule Calculator do
 iex> Calculator.Area.square(5)
 25
 ----
+In both instances, we achieve the same outcome. The choice between the two 
+methods depends on your project's structure and your personal style preference.
+These hierarchical modules provide a clear path for code organization, 
+simplifying navigation and readability in large codebases.
 
-### Import
+[[import-modules]]
+=== Import
 indexterm:["Import", "Import Modules"]
 
-We can import access to public functions from other modules. So that we don't
-have to use their fully qualified name.
+Elixir provides the `import` directive for accessing public functions from other modules without needing to use their fully qualified names.
+
+Consider this `Rectangle` module with two area calculation functions:
 
 [source,elixir]
 ----
 iex> defmodule Rectangle do
-...>   def area(a) do
-...>     a * a
+...>   def area(side) do
+...>     side * side
 ...>   end
 ...>
-...>   def area(a, b) do
-...>     a * b
+...>   def area(length, width) do
+...>     length * width
 ...>   end
 ...> end
+----
+By using `import`, you can call these functions directly without prefixing them with the module name:
 
+[source,elixir]
+----
 iex> import Rectangle <1>
 Rectangle
 iex> area(5) <2>
 25
 ----
-<1> Here we `import Rectangle` to have all the functions of that module at our fingertips.
-<2> No need to `Rectangle.area/1` any more `area/1` is just fine.
+<1> The `import Rectangle` directive allows direct access to all the functions of the `Rectangle` module.
+<2> Now, you can call `area/1` directly without needing to specify `Rectangle.` beforehand.
 
-And you can also just import special functions from that module:
+You can also limit your import to specific functions from the module:
 
 [source,elixir]
 ----
@@ -414,13 +445,11 @@ iex> area(1) <2>
 iex> area(1,5) <3>
 5
 ----
-<1> Let's just import `area/2` but not all the other functions of that module.
-<2> I try to run `area/1`, but that triggered an error because I didn't import it.
-<3> Just works fine.
+<1> This line imports only the `area/2` function from the `Rectangle` module, excluding other functions.
+<2> An attempt to use `area/1` results in a compile error since it wasn't imported.
+<3> The `area/2` function works as expected.
 
-NOTE: Whenever you just use a given function without a module name before it,
-that means that the module has already been imported by Elixir (e.g. the
-`Kernel` module gets imported automatically).
+NOTE: If you are using a function without a preceding module name, it's most likely because its module has been imported already. Elixir automatically imports certain modules such as the `Kernel` module.
 
 #### Import Hierarchical Modules
 
