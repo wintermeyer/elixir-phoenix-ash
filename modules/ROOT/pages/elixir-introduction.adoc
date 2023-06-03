@@ -1,83 +1,64 @@
 [[elixir_introduction]]
-# Elixir Introduction
+= Elixir Introduction
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-This chapter teaches the basics of Elixir, just enough for you
-to become productive with Phoenix.
+Welcome to the express lane of Elixir basics! This chapter aims to equip you 
+with just the right amount of knowledge to get productive with Phoenix.
 
 [IMPORTANT]
-.Elixir version
+.Elixir Version
 ====
-All code examples are written and tested for Elixir version 1.13.3.
-Please make sure that you have that or a higher version installed.
+Our journey is charted for Elixir version 1.15. Please use the following 
+command to check your Elixir version:
+
 [source,bash]
 ----
 $ elixir -v
-Erlang/OTP 24 [erts-12.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1]
+Erlang/OTP 26 [erts-14.0] [source] [64-bit] [...]
 
-Elixir 1.13.3 (compiled with Erlang/OTP 22)
+Elixir 1.15.0 (compiled with Erlang/OTP 24)
 ----
 ====
 
-[[elixir-introduction-iex]]
-## Elixir's Interactive Shell (iex)
+NOTE: If you're new to Elixir or in need of an upgrade, you might want 
+to consider using `asdf`, a versatile version manager that can handle both 
+Elixir and Erlang (you need both). Head over to the 
+https://asdf-vm.com[asdf] homepage for instructions on how to install and 
+use it.
+indexterm:["asdf"]
 
-Your Elixir installation comes with Elixir's Interactive Shell (`iex`), which
-we will use for most of the examples in this chapter. Please go to your command
-line and fire it up:
-indexterm:["iex", "Elixir's Interactive Shell"]
+
+[[elixir-introduction-iex]]
+== Elixir's Interactive Shell (IEx)
+
+Elixir equips you with an interactive shell, `IEx` (Interactive Elixir), that's 
+going to be our sandbox for most examples in this chapter. So let's roll up our 
+sleeves and give it a whirl in your command line:
+indexterm:[IEx, Interactive Elixir]
 
 [source,elixir]
 ----
 $ iex
-Erlang/OTP 24 [erts-12.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1]
+Erlang/OTP 26 [erts-14.0] [source] [64-bit] [...]
 
-Interactive Elixir (1.13.3) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.15.0) - press Ctrl+C to exit (type h() ENTER for help)
 iex(1)> <1>
 ----
-<1> This is your iex prompt.
+<1> This is your IEx prompt.
 
-IMPORTANT: Press `CTRL-C` twice (or `CTRL-\` once) to exit `iex`.
+IMPORTANT: To bid goodbye to IEx, give `CTRL-C` a double tap or a single `CTRL-\` will do.
 
-The `iex` will be your trusted friend during the work with this book and later
-while working with Phoenix. While programming in development mode, you can use
-it for diving into the core of your Phoenix application. You can do so too while
-being in production mode but that is the equivalent to open-heart surgery. It
-can be a lifesaver, but you need to know what you are doing.
+Embrace IEx as it's not just your companion for this book, but a reliable ally 
+for your upcoming Phoenix adventures.
 
-TIP: iex offers autocomplete (doubt press `TAB`) and a history (press the arrow-up key).
-
-### Help in the iex shell
-
-`iex`` has a built-in help function `h/1` which gives you access to some
-basic documentation:
-
-[source,elixir]
-----
-iex> h length
-
-                                def length(list)
-
-  @spec length(list()) :: non_neg_integer()
-
-guard: true
-
-Returns the length of list.
-
-Allowed in guard tests. Inlined by the compiler.
-
-## Examples
-
-    iex> length([1, 2, 3, 4, 5, 6, 7, 8, 9])
-    9
-----
-
-NOTE: The `/1` part of `h/1` signals that this function takes one argument. 
+TIP: IEx provides autocomplete (just tap `TAB` when you're unsure) and a command
+history (the arrow-up key is your friend).
 
 [[elixir-introduction-hello-world]]
 ## Hello world!
 
-The classic! The function `IO.puts/1` prints a string to standard output:
+The classic! We use `iex` to run the function `IO.puts/1` which prints a string
+to standard output:
 
 [source,elixir]
 ----
@@ -87,11 +68,9 @@ Hello world!
 ----
 indexterm:["Hello World!"]
 
-IMPORTANT: Always enclose strings with double quotes. Single
-           quotes create a charlist, which is a different type.
-
-In case you need double quotes within a string you have to escape them with
-backslashes:
+Always **enclose strings with double quotes**! Single quotes create a charlist,
+which is a different type. In case you need double quotes within a string you
+have to escape them with backslashes:
 
 [source,elixir]
 ----
@@ -99,6 +78,19 @@ iex> IO.puts("With double quotes: \"Hello world!\"")
 With double quotes: "Hello world!"
 :ok
 ----
+
+Let's have a quick look into `IO.puts/1`:
+
+- `IO` is the name of the https://hexdocs.pm/elixir/1.15.0-rc.1/IO.html[IO
+module]. A module is collection of functions. It is a way to organize code.
+Normally a module has to be loaded with `require` or `import` but since the `IO`
+module is so essential it gets loaded automatically. 
+- `puts/1` is the name of a
+function. The `1` part is called an **arity**. The arity represents the number
+of arguments that function accepts. A module can have multiple functions with
+the same name as long as they all have a different arity.
+
+TIP: When writing documentation always use the function name AND the arity! Otherwise it just doesn't make sense for Elixir programmers.
 
 [[elixir-introduction-basic-calculations]]
 ## Basic Calculations
@@ -118,8 +110,8 @@ iex(3)> 23 / 3
 
 [TIP]
 ====
-You can use the `i/1` function to find out the type of an expression. 
-I like to combine that with the `v/1` function which prints the value of an expression. 
+You can use the `i/1` function which is build into the `iex` shell to 
+find out the type of an expression. I like to combine that with the `v/1` function which prints the value of the latest expression. 
 
 [source,elixir]
 ----
@@ -139,10 +131,11 @@ indexterm:["v/1", "i/1"]
 ====
 
 [[elixir-introduction-logical-expressions]]
-## Logical Expressions
+== Logical Expressions
 
-A type `boolean` can store the values `true` or `false`. These can be used with
-the operators `and`, `or` and `not`:
+The `boolean` type in Elixir can be either `true` or `false`. You can use
+logical operators like `and`, `or`, and `not` to manipulate these boolean
+values:
 
 [source,elixir]
 ----
@@ -155,9 +148,36 @@ false
 ----
 indexterm:["Logical Expressions"]
 
-The operators `and`, `or` and `not` can only work with boolean values. The
-operators `&&` (and), `||` (or) and `!` (not) do the same but are a bit more
-free-spirited and accept *truthy* and *falsy* values (`false`` or `nil``).
+Elixir's `and`, `or`, and `not` operators strictly work with boolean values. But
+there's more! Elixir also provides `&&` (and), `||` (or), and `!` (not)
+operators that can handle *truthy* and *falsy* values, giving them a bit of
+flexibility. **In Elixir, every value is considered *truthy* except for `false`
+and `nil`, which are *falsy*.**
+
+To clarify:
+
+* `&&` (and) returns the first *falsy* value or the last value if all are *truthy*.
+* `||` (or) returns the first *truthy* value or the last value if all are *falsy*.
+* `!` (not) returns `false` if its argument is *truthy* and `true` if it's *falsy*.
+
+Let's consider a few examples:
+
+[source,elixir]
+----
+iex> true && :hello
+:hello
+iex> false || "world"
+"world"
+iex> !nil
+true
+----
+
+In the first example, `:hello` is returned because `true && :hello` evaluates to
+the last *truthy* value, which is `:hello`. In the second example, `"world"` is
+returned because `false || "world"` evaluates to the first *truthy* value, which
+is `"world"`. In the final example, `!nil` gives `true` because `nil` is a
+*falsy* value and `!` flips it to `true`.
+
 
 [[elixir-introduction-variables]]
 ## Variables
