@@ -1,0 +1,178 @@
+== Strings
+
+=== Overview
+
+indexterm:[Elixir,Strings]In Elixir, strings are binary sequences, encoded in
+UTF-8. This encoding enables strings to handle any Unicode character, which is a
+significant advantage when developing international applications.
+
+Elixir strings are defined using double quotes (`"`). Here's an example:
+
+[source,elixir]
+----
+iex> "Hello, World!"
+"Hello, World!"
+----
+
+=== Concatenation
+
+In Elixir, you can concatenate strings using the `<>` operator:
+
+[source,elixir]
+----
+iex> "Hello, " <> "World!"
+"Hello, World!"
+----
+
+=== String Interpolation
+
+indexterm:["Data Types", "String Interpolation"]Elixir provides a powerful
+feature called string interpolation. It allows you to embed expressions, not
+limited to just strings but also other data types, directly into a string. The
+embedded expressions are evaluated and their results are inserted into the
+original string at the corresponding positions. String interpolation is
+accomplished using the `#{}` syntax.
+
+Apart from strings, Elixir's string interpolation also works with other data
+types like integers, floats, atoms, and even lists or tuples of integers or
+characters. When these data types are interpolated, they are automatically
+converted to string format within the larger string.
+
+Below are examples that demonstrate string interpolation with various data
+types:
+
+[source,elixir]
+----
+iex> first_name = "Stefan"
+iex> greeting = "Hello #{first_name}!" <1>
+"Hello Stefan!"
+
+iex> counter = 23
+iex> "Count: #{counter}"
+"Count: 23"
+
+iex> list = [72, 101, 108, 108, 111]
+iex> "The list is #{list}."
+"The list is [72, 101, 108, 108, 111]."
+
+iex> tuple = {72, 101, 108, 108, 111}
+iex> "The tuple is #{tuple}."
+"The tuple is {72, 101, 108, 108, 111}."
+----
+<1> Here, we've used the `#{}` syntax to insert the value of the `first_name` variable into the string.
+
+This string interpolation feature provides a convenient way to incorporate
+dynamic content into strings, enhancing the flexibility of text manipulation in
+Elixir.
+
+=== Multiline Strings
+
+Elixir also supports multiline strings. You can define a multiline string by
+wrapping the text in triple double quotes (`"""`):
+
+[source,elixir]
+----
+iex> """
+...> Hello,
+...> World!
+...> """
+"Hello,\nWorld!\n"
+----
+
+Notice that Elixir automatically inserts newline characters (`\n`) where the
+line breaks occur.
+
+### Escape Characters
+indexterm:["Escape Characters"]
+
+In certain situations, we might want to include special characters in our
+strings that can't be typed directly. For instance, we might want to include
+newline to split a string across multiple lines.
+
+These special characters can be represented using _escape sequences_, which are
+initiated by a backslash (`\`). Here are some common escape sequences:
+
+* `\"` - Double quote
+* `\'` - Single quote
+* `\\` - Backslash
+* `\n` - Newline
+* `\t` - Tab
+
+Here are some examples of using escape sequences:
+
+[source,elixir]
+----
+iex> "Hello, \"World!\"" <1>
+"Hello, \"World!\""
+iex> "Line 1\nLine 2" <2>
+"Line 1\nLine 2"
+iex> "Column 1\tColumn 2" <3>
+"Column 1\tColumn 2"
+----
+<1> The `\"` escape sequence allows us to include double quotes within a string.
+<2> The `\n` escape sequence represents a newline, which splits a string across multiple lines.
+<3> The `\t` escape sequence represents a tab, which creates some horizontal space in the string.
+
+=== String Functions
+
+indexterm:[Elixir,String Functions]Elixir provides a `String` module that offers
+a comprehensive set of functions for working with strings. With these functions,
+you can perform a variety of operations such as changing case, trimming
+whitespace, splitting and joining strings, repeating strings, replacing
+substrings, and much more.
+
+For example, you can use the `upcase` function to convert a string to uppercase:
+
+[source,elixir]
+----
+iex> String.upcase("hello")
+"HELLO"
+----
+
+You can use the `downcase` function to convert a string to lowercase:
+
+[source,elixir]
+----
+iex> String.downcase("HELLO")
+"hello"
+----
+
+The `trim` function allows you to remove leading and trailing whitespace:
+
+[source,elixir]
+----
+iex> String.trim("  hello  ")
+"hello"
+----
+
+With the `split` function, you can divide a string into a list of substrings:
+
+[source,elixir]
+----
+iex> String.split("Hello, World!", ", ")
+["Hello", "World!"]
+----
+
+On the other hand, the `join` function lets you combine a list of strings into a
+single string:
+
+[source,elixir]
+----
+iex> String.join(["Hello", "World!"], ", ")
+"Hello, World!"
+----
+
+The `replace` function allows you to substitute a specific pattern in a string
+with another string:
+
+[source,elixir]
+----
+iex> String.replace("Hello, World!", "World", "Elixir")
+"Hello, Elixir!"
+----
+
+These are just a few examples of the many functions available in the `String`
+module. You can find the full list of functions, along with their descriptions
+and examples, in the official Elixir documentation for the String module at
+link:https://hexdocs.pm/elixir/String.html[hexdocs.pm/elixir/String.html].
+
