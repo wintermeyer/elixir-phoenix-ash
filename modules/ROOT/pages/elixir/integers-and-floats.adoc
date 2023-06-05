@@ -1,0 +1,129 @@
+== Numbers
+
+=== Integers 
+
+indexterm:[Elixir,Integers]Integers are whole numbers that can be positive, negative or zero. In Elixir, you can use integers without any limits, as long as you have enough memory in your machine.footnote:[For more information on the minimum and maximum values of integers in Elixir, see https://stackoverflow.com/questions/28093580/how-to-get-minimum-and-maximum-value-of-each-type-in-elixir#:~:text=Integers%20in%20Erlang%2FElixir%20are,how%20large%20they%20can%20be.]
+
+Here is an example of integers in Elixir:
+
+[source,elixir]
+----
+iex> 3
+3
+
+iex> -1042
+-1042
+
+iex> 0
+0
+----
+
+Integers can also be represented in binary, octal, and hexadecimal:
+
+[source,elixir]
+----
+iex> 0b1010
+10
+
+iex> 0o777
+511
+
+iex> 0x1F
+31
+----
+
+Additionally, Elixir supports basic arithmetic operations with integers:
+
+[source,elixir]
+----
+iex> 2 + 3
+5
+
+iex> 10 - 7
+3
+
+iex> 5 * 4
+20
+
+iex> 16 / 2 
+8.0 <1>
+----
+
+<1> The division operation (`/`) in Elixir always returns a float.
+
+==== Readability in Large Integers
+
+When working with large integers in Elixir, it's common to encounter readability issues. A long, continuous string of digits can be difficult to read at a glance, especially when it comes to distinguishing thousands, millions, billions and so on.
+
+To improve the readability of large integers, Elixir allows the use of underscores (`_`) as visual separators. You can place these underscores anywhere in your number, and they will be ignored by the compiler.
+
+Here's an example:
+
+[source,elixir]
+----
+iex> 1_000_000
+1000000
+----
+
+In the example above, `1_000_000` is exactly the same as `1000000` in Elixir. The underscores simply make it easier to identify the number as one million at a glance.
+
+This feature is particularly useful when working with very large numbers, or when defining constants that might be better understood in their 'grouped' form. 
+
+Remember that while you can place the underscores anywhere in the number, placing them in positions that reflect common numeric groupings (e.g., thousands, millions) tends to be the most effective for readability.
+
+[source,elixir]
+----
+iex> 123_456_789 # easy to read
+123456789
+
+iex> 1234_5678_9 # harder to read
+123456789
+----
+
+
+=== Floats
+
+indexterm:[Elixir,Floats]Floats are numbers that have a decimal point. They are represented in Elixir using 64-bit double-precision.
+
+Here's how you can represent float numbers in Elixir:
+
+[source,elixir]
+----
+iex> 3.14
+3.14
+
+iex> -0.1234
+-0.1234
+
+iex> 0.0
+0.0
+----
+
+Floats in Elixir must be at least 1 digit long, and they can have an optional exponent part. Here's an example:
+
+[source,elixir]
+----
+iex> 1.0e-10
+1.0e-10
+----
+
+Keep in mind that float number precision can be a little imprecise due to the way they are stored in memory.
+
+Remember that in Elixir, as in other languages, when you perform arithmetic with both integers and floats, the result will be a float to maintain precision.
+
+[source,elixir]
+----
+iex> 2 * 3.5
+7.0
+----
+
+The use of floor division (`div`) and modulo operation (`rem`) can return integer values:
+
+[source,elixir]
+----
+iex> div(10, 3)
+3
+
+iex> rem(10, 3)
+1
+----

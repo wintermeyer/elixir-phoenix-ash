@@ -1,0 +1,17 @@
+[[elixir_101]]
+= Elixir 101
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
+
+Welcome to the fast track of Elixir fundamentals! This chapter is designed to
+furnish you with a balanced measure of knowledge to kickstart your journey with
+the Phoenix Framework effectively. During the course, we might encounter a few
+scenarios that resemble 'chicken-or-egg' situations - where an explanation
+relies on concepts yet to be discussed. However, rest assured that such
+occurrences will be kept minimal, and the context provided should help you grasp
+the overarching idea. Buckle up and prepare for an exciting adventure into the
+realm of Elixir.
+
+include::elixir-version.adoc[]
+include::iex.adoc[]
+include::hello-world.adoc[]
+include::integers-and-floats.adoc[]

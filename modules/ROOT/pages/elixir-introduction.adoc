@@ -1,134 +1,3 @@
-[[elixir_introduction]]
-= Elixir Introduction
-Stefan Wintermeyer <sw@wintermeyer-consulting.de>
-
-Welcome to the express lane of Elixir basics! This chapter aims to equip you 
-with just the right amount of knowledge to get productive with Phoenix.
-
-[IMPORTANT]
-.Elixir Version
-====
-Our journey is charted for Elixir version 1.15. Please use the following 
-command to check your Elixir version:
-
-[source,bash]
-----
-$ elixir -v
-Erlang/OTP 26 [erts-14.0] [source] [64-bit] [...]
-
-Elixir 1.15.0 (compiled with Erlang/OTP 24)
-----
-====
-
-NOTE: If you're new to Elixir or in need of an upgrade, you might want 
-to consider using `asdf`, a versatile version manager that can handle both 
-Elixir and Erlang (you need both). Head over to the 
-https://asdf-vm.com[asdf] homepage for instructions on how to install and 
-use it.
-indexterm:["asdf"]
-
-
-[[elixir-introduction-iex]]
-== Elixir's Interactive Shell (IEx)
-
-Elixir equips you with an interactive shell, `IEx` (Interactive Elixir), that's 
-going to be our sandbox for most examples in this chapter. So let's roll up our 
-sleeves and give it a whirl in your command line:
-indexterm:[IEx, Interactive Elixir]
-
-[source,elixir]
-----
-$ iex
-Erlang/OTP 26 [erts-14.0] [source] [64-bit] [...]
-
-Interactive Elixir (1.15.0) - press Ctrl+C to exit (type h() ENTER for help)
-iex(1)> <1>
-----
-<1> This is your IEx prompt.
-
-IMPORTANT: To bid goodbye to IEx, give `CTRL-C` a double tap or a single `CTRL-\` will do.
-
-Embrace IEx as it's not just your companion for this book, but a reliable ally 
-for your upcoming Phoenix adventures.
-
-TIP: IEx provides autocomplete (just tap `TAB` when you're unsure) and a command
-history (the arrow-up key is your friend).
-
-[[elixir-introduction-hello-world]]
-## Hello world!
-
-The classic! We use `iex` to run the function `IO.puts/1` which prints a string
-to standard output:
-
-[source,elixir]
-----
-iex> IO.puts("Hello world!")
-Hello world!
-:ok
-----
-indexterm:["Hello World!"]
-
-Always **enclose strings with double quotes**! Single quotes create a charlist,
-which is a different type. In case you need double quotes within a string you
-have to escape them with backslashes:
-
-[source,elixir]
-----
-iex> IO.puts("With double quotes: \"Hello world!\"")
-With double quotes: "Hello world!"
-:ok
-----
-
-Let's have a quick look into `IO.puts/1`:
-
-- `IO` is the name of the https://hexdocs.pm/elixir/1.15.0-rc.1/IO.html[IO
-module]. A module is collection of functions. It is a way to organize code.
-Normally a module has to be loaded with `require` or `import` but since the `IO`
-module is so essential it gets loaded automatically. 
-- `puts/1` is the name of a
-function. The `1` part is called an **arity**. The arity represents the number
-of arguments that function accepts. A module can have multiple functions with
-the same name as long as they all have a different arity (see <<function-arity>>).
-
-TIP: When writing documentation always use the function name AND the arity! Otherwise it just doesn't make sense for Elixir programmers.
-
-[[elixir-introduction-basic-calculations]]
-## Basic Calculations
-
-Let's have a look at some basic calculations with the types `integer` (integer numbers) 
-and `float` (real numbers):
-
-[source,elixir]
-----
-iex(1)> 1 + 1
-2
-iex(2)> 1.1 + 1
-2.1
-iex(3)> 23 / 3
-7.666666666666667
-----
-
-[TIP]
-====
-You can use the `i/1` function which is build into the `iex` shell to 
-find out the type of an expression. I like to combine that with the `v/1` function which prints the value of the latest expression. 
-
-[source,elixir]
-----
-iex(1)> 23 / 3
-7.666666666666667
-iex(2)> i v
-Term
-  7.666666666666667
-Data type
-  Float
-Reference modules
-  Float
-Implemented protocols
-  IEx.Info, Inspect, List.Chars, String.Chars
-----
-indexterm:["v/1", "i/1"]
-====
 
 [[elixir-introduction-logical-expressions]]
 == Logical Expressions
@@ -501,12 +370,12 @@ the module name:
 
 [source,elixir]
 ----
-iex> alias Calculator.Area <2>
+iex> alias Calculator.Area <1>
 Calculator.Area
 iex> Area.square(99)
 9801
 ----
-<2> This command sets an alias `Area` for `Calculator.Area` using a more concise syntax.
+<1> This command sets an alias `Area` for `Calculator.Area` using a more concise syntax.
 
 [[use-keyword]]
 === The 'use' Keyword
@@ -775,7 +644,7 @@ iex> {true, :apple, 234, "house", 3.14} <3>
 {true, :apple, 234, "house", 3.14}
 ----
 <1> A tuple containing three integers.
-<2> A tuple with an atom representing status and a string — a prevalent construct in Elixir.
+<2> A tuple with an atom representing status and a string — an often used construct in Elixir.
 <3> A tuple containing different data types.
 
 You can quickly access an element of a tuple by using the `elem/2` function:
@@ -872,26 +741,42 @@ iex> List.last(shopping_list)
 "pineapple"
 ----
 
-NOTE: You don't need to stress over choosing between lists and tuples early on. As you continue your journey through this book, you'll develop an intuitive understanding of when to use which based on the specific problem at hand.
+NOTE: No need to stress over choosing between lists and tuples early on. As you
+continue your journey through this book, you'll develop an intuitive
+understanding of when to use which based on the specific problem at hand.
 
 ### Lists vs. Tuples: Performance Differences
 indexterm:["Performance", "Lists", "Tuples"]
 
-When it comes to choosing between lists and tuples in Elixir, one important factor to consider is their performance. Here's a simplified rundown:
+When it comes to choosing between lists and tuples in Elixir, one important
+factor to consider is their performance. Here's a simplified rundown:
 
 #### Tuples
 indexterm:["Tuples"]
 
-Tuples are like a fast train with assigned seats. You can quickly find your seat (element), no matter where it is. But if you want to add or remove passengers (modify the tuple), it's a big deal - you pretty much need to start a new train (create a new tuple). So, tuples are great when you just want to look at your data and don't plan to change it much.
+Tuples are like a fast train with assigned seats. You can quickly find your seat
+(element), no matter where it is. But if you want to add or remove passengers
+(modify the tuple), it's a big deal - you pretty much need to start a new train
+(create a new tuple). So, tuples are great when you just want to look at your
+data and don't plan to change it much.
 
 #### Lists
 indexterm:["Lists"]
 
-Lists are like a chain of people holding hands. Adding a new person at the front of the chain (adding an element to the start of the list) is easy. But if you're looking for someone specific (accessing a particular element), you have to start at one end of the chain and check each person until you find them. So, lists are excellent when you want to keep adding new elements, but not so great if you frequently need to find a specific element.
+Lists are like a chain of people holding hands. Adding a new person at the front
+of the chain (adding an element to the start of the list) is easy. But if you're
+looking for someone specific (accessing a particular element), you have to start
+at one end of the chain and check each person until you find them. So, lists are
+excellent when you want to keep adding new elements, but not so great if you
+frequently need to find a specific element.
 
 #### Which One to Use?
 
-In general, if you're mostly looking at your data and not changing it much, tuples are a better bet. But if you're continually adding new stuff to the start, you'll want to use lists. If you're often adding to the end or frequently looking for specific items, you might want to consider other options, like maps or keyword lists.
+In general, if you're mostly looking at your data and not changing it much,
+tuples are a better bet. But if you're continually adding new stuff to the
+start, you'll want to use lists. If you're often adding to the end or frequently
+looking for specific items, you might want to consider other options, like maps
+or keyword lists.
 
 ## Higher-Order Functions
 

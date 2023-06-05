@@ -1,0 +1,38 @@
+[[elixir-introduction-hello-world]]
+## Hello world!
+
+The classic! We use `iex` to run the function `IO.puts/1` which prints a string
+to standard output:
+
+[source,elixir]
+----
+iex> IO.puts("Hello world!")
+Hello world!
+:ok
+----
+indexterm:["Hello World!"]
+
+Always **enclose strings with double quotes**! Single quotes create a charlist,
+which is a different type. In case you need double quotes within a string you
+have to escape them with backslashes:
+
+[source,elixir]
+----
+iex> IO.puts("With double quotes: \"Hello world!\"")
+With double quotes: "Hello world!"
+:ok
+----
+
+Let's have a quick look into `IO.puts/1`:
+
+- `IO` is the name of the https://hexdocs.pm/elixir/1.15.0-rc.1/IO.html[IO
+module]. A module is collection of functions. It is a way to organize code.
+Normally a module has to be loaded with `require` or `import` but since the `IO`
+module is so essential it gets loaded automatically. 
+- `puts/1` is the name of a
+function. The final `1` of `IO.puts/1` is called an **arity**. The arity represents the number
+of arguments that function accepts. A module can have multiple functions with
+the same name as long as they all have a different arity (see <<function-arity>>).
+
+TIP: When writing documentation always use the function name AND the arity! Otherwise it just doesn't make sense for your fellow Elixir programmers.
+
