@@ -1,0 +1,31 @@
+[[elixir-introduction-variables]]
+== Variables
+indexterm:["Variables"]
+
+In Elixir, variable names adhere to the 
+https://en.wikipedia.org/wiki/Snake_case[snake_case] format. They start with a 
+lowercase letter, and words are separated by underscores (_). 
+
+Take a look at the following examples:
+
+[source,elixir]
+----
+iex> length = 10 <1>
+10
+iex> width = 23
+23
+iex> room_area = length * width
+230
+----
+<1> Here, the `=` operator assigns the value 10 to the variable `length`.
+
+Variable names starting with an uppercase letter will throw an error:
+
+[source,elixir]
+----
+iex> RoomWidth = 2
+** (MatchError) no match of right hand side value: 2 <1>
+----
+<1> The `MatchError` might seem strange at this point, but fear not! Its 
+mystery will unravel as we dive deeper into Elixir's realm.
+

@@ -1,0 +1,53 @@
+== Pattern Matching
+indexterm:["Pattern Matching"]
+
+If you're new to Elixir, one of the first and most important concepts you'll encounter is pattern matching, often described as "the equals sign is not an assignment operator". This might sound confusing, so let's break it down into simple terms.
+
+In many programming languages, the equals sign (`=`) is used for assigning a value to a variable. For instance, if we write `x = 5`, we mean "Let `x` be equal to 5." But in Elixir, the equals sign has a slightly different role.
+
+In Elixir, the `=` sign is the _match operator_, and it tries to match the left side with the right side. When we write `x = 5` in Elixir, what we're really saying is "Match `x` to the value 5." If `x` is not yet bound to any value, Elixir will bind `x` to 5, making it act similar to assignment. However, if `x` is already bound to a value, Elixir will try to match that value with 5, leading to a different outcome.
+
+For instance, let's say `x` is already bound to 5. If we then try to match `x = 7`, Elixir will throw a `MatchError` because it can't match 5 with 7:
+
+[source,elixir]
+----
+iex> x = 5
+5
+iex> x = 7
+** (MatchError) no match of right hand side value: 7
+----
+
+Pattern matching becomes even more powerful with complex data types, like tuples or lists:
+
+[source,elixir]
+----
+iex> {a, b, c} = {:hello, "world", 42}
+{:hello, "world", 42}
+iex> a
+:hello
+iex> b
+"world"
+iex> c
+42
+----
+
+In the example above, Elixir matches the variables `a`, `b`, and `c` to the respective values in the tuple on the right side. Now `a` is `:hello`, `b` is `"world"`, and `c` is `42`.
+
+This might look similar to destructuring in JavaScript or other languages, but remember that Elixir will always try to _match_, not just assign. If there's no match, you'll get an error:
+
+[source,elixir]
+----
+iex> {d, e, f} = {:hi, "there", 23}
+{:hi, "there", 23}
+iex> {d, e} = {:hi, "there", 23}
+** (MatchError) no match of right hand side value: {:hi, "there", 23}
+----
+
+In the second command, we're trying to match a two-element pattern with a three-element tuple, which doesn't work. Hence, the `MatchError`.
+
+So, in a nutshell, pattern matching in Elixir is a way to check if a certain pattern corresponds to the data you have, and if it does, to assign values to variables based on that pattern.
+indexterm:["Pattern Matching", "MatchError"]
+indexterm:["Pattern Matching", "Match Operator"]
+
+NOTE: Pattern Matching is a very powerful concept in Elixir, and it's used in many different ways. This is just the tip of the iceberg. We'll see more examples of it throughout this book.
+
