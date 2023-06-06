@@ -1,7 +1,7 @@
 ### Keyword List
 indexterm:["Keyword List"]
 
-Keyword lists serve as a staple data structure in Elixir, taking the form of lists of tuples which act as key-value pairs, with atoms acting as keys. There are two ways to create keyword lists:
+Keyword lists serve as a staple data structure in Elixir, taking the form of lists of tuples which act as key-value pairs, with atoms acting as keys. 
 
 #### Creating Keyword Lists
 
@@ -47,7 +47,7 @@ iex> user = [{:name, "joe"}, {:age, 23}] <1>
 
 #### Manipulating Keyword Lists
 
-Keyword lists can be manipulated with these functions:
+Keyword lists can be manipulated with these functionsfootnote:[Find all Keyword funcations at https://hexdocs.pm/elixir/Keyword.html]:
 
 * `Keyword.get/2`: This function retrieves the value associated with a given key within a keyword list.
 +
@@ -115,3 +115,4 @@ iex> new_user[:name] <1>
 "fred"
 ----
 <1> If duplicate keys are present in a keyword list, a lookup operation retrieves the first occurrence.
+

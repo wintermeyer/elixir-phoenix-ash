@@ -1,0 +1,171 @@
+### Map
+indexterm:["Map"]
+
+Maps are data structures that store key-value pairs. So they are similar to keyword lists, but with some important differences:
+
+1. **Performance**
++
+Maps are faster at finding values for given keys, especially when the map gets large. If you have a big bunch of key-value pairs and need to frequently lookup values, a map is more efficient. Keyword lists can be slower when they grow bigger because they have to search through the list one item at a time.
+2. **Key Uniqueness**
++
+In a map, each key is unique. If you try to add an entry with a key that already exists, it will just update the existing entry. This is useful when you want to ensure there are no duplicates. With keyword lists, you can have the same key multiple times.
+3. **No Key Ordering**
++
+Keyword lists keep the order of the elements as you added them, which can be useful in certain situations. Maps, on the other hand, don't keep track of the insertion order.
+4. **Any Key Type**
++
+Maps can have keys of any type, while keyword lists usually have atom keys. This gives maps more flexibility if you need to use different types as keys.
+
+Maps are created using the `%{}` syntax.
+
+[source,elixir]
+----
+iex(1)> product_prices = %{"Apple" => 0.5, "Orange" => 0.7} <1>
+%{"Apple" => 0.5, "Orange" => 0.7}
+iex(2)> product_prices["Orange"] <2>
+0.7
+iex(3)> product_prices["Banana"] <3>
+nil
+iex(4)> product_prices = %{"Apple" => 0.5, "Apple" => 1, "Orange" => 0.7}
+warning: key "Apple" will be overridden in map
+  iex:4
+
+%{"Apple" => 1, "Orange" => 0.7} <4>
+----
+<1> A new map is created and bound to the variable `product_prices`.
+<2> Value retrieval is straightforward: append the key to the map name within brackets.
+<3> If the given key doesn't exist, it returns `nil`.
+<4> Unlike keyword lists, maps **disallow duplicate keys**.
+
+Maps are flexible, allowing any data type to serve as both keys and values:
+
+[source,elixir]
+----
+iex> %{"one" => 1, "two" => "abc", 3 => 7, true => "asdf"}
+%{3 => 7, true => "asdf", "one" => 1, "two" => "abc"}
+----
+
+NOTE: Each key must be unique within a map. If there are duplicates, the last one overwrites the previous values.
+
+#### Atom Key
+
+Maps support atom keys, enabling some handy features:
+
+[source,elixir]
+----
+iex> product_prices = %{apple: 0.5, orange: 0.7} <1>
+%{apple: 0.5, orange: 0.7}
+iex> product_prices.apple <2>
+0.5
+iex> product_prices.banana <3>
+** (KeyError) key :banana not found in: %{apple: 0.5, orange: 0.7}
+----
+<1> This syntax makes reading and typing easier when using atoms as keys.
+<2> Atom keys allow the use of the dot operator (`.`) to access their values.
+<3> If an attempt is made to access a nonexistent key with the dot operator, an error is thrown.
+
+Sure, let's break it down a little bit more and explain each part in a simpler way.
+
+#### Map Functions
+
+Elixir's `Map` module is equipped with various functions that help to perform different operations on maps.footnote:[Find all functions at https://hexdocs.pm/elixir/Map.html.] Let's explore the functions I use the most. 
+
+##### Creating a Map
+
+Create a map named `product_prices` that stores the prices of various products. 
+
+```elixir
+iex> product_prices = %{apple: 0.5, orange: 0.7, coconut: 1}
+%{apple: 0.5, coconut: 1, orange: 0.7}
+```
+indexterm:[`%{}`]
+Here, we have three items - apple, orange, and coconut - each with their respective prices.
+
+##### Converting a Map to a List
+
+indexterm:[`Map.to_list/1`]
+The `Map.to_list/1` function allows us to convert a map into a keyword list.
+
+```elixir
+iex> Map.to_list(product_prices)
+[apple: 0.5, coconut: 1, orange: 0.7]
+```
+We can see that our map has now been transformed into a keyword list.
+
+##### Retrieving All Values from a Map
+
+indexterm:[`Map.values/1`]
+To fetch all the values from a map (in our case, the product prices), we can utilize the `Map.values/1` function.
+
+```elixir
+iex> Map.values(product_prices)
+[0.5, 1, 0.7]
+```
+This gives us the prices for all our products.
+
+##### Retrieving All Keys from a Map
+
+indexterm:[`Map.keys/1`]
+To fetch all the keys from a map, we can utilize the `Map.keys/1` function.
+
+```elixir
+iex> Map.keys(product_prices)
+[:apple, :orange, :coconut]
+```
+
+##### Splitting a Map
+
+indexterm:[`Map.split/2`]
+We can split a map into two new maps based on a provided list of keys using the `Map.split/2` function.
+
+```elixir
+iex> Map.split(product_prices, [:orange, :apple])
+{%{apple: 0.5, orange: 0.7}, %{coconut: 1}}
+```
+Our original map is divided into two maps: one containing `apple` and `orange`, and the other containing `coconut`.
+
+##### Removing a Key-Value Pair from a Map
+
+indexterm:[`Map.delete/2`]
+The `Map.delete/2` function can be used when we need to remove a specific key-value pair from our map.
+
+```elixir
+iex> a = Map.delete(product_prices, :orange)
+%{apple: 0.5, coconut: 1}
+```
+A new map `a` is created where the key-value pair for `orange` is removed.
+
+##### Removing Multiple Key-Value Pairs from a Map
+
+indexterm:[`Map.drop/2`]
+For removing multiple key-value pairs, we can use the `Map.drop/2` function.
+
+```elixir
+iex> b = Map.drop(product_prices, [:apple, :orange])
+%{coconut: 1}
+```
+We have removed `apple` and `orange`, leaving only `coconut` in the new map `b`.
+
+##### Merging Two Maps
+
+indexterm:[`Map.merge/2`]
+The `Map.merge/2` function enables us to combine two maps.
+
+```elixir
+iex> additional_prices = %{banana: 0.4, pineapple: 1.2}
+%{banana: 0.4, pineapple: 1.2}
+iex> Map.merge(product_prices, additional_prices)
+%{apple: 0.5, banana: 0.4, coconut: 1, orange: 0.7, pineapple: 1.2}
+```
+A new map is created that contains the items and their prices from both the maps.
+
+##### Adding a Key-Value Pair to a Map
+
+indexterm:[`Map.put/2`]
+The `Map.put/2` function allows us to add a new key-value pair to a map.
+
+```elixir
+iex> c = Map.put(product_prices, :potato, 0.2)
+%{apple: 0.5, coconut: 1, orange: 0.7, potato: 0.2}
+```
+We've created a new map `c` where `potato` has been added to our original map with a price of 0.2.
