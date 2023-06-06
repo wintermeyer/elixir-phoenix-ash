@@ -1,0 +1,67 @@
+## [[higher-order-functions]]
+== Higher-Order Functions
+indexterm:["Functions", "Higher-Order Functions"]
+
+In Elixir, functions are treated as first-class citizens. This means you can use functions as arguments to other functions, and even return them as results. A function that can take another function as an argument or return it as a result is called a *higher-order function*. 
+
+When passing a function to a higher-order function, we often use *anonymous functions*. Let's dive in and understand what these are.
+
+### [[anonymous-functions]]
+=== Anonymous Functions
+indexterm:["Functions", "Anonymous Functions"]
+
+An anonymous function, as the name suggests, is a function without a name. These are throwaway functions that you define right where you need them.
+
+Anonymous functions are defined using the `fn` keyword, like so:
+
+[source,elixir]
+----
+iex> hello = fn -> "Hello, world!" end <1>
+#Function<20.99386804/0 in :erl_eval.expr/5>
+iex> hello.() <2>
+"Hello, world!"
+----
+<1> We're defining an anonymous function that returns "Hello, world!" and assigning it to the variable `hello`.
+<2> The `.` (dot) operator is used to call anonymous functions.
+
+Anonymous functions can also take parameters:
+
+[source,elixir]
+----
+iex> add = fn (a, b) -> a + b end <1>
+#Function<12.99386804/2 in :erl_eval.expr/5>
+iex> add.(1, 2) <2>
+3
+----
+<1> We define an anonymous function that accepts two parameters and returns their sum.
+<2> This anonymous function can be invoked with two numbers to get their sum.
+
+### [[capture-operator]]
+=== The Capture Operator (&)
+indexterm:["& operator", "Capture operator"]
+
+Creating anonymous functions in Elixir is even easier with the `&` operator, which is also known as the *capture operator*. It provides a shorthand for creating anonymous functions. Let's see how it works:
+
+[source,elixir]
+----
+iex> double = &(&1 * 2) <1>
+#Function<6.99386804/1 in :erl_eval.expr/5>
+iex> double.(4) <2>
+8
+----
+<1> The `&1` refers to the first argument passed to the function. This function simply doubles whatever value it's given.
+<2> Invoking this function with the number 4 yields 8.
+
+We can also use the capture operator within higher-order functions:
+
+[source,elixir]
+----
+iex> numbers = [1, 2, 3, 4]
+[1, 2, 3, 4]
+iex> Enum.map(numbers, &(&1 * 2)) <1>
+[2, 4, 6, 8]
+----
+<1> `Enum.map/2` applies a function to each element in a list and returns a new list. Here, we double each number in the list.
+
+These fundamental concepts - anonymous functions and the capture operator - will empower you to write flexible and reusable code in Elixir. 
+
