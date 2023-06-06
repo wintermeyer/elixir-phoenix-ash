@@ -169,3 +169,4 @@ iex> c = Map.put(product_prices, :potato, 0.2)
 %{apple: 0.5, coconut: 1, orange: 0.7, potato: 0.2}
 ```
 We've created a new map `c` where `potato` has been added to our original map with a price of 0.2.
+

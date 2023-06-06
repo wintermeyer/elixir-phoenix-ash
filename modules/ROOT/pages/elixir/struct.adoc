@@ -1,10 +1,5 @@
-### Keyword List, Map and Struct
-indexterm:["Structured Data Types", "Keyword Lists, Maps and Structs"]
-
-While Lists and Tuples are useful, they lack the ability to access values using a specific key. This is where more advanced data types like Keyword Lists, Maps, and Structs come into play, providing key-value pair functionality.
-
-#### Struct
-indexterm:["Structs"]
+### Struct
+indexterm:["Struct"]
 
 A struct is a map variant that includes compile-time checks and default values. The `defstruct` construct is used to define a struct:
 

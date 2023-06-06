@@ -15,12 +15,4 @@ include::elixir-version.adoc[]
 include::iex.adoc[]
 include::hello-world.adoc[]
 include::basic-debugging.adoc[]
-
-== Data Types
-
-include::integers-and-floats.adoc[]
-include::strings.adoc[]
-include::lists-and-tuples.adoc[]
-include::keyword-list.adoc[]
-include::map.adoc[]
-include::keyword-lists-maps-structs.adoc[]
+include::data-types.adoc[]

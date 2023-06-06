@@ -1,0 +1,10 @@
+== Data Types
+
+Since this is a beginners book I have to discuss all these data types because you'll use them eventually. But you don't need to understand them all right away. Feel free to skip the parts which don't interest you. You can always come back later.
+
+include::integers-and-floats.adoc[]
+include::strings.adoc[]
+include::lists-and-tuples.adoc[]
+include::keyword-list.adoc[]
+include::map.adoc[]
+include::struct.adoc[]
