@@ -1,0 +1,94 @@
+## The absolute Essentials of Debugging Elixir Code
+
+In this introductory guide, we're only scratching the surface of debugging in
+Elixir, but I will introduce three vital tools that will be beneficial while
+exploring the code examples in this book.
+
+### dbg/2
+indexterm:["dbg/2"]
+
+Elixir version 1.14 introduced the powerful debugging tool `dbg(code \\ quote do
+binding() end, options \\ [])`. It not only prints the passed value, returning
+it simultaneously, but also outlines the code and location. Here's an example:
+
+```elixir
+iex(1)> name = "Elixir"
+"Elixir"
+iex(2)> dbg(name)
+[iex:2: (file)]
+name #=> "Elixir"
+
+"Elixir"
+iex(3)> dbg(IO.puts("Hello World!"))
+Hello World!
+[iex:3: (file)]
+IO.puts("Hello World!") #=> :ok
+
+:ok
+```
+
+NOTE: Beginners often find it odd that `dbg/2` and `IO.inspect/2` return the
+value they print. However, once you start utilizing Pipes (which comes later in
+this book), it becomes a natural part of maintaining uninterrupted code flow
+while inspecting values in a pipe operation.
+
+TIP: Have you recognized that `dbg/2` has an arity of 2 but we only use one
+argument? That is possible because the second argument is optional (hence the
+`options \\ []` part).
+
+### IO.inspect/2
+indexterm:["IO.inspect/2"]
+
+The function `IO.inspect(item, opts \\ [])` is a staple in Elixir debugging.
+Although it's less feature-rich than `dbg/2`, its usage remains widespread,
+given its history and straightforward application. You can inject `IO.inspect/2`
+into your code at any point, printing the value of an expression to your console
+- perfect for verifying a variable's value or a function call's result.
+
+For example:
+
+```elixir
+iex> name = "Elixir"
+"Elixir"
+iex> IO.inspect(name)
+"Elixir"
+"Elixir"
+```
+
+TIP: Feel free to always use `dbg/2` instead of `IO.inspect/2`. It does make
+more sense. However, if you're working with older codebases, you'll likely
+encounter `IO.inspect/2`.
+
+### i/1
+indexterm:["i/1"]
+
+Finally, the IEx helper function `i/1` offers useful insights about any data
+type or structure. Launch an IEx session with `iex` in your terminal, and then
+call `i()` with any term to obtain information about it.
+
+Here's an example:
+
+```elixir
+iex> name = "Elixir"
+"Elixir"
+iex> i(name)
+Term
+  "Elixir"
+Data type
+  BitString
+Byte size
+  6
+Description
+  This is a string: a UTF-8 encoded binary. It's printed surrounded by
+  "double quotes" because all UTF-8 encoded code points in it are printable.
+Raw representation
+  <<69, 108, 105, 120, 105, 114>>
+Reference modules
+  String, :binary
+Implemented protocols
+  Collectable, IEx.Info, Inspect, List.Chars, String.Chars
+```
+
+This output elucidates that `"Hello, world!"` is a 13-byte BitString and
+provides further details like the string's raw representation and the protocols
+it implements.

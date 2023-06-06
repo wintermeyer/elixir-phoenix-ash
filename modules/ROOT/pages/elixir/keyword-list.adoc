@@ -1,0 +1,117 @@
+### Keyword List
+indexterm:["Keyword List"]
+
+Keyword lists serve as a staple data structure in Elixir, taking the form of lists of tuples which act as key-value pairs, with atoms acting as keys. There are two ways to create keyword lists:
+
+#### Creating Keyword Lists
+
+Typically in Elixir, the most common method to create a keyword list involves using a `[_key_: _value_]` syntax:
+
+[source,elixir]
+----
+iex> user = [name: "joe", age: 23] <1>
+[name: "joe", age: 23]
+----
+<1> This syntax offers an intuitive way to create a keyword list, with each atom (e.g., `:name`, `:age`) serving as the key.
+
+You can access the value associated with a key simply:
+
+[source,elixir]
+----
+iex> user[:name] <1>
+"joe"
+----
+<1> Use the key, preceded by a colon and within brackets appended to the list name, to retrieve the associated value.
+
+[NOTE]
+====
+Keyword lists frequently appear in Phoenix applications, particularly as the final argument in the `render/3` function:
+
+[source,elixir]
+----
+render(conn, "show.html", message: "Hello", name: "Mary") <1>
+----
+<1> In this line, `[message: "Hello", name: "Mary"]` represents a keyword list. Note that the enclosing brackets are optional in this context.
+====
+
+##### Alternative Creation Method
+
+Alternatively, although less commonly used, you can create a keyword list by constructing a list of 2-item tuples, with the first item of each tuple being an atom:
+
+[source,elixir]
+----
+iex> user = [{:name, "joe"}, {:age, 23}] <1>
+[name: "joe", age: 23]
+----
+<1> This list of tuples serves as another representation of a keyword list, equivalent to the more common `[_key_: _value_]` syntax mentioned earlier.
+
+#### Manipulating Keyword Lists
+
+Keyword lists can be manipulated with these functions:
+
+* `Keyword.get/2`: This function retrieves the value associated with a given key within a keyword list.
++
+[source,elixir]
+----
+iex> list = [{:a, 1}, {:b, 2}]
+[a: 1, b: 2]
+iex> value = Keyword.get(list, :a)
+1
+iex> IO.puts(value)
+1
+:ok
+----
+
+* `Keyword.put/3`: This function is used to either add a new key-value pair to a keyword list or update an existing one.
++
+[source,elixir]
+----
+iex> list = [{:a, 1}, {:b, 2}]
+[a: 1, b: 2]
+iex> updated_list = Keyword.put(list, :a, 3)
+[a: 3, b: 2]
+iex> IO.inspect(updated_list)
+[a: 3, b: 2]
+[a: 3, b: 2]
+----
+
+* `Keyword.delete/2`: This function removes a key-value pair from a keyword list, given its key.
++
+[source,elixir]
+----
+iex> list = [{:a, 1}, {:b, 2}]
+[a: 1, b: 2]
+iex> updated_list = Keyword.delete(list, :a)
+[b: 2]
+iex> IO.inspect(updated_list)
+[b: 2]
+[b: 2]
+----
+
+* `Keyword.merge/2`: This function merges two keyword lists into one. In case of duplicate keys, values from the second list overwrite those from the first.
++
+[source,elixir]
+----
+iex> list1 = [{:a, 1}, {:b, 2}]
+[a: 1, b: 2]
+iex> list2 = [{:b, 3}, {:c, 4}]
+[b: 3, c: 4]
+iex> merged_list = Keyword.merge(list1, list2)
+[a: 1, b: 3, c: 4]
+iex> IO.inspect(merged_list)
+[a: 1, b: 3, c: 4]
+[a: 1, b: 3, c: 4]
+----
+
+#### Duplication of Keys
+
+Be aware that keyword lists allow duplication of keys, and this aspect affects how they are manipulated or accessed. For example:
+
+[source,elixir]
+----
+iex> new_user = [name: "fred"] ++ user
+[name: "fred", name: "joe", age: 23]
+iex> new_user[:name] <1>
+"fred"
+----
+<1> If duplicate keys are present in a keyword list, a lookup operation retrieves the first occurrence.

@@ -32,7 +32,7 @@ module is so essential it gets loaded automatically.
 - `puts/1` is the name of a
 function. The final `1` of `IO.puts/1` is called an **arity**. The arity represents the number
 of arguments that function accepts. A module can have multiple functions with
-the same name as long as they all have a different arity (see <<function-arity>>).
+the same name as long as they all have a different arity.
 
 TIP: When writing documentation always use the function name AND the arity! Otherwise it just doesn't make sense for your fellow Elixir programmers.
 

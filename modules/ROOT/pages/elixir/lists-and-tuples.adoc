@@ -1,0 +1,131 @@
+### Tuple
+indexterm:["Tuple"]
+
+Tuples in Elixir are a collection of elements enclosed in curly braces `{}`. They can hold multiple elements of different types. Tuples are stored contiguously in memory, making data access operations quick. However, modifications (like inserting or deleting elements) can be slow because they require creating a new tuple to preserve immutability.
+
+NOTE: Tuples are like a fast train with assigned seats. You can quickly find your seat
+(element), no matter where it is. But if you want to add or remove passengers
+(modify the tuple), it's a big deal - you pretty much need to start a new train
+(create a new tuple). So, tuples are great when you just want to look at your
+data and don't plan to change it much.
+
+Here's how tuples are represented:
+
+[source,elixir]
+----
+iex> {1, 2, 3} <1>
+{1, 2, 3}
+iex> {:ok, "test"} <2>
+{:ok, "test"}
+iex> {true, :apple, 234, "house", 3.14} <3>
+{true, :apple, 234, "house", 3.14}
+----
+<1> A tuple containing three integers.
+<2> A tuple with an atom representing status and a string — an often used construct in Elixir.
+<3> A tuple containing different data types.
+
+You can quickly access an element of a tuple by using the `elem/2` function:
+
+[source,elixir]
+----
+iex> result = {:ok, "Lorem ipsum"}
+{:ok, "Lorem ipsum"}
+iex> elem(result, 1) <1>
+"Lorem ipsum"
+iex> elem(result, 0) <2>
+:ok
+----
+<1> The `elem/2` function provides quick access to tuple elements.
+<2> The index starts from 0 for the first element.
+
+#### Tuple Functions
+indexterm:["Tuple Functions"]
+
+Elixir's `Tuple` module includes various functions for manipulating tuples, such as appending or deleting elements, and converting tuples to lists. Here are some examples:
+
+[source,elixir]
+----
+iex> results = {:ok, "Lorem ipsum"}
+{:ok, "Lorem ipsum"}
+iex> b = Tuple.append(results, "Test")
+{:ok, "Lorem ipsum", "Test"}
+iex> c = Tuple.delete_at(b, 1)
+{:ok, "Test"}
+iex> d = Tuple.insert_at(b, 1, "ipsum")
+{:ok, "ipsum", "Lorem ipsum", "Test"}
+iex> new_list = Tuple.to_list(d)
+[:ok, "ipsum", "Lorem ipsum", "Test"]
+iex> tuple_size(d)
+4
+----
+
+### List
+indexterm:["Lists"]
+
+On the other hand, lists, enclosed in brackets `[]`, are implemented as linked lists, storing each element's value and a reference to the next element. This structure makes adding elements to the start of the list fast. However, accessing individual elements or determining the list's length is a linear operation, meaning it can take longer as the list size grows.
+
+NOTE: Lists are like a chain of people holding hands. Adding a new person at the front
+of the chain (adding an element to the start of the list) is easy. But if you're
+looking for someone specific (accessing a particular element), you have to start
+at one end of the chain and check each person until you find them. So, lists are
+excellent when you want to keep adding new elements, but not so great if you
+frequently need to find a specific element.
+
+Here's how you can work with lists:
+
+[source,elixir]
+----
+iex> [1, 2, 3, 4]
+[1, 2, 3, 4]
+iex> ["a", "b", "c"]
+["a", "b", "c"]
+iex> [1, "b", true, false, :blue, "house"]
+[1, "b", true, false, :blue, "house"]
+----
+
+List concatenation and subtraction can be done using the `++` and `--` operators:
+
+[source,elixir]
+----
+iex> [1, 2] ++ [2, 4] <1>
+[1, 2, 2, 4]
+iex> [1, 2] ++ [1] <2>
+[1, 2, 1]
+iex> [1, "a", 2, false, true] -- ["a", 2] <3>
+[1, false, true]
+----
+<1> Appends two lists.
+<2> Adds an element to the list.
+<3> Subtracts elements from a list.
+
+#### Working with Lists: Head, Tail, and Other Operations
+indexterm:["Head", "Tail", "hd/1", "tl/1"]
+
+Elixir offers several built-in functions to operate on lists such as getting the first element (head) and the remaining elements (tail) using `hd/1` and `tl/1` functions. Also, functions like `length/1` provide the list's size, and various functions in the `Enum` and `List` modules assist in processing and manipulating lists.
+
+Here are some examples:
+
+[source,elixir]
+----
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex> hd(shopping_list)
+"apple"
+iex> tl(shopping_list)
+["orange", "banana", "pineapple"]
+iex> length(shopping_list)
+4
+iex> numbers = [1, 5, 3, 7, 2, 3, 9, 5, 3]
+[1, 5, 3, 7, 2, 3, 9, 5, 3]
+iex> Enum.max(numbers)
+9
+iex> Enum.sort(numbers)
+[1, 2, 3, 3, 3, 5, 5, 7, 9]
+iex> List.last(shopping_list)
+"pineapple"
+----
+
+NOTE: No need to stress over choosing between lists and tuples early on. As you
+continue your journey through this book, you'll develop an intuitive
+understanding of when to use which based on the specific problem at hand.
+

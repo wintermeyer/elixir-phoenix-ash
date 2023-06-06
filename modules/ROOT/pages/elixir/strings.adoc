@@ -1,6 +1,6 @@
-== Strings
+=== String
 
-=== Overview
+==== Overview
 
 indexterm:[Elixir,Strings]In Elixir, strings are binary sequences, encoded in
 UTF-8. This encoding enables strings to handle any Unicode character, which is a
@@ -14,7 +14,7 @@ iex> "Hello, World!"
 "Hello, World!"
 ----
 
-=== Concatenation
+==== Concatenation
 
 In Elixir, you can concatenate strings using the `<>` operator:
 
@@ -24,7 +24,7 @@ iex> "Hello, " <> "World!"
 "Hello, World!"
 ----
 
-=== String Interpolation
+==== String Interpolation
 
 indexterm:["Data Types", "String Interpolation"]Elixir provides a powerful
 feature called string interpolation. It allows you to embed expressions, not
@@ -65,7 +65,7 @@ This string interpolation feature provides a convenient way to incorporate
 dynamic content into strings, enhancing the flexibility of text manipulation in
 Elixir.
 
-=== Multiline Strings
+==== Multiline Strings
 
 Elixir also supports multiline strings. You can define a multiline string by
 wrapping the text in triple double quotes (`"""`):
@@ -82,7 +82,7 @@ iex> """
 Notice that Elixir automatically inserts newline characters (`\n`) where the
 line breaks occur.
 
-### Escape Characters
+#### Escape Characters
 indexterm:["Escape Characters"]
 
 In certain situations, we might want to include special characters in our
@@ -113,7 +113,7 @@ iex> "Column 1\tColumn 2" <3>
 <2> The `\n` escape sequence represents a newline, which splits a string across multiple lines.
 <3> The `\t` escape sequence represents a tab, which creates some horizontal space in the string.
 
-=== String Functions
+==== String Functions
 
 indexterm:[Elixir,String Functions]Elixir provides a `String` module that offers
 a comprehensive set of functions for working with strings. With these functions,

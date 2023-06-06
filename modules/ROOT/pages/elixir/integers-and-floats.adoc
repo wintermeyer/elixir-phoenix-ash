@@ -1,6 +1,4 @@
-== Numbers
-
-=== Integers 
+=== Integer
 
 indexterm:[Elixir,Integers]Integers are whole numbers that can be positive, negative or zero. In Elixir, you can use integers without any limits, as long as you have enough memory in your machine.footnote:[For more information on the minimum and maximum values of integers in Elixir, see https://stackoverflow.com/questions/28093580/how-to-get-minimum-and-maximum-value-of-each-type-in-elixir#:~:text=Integers%20in%20Erlang%2FElixir%20are,how%20large%20they%20can%20be.]
 
@@ -81,7 +79,7 @@ iex> 1234_5678_9 # harder to read
 ----
 
 
-=== Floats
+=== Float
 
 indexterm:[Elixir,Floats]Floats are numbers that have a decimal point. They are represented in Elixir using 64-bit double-precision.
 
