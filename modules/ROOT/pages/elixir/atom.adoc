@@ -1,0 +1,32 @@
+[[elixir-introduction-atoms]]
+### Atom
+indexterm:["Atom"]
+
+Atoms in Elixir are constants that are represented by their name. They're
+similar to symbols in other languages and start with a `:`.
+
+They are extensively used to label or categorize values. For example, when a
+function might fail, it often returns a tuple tagged with an atom such as 
+`{:ok, value}` or `{:error, message}`.
+
+[source,elixir]
+----
+iex> :red
+:red
+iex> :blue
+:blue
+iex> is_atom(:blue) <1>
+true
+----
+<1> The function `is_atom()` checks whether a value is an atom.
+
+While atoms can be written in `snake_case` or `CamelCase`, `snake_case` is
+commonly used within the Elixir community. Ensure your atoms are descriptive and
+indicative of their purpose for code readability.
+
+WARNING: It's worth noting that while atoms are handy, they aren't garbage
+collected and consume system memory until the system is shut down, so they
+should be used sparingly. **Do not dynamically create atoms from user input or
+untrusted data**, as this can exhaust your system's available memory and cause it
+to crash. It is unlikely that you run into this problem but not impossilbe.footnote:[More information about atoms not being garbage collected: https://stackoverflow.com/questions/20517966/how-erlang-atoms-can-be-garbage-collected/54919072#54919072]
+

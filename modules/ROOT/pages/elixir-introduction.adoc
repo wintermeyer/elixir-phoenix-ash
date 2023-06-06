@@ -419,32 +419,7 @@ ExUnit.Case` in your test files. This is a practical example where `ExUnit.Case`
 provides a set of functionalities (like assert functions) that will be
 accessible within your test cases.
 
-[[elixir-introduction-atoms]]
-## Atoms
 
-Atoms in Elixir are constants that are represented by their name. They're
-similar to symbols in other languages and start with a `:`.
-
-They are extensively used to label or categorize values. For example, when a
-function might fail, it often returns a tuple tagged with an atom such as 
-`{:ok, value}` or `{:error, message}`.
-
-NOTE: Atoms also serve to reference modules from Erlang libraries.
-
-[source,elixir]
-----
-iex> :red
-:red
-iex> :blue
-:blue
-iex> is_atom(:blue) <1>
-true
-----
-<1> The function `is_atom()` checks whether a value is an atom.
-
-While atoms can be written in `snake_case` or `CamelCase`, `snake_case` is
-commonly used within the Elixir community. Ensure your atoms are descriptive and
-indicative of their purpose for code readability.
 
 [[elixir-introduction-strings]]
 ## Strings
