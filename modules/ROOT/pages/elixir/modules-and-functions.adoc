@@ -324,3 +324,8 @@ In these cases, we've applied a 20% discount to the price of apples (which was 1
 
 By leveraging the power of the `use` keyword and metaprogramming, we've written a versatile `Discount` module that can be used across multiple fruit modules to apply discounts to their prices.
 
+NOTE: If you're working with a Phoenix application, you might see `use
+ExUnit.Case` in your test files. This is a practical example where `ExUnit.Case`
+provides a set of functionalities (like assert functions) that will be
+accessible within your test cases.
+
