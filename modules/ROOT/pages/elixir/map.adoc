@@ -68,7 +68,7 @@ Sure, let's break it down a little bit more and explain each part in a simpler w
 
 #### Map Functions
 
-Elixir's `Map` module is equipped with various functions that help to perform different operations on maps.footnote:[Find all functions at https://hexdocs.pm/elixir/Map.html.] Let's explore the functions I use the most. 
+Elixir's `Map` module is equipped with various functions that help to perform different operations on maps.footnote:[Find all Map functions at https://hexdocs.pm/elixir/Map.html.] Let's explore the functions I use the most. 
 
 ##### Creating a Map
 

@@ -47,7 +47,7 @@ iex> user = [{:name, "joe"}, {:age, 23}] <1>
 
 #### Manipulating Keyword Lists
 
-Keyword lists can be manipulated with these functionsfootnote:[Find all Keyword funcations at https://hexdocs.pm/elixir/Keyword.html]:
+Keyword lists can be manipulated with these functionsfootnote:[Find all Keyword functions at https://hexdocs.pm/elixir/Keyword.html]:
 
 * `Keyword.get/2`: This function retrieves the value associated with a given key within a keyword list.
 +
