@@ -27,5 +27,6 @@ iex> RoomWidth = 2
 ** (MatchError) no match of right hand side value: 2 <1>
 ----
 <1> The `MatchError` might seem strange at this point, but fear not! Its 
-mystery will unravel as we dive deeper into Elixir's realm.
+mystery will unravel as we dive deeper into Elixir's realm and learn about 
+pattern matching.
 

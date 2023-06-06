@@ -1,0 +1,7 @@
+=== Boolean
+indexterm:["Booleans"]
+
+Booleans are a data type in Elixir used to represent truthiness and falsiness. They come in two flavors: `true` and `false`.
+
+Interestingly, in Elixir, booleans are represented as atoms under the hood. Specifically, `true` and `false` are equivalent to the atoms `:true` and `:false`, respectively. This means you can use `:true` and `:false` as if they were `true` and `false`. But please don't. It's generally better to use `true` and `false` when dealing with booleans, as it makes the code clearer and easier to understand.
+

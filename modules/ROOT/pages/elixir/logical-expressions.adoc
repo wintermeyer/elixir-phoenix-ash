@@ -1,0 +1,48 @@
+[[elixir-introduction-logical-expressions]]
+== Logical Expressions
+
+The `boolean` type in Elixir can be either `true` or `false`. You can use
+logical operators like `and`, `or`, and `not` to manipulate these boolean
+values:
+
+[source,elixir]
+----
+iex> true and true
+true
+iex> true or false
+true
+iex> not true
+false
+----
+indexterm:["Logical Expressions"]
+
+Elixir's `and`, `or`, and `not` operators strictly work with boolean values. But
+there's more! Elixir also provides `&&` (and), `||` (or), and `!` (not)
+operators that can handle *truthy* and *falsy* values, giving them a bit of
+flexibility. **In Elixir, every value is considered *truthy* except for `false`
+and `nil`, which are *falsy*.**
+
+To clarify:
+
+* `&&` (and) returns the first *falsy* value or the last value if all are *truthy*.
+* `||` (or) returns the first *truthy* value or the last value if all are *falsy*.
+* `!` (not) returns `false` if its argument is *truthy* and `true` if it's *falsy*.
+
+Let's consider a few examples:
+
+[source,elixir]
+----
+iex> true && :hello
+:hello
+iex> false || "world"
+"world"
+iex> !nil
+true
+----
+
+In the first example, `:hello` is returned because `true && :hello` evaluates to
+the last *truthy* value, which is `:hello`. In the second example, `"world"` is
+returned because `false || "world"` evaluates to the first *truthy* value, which
+is `"world"`. In the final example, `!nil` gives `true` because `nil` is a
+*falsy* value and `!` flips it to `true`.
+

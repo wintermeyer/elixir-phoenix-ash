@@ -5,6 +5,7 @@ Since this is a beginners book I have to discuss all these data types because yo
 include::integers-and-floats.adoc[]
 include::strings.adoc[]
 include::atom.adoc[]
+include::boolean.adoc[]
 include::lists-and-tuples.adoc[]
 include::keyword-list.adoc[]
 include::map.adoc[]

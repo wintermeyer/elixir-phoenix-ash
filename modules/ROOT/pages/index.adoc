@@ -4,30 +4,27 @@ Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Embarking on https://www.phoenixframework.org[Phoenix Framework] and
 https://elixir-lang.org[Elixir] is a steep but exciting climb. No sugar-coating
-here; prepare for a thrilling ride, especially if Elixir is your first
-functional programming language.
+here; **prepare for a thrilling ride, especially if Elixir is your first
+functional programming language.**
 
 If practical "Hello World!" examples are your learning jam, you're in the right
-place. In this book, I offer clear examples, not abstract theories.
+place. In this book, I offer clear and small examples, not abstract theories.
 
-* *Expect bite-sized code examples.* They're your guiding stars, crafted for
+* *Expect bite-sized code examples.* Crafted for
 comprehension just by reading the code, with added notes for clarity.
 * *This is a step-by-step guide.* No prior knowledge of Phoenix or Elixir needed.
 Just understand the basics of programming and HTML.
 * *Simplicity is key here.* My goal is to get you productive ASAP. For in-depth
 exploration, there are other resources.
-* Don't expect our example web apps to win beauty contests; we're not investing
-time in aesthetics.
+* *Not a beauty contest.* We're not investing much time in aesthetics. This is 
+not a CSS design book.
 
-NOTE: If a section doesn't resonate with you, skip it. You can circle back later
-if needed.
-
-xref:elixir-introduction.adoc[Elixir Introduction] is a quick-start guide for
-Elixir newbies. Just read through to catch the language's basics.
+If a section doesn't resonate with you, skip it. You can circle back later
+if needed. I recommend reading the book in order, but it's not required.
 
 Stefan Wintermeyer
 
-PS: Your feedback would be appreciated. Email me at
+PS: Your feedback is very much appreciated. Email me at
 sw@wintermeyer-consulting.de and follow me on Twitter
 https://twitter.com/wintermeyer[@wintermeyer].
 

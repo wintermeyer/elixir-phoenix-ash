@@ -1,0 +1,326 @@
+== Modules and Functions
+indexterm:["Modules", "Functions"]
+
+In Elixir, we organize code in a structured way using modules and functions.
+
+Modules are like containers for functions, which represent reusable pieces of code. 
+
+Let's illustrate this with an example:
+
+[source,elixir]
+----
+iex> defmodule Greetings do <1>
+...>   def hello(name) do <2>
+...>     "Hello, " <> name <> "!" <3>
+...>   end
+...> end
+{:module, Greetings,
+ <<...>>, {:hello, 1}} <4>
+iex> Greetings.hello("Alice") <5>
+"Hello, Alice!"
+----
+<1> We use the `defmodule` keyword to define a module. The module's name always begins with a capital letter.
+<2> We define a function within the module using the `def` keyword.
+<3> The function concatenates the input name with a greeting message.
+<4> The return value represents the module creation.
+<5> We call the function from outside the module using this syntax.
+
+IMPORTANT: Both `defmodule` and `def` use a `do ... end` structure to denote the start and end of the block.
+
+NOTE: Module names use `CamelCase` and start with a capital letter, while function names are in `snake_case`.
+
+As an exercise, let's save the following module to `greetings.exs`:
+
+[source,elixir, :file: greetings.exs]
+----
+defmodule Greetings do
+  def hello(name) do
+    "Hello, " <> name <> "!"
+  end
+end
+----
+
+To use the `hello/1` function in the `Greetings` module, we need to load and compile `greetings.exs` with `c("greetings.exs")` in `iex`:
+
+[source,elixir]
+----
+$ iex
+Erlang/OTP 26 [erts-14.0] [source] [64-bit] [...]
+
+Interactive Elixir (1.15.0-rc.1) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> c("greetings.exs")
+[Greetings]
+iex(2)> Greetings.hello("Bob")
+"Hello, Bob!"
+----
+
+[[function-arity]]
+=== Function Arity
+indexterm:["Function Arity", "Arity"]
+
+In Elixir, the term "arity" refers to the number of arguments that a function accepts. Functions are identified by both their name and their arity, expressed as `name/arity`.
+
+The arity concept is essential because it allows us to define multiple functions with the same name but different arities within a single module. Each of these is considered a distinct function due to its unique argument count.
+
+Let's demonstrate this with a slightly more complex example:
+
+[source,elixir]
+----
+iex> defmodule Greeting do
+...>   def greet() do
+...>     "Hello, world!"
+...>   end
+...>
+...>   def greet(name) do
+...>     "Hello, #{name}!"
+...>   end
+...>
+...>   def greet(name, time_of_day) do
+...>     "Good #{time_of_day}, #{name}!"
+...>   end
+...> end
+
+iex> Greeting.greet()
+"Hello, world!"
+iex> Greeting.greet("Alice")
+"Hello, Alice!"
+iex> Greeting.greet("Bob", "morning")
+"Good morning, Bob!"
+----
+In this example, we've defined three versions of the `greet` function, each with a different arity. The `greet/0` function, which takes no arguments, returns a generic greeting. The `greet/1` function accepts one argument and provides a personalized greeting. The `greet/2` function takes two arguments and offers a personalized greeting that also includes the time of day.
+
+By allowing us to define multiple versions of a function with different arities, Elixir significantly enhances our code's flexibility and expressiveness.
+
+=== Private Functions
+indexterm:["Private Functions"]
+
+Sometimes, we want to hide certain functions within a module, making them inaccessible from outside. Elixir supports this through private functions, which we declare using the `defp` keyword:
+
+[source,elixir]
+----
+iex> defmodule SecretMessage do
+...>   def public_message(name) do
+...>     secret() <> name
+...>   end
+...>
+...>   defp secret do <1>
+...>     "Secret Hello, "
+...>   end
+...> end
+
+iex> SecretMessage.public_message("Alice") <2>
+"Secret Hello, Alice"
+iex> SecretMessage.secret <3>
+** (UndefinedFunctionError) function SecretMessage.secret/0 is undefined or private
+    SecretMessage.secret()
+----
+<1> `secret/0` is a private function and can only be accessed within its module.
+<2> `public_message/1` is public, and can be called from outside its module. It can access `secret/0` because they're in the same module.
+<3> Attempting to call `secret/0` from outside its module results in an `UndefinedFunctionError` because it's a private function.
+
+Private functions help us hide implementation details and reduce the exposed interface of a module, leading to cleaner and more maintainable code.
+
+[[hierarchical-modules]]
+=== Hierarchical Modules
+indexterm:["Hierarchical Modules"]
+
+As your projects become more complex, it's crucial to structure your code into a clear and manageable form. In Elixir, you can achieve this by using hierarchical module names. Hierarchical modules are defined by attaching sub-module names to a parent module using a `.` delimiter.
+
+Here's a new example with a Fruit Shop:
+
+[source,elixir]
+----
+iex> defmodule FruitShop.Apples do
+...>   def price_per_kg() do
+...>     10
+...>   end
+...> end
+
+iex> FruitShop.Apples.price_per_kg()
+10
+----
+The `.` syntax offers a neat shortcut for defining nested modules. Here's how you can create the same hierarchy using nested module definitions:
+
+[source,elixir]
+----
+iex> defmodule FruitShop do
+...>   defmodule Apples do
+...>     def price_per_kg() do
+...>       10
+...>     end
+...>   end
+...> end
+
+iex> FruitShop.Apples.price_per_kg()
+10
+----
+Both methods achieve the same result. Your choice between these two depends on your project's structure and your coding style preference.
+
+[[import-modules]]
+=== Import
+indexterm:["Import", "Import Modules"]
+
+The `import` directive in Elixir provides a way to access public functions from other modules without needing to write out their fully qualified names. This can make your code cleaner and easier to read.
+
+Consider the following `FruitShop.Apples` module:
+
+[source,elixir]
+----
+iex> defmodule FruitShop.Apples do
+...>   def price_per_kg() do
+...>     10
+...>   end
+...> end
+----
+
+By importing this module, you can call its functions directly, without having to prefix them with the module's name:
+
+[source,elixir]
+----
+iex> import FruitShop.Apples
+FruitShop.Apples
+iex> price_per_kg()
+10
+----
+
+Here, importing `FruitShop.Apples` lets you call `price_per_kg/0` directly, eliminating the need to use the `FruitShop.Apples.` prefix.
+
+=== Selective Importing
+indexterm:["Import", "Selective Import"]
+
+While importing a module grants you access to all its public functions, there might be times when you want to import only specific functions from a module. Elixir allows you to do this using a selective import.
+
+For instance, suppose the `FruitShop.Apples` module also had a `quantity_in_stock/0` function. But if you only needed `price_per_kg/0` in your current context, you could import just that function like so:
+
+[source,elixir]
+----
+iex> defmodule FruitShop.Apples do
+...>   def price_per_kg() do
+...>     10
+...>   end
+...>   def quantity_in_stock() do
+...>     100
+...>   end
+...> end
+
+iex> import FruitShop.Apples, only: [price_per_kg: 0]
+FruitShop.Apples
+iex> price_per_kg()
+10
+----
+Here, `import FruitShop.Apples, only: [price_per_kg: 0]` means that only the `price_per_kg/0` function from `FruitShop.Apples` is available for direct calling. This can help reduce naming conflicts and makes it clear which functions are being used from the imported module.
+
+[[import-hierarchical-modules]]
+=== Hierarchical Modules
+indexterm:["Import Hierarchical Modules"]
+
+When working with hierarchical modules, importing them can simplify access to their functions. For instance, let's use the `FruitShop.Apples` module:
+
+[source,elixir]
+----
+iex> defmodule FruitShop.Apples do
+...>   def price_per_kg() do
+...>     10
+...>   end
+...> end
+
+iex> import FruitShop.Apples
+FruitShop.Apples
+iex> price_per_kg()
+10
+----
+By importing `FruitShop.Apples`, you can call `price_per_kg/0` directly, without specifying the module name.
+
+[[alias-modules]]
+=== Alias
+indexterm:["Alias"]
+
+The `alias` directive offers a convenient way to assign a shorter, alternative name to a module. This can improve both readability and maintainability of your code by reducing verbosity when accessing the module's functions.
+
+Take a look at the `FruitShop.Apples` module:
+
+[source,elixir]
+----
+iex> defmodule FruitShop.Apples do
+...>   def price_per_kg() do
+...>     10
+...>   end
+...> end
+----
+
+To make calling this module's functions less verbose, you can use the `alias` directive to assign it a shorter name:
+
+[source,elixir]
+----
+iex> alias FruitShop.Apples, as: Apples
+FruitShop.Apples
+iex> Apples.price_per_kg()
+10
+----
+
+In the code above, we've created an alias for `FruitShop.Apples` as `Apples`.
+
+For a quicker and more direct way, you can simply use `alias FruitShop.Apples`. Elixir will automatically infer the alias from the last part of the module name, in this case `Apples`:
+
+[source,elixir]
+----
+iex> alias FruitShop.Apples
+FruitShop.Apples
+iex> Apples.price_per_kg()
+10
+----
+
+In this example, the `alias FruitShop.Apples` directive lets you call functions from `FruitShop.Apples` using the shortened name `Apples`. This can significantly improve readability when working with modules that have long or complex names.
+
+[[use-keyword]]
+=== Use
+indexterm:["Use", "Metaprogramming"]
+
+Elixir's `use` keyword is a cornerstone of metaprogramming in Elixir. It is a powerful tool that helps keep our code DRY (Don't Repeat Yourself) by allowing us to perform certain actions defined in another module within the current module.
+
+Metaprogramming is a technique that helps us write code that generates or modifies other code. In the context of Elixir, we can think of the `use` keyword as a way to inject code from one module into another. This is accomplished through the use of the `__using__` macro in the module that is being used.
+
+Let's illustrate this with a more comprehensive example involving a `Discount` module and two fruit modules, `Apples` and `Bananas`:
+
+[source,elixir]
+----
+defmodule Discount do
+  defmacro __using__(_) do
+    quote do
+      def apply_discount(price, percentage) do
+        price - (price * (percentage / 100))
+      end
+    end
+  end
+end
+
+defmodule FruitShop.Apples do
+  use Discount
+
+  def price_per_kg() do
+    10
+  end
+end
+
+defmodule FruitShop.Bananas do
+  use Discount
+
+  def price_per_kg() do
+    5
+  end
+end
+----
+In these examples, both the `FruitShop.Apples` and `FruitShop.Bananas` modules *use* the `Discount` module. The `use` keyword triggers the `__using__` macro in the `Discount` module, which in turn injects the `apply_discount/2` function definition into the `FruitShop.Apples` and `FruitShop.Bananas` modules. Therefore, we can call `apply_discount/2` directly on either of these modules:
+
+[source,elixir]
+----
+iex> FruitShop.Apples.apply_discount(10, 20)
+8
+
+iex> FruitShop.Bananas.apply_discount(5, 15)
+4.25
+----
+In these cases, we've applied a 20% discount to the price of apples (which was 10), and the result is 8. Similarly, we've applied a 15% discount to the price of bananas (which was 5), and the result is 4.25. 
+
+By leveraging the power of the `use` keyword and metaprogramming, we've written a versatile `Discount` module that can be used across multiple fruit modules to apply discounts to their prices.
+
