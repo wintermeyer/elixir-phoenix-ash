@@ -1,13 +1,16 @@
 == Pattern Matching
-indexterm:["Pattern Matching"]
+indexterm:[Pattern Matching]
 
-If you're new to Elixir, one of the first and most important concepts you'll encounter is pattern matching, often described as "the equals sign is not an assignment operator". This might sound confusing, so let's break it down into simple terms.
+When getting started with Elixir, you'll quickly encounter a crucial concept known as _pattern matching_. Often explained as "the equals sign is not an assignment operator", this might initially sound baffling. However, a closer look can make it more approachable.
 
-In many programming languages, the equals sign (`=`) is used for assigning a value to a variable. For instance, if we write `x = 5`, we mean "Let `x` be equal to 5." But in Elixir, the equals sign has a slightly different role.
+=== The Match Operator `=`
+indexterm:[Pattern Matching, Match Operator]
 
-In Elixir, the `=` sign is the _match operator_, and it tries to match the left side with the right side. When we write `x = 5` in Elixir, what we're really saying is "Match `x` to the value 5." If `x` is not yet bound to any value, Elixir will bind `x` to 5, making it act similar to assignment. However, if `x` is already bound to a value, Elixir will try to match that value with 5, leading to a different outcome.
+In various programming languages, the equals sign (`=`) signifies assignment. For example, `x = 5` generally reads as "Let `x` be equal to 5." Elixir, however, assigns a slightly different role to the equals sign.
 
-For instance, let's say `x` is already bound to 5. If we then try to match `x = 7`, Elixir will throw a `MatchError` because it can't match 5 with 7:
+In Elixir, `=` acts as the _match operator_—trying to match the right side of the expression with its left side. When we say `x = 5` in Elixir, we are essentially telling the language, "Match `x` to the value 5." If `x` is unbound or has no assigned value, Elixir will bind `x` to 5, making it behave similarly to an assignment operator. But if `x` already holds a value, Elixir will attempt to match this value with 5, which may yield a different result.
+
+For instance, if `x` already equals 5 and we attempt `x = 7`, Elixir will throw a `MatchError`—it can't match 5 with 7:
 
 [source,elixir]
 ----
@@ -17,7 +20,7 @@ iex> x = 7
 ** (MatchError) no match of right hand side value: 7
 ----
 
-Pattern matching becomes even more powerful with complex data types, like tuples or lists:
+Elixir's pattern matching becomes even more robust with more complex data types like tuples or lists:
 
 [source,elixir]
 ----
@@ -31,9 +34,9 @@ iex> c
 42
 ----
 
-In the example above, Elixir matches the variables `a`, `b`, and `c` to the respective values in the tuple on the right side. Now `a` is `:hello`, `b` is `"world"`, and `c` is `42`.
+In the above snippet, Elixir matches variables `a`, `b`, and `c` to their respective values in the right-side tuple. Thus `a` equals `:hello`, `b` equals `"world"`, and `c` equals `42`.
 
-This might look similar to destructuring in JavaScript or other languages, but remember that Elixir will always try to _match_, not just assign. If there's no match, you'll get an error:
+While it might seem similar to destructuring in JavaScript or other languages, remember that Elixir aims to _match_ instead of simply assigning. If no match is found, Elixir throws an error:
 
 [source,elixir]
 ----
@@ -43,11 +46,263 @@ iex> {d, e} = {:hi, "there", 23}
 ** (MatchError) no match of right hand side value: {:hi, "there", 23}
 ----
 
-In the second command, we're trying to match a two-element pattern with a three-element tuple, which doesn't work. Hence, the `MatchError`.
+In the second command, a two-element pattern cannot match a three-element tuple, thus resulting in a `MatchError`.
 
-So, in a nutshell, pattern matching in Elixir is a way to check if a certain pattern corresponds to the data you have, and if it does, to assign values to variables based on that pattern.
-indexterm:["Pattern Matching", "MatchError"]
-indexterm:["Pattern Matching", "Match Operator"]
+To summarize, pattern matching in Elixir verifies whether a certain pattern matches your data. If it does, Elixir assigns values to variables based on that pattern.
+indexterm:[Pattern Matching, MatchError]
 
-NOTE: Pattern Matching is a very powerful concept in Elixir, and it's used in many different ways. This is just the tip of the iceberg. We'll see more examples of it throughout this book.
+NOTE: Pattern Matching is an incredibly powerful concept in Elixir, used in myriad ways. This is merely an introduction—we will explore more examples throughout this book.
+
+=== Functions
+indexterm:[Pattern Matching, Functions]
+
+Pattern matching is pervasive in Elixir, and it can even be used with functions:
+
+[source,elixir]
+----
+iex> defmodule Area do
+...>   def circle(:exact, radius) do <1>
+...>     3.14159265359 * radius * radius
+...>   end
+...>
+...>   def circle(:normal, radius) do <2>
+...>     3.14 * radius * radius
+...>   end
+...>
+...>   def circle(radius) do <3>
+...>     circle(:normal, radius)
+...>   end
+...> end
+
+iex> Area.circle(:exact, 4)
+50.26548245744
+iex> Area.circle(:normal, 4)
+50.24
+iex> Area.circle(4)
+50.24
+----
+<1> We define a `circle/2` function which matches if the first argument is the atom `:exact`.
+<2> We define a `circle/2` function which matches if the first argument is the atom `:normal`.
+<3> We define a `circle/1` function which calls the `circle/2` function with the `:normal` argument.
+
+==== Functions with Guards
+indexterm:[Pattern Matching, Guards]
+
+Guards add extra layers to pattern matching with functions. Full details can be found at https://hexdocs.pm/elixir/guards.html. For now, let's look at a few examples. Guards start with `when`:
+
+[source,elixir]
+----
+iex> defmodule Law do
+...>   def can_vote?(age) when is_integer(age) and age > 17 do <1>
+...>     true
+...>   end
+...>
+...>   def can_vote?(age) when is_integer(age) do <2>
+...>     false
+...>   end
+...>
+...>   def can_vote?(_age) do <3>
+...>     raise ArgumentError, "age should be an integer"
+...>   end
+...> end
+
+iex> Law.can_vote?(18)
+true
+iex> Law.can_vote?(16)
+false
+iex> Law.can_vote?("18")
+** (ArgumentError) age should be an integer
+----
+<1> We define a `can_vote?/1` function with a guard clause that checks whether the age is an integer and greater than 17.
+<2> We define a `can_vote?/1` function with a guard clause that checks whether the age is an integer.
+<3> We define a `can_vote?/1` function to handle other cases.
+
+=== Pattern Matching With Various Data Structures
+indexterm:[Pattern Matching]
+
+Pattern matching extends to various data structures in Elixir, including lists, maps, strings, and even function clauses. Let's see how this works.
+
+==== Lists
+indexterm:[Pattern Matching, Lists]
+
+Elixir provides a unique syntax for pattern matching the head and tail of a list. Let's consider the following examples:
+
+[source,elixir]
+----
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"] <1>
+["apple", "orange", "banana", "pineapple"]
+iex> [head | tail] = shopping_list <2>
+["apple", "orange", "banana", "pineapple"]
+iex> head
+"apple"
+iex> tail
+["orange", "banana", "pineapple"]
+iex> [a | b] = tail <3>
+["orange", "banana", "pineapple"]
+iex> a
+"orange"
+iex> b
+["banana", "pineapple"]
+iex> [first_product, second_product | tail] = shopping_list <4>
+["apple", "orange", "banana", "pineapple"]
+iex> first_product
+"apple"
+iex> second_product
+"orange"
+iex> tail
+["banana", "pineapple"]
+iex> [first_product | [second_product | tail]] = shopping_list <5>
+["apple", "orange", "banana", "pineapple"]
+----
+<1> We match a list to the variable `shopping_list`.
+<2> `[head | tail]` is the special syntax to match a head and tail of a given list.
+<3> Here we match the head `a` and the tail `b` with `tail`.
+<4> This is slightly more complex. We match the first and second product followed by a tail.
+<5> This alternative syntax yields the same result but follows different logic. Choose the one you prefer.
+
+If we know that a list has a specific number of elements, we can match it directly:
+
+[source,elixir]
+----
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex> [a, b, c, d] = shopping_list
+["apple", "orange", "banana", "pineapple"]
+iex> a
+"apple"
+iex> b
+"orange"
+iex> [e, f, g] = shopping_list <1>
+** (MatchError) no match of right hand side value: ["apple", "orange", "banana", "pineapple"]
+----
+<1> Just checking. You get an `MatchError` if Elixir can't match both sides.
+
+
+==== Keyword Lists
+indexterm:[Pattern Matching, Keyword Lists]
+
+Pattern matching with keyword lists is particularly useful for function arguments, as it allows us to capture specific items in the list without having to know the exact order or the entire content of the list.
+
+Here are some examples:
+
+[source,elixir]
+----
+iex> list = [a: 1, b: 2, c: 3]
+[a: 1, b: 2, c: 3]
+
+iex> [a: a_val] = list
+[a: 1, b: 2, c: 3]
+iex> a_val
+1
+
+iex> [c: c_val] = list
+[a: 1, b: 2, c: 3]
+iex> c_val
+3
+----
+In the example above, we match only the value we're interested in and ignore the rest of the list. Notice that the order of the elements in the keyword list does not matter; the pattern will match the keys regardless of where they're located in the list.
+
+It's also important to note that the pattern must match at least one key-value pair in the list. If it doesn't, you'll get a `MatchError`. For example:
+
+[source,elixir]
+----
+iex> [d: d_val] = list
+** (MatchError) no match of right hand side value: [a: 1, b: 2, c: 3]
+----
+In the above example, there's no `:d` key in the list, so the pattern match fails.
+
+#### Matching Inside Functions
+
+Pattern matching with keyword lists is often used in function heads. Consider a system where you want to provide different messages to users based on their role. You could achieve this with pattern matching on keyword lists:
+
+[source,elixir]
+----
+defmodule User do
+  def greet(name, opts \\ []) do
+    greet(name, opts)
+  end
+
+  defp greet(name, [role: "admin"]) do
+    "Welcome, #{name}. You have admin privileges."
+  end
+
+  defp greet(name, [role: "moderator"]) do
+    "Welcome, #{name}. You can moderate content."
+  end
+
+  defp greet(name, _) do
+    "Welcome, #{name}."
+  end
+end
+
+IO.puts User.greet("Alice") # Outputs: "Welcome, Alice."
+
+IO.puts User.greet("Bob", role: "admin") # Outputs: "Welcome, Bob. You have admin privileges."
+
+IO.puts User.greet("Carol", role: "moderator") # Outputs: "Welcome, Carol. You can moderate content."
+----
+In this example, we define different greetings based on user roles. When calling the `greet` function, we can optionally provide a `role`. We have created private functions (`defp`) for each specific role we want to handle ("admin", "moderator"), and a fallback function for the general case.
+indexterm:[Pattern Matching, Keyword Lists, Roles]
+
+
+==== Maps
+indexterm:[Pattern Matching, Maps]
+
+Matching a map in Elixir differs slightly from tuples or lists. We can match specific values we're interested in:
+
+[source,elixir]
+----
+iex> product_prices = %{apple: 0.5, orange: 0.7, pineapple: 1}
+%{apple: 0.5, orange: 0.7, pineapple: 1}
+iex> %{orange: price} = product_prices <1>
+%{apple: 0.5, orange: 0.7, pineapple: 1}
+iex> price
+0.7
+iex> %{orange: price1, apple: price2} = product_prices <2>
+%{apple: 0.5, orange: 0.7, pineapple: 1}
+iex> price1
+0.7
+iex> price2
+0.5
+----
+<1> Here we match just one value.
+<2> We can match multiple values. It's not necessary to match the entire map.
+
+==== Strings
+indexterm:[Pattern Matching, Strings]
+
+Pattern matching with strings is best illustrated with a code snippet:
+
+[source,elixir]
+----
+iex> user = "Stefan Wintermeyer"
+"Stefan Wintermeyer"
+iex> "Stefan " <> last_name = user
+"Stefan Wintermeyer"
+iex> last_name
+"Wintermeyer"
+----
+
+NOTE: The left side of a `<>` operator in a match should always be a string. Otherwise, Elixir can't determine its size.
+
+==== Wildcards
+indexterm:[Pattern Matching, Wildcards]
+
+Sometimes you may need to retrieve a value through pattern matching but don't need all the values in the pattern. For such cases, you can use `_` (alone or as a prefix to a variable name). This informs Elixir that the variable doesn't need to be bound to anything.
+
+[source,elixir]
+----
+iex> shopping_list = ["apple", "orange", "banana", "pineapple"]
+["apple", "orange", "banana", "pineapple"]
+iex> [first_product | _tail] = shopping_list <1>
+["apple", "orange", "banana", "pineapple"]
+iex> first_product
+"apple"
+iex> [head | _] = shopping_list <2>
+["apple", "orange", "banana", "pineapple"]
+iex> head
+"apple"
+----
+<1> We pattern match the head of `shopping_list` to `first_product`. The tail, indicated by prefixing `_`, is not needed.
+<2> We can use just a `_` too. Using `_tail` simply improves code readability.
 
