@@ -1,7 +1,11 @@
 == Pattern Matching
 indexterm:[Pattern Matching]
 
-When getting started with Elixir, you'll quickly encounter a crucial concept known as _pattern matching_. Often explained as "the equals sign is not an assignment operator", this might initially sound baffling. However, a closer look can make it more approachable.
+In Elixir, pattern matching is a potent feature that elevates the language's
+expressiveness and readability. This chapter introduces the concept of pattern
+matching and illuminates its practical uses. From assigning variables to
+deconstructing complex data structures and controlling program flow, pattern
+matching serves as a fundamental tool in your Elixir toolkit.
 
 === The Match Operator `=`
 indexterm:[Pattern Matching, Match Operator]
@@ -268,6 +272,7 @@ iex> price2
 <1> Here we match just one value.
 <2> We can match multiple values. It's not necessary to match the entire map.
 
+
 ==== Strings
 indexterm:[Pattern Matching, Strings]
 
@@ -285,24 +290,33 @@ iex> last_name
 
 NOTE: The left side of a `<>` operator in a match should always be a string. Otherwise, Elixir can't determine its size.
 
-==== Wildcards
+=== Wildcards
 indexterm:[Pattern Matching, Wildcards]
 
-Sometimes you may need to retrieve a value through pattern matching but don't need all the values in the pattern. For such cases, you can use `_` (alone or as a prefix to a variable name). This informs Elixir that the variable doesn't need to be bound to anything.
+Sometimes you want to pattern match something but you don't care about the
+value. By using the `_` wildcard, either standalone or as a prefix to a variable
+name, you signal to Elixir that there's no requirement for a binding to a
+particular variable. Here are two examples:
 
 [source,elixir]
 ----
-iex> shopping_list = ["apple", "orange", "banana", "pineapple"]
-["apple", "orange", "banana", "pineapple"]
-iex> [first_product | _tail] = shopping_list <1>
-["apple", "orange", "banana", "pineapple"]
-iex> first_product
+iex(1)> cart = {"apple", "orange", "banana"}
+{"apple", "orange", "banana"}
+iex(2)> {first, _, _} = cart <1>
+{"apple", "orange", "banana"}
+iex(3)> IO.puts(first) 
 "apple"
-iex> [head | _] = shopping_list <2>
+
+iex(4)> cart2 = ["apple", "orange", "banana", "pineapple"]
 ["apple", "orange", "banana", "pineapple"]
-iex> head
+iex(5)> [head | _tail] = cart2 <2>
+["apple", "orange", "banana", "pineapple"]
+iex(6)> IO.puts(head)
 "apple"
 ----
-<1> We pattern match the head of `shopping_list` to `first_product`. The tail, indicated by prefixing `_`, is not needed.
-<2> We can use just a `_` too. Using `_tail` simply improves code readability.
+<1> We use wildcards `_` to ignore "orange" and "banana" in the `cart` tuple 
+while pattern matching the first item to `first`.
+<2> With the list `cart2`, we pattern match the first item to `head`, ignoring 
+the rest of the list by prefixing `_` to `tail`. 
 
+NOTE: Using `_tail` instead of just `_` increases the readability of the code.
