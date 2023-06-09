@@ -1,0 +1,67 @@
+[[with-for]]
+=== `with` and `for`
+indexterm:[Control Structures,With,For]
+
+==== `with` Keyword
+
+The `with` keyword in Elixir is used for a sequence of pattern matches, 
+returning the value of the last expression if all previous matches succeed.
+
+Here's an example:
+
+[source,elixir]
+----
+iex> fruits = [{:apple, 5}, {:orange, 3}, {:banana, 4}]
+iex> with {:apple, count} <- List.keyfind(fruits, :apple, 0) do
+...>   IO.puts("Found #{count} apples!")
+...> else
+...>   _ -> IO.puts("No apples found.")
+...> end
+Found 5 apples!
+----
+
+In this example, we have a list of tuples representing different kinds of fruits 
+and their respective counts. We use the `with` keyword to pattern match on an 
+`{:apple, count}` tuple. 
+
+If the pattern match is successful, we print a message saying we found a 
+certain number of apples. If the pattern match fails, we fall back to the `else` 
+clause and print a message saying no apples were found. 
+
+==== `for` Comprehensions
+
+`for` comprehensions in Elixir provide a way to iterate over <<enumerables>> and 
+generate a new list, optionally filtering the elements. The result of this 
+operation can be assigned to a variable.
+
+Here's an example:
+
+[source,elixir]
+----
+iex> squared_numbers = for num <- [1, 2, 3, 4, 5], 
+...>     do: num * num
+[1, 4, 9, 16, 25]
+iex> squared_numbers
+[1, 4, 9, 16, 25]
+----
+
+In this example, `for` iterates over each number in the list `[1, 2, 3, 4, 5]`, 
+squares each number (`num * num`), and collects the results into a new list. 
+This list is then assigned to the variable `squared_numbers`.
+
+You can also filter elements in a `for` comprehension using `when`:
+
+[source,elixir]
+----
+iex> odd_squares = for num <- [1, 2, 3, 4, 5], 
+...>     rem(num, 2) == 1,
+...>     do: num * num
+[1, 9, 25]
+iex> odd_squares
+[1, 9, 25]
+----
+
+In this example, only odd numbers are squared. The `rem(num, 2) == 1` condition 
+filters out even numbers, so they are not included in the result. This resulting 
+list is assigned to the variable `odd_squares`.
+

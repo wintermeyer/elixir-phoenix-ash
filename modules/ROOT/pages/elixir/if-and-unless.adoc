@@ -1,0 +1,147 @@
+[[if-unless-else]]
+=== `if`, `unless`, and `else`
+indexterm:[Control Structures,If,Unless,Else]
+
+`if`, `unless`, and `else` are coding classics to create conditional branches which are used in most programming languages. These expressions evaluate to either `true` or `false` and execute the associated code blocks. 
+
+Two styles of syntax can be used for these expressions: multi-line and 
+single-line. 
+
+==== Multi-line Syntax
+indexterm:[Control Structures,Multi-line Syntax]
+
+For more complex conditions or actions, or when including an `else` clause, the 
+multi-line syntax is more appropriate. This uses `do...end` to wrap the 
+executed code block.
+
+[source,elixir]
+----
+# `if` expression
+iex> num = 5
+iex> if num > 3 do
+...>   IO.puts("#{num} is greater than 3")
+...> end
+
+# `unless` expression
+iex> num = 2
+iex> unless num > 3 do
+...>   IO.puts("#{num} is not greater than 3")
+...> end
+
+# `if` with `else` expression
+iex> num = 2
+iex> if num > 3 do
+...>   IO.puts("#{num} is greater than 3")
+...> else
+...>   IO.puts("#{num} is not greater than 3")
+...> end
+----
+
+==== Single-line Syntax
+indexterm:[Control Structures,Single-line Syntax]
+
+In a single-line syntax, the `do:` keyword follows the condition. This syntax is 
+often used for simple conditions and actions. 
+
+[source,elixir]
+----
+# `if` expression
+iex> num = 5
+iex> if num > 3, do: IO.puts("#{num} is greater than 3")
+
+# `unless` expression
+iex> num = 2
+iex> unless num > 3, do: IO.puts("#{num} is not greater than 3")
+----
+
+Both styles are equally valid; the choice depends on the specific use case and 
+code readability. Remember, `if`, `unless`, and `else` are expressions, not 
+statements. This means they always return a value, which can be assigned to a 
+variable or used in a larger expression.
+
+==== Variable Assignment with `if` and `unless`
+indexterm:[Control Structures,Variable Assignment]
+
+One of the unique characteristics of `if` and `unless` in Elixir is their ability to return a value, which can be assigned to a variable. This is possible because, unlike some other languages, these are expressions and not statements.
+
+Here's an example of assigning the result of an `if` expression to a variable:
+
+[source,elixir]
+----
+iex> num = 5
+iex> comparison_result = if num > 3 do
+...>   "#{num} is greater than 3"
+...> else
+...>   "#{num} is not greater than 3"
+...> end
+iex> IO.puts(comparison_result)
+5 is greater than 3
+----
+
+Similarly, you can assign the result of an `unless` expression to a variable:
+
+[source,elixir]
+----
+iex> num = 2
+iex> comparison_result = unless num > 3 do
+...>   "#{num} is not greater than 3"
+...> else
+...>   "#{num} is greater than 3"
+...> end
+iex> IO.puts(comparison_result)
+2 is not greater than 3
+----
+
+The returned value of the `if` or `unless` expression is the last expression executed within the block. If the condition does not pass, and there is no `else` clause, the expression returns `nil`.
+
+==== `if/2` is a Macro
+indexterm:[Control Structures,if/2]
+
+In Elixir, `if/2` is a macro, a special kind of function that is executed at
+compile-time, before your program runs. It gets "translated" into a `case/2`
+expression internally. This doesn't have to bother you. I just felt that it was
+good to know. In case you are more interested in this detail have a look at 
+
+- https://hexdocs.pm/elixir/Kernel.html#if/2
+- https://www.brewinstallbuzzwords.com/posts/elixir-if-block-source-code/
+
+[[if-arity]]
+==== Understanding `if/2` Arity
+indexterm:[Control Structures,If,Arity]
+
+In Elixir, when we say a function or macro has an arity of 2, we mean it accepts 
+two arguments. The `if` macro in Elixir has an arity of 2 because it requires 
+two arguments to work correctly: a condition and a keyword list.
+
+You are now familiar with the `if` construct looking something like this:
+
+[source,elixir]
+----
+if condition do
+  # Code executed when the condition is true
+else
+  # Code executed when the condition is false
+end
+----
+
+This is the most common way to use `if` in Elixir, and it's very readable. 
+However, under the hood, Elixir is interpreting this in a slightly different way. 
+This 'do/else' style is actually syntactic sugar, a way to make the code look 
+nicer and easier to understand. 
+
+In reality, Elixir sees the `if` construct as follows:
+
+[source,elixir]
+----
+if(condition, do: # Code to execute if true, else: # Code to execute if false)
+----
+
+Here, it's clear to see that `if` is receiving two arguments: 
+
+1. The condition to evaluate, which should be either `true` or `false`.
+2. A keyword list that specifies what to `do:` if the condition is true and 
+   what to do `else:` if the condition is false.
+
+So when we say `if/2`, we're saying the `if` macro with two arguments: a condition 
+and a keyword list.
+

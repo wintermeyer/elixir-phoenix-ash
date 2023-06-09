@@ -1,0 +1,104 @@
+[[case]]
+=== `case`
+indexterm:[Control Structures,Case]
+
+The `case` construct in Elixir provides a powerful way to pattern match complex
+data structures and execute code based on the matching pattern. For many Elixir
+porgrammers it is the go-to construct for control flow.
+
+A `case` expression evaluates an expression, and compares the result to 
+each pattern specified in the clauses. When a match is found, the associated 
+block of code is executed.
+
+[source,elixir]
+----
+iex> num = 2
+iex> case num do
+...>   1 -> 
+...>     IO.puts("One")
+...>   2 -> 
+...>     IO.puts("Two")
+...>   _ -> 
+...>     IO.puts("Other")
+...> end
+Two
+----
+
+In the above example, `num` is evaluated and its value is compared with each 
+pattern. The pattern `2` matches the value of `num`, so `"Two"` is printed.
+
+IMPORTANT: A catch-all clause (`_ ->`) is often used as the last clause to
+handle any values not explicitly covered by previous patterns.
+
+Pattern matching in `case` is not limited to simple values. You can also 
+pattern match on more complex structures like tuples, lists, or maps.
+
+[source,elixir]
+----
+iex> tuple = {:ok, "Success"}
+iex> case tuple do
+...>   {:ok, msg} -> 
+...>     IO.puts("Operation successful: #{msg}")
+...>   {:error, reason} -> 
+...>     IO.puts("Operation failed: #{reason}")
+...>   _ -> 
+...>     IO.puts("Unknown response")
+...> end
+Operation successful: Success
+----
+
+In this example, the `case` statement matches on the structure and content of 
+the tuple.
+
+Remember, like `if` and `unless`, `case` is an expression, meaning it returns 
+a value which can be assigned to a variable or used in another expression.
+
+[source,elixir]
+----
+iex> num = 3
+iex> result = case num do
+...>   1 -> 
+...>     "One"
+...>   2 -> 
+...>     "Two"
+...>   _ -> 
+...>     "Other"
+...> end
+iex> IO.puts(result)
+Other
+----
+
+In this example, we use a `case` expression to evaluate `num` and assign the corresponding string to the `result` variable. The variable `result` is then printed using `IO.puts/1`. The `case` expression returns `"Other"`, because `num` does not match `1` or `2`, and `"Other"` is assigned to `result`.
+
+==== Importance of Pattern Order
+indexterm:[Control Structures,Case,Pattern Order]
+
+A critical aspect to understand when using `case` is the order of pattern 
+matches. Elixir evaluates the patterns from top to bottom and executes the 
+first pattern that matches, ignoring any subsequent patterns even if they are 
+more precise.
+
+Let's illustrate this with an example:
+
+[source,elixir]
+----
+iex> tuple = {:ok, "Success"}
+iex> case tuple do
+...>   {:ok, _} -> 
+...>     IO.puts("Operation was OK")
+...>   {:ok, msg} -> 
+...>     IO.puts("Operation successful: #{msg}")
+...>   _ -> 
+...>     IO.puts("Unknown response")
+...> end
+Operation was OK
+----
+
+In this example, even though the second pattern `{:ok, msg}` is a better match 
+for `tuple` (as it also matches and binds the message), the first pattern `{:ok, _}` 
+matches first and so its associated code is executed.
+
+IMPORTANT: Therefore, when using `case`, it's important to order your patterns
+from the most specific to the least specific to ensure the intended pattern is
+matched first.
+

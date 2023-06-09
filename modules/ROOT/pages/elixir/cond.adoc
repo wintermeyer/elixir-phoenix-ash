@@ -1,0 +1,40 @@
+[[cond]]
+=== `cond`
+indexterm:[Control Structures,Cond]
+
+`cond` is another control structure in Elixir that checks for the truthiness of
+multiple conditions. It is like a collection of multiple `if/2` expressions. It
+evaluates each condition in turn, from top to bottom, and once it encounters a
+condition that evaluates to `true`, it executes the associated block of code and
+ignores the rest.
+
+Here's an example:
+
+[source,elixir]
+----
+iex> num = 15
+iex> cond do
+...>   num < 10 -> 
+...>     IO.puts("#{num} is less than 10")
+...>   num < 20 -> 
+...>     IO.puts("#{num} is less than 20 but greater than or equal to 10")
+...>   true -> 
+...>     IO.puts("#{num} is greater than or equal to 20")
+...> end
+15 is less than 20 but greater than or equal to 10
+----
+
+In this example, `cond` checks each condition in order. When it finds a 
+truthy condition (`num < 20`), it executes the associated block of code 
+and skips the rest. 
+
+IMPORTANT: The `true ->` clause serves as a catch-all clause, similar to the `_
+->` in a `case` expression. If none of the previous conditions are truthy, the
+code associated with the `true ->` clause will be executed.
+
+`cond` is especially useful when you have multiple conditions and don't 
+want to write nested `if` statements.
+
+NOTE: Remember, `cond` is an expression and it returns a value, which can be
+assigned to a variable or used in another expression.
+

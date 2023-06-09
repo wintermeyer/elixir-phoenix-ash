@@ -1,0 +1,15 @@
+[[control-structures]]
+== Control Structures
+
+Control structures are a fundamental aspect of any programming language, and
+Elixir is no exception. They direct the flow of execution and help us build 
+more complex and powerful programs. 
+
+NOTE: You will not use all of these control structures regularly. Have a look
+and decide which ones feel useful to you.
+
+include::if-and-unless.adoc[]
+include::case.adoc[]
+include::cond.adoc[]
+include::with-and-for.adoc[]
+
