@@ -1,0 +1,299 @@
+[[enum]]
+=== The Enum Module
+
+[[introduction-to-enum]]
+=== Introduction
+indexterm:[Enum]
+
+The `Enum` module contains functions for mapping, filtering, grouping, sorting,
+reducing, and other operations. They are the building blocks for manipulating
+and transforming data collections in a functional and declarative style,
+enhancing code readability and maintainability.
+
+Consider this example of using `Enum` to multiply each element in a list by 2:
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.map(list, fn x -> x * 2 end)
+# => [2, 4, 6, 8]
+----
+
+The `Enum.map` function takes two arguments: the enumerable (list in this case) and a transformation function for each element.
+
+For further enhancement, Elixir's pipe operator (`|>`) can be used with `Enum` functions for cleaner and more readable code. Here's an example:
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+list 
+  |> Enum.map(fn x -> x * 2 end) 
+  |> Enum.filter(fn x -> rem(x, 2) == 0 end)
+# => [4, 8]
+----
+
+This statement takes a list, multiplies each element by 2 using `Enum.map`, and then filters out the odd numbers using `Enum.filter`. The use of the pipe operator makes the code flow naturally and easier to read.
+
+NOTE: **`Enum` functions are eager;** they execute immediately and return a result. If memory usage is a concern with very large collections, consider using the `Stream` module for lazy computation.
+
+[[commonly-used-enum-functions]]
+=== Commonly Used Enum Functions
+indexterm:[Enum,Functions]
+
+Enum offers a ton of useful functions. All are listed at https://hexdocs.pm/elixir/Enum.html[the official Enum documentation]. Here are some of the most commonly used functions to give you an idea of what's available.
+
+[[map]]
+==== Enum.map/2
+indexterm:[Enum,Functions,map]
+
+The link:https://hexdocs.pm/elixir/Enum.html#map/2[`Enum.map/2`] function is used to transform each element in an enumerable using a provided function.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.map(list, fn x -> x * 2 end)
+# => [2, 4, 6, 8]
+----
+
+The `&1` shorthand can be used as follows:
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+list |> Enum.map(&(&1 * 2))
+# => [2, 4, 6, 8]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#map/2[Elixir Enum.map/2 documentation].
+
+[[filter]]
+==== Enum.filter/2
+indexterm:[Enum,Functions,filter]
+
+The link:https://hexdocs.pm/elixir/Enum.html#filter/2[`Enum.filter/2`] function filters out elements based on a provided function.
+
+[source,elixir]
+----
+list = [1, nil, 2, nil, 3]
+Enum.filter(list, fn x -> x != nil end)
+# => [1, 2, 3]
+----
+
+Using the `&1` shorthand:
+
+[source,elixir]
+----
+list = [1, nil, 2, nil, 3]
+list |> Enum.filter(&(&1 != nil))
+# => [1, 2, 3]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#filter/2[Elixir Enum.filter/2 documentation].
+
+[[reduce]]
+==== Enum.reduce/2,3
+indexterm:[Enum,Functions,reduce]
+
+The link:https://hexdocs.pm/elixir/Enum.html#reduce/3[`Enum.reduce/2,3`] function reduces an enumerable to a single value.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.reduce(list, 0, fn x, acc -> x + acc end)
+# => 10
+----
+
+NOTE: The use of `reduce/3` and it's accumulator is similar to the `fold` function in other languages. It can be tricky to use.
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#reduce/2[Elixir Enum.reduce/2 documentation].
+
+[[sort]]
+==== Enum.sort/1,2
+indexterm:[Enum,Functions,sort]
+
+The link:https://hexdocs.pm/elixir/Enum.html#sort/2[`Enum.sort/1,2`] function sorts the elements in an enumerable.
+
+[source,elixir]
+----
+list = [4, 2, 3, 1]
+Enum.sort(list)
+# => [1, 2, 3, 4]
+----
+
+You can provide a comparator function:
+
+[source,elixir]
+----
+list = [4, 2, 3, 1]
+Enum.sort(list, fn a, b -> a > b end)
+# => [4, 3, 2, 1]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#sort/2[Elixir Enum.sort/2 documentation].
+
+[[at]]
+==== Enum.at/2,3
+indexterm:[Enum,Functions,at]
+
+Returns the element at the given `index` (zero based) or a default value. 
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.at(list, 2)
+# Output: 3
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#at/3[Elixir Enum.at/2,3 documentation].
+
+[[concat]]
+==== Enum.concat/1,2
+indexterm:[Enum,Functions,concat]
+
+Concatenates the collection of enumerable(s) given. 
+
+[source,elixir]
+----
+Enum.concat([[1, 2], [3, 4]])
+# Output: [1, 2, 3, 4]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#concat/1[Elixir Enum.concat/1,2 documentation].
+
+[[count]]
+==== Enum.count/1,2
+indexterm:[Enum,Functions,count]
+
+Counts the enumerable items, optionally, using the provided function. 
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.count(list)
+# Output: 4
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#count/2[Elixir Enum.count/1,2 documentation].
+
+[[find]]
+==== Enum.find/2,3
+indexterm:[Enum,Functions,find]
+
+Finds the first element for which the provided function returns a truthy value. 
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.find(list, fn x -> x > 2 end)
+# Output: 3
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#find/3[Elixir Enum.find/2,3 documentation].
+
+[[group_by]]
+==== Enum.group_by/2,3
+indexterm:[Enum,Functions,group_by]
+
+Groups all items in the enumerable by the given function. 
+
+[source,elixir]
+----
+list = [{:apple, "fruit"}, {:carrot, "vegetable"}, {:banana, "fruit"}]
+Enum.group_by(list, fn {_name, type} -> type end)
+# Output: %{"fruit" => [{:apple, "fruit"}, {:banana, "fruit"}], "vegetable" => [{:carrot, "vegetable"}]}
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#group_by/3[Elixir Enum.group_by/2,3 documentation].
+
+[[join]]
+==== Enum.join/1,2
+indexterm:[Enum,Functions,join]
+
+Joins all the items in the enumerable into a single string. 
+
+[source,elixir]
+----
+list = ["Hello", "World"]
+Enum.join(list, " ")
+# Output: "Hello World"
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#join/2[Elixir Enum.join/1,2 documentation].
+
+[[max]]
+==== Enum.max/1
+indexterm:[Enum,Functions,max]
+
+Returns the maximum value in the enumerable.
+
+[source,elixir]
+----
+list = [1, 2, 3, 
+
+4]
+Enum.max(list)
+# Output: 4
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#max/1[Elixir Enum.max/1 documentation].
+
+[[min]]
+==== Enum.min/1
+indexterm:[Enum,Functions,min]
+
+Returns the minimum value in the enumerable.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.min(list)
+# Output: 1
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#min/1[Elixir Enum.min/1 documentation].
+
+[[random]]
+==== Enum.random/1
+indexterm:[Enum,Functions,random]
+
+Selects a random element from the enumerable.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.random(list)
+# Output: Random value from the list
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#random/1[Elixir Enum.random/1 documentation].
+
+[[reject]]
+==== Enum.reject/2
+indexterm:[Enum,Functions,reject]
+
+Filters out the items in the enumerable for which the provided function returns a truthy value.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.reject(list, fn x -> x < 3 end)
+# Output: [3, 4]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#reject/2[Elixir Enum.reject/2 documentation].
+
+[[sum]]
+==== Enum.sum/1
+indexterm:[Enum,Functions,sum]
+
+Returns the sum of all items in the enumerable.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Enum.sum(list)
+# Output: 10
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#sum/1[Elixir Enum.sum/1 documentation].
+

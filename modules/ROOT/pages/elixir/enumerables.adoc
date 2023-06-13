@@ -1,64 +1,47 @@
 [[enumerables]]
 == Enumerables
 
-In Elixir, an enumerable is any data structure that can be traversed or iterated
-over. Examples of enumerable data structures include lists like [1, 2, 3], maps
-like %{a: 1, b: 2}, and ranges like 1..3. All these structures can be processed
-using the functions provided by the Enum module.
+An enumerable is any data structure that can be traversed or iterated over. It
+can be lists like `[1, 2, 3]`, maps like `%{a: 1, b: 2}` and ranges like `1..3`. All
+these structures can be processed using the functions provided by the Enum
+module.
 
-This chapter covers the enumerable module `Enum`, its functions, and the concept 
-of lazy enumeration with the `Stream` module.
+Within Elixir, there are two main modules for processing enumerables:
+link:https://hexdocs.pm/elixir/Enum.html[`Enum`] and
+link:https://hexdocs.pm/elixir/Stream.html[`Stream`].
 
-[[enum]]
-=== The Enum Module
-
-[[introduction-to-enum]]
-==== Introduction to Enum
-
-A brief introduction to what `Enum` module is and why it is used.
-
-[[commonly-used-enum-functions]]
-==== Commonly Used Enum Functions
-
-Subsections for each function that includes a brief explanation and an example.
-
-* [[map]]
-===== Enum.map/2
-* [[filter]]
-===== Enum.filter/2
-* [[reduce]]
-===== Enum.reduce/2
-* [[sort]]
-===== Enum.sort/1,2
-
-[[streams]]
-=== The Stream Module
-
-[[introduction-to-streams]]
-==== Introduction to Streams
-
-An introduction to `Stream` module, and an explanation of lazy enumeration.
-
-[[commonly-used-stream-functions]]
-==== Commonly Used Stream Functions
-
-Subsections for each function that includes a brief explanation and an example.
-
-* [[stream-map]]
-===== Stream.map/2
-* [[stream-filter]]
-===== Stream.filter/2
-* [[stream-zip]]
-===== Stream.zip/2
+include::enum.adoc[]
+include::stream.adoc[]
 
 [[enum-vs-stream]]
 === Enum vs Stream
+indexterm:[Enum,vs Stream]
+indexterm:[Stream,vs Enum]
+indexterm:[Eager Computation,Enum]
+indexterm:[Lazy Computation,Stream]
+indexterm:[Performance,Comparison]
+indexterm:[Memory Efficiency,Stream]
+indexterm:[Data Processing,Enum and Stream]
 
-A comparison of the `Enum` and `Stream` modules, explaining when to use each.
+Think about `Enum` and `Stream` as two different chefs in a kitchen who are asked to prepare a large meal.
 
-[[enumerable-protocol]]
-=== The Enumerable Protocol
+**The Enum Chef (Eager Chef):**
 
-Explanation of the `Enumerable` protocol, how to implement it for custom data types, 
-and how `Enum` and `Stream` use it under the hood.
+The Enum chef is eager to get the job done. He tries to cook everything at once. He gets every ingredient, every pot and pan, and starts cooking immediately. This is great if you're not cooking a lot of food, because everything gets done fast.
+
+But what if the meal or the number of meals is huge? Well, then the Enum chef might run into trouble. His kitchen (or our computer's memory) might not have enough room for all the food he's trying to cook at once. He might get overwhelmed because he's trying to do too much at once.
+
+**The Stream Chef (Lazy Chef):**
+
+The Stream chef, on the other hand, is more laid-back. He doesn't start cooking until it's absolutely necessary. He prepares each dish one at a time, using only the ingredients and cookware needed for each dish. Once a dish is ready, he moves on to the next one.
+
+If the meal is huge, the Stream chef handles it better because he only works on one dish at a time, which means he doesn't need a lot of room in his kitchen. He's more efficient with large meals because he can handle them piece by piece.
+
+**Comparing the Chefs:**
+
+- **Speed:** The Enum chef (Eager chef) works faster when the meal is small because he cooks everything at once. But the Stream chef (Lazy chef) could be faster for large meals because he efficiently handles them one dish at a time. You could use a stopwatch to see who finishes cooking first.
+
+- **Kitchen Space (Memory):** The Stream chef (Lazy chef) uses his kitchen space more efficiently because he only prepares one dish at a time. This difference becomes obvious when they're asked to prepare a large meal. You could look at how messy their kitchens are to see who uses space better.
+
+So, when you're choosing between Enum and Stream in your Elixir code, think about the size of your "meal" (your data), and pick the chef that suits your needs best.
 

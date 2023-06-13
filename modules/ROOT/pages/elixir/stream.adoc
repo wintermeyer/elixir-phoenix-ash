@@ -1,0 +1,207 @@
+[[stream]]
+=== The Stream Module
+
+[[introduction-to-stream]]
+=== Introduction
+indexterm:[Stream]
+
+The `Stream` module contains functions similar to the `Enum` module for mapping, filtering, grouping, sorting, reducing, and other operations. However, the key difference is that `Stream` operations are _lazy_. This means they only compute results when necessary, **potentially saving a lot of resources when dealing with large data sets or I/O operations.**
+
+Consider this example of using `Stream` to multiply each element in a list by 2:
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Stream.map(list, fn x -> x * 2 end)
+# => #Stream<[enum: [1, 2, 3, 4], funs: [#Function<45.122072036/1 in Stream.map/2>]]>
+----
+
+You might notice that the output is not a list but a `Stream`. To retrieve the final result, you will need to convert the stream back into a list:
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+list
+|> Stream.map(fn x -> x * 2 end)
+|> Enum.to_list()
+# => [2, 4, 6, 8]
+----
+
+The `Stream` module can be used with Elixir's pipe operator (`|>`) to create a sequence of transformations. The transformations only get executed when the stream is converted into a list or another enumerable.
+
+This is how you would use `Stream` to multiply each element by 2 and then filter out odd numbers:
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+list 
+  |> Stream.map(fn x -> x * 2 end) 
+  |> Stream.filter(fn x -> rem(x, 2) == 0 end)
+  |> Enum.to_list()
+# => [4, 8]
+----
+
+[[commonly-used-stream-functions]]
+=== Commonly Used Stream Functions
+indexterm:[Stream,Functions]
+
+Stream offers a lot of useful functions, similar to Enum. All are listed at https://hexdocs.pm/elixir/Stream.html[the official Stream documentation]. Here are some of the most commonly used functions to give you an idea of what's available.
+
+[[map]]
+==== Stream.map/2
+indexterm:[Stream,Functions,map]
+
+The link:https://hexdocs.pm/elixir/Stream.html#map/2[`Stream.map/2`] function is used to transform each element in an enumerable using a provided function. The result is a new Stream that can be evaluated later.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+list 
+|> Stream.map(fn x -> x * 2 end) 
+|> Enum.to_list()
+# => [2, 4, 6, 8]
+----
+
+The `&1` shorthand can be used as follows:
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+list 
+|> Stream.map(&(&1 * 2))
+|> Enum.to_list()
+# => [2, 4, 6, 8]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#map/2[Elixir Stream.map/2 documentation].
+
+[[filter]]
+==== Stream.filter/2
+indexterm:[Stream,Functions,filter]
+
+The link:https://hexdocs.pm/elixir/Stream.html#filter/2[`Stream.filter/2`] function filters out elements based on a provided function, resulting in a new Stream.
+
+[source,elixir]
+----
+list = [1, nil, 2, nil, 3]
+list 
+|> Stream.filter(fn x -> x != nil end)
+|> Enum.to_list()
+# => [1, 2, 3]
+----
+
+Using the `&1` shorthand:
+
+[source,elixir]
+----
+list = [1, nil, 2, nil, 3]
+list 
+|> Stream.filter(&(&1 != nil))
+|> Enum.to_list()
+# => [1, 2, 3]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#filter/2[Elixir Stream.filter/2 documentation].
+
+[[reduce]]
+==== Stream.reduce/2,3
+indexterm:[Stream,Functions,reduce]
+
+The link:https://hexdocs.pm/elixir/Stream.html#reduce/3[`Stream.reduce/2,3`] function reduces an enumerable to a single value.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+Stream.reduce(list, 0, fn x, acc -> x + acc end)
+# => 10
+----
+
+NOTE: The use of `reduce/3` and it's accumulator is similar to the `fold` function in other languages. It can be tricky to use.
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#reduce/2[Elixir Stream.reduce/2 documentation].
+
+[[take]]
+==== Stream.take/2
+indexterm:[Stream,Functions,take]
+
+The link:https://hexdocs.pm/elixir/Stream.html#take/2[`Stream.take/2`] function generates a new stream that takes the first `n` items from the original stream.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+list 
+|> Stream.take(2)
+|> Enum.to_list()
+# => [1, 2]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#take/2[Elixir Stream.take/2 documentation].
+
+[[drop]]
+==== Stream.drop/2
+indexterm:[Stream,Functions,drop]
+
+The link:https://hexdocs.pm/elixir/Stream.html#drop/2[`Stream.drop/2`] function generates a new stream that drops the first `n` items from the original stream.
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+list 
+|> Stream.drop(2)
+|> Enum.to_list()
+# => [3, 4]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#drop/2[Elixir Stream.drop/2 documentation].
+
+[[concat]]
+==== Stream.concat/1,2
+indexterm:[Stream,Functions,concat]
+
+The link:https://hexdocs.pm/elixir/Stream.html#concat/2[`Stream.concat/1,2`] function generates a new stream that concatenates two streams or a stream of streams.
+
+[source,elixir]
+----
+Stream.concat([1, 2], [3, 4])
+|> Enum.to_list()
+# => [1, 2, 3, 4]
+----
+
+More details can be found at the official link:https://hex
+
+docs.pm/elixir/Stream.html#concat/2[Elixir Stream.concat/1,2 documentation].
+
+[[cycle]]
+==== Stream.cycle/1
+indexterm:[Stream,Functions,cycle]
+
+The link:https://hexdocs.pm/elixir/Stream.html#cycle/1[`Stream.cycle/1`] function generates an infinite stream repeating the given enumerable.
+
+[source,elixir]
+----
+Stream.cycle([1, 2])
+|> Stream.take(5)
+|> Enum.to_list()
+# => [1, 2, 1, 2, 1]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#cycle/1[Elixir Stream.cycle/1 documentation].
+
+[[unzip]]
+==== Stream.unzip/1
+indexterm:[Stream,Functions,unzip]
+
+The link:https://hexdocs.pm/elixir/Stream.html#unzip/1[`Stream.unzip/1`] function generates two new streams from a stream of tuples.
+
+[source,elixir]
+----
+list = [{1, "a"}, {2, "b"}, {3, "c"}]
+{left, right} = Stream.unzip(list)
+Enum.to_list(left)
+# => [1, 2, 3]
+Enum.to_list(right)
+# => ["a", "b", "c"]
+----
+
+More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#unzip/1[Elixir Stream.unzip/1 documentation].
+
