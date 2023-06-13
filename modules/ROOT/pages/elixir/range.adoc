@@ -1,9 +1,13 @@
 [[ranges]]
 === Ranges
+indexterm:[Range]
+indexterm:[Data Types,Range]
+indexterm:[Enumerable,Range]
+indexterm:[Sequence,Range]
 
-Ranges in Elixir represent sequences of successive integers. They are defined using 
-two integers (start and end points) separated by two dots (`..`). The sequence includes 
-both the start and end points.
+Ranges in Elixir represent sequences of successive integers. They are defined
+using two integers (start and end points) separated by two dots (`..`). The
+sequence includes both the start and end points.
 
 [source,elixir]
 ----
@@ -16,9 +20,9 @@ iex> Enum.to_list(1..5) <2>
 <1> In this example, `1..5` is a range that includes the integers from 1 through 5. 
 <2> `Enum.to_list/1` is a function that converts an enumerable into a list.
 
-Ranges in Elixir are enumerables, which means they can be used with the `Enum` module 
-to iterate over the sequence of numbers. This allows for concise and readable code 
-when you need to work with sequences of numbers.
+Ranges in Elixir are enumerables, which means they can be used with the `Enum`
+module to iterate over the sequence of numbers. This allows for concise and
+readable code when you need to work with sequences of numbers.
 
 For example:
 
@@ -28,16 +32,22 @@ iex> Enum.map(1..5, fn x -> x * x end)
 [1, 4, 9, 16, 25]
 ----
 
-In this example, the `Enum.map` function is used to square each number in the range `1..5`, 
-resulting in a new list `[1, 4, 9, 16, 25]`.
+In this example, the `Enum.map` function is used to square each number in the
+range `1..5`, resulting in a new list `[1, 4, 9, 16, 25]`.
 
-Remember that ranges in Elixir are always increasing, from the start point to the end point. 
-If you define a range with a larger number as the start point and a smaller number as the 
-end point, like `5..1`, you will get an empty range.
+Remember that ranges in Elixir are always increasing, from the start point to
+the end point. If you define a range with a larger number as the start point and
+a smaller number as the end point, like `5..1`, you will get an empty range.
+
+NOTE: A Range doesn't have to consist of just integers. But because this is a
+beginners book we are not going into that.
 
 ==== Step
+indexterm:[Step]
+indexterm:[Range,Step]
 
-You can use the `step` option to define the increment between successive numbers in a range.
+You can use the `step` argument to define the increment between successive
+numbers in a range.
 
 [source,elixir]
 ----
