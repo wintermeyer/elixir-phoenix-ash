@@ -1,3 +1,4 @@
+[[cons-operator]]
 === Cons Operator `|` in Elixir
 indexterm:[Elixir, Operators, Cons]
 

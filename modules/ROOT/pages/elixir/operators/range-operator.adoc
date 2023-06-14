@@ -1,3 +1,4 @@
+[[range-operator]]
 === The Range Operator
 indexterm:[Range Operator]
 

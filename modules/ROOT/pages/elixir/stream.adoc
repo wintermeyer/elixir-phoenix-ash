@@ -47,7 +47,7 @@ indexterm:[Stream,Functions]
 
 Stream offers a lot of useful functions, similar to Enum. All are listed at https://hexdocs.pm/elixir/Stream.html[the official Stream documentation]. Here are some of the most commonly used functions to give you an idea of what's available.
 
-[[map]]
+[[stream-map]]
 ==== Stream.map/2
 indexterm:[Stream,Functions,map]
 
@@ -75,7 +75,7 @@ list
 
 More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#map/2[Elixir Stream.map/2 documentation].
 
-[[filter]]
+[[stream-filter]]
 ==== Stream.filter/2
 indexterm:[Stream,Functions,filter]
 
@@ -103,7 +103,7 @@ list
 
 More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#filter/2[Elixir Stream.filter/2 documentation].
 
-[[reduce]]
+[[stream-reduce]]
 ==== Stream.reduce/2,3
 indexterm:[Stream,Functions,reduce]
 
@@ -120,7 +120,7 @@ NOTE: The use of `reduce/3` and it's accumulator is similar to the `fold` functi
 
 More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#reduce/2[Elixir Stream.reduce/2 documentation].
 
-[[take]]
+[[stream-take]]
 ==== Stream.take/2
 indexterm:[Stream,Functions,take]
 
@@ -137,7 +137,7 @@ list
 
 More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#take/2[Elixir Stream.take/2 documentation].
 
-[[drop]]
+[[stream-drop]]
 ==== Stream.drop/2
 indexterm:[Stream,Functions,drop]
 
@@ -154,7 +154,7 @@ list
 
 More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#drop/2[Elixir Stream.drop/2 documentation].
 
-[[concat]]
+[[stream-concat]]
 ==== Stream.concat/1,2
 indexterm:[Stream,Functions,concat]
 
@@ -171,7 +171,7 @@ More details can be found at the official link:https://hex
 
 docs.pm/elixir/Stream.html#concat/2[Elixir Stream.concat/1,2 documentation].
 
-[[cycle]]
+[[stream-cycle]]
 ==== Stream.cycle/1
 indexterm:[Stream,Functions,cycle]
 
@@ -187,7 +187,7 @@ Stream.cycle([1, 2])
 
 More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#cycle/1[Elixir Stream.cycle/1 documentation].
 
-[[unzip]]
+[[stream-unzip]]
 ==== Stream.unzip/1
 indexterm:[Stream,Functions,unzip]
 

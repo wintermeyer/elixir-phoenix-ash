@@ -1,3 +1,4 @@
+[[string-concatenation-operator]]
 === String Concatenation Operator `<>` in Elixir
 indexterm:[Elixir, Operators, String Concatenation]
 

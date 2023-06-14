@@ -1,3 +1,4 @@
+[[match-operator]]
 === The Match Operator `=` (Pattern Matching)
 indexterm:[Pattern Matching, Match Operator]
 indexterm:[Pattern Matching]

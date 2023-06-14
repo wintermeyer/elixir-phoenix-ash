@@ -1,6 +1,6 @@
 [[elixir_101]]
 = Elixir 101
-Stefan Wintermeyer <sw@wintermeyer-consulting.de>
+:name: Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Welcome to the fast track of Elixir fundamentals! This chapter is designed to
 furnish you with a balanced measure of knowledge to kickstart your journey with
@@ -16,8 +16,8 @@ include::iex.adoc[]
 include::hello-world.adoc[]
 include::basic-debugging.adoc[]
 include::variables.adoc[]
-include::data-types.adoc[]
-include::operators.adoc[]
+include::data-types/index-data-types.adoc[]
+include::operators/index-operators.adoc[]
 include::logical-expressions.adoc[]
 include::modules-and-functions.adoc[]
 include::higher-order-functions.adoc[]

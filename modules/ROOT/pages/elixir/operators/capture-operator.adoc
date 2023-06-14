@@ -1,3 +1,4 @@
+[[capture-operator]]
 === Capture Operator `&` in Elixir
 indexterm:[Elixir, Operators, Capture]
 

@@ -1,3 +1,4 @@
+[[pipe-operator]]
 ### The Pipe Operator (|>)
 indexterm:["Pipe Operator", "|>"]
 

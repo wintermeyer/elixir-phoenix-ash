@@ -1,0 +1,18 @@
+[[elixir-operators]]
+== Operators
+indexterm:[Elixir,Operators]
+
+In Elixir, operators are special symbols or words that are used to perform various operations like mathematical, comparison, logical and more. 
+
+include::arithmetic-operator.adoc[]
+include::comparison-operator.adoc[]
+include::boolean-operator.adoc[]
+include::bitwise-operator.adoc[]
+include::pipe-operator.adoc[]
+include::match-operator.adoc[]
+include::range-operator.adoc[]
+include::string-concatenation-operator.adoc[]
+// include::interpolation-operator.adoc[]
+include::capture-operator.adoc[]
+include::cons-operator.adoc[]
+
