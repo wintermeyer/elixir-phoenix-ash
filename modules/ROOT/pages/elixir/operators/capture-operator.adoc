@@ -1,0 +1,47 @@
+=== Capture Operator `&` in Elixir
+indexterm:[Elixir, Operators, Capture]
+
+The Capture operator, denoted as `&`, is a unique feature in Elixir that enables the creation of anonymous functions, often in a more succinct and readable way than the traditional `fn -> end` syntax.
+
+=== Understanding the Capture Operator `&` 
+indexterm:[Elixir, Operators, Capture, Basics]
+
+The Capture operator is often used to create quick, inline functions. Here's a simple example:
+
+[source,elixir]
+----
+iex> add = &(&1 + &2)
+#Function<12.128620087/2 in :erl_eval.expr/5>
+iex> add.(1, 2)
+3
+----
+
+In the above example, `&(&1 + &2)` creates an anonymous function that adds two arguments together. The placeholders `&1` and `&2` refer to the first and second arguments, respectively. The function is then assigned to the variable `add`, and it can be invoked with `add.(1, 2)`.
+
+=== Using the Capture Operator `&`
+indexterm:[Elixir, Operators, Capture, Usage]
+
+The Capture operator isn't just for simple functions. It can be used with more complex expressions and even function calls:
+
+[source,elixir]
+----
+iex> double = &(&1 * 2)
+#Function<6.128620087/1 in :erl_eval.expr/5>
+iex> double.(10)
+20
+----
+
+In the above example, `&(&1 * 2)` creates an anonymous function that doubles its argument.
+
+You can also use the Capture operator to reference named functions from modules. For example, to reference the `length` function from the List module:
+
+[source,elixir]
+----
+iex> len = &List.length/1
+&List.length/1
+iex> len.([1, 2, 3, 4, 5])
+5
+----
+
+In the example above, `&List.length/1` captures the `length` function from the `List` module, which takes one argument (`/1`). This function is then assigned to the variable `len`.
+

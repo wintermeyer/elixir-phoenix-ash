@@ -1,0 +1,51 @@
+=== String Concatenation Operator `<>` in Elixir
+indexterm:[Elixir, Operators, String Concatenation]
+
+The string concatenation operator in Elixir is the `<>` operator. It plays a fundamental role in handling strings as it enables the combination of two or more strings into a single string.
+
+=== Understanding the `<>` Operator
+indexterm:[Elixir, Operators, String Concatenation, Basics]
+
+In Elixir, the `<>` operator takes two strings and merges them together, forming a new string. This process is commonly known as "string concatenation." Here's a simple example:
+
+[source,elixir]
+----
+iex> "Hello" <> " world"
+"Hello world"
+----
+
+In the above example, `"Hello"` and `" world"` are two separate strings. The `<>` operator combines them into one string: `"Hello world"`.
+
+=== Using the `<>` Operator
+indexterm:[Elixir, Operators, String Concatenation, Usage]
+
+In practice, the `<>` operator is extensively used when there's a need to dynamically construct a string. It allows parts of the string to be variables that can change depending on the program's context:
+
+[source,elixir]
+----
+iex> greeting = "Hello"
+"Hello"
+iex> name = "Alice"
+"Alice"
+iex> greeting <> ", " <> name
+"Hello, Alice"
+----
+
+In the example above, `greeting` and `name` are variables holding different string values. Using the `<>` operator, we can concatenate these variables with another string (", ") to create the desired output.
+
+It's important to note that the `<>` operator only works with strings. Attempting to concatenate a non-string data type without first converting it to a string will result in an error:
+
+[source,elixir]
+----
+iex> "The answer is " <> 42
+** (ArgumentError) "argument error"
+----
+
+To avoid such errors, ensure all operands of the `<>` operator are strings. For example, you can use the `Integer.to_string/1` function to convert an integer to a string:
+
+[source,elixir]
+----
+iex> "The answer is " <> Integer.to_string(42)
+"The answer is 42"
+----
+

@@ -1,0 +1,48 @@
+=== The Range Operator
+indexterm:[Range Operator]
+
+The range operator (`..`) in Elixir introduces a convenient way of defining sequences of successive integers. This section will explore the range operator, demonstrating its various uses from simple range definitions to utilization in functions for processing sequences.
+
+=== Understanding the Range Operator `..`
+indexterm:[Range Operator, Basics]
+
+In Elixir, a range is created by two integers separated by the `..` operator. This sequence includes both the start and end points. For example, `1..5` creates a range of integers from 1 to 5 inclusive. `5..1` does the same but in reverse order.
+
+Ranges in Elixir are considered as enumerables, which means they can be used with the `Enum` module to iterate over the sequence of numbers. This capability makes the range operator a versatile tool in various situations involving sequences of numbers.
+
+[source,elixir]
+----
+iex> 1..5
+1..5
+iex> Enum.to_list(1..5)
+[1, 2, 3, 4, 5]
+----
+
+In the code above, the first command creates a range from 1 to 5. The second command converts the range into a list using the `Enum.to_list/1` function.
+
+=== Range Operator in Functions
+indexterm:[Range Operator, Functions]
+
+The range operator can also be used in combination with functions:
+
+[source,elixir]
+----
+iex> Enum.map(1..5, fn x -> x * x end)
+[1, 4, 9, 16, 25]
+----
+
+In this example, the `Enum.map` function is used to square each number in the range `1..5`, resulting in a new list `[1, 4, 9, 16, 25]`.
+
+=== Step in Ranges
+indexterm:[Range Operator, Step]
+
+Elixir also allows you to define the step (increment) between successive numbers in a range using the `//` operator:
+
+[source,elixir]
+----
+iex> Enum.to_list(1..11//3)
+[1, 4, 7, 10]
+----
+
+In this example, `1..11//3` creates a range from 1 to 11 with a step of 3, resulting in the list `[1, 4, 7, 10]`.
+

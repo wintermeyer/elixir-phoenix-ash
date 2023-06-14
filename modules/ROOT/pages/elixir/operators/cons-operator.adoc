@@ -1,0 +1,52 @@
+=== Cons Operator `|` in Elixir
+indexterm:[Elixir, Operators, Cons]
+
+The Cons operator, represented by the pipe character (`|`), is a core tool in Elixir used to construct and manipulate lists.
+
+=== Understanding the Cons Operator `|`
+indexterm:[Elixir, Operators, Cons, Basics]
+
+In Elixir, lists are fundamentally built as singly linked lists. That means each element in the list holds its value and also the remainder of the list. These individual pieces are referred to as the "head" and the "tail" of the list. The Cons operator is used to combine a head and a tail into a list.
+
+Here is a simple example:
+
+[source,elixir]
+----
+iex> list = [1 | [2 | [3 | []]]]
+[1, 2, 3]
+----
+
+In this example, the expression `[1 | [2 | [3 | []]]]` constructs a list with the elements 1, 2, and 3. The last list in the chain is an empty list `[]`.
+
+=== Using the Cons Operator `|`
+indexterm:[Elixir, Operators, Cons, Usage]
+
+One common usage of the Cons operator is in pattern matching to destructure a list into its head and tail:
+
+[source,elixir]
+----
+iex> [head | tail] = [1, 2, 3]
+[1, 2, 3]
+iex> head
+1
+iex> tail
+[2, 3]
+----
+
+In the example above, `[head | tail] = [1, 2, 3]` splits the list `[1, 2, 3]` into the head (the first element, `1`) and the tail (the remainder of the list, `[2, 3]`).
+
+This operator is particularly useful when working with recursive functions that need to operate on each element of a list.
+
+=== Caution when Using the Cons Operator `|`
+indexterm:[Elixir, Operators, Cons, Caution]
+
+While the Cons operator can be used to construct lists, it should be noted that the resulting data structure is only properly recognized as a list if the tail is a list or an empty list. For example:
+
+[source,elixir]
+----
+iex> ["Hello" | "World"]
+["Hello"| "World"]
+----
+
+In this case, since `"World"` is not a list, Elixir does not treat the entire structure as a regular list.
+

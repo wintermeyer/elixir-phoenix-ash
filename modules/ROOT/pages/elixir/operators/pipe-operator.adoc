@@ -1,4 +1,4 @@
-## The Pipe Operator (|>)
+### The Pipe Operator (|>)
 indexterm:["Pipe Operator", "|>"]
 
 The pipe operator `|>` is an effective tool in enhancing the readability of 

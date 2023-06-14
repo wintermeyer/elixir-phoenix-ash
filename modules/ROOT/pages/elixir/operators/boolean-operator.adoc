@@ -1,0 +1,66 @@
+[[boolean-operators]]
+=== Boolean Operators
+indexterm:[Elixir,Operators,Boolean]
+
+Boolean operators in Elixir are essential tools that control logical flow within your program. They perform operations on boolean values and return a boolean result (`true` or `false`). The primary boolean operators include `and`, `or`, `not`, and `xor`.
+
+* `and`: The `and` operator returns true if both the operands are true. Otherwise, it returns false.
+
+[source,elixir]
+----
+iex> true and true
+true
+
+iex> true and false
+false
+----
+
+* `or`: The `or` operator returns true if at least one of the operands is true.
+
+[source,elixir]
+----
+iex> false or true
+true
+
+iex> false or false
+false
+----
+
+* `not`: The `not` operator returns the opposite boolean value of the operand.
+
+[source,elixir]
+----
+iex> not true
+false
+
+iex> not false
+true
+----
+
+* `xor`: The `xor` (exclusive or) operator returns true if exactly one of the operands is true.
+
+[source,elixir]
+----
+iex> true xor false
+true
+
+iex> true xor true
+false
+----
+
+Elixir also provides `&&`, `||`, and `!` as short-circuit operators that are equivalent to `and`, `or`, and `not` respectively. These operators differ in the way they handle non-boolean values, and only evaluate their second operand when necessary.
+
+[source,elixir]
+----
+iex> nil && true
+nil
+
+iex> true || "Hello"
+true
+
+iex> !1
+false
+----
+
+Understanding these boolean operators is crucial in making logical decisions in your Elixir programs. They form the foundation for creating complex conditions, enabling your program to react differently based on certain circumstances.
+

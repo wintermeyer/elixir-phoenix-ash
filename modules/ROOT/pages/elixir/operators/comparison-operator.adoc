@@ -1,0 +1,70 @@
+[[comparison-operators]]
+=== Comparison Operators
+indexterm:[Elixir,Operators,Comparison]
+
+Comparison operators in Elixir are used to compare two values. They evaluate to either `true` or `false`. These operators play a crucial role in controlling program flow through conditions.
+
+Here are the primary comparison operators:
+
+* Less Than (<): This operator returns true if the value on the left is less than the value on the right.
+
+[source,elixir]
+----
+iex> 2 < 3
+true
+----
+
+* Less Than or Equal To (<=): This operator returns true if the value on the left is less than or equal to the value on the right.
+
+[source,elixir]
+----
+iex> 2 <= 2
+true
+----
+
+* Greater Than (>): This operator returns true if the value on the left is greater than the value on the right.
+
+[source,elixir]
+----
+iex> 3 > 2
+true
+----
+
+* Greater Than or Equal To (>=): This operator returns true if the value on the left is greater than or equal to the value on the right.
+
+[source,elixir]
+----
+iex> 3 >= 3
+true
+----
+
+* Equal To (==): This operator returns true if the value on the left is equal to the value on the right. 
+
+[source,elixir]
+----
+iex> 2 == 2
+true
+----
+
+* Not Equal To (!=): This operator returns true if the value on the left is not equal to the value on the right.
+
+[source,elixir]
+----
+iex> 2 != 3
+true
+----
+
+These operators are typically used in conditional expressions such as those found in `if`, `unless`, and `cond` statements.
+
+It's important to note that Elixir provides strict comparison operators as well (`===` and `!==`). These are identical to `==` and `!=` respectively, but additionally distinguish between integers and floats.
+
+[source,elixir]
+----
+iex> 2 == 2.0
+true
+iex> 2 === 2.0
+false
+----
+
+NOTE: Comparison operators in Elixir have an interesting feature where you can compare different types of data. It follows the rule: number < atom < reference < function < port < pid < tuple < map < list < bitstring. Truth be told: I have never used this feature.
+

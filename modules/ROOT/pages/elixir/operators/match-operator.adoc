@@ -1,14 +1,6 @@
-== Pattern Matching
-indexterm:[Pattern Matching]
-
-In Elixir, pattern matching is a potent feature that elevates the language's
-expressiveness and readability. This chapter introduces the concept of pattern
-matching and illuminates its practical uses. From assigning variables to
-deconstructing complex data structures and controlling program flow, pattern
-matching serves as a fundamental tool in your Elixir toolkit.
-
-=== The Match Operator `=`
+=== The Match Operator `=` (Pattern Matching)
 indexterm:[Pattern Matching, Match Operator]
+indexterm:[Pattern Matching]
 
 In various programming languages, the equals sign (`=`) signifies assignment. For example, `x = 5` generally reads as "Let `x` be equal to 5." Elixir, however, assigns a slightly different role to the equals sign.
 
