@@ -1,0 +1,24 @@
+[[immutability]]
+## Immutability
+indexterm:[Elixir,Immutability]
+
+_Immutabilty_ is one of that magic words that you'll hear a lot in the Elixir
+community. It's one of the things that makes Elixir so fast and reliable. But
+what does it mean?
+
+In simple terms, once you give a value to a variable in Elixir, this value stays
+the same. And that means that the given part of memory is not touched until the
+function is ended and everything is garbage collected. If you want to change the
+value of a variable, the system creates a new memory space with the new value
+while the old one still exists. This is called _immutability_.
+Counterintiutively it is much faster to just create a new memory space than to
+change the value of an existing one. And when data is immutable, it can be
+shared freely among multiple processes without the fear of data races or
+inconsistencies. This is particularly beneficial in concurrent and distributed
+systems, where multiple processes may need to access and operate on the same
+data.
+
+NOTE: There is no way I can convince you of the importance of immutability in
+these few sentences. You'll get a feeling and better understanding while coding
+Elixir. No need to worry about it now.
+

@@ -13,19 +13,19 @@ defmodule FruitShop do
     
     basket_fruits() <2>
     
-    IO.puts("Apples in the shop: #{apples}") <3>
+    IO.puts("Apples in the shop: #{apples}") <4>
   end
 
   defp basket_fruits do
-    apples = 5 <4>
+    apples = 5 <3>
     IO.puts("Apples in the basket: #{apples}")
   end
 end
 ----
 <1> Here, we declare the number of apples in the shop as 10.
 <2> We then call the `basket_fruits/0` function.
-<3> After coming back from the basket, we check the count of apples in the shop again.
-<4> Inside the `basket_fruits/0` function, we declare the count of apples in the basket as 5.
+<3> Inside the `basket_fruits/0` function, we declare the count of apples in the basket as 5.
+<4> After coming back from the basket, we check the count of apples in the shop again.
 
 The output of calling `FruitShop.fruit_count()` would be:
 
