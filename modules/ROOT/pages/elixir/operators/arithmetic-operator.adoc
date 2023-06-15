@@ -4,10 +4,10 @@ indexterm:[Elixir,Operators,Arithmetic]
 
 Arithmetic operators in Elixir allow you to perform basic mathematical calculations. These operators work with numbers and support integer as well as floating-point arithmetic.
 
-Here are the primary arithmetic operators:
+Here are the most popular arithmetic operators:
 
 * Addition (+): This operator adds two numbers together.
-
++
 [source,elixir]
 ----
 iex> 2 + 2
@@ -15,7 +15,7 @@ iex> 2 + 2
 ----
 
 * Subtraction (-): This operator subtracts the second number from the first.
-
++
 [source,elixir]
 ----
 iex> 4 - 2
@@ -23,46 +23,30 @@ iex> 4 - 2
 ----
 
 * Multiplication (*): This operator multiplies two numbers.
-
++
 [source,elixir]
 ----
 iex> 3 * 3
 9
 ----
 
-* Division (/): This operator divides the first number by the second. Note that it always returns a float.
-
+* Division (/): This operator divides the first number by the second. It always returns a float.
++
 [source,elixir]
 ----
 iex> 10 / 2
 5.0
 ----
-
++
 If you need integer division, you can use the `div/2` function:
-
++
 [source,elixir]
 ----
 iex> div(10, 2)
 5
 ----
 
-* Remainder (%): This operator returns the remainder of an integer division.
-
-[source,elixir]
-----
-iex> 10 % 3
-1
-----
-
-Again, Elixir provides a built-in function `rem/2` for getting the remainder:
-
-[source,elixir]
-----
-iex> rem(10, 3)
-1
-----
-
-It's important to know that these operators follow standard mathematical precedence rules. If you want to ensure a specific order of operations, use parentheses to make your intentions clear:
+These operators follow standard mathematical precedence rules. If you want to ensure a specific order of operations, use parentheses to make your intentions clear:
 
 [source,elixir]
 ----

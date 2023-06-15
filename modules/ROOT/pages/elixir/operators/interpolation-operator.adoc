@@ -1,13 +1,8 @@
 [[interpolation-operator]]
-=== Interpolation Operator `#{}` in Elixir
+=== Interpolation Operator `#{}`
 indexterm:[Elixir, Operators, Interpolation]
 
-The interpolation operator in Elixir, represented as `#{}`, is a powerful tool used for inserting values within a string. It allows for dynamic expression of values within a string without the need for explicit concatenation.
-
-==== Understanding the Interpolation Operator `#{}` 
-indexterm:[Elixir, Operators, Interpolation, Basics]
-
-String interpolation is a process of substituting values of variables into placeholders in a string. In Elixir, this is achieved using the interpolation operator `#{}`. Here's a simple example:
+The interpolation operator in Elixir, represented as `#{}`, is a powerful tool used for inserting values within a string. It allows for dynamic expression of values within a string without the need for explicit concatenation. Here's a simple example:
 
 [source,elixir]
 ----
@@ -18,9 +13,6 @@ iex> "Hello, #{name}"
 ----
 
 In the example above, the variable `name` is interpolated into the string. The resulting string is `"Hello, Alice"`.
-
-==== Using the Interpolation Operator `#{}` 
-indexterm:[Elixir, Operators, Interpolation, Usage]
 
 String interpolation in Elixir can handle more complex expressions, not just variables. This includes arithmetic operations, function calls, and more:
 

@@ -1,11 +1,6 @@
 [[string-concatenation-operator]]
-=== String Concatenation Operator `<>` in Elixir
+=== String Concatenation Operator `<>`
 indexterm:[Elixir, Operators, String Concatenation]
-
-The string concatenation operator in Elixir is the `<>` operator. It plays a fundamental role in handling strings as it enables the combination of two or more strings into a single string.
-
-=== Understanding the `<>` Operator
-indexterm:[Elixir, Operators, String Concatenation, Basics]
 
 In Elixir, the `<>` operator takes two strings and merges them together, forming a new string. This process is commonly known as "string concatenation." Here's a simple example:
 
@@ -16,9 +11,6 @@ iex> "Hello" <> " world"
 ----
 
 In the above example, `"Hello"` and `" world"` are two separate strings. The `<>` operator combines them into one string: `"Hello world"`.
-
-=== Using the `<>` Operator
-indexterm:[Elixir, Operators, String Concatenation, Usage]
 
 In practice, the `<>` operator is extensively used when there's a need to dynamically construct a string. It allows parts of the string to be variables that can change depending on the program's context:
 

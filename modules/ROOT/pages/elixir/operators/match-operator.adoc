@@ -53,7 +53,7 @@ NOTE: Pattern Matching is an incredibly powerful concept in Elixir, used in myri
 === Functions
 indexterm:[Pattern Matching, Functions]
 
-Pattern matching is pervasive in Elixir, and it can even be used with functions:
+Pattern matching is pervasive in Elixir. It is used with functions too:
 
 [source,elixir]
 ----
@@ -85,7 +85,9 @@ iex> Area.circle(4)
 ==== Functions with Guards
 indexterm:[Pattern Matching, Guards]
 
-Guards add extra layers to pattern matching with functions. Full details can be found at https://hexdocs.pm/elixir/guards.html. For now, let's look at a few examples. Guards start with `when`:
+Guards add extra layers to pattern matching with functions. Full details can be
+found at https://hexdocs.pm/elixir/guards.html. Let's look at a few examples.
+Guards start with `when`:
 
 [source,elixir]
 ----
