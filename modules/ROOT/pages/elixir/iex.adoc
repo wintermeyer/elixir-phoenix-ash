@@ -1,10 +1,10 @@
 [[elixir-introduction-iex]]
 == Elixir's Interactive Shell (IEx)
 
-Elixir equips you with an interactive shell, `IEx` (Interactive Elixir), that's 
-going to be our sandbox for most examples in this chapter. So let's roll up our 
-sleeves and give it a whirl in your command line:
-indexterm:[IEx, Interactive Elixir]
+Elixir equips you with an interactive shell, `IEx` (Interactive Elixir), that's
+going to be our sandbox for a lot of examples in this chapter. So let's roll up
+our sleeves and give it a whirl in your command line: indexterm:[IEx,
+Interactive Elixir]
 
 [source,elixir]
 ----
@@ -17,9 +17,6 @@ iex(1)> <1>
 <1> This is your IEx prompt.
 
 IMPORTANT: To bid goodbye to IEx, give `CTRL-C` a double tap or a single `CTRL-\` will do.
-
-Embrace IEx as it's not just your companion for this book, but a reliable ally 
-for your upcoming Phoenix adventures.
 
 TIP: IEx provides autocomplete (just tap `TAB` when you're unsure) and a command
 history (the arrow-up key is your friend).

@@ -1,7 +1,13 @@
+[[modules-and-functions]]
 == Modules and Functions
 indexterm:["Modules", "Functions"]
 
-In Elixir, we organize code in a structured way using modules and functions.
+In Elixir, we organize code in a structured way using modules and functions. 
+
+NOTE: For Elixir beginners we now run into a typical chicken and egg problem.
+Because how can I show you how Modules and Functions work while you have never
+used any Elixir code? I try to use code examples which should be easy to 
+understand.
 
 Modules are like containers for functions, which represent reusable pieces of code. 
 
@@ -27,9 +33,9 @@ iex> Greetings.hello("Alice") <5>
 
 IMPORTANT: Both `defmodule` and `def` use a `do ... end` structure to denote the start and end of the block.
 
-NOTE: Module names use `CamelCase` and start with a capital letter, while function names are in `snake_case`.
+TIP: Module names use `CamelCase` and start with a capital letter, while function names are in `snake_case`.
 
-As an exercise, let's save the following module to `greetings.exs`:
+As an exercise, let's save the following module to the file `greetings.exs`:
 
 [source,elixir, :file: greetings.exs]
 ----
@@ -40,16 +46,19 @@ defmodule Greetings do
 end
 ----
 
-To use the `hello/1` function in the `Greetings` module, we need to load and compile `greetings.exs` with `c("greetings.exs")` in `iex`:
+To use the `hello/1` function in the `Greetings` module, we need to load and compile `greetings.exs` with `Code.require_file("greetings.exs")` in `iex`:
 
 [source,elixir]
 ----
 $ iex
 Erlang/OTP 26 [erts-14.0] [source] [64-bit] [...]
 
-Interactive Elixir (1.15.0-rc.1) - press Ctrl+C to exit (type h() ENTER for help)
-iex(1)> c("greetings.exs")
-[Greetings]
+Interactive Elixir (1.15.0) - press Ctrl+C to exit (...)
+iex(1)> Code.require_file("greetings.exs")
+[
+  {Greetings,
+   <<70, 79, ...>>}
+]
 iex(2)> Greetings.hello("Bob")
 "Hello, Bob!"
 ----
@@ -67,15 +76,15 @@ Let's demonstrate this with a slightly more complex example:
 [source,elixir]
 ----
 iex> defmodule Greeting do
-...>   def greet() do
+...>   def greet() do <1>
 ...>     "Hello, world!"
 ...>   end
 ...>
-...>   def greet(name) do
+...>   def greet(name) do <2>
 ...>     "Hello, #{name}!"
 ...>   end
 ...>
-...>   def greet(name, time_of_day) do
+...>   def greet(name, time_of_day) do <3>
 ...>     "Good #{time_of_day}, #{name}!"
 ...>   end
 ...> end
@@ -87,9 +96,11 @@ iex> Greeting.greet("Alice")
 iex> Greeting.greet("Bob", "morning")
 "Good morning, Bob!"
 ----
-In this example, we've defined three versions of the `greet` function, each with a different arity. The `greet/0` function, which takes no arguments, returns a generic greeting. The `greet/1` function accepts one argument and provides a personalized greeting. The `greet/2` function takes two arguments and offers a personalized greeting that also includes the time of day.
+In this example, we've defined three versions of the `greet` function, each with a different arity. 
 
-By allowing us to define multiple versions of a function with different arities, Elixir significantly enhances our code's flexibility and expressiveness.
+<1> The `greet/0` function, which takes no arguments, returns a generic greeting. 
+<2> The `greet/1` function accepts one argument and provides a personalized greeting. 
+<3> The `greet/2` function takes two arguments and offers a personalized greeting that also includes the time of day.
 
 === Private Functions
 indexterm:["Private Functions"]
@@ -277,6 +288,8 @@ In this example, the `alias FruitShop.Apples` directive lets you call functions 
 indexterm:["Use", "Metaprogramming"]
 
 Elixir's `use` keyword is a cornerstone of metaprogramming in Elixir. It is a powerful tool that helps keep our code DRY (Don't Repeat Yourself) by allowing us to perform certain actions defined in another module within the current module.
+
+NOTE: I won't delve too deeply into metaprogramming here. I'm simply covering it to ensure that you can recognize it when you come across it unexpectedly.
 
 Metaprogramming is a technique that helps us write code that generates or modifies other code. In the context of Elixir, we can think of the `use` keyword as a way to inject code from one module into another. This is accomplished through the use of the `__using__` macro in the module that is being used.
 
