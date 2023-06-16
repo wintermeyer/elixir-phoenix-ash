@@ -12,4 +12,5 @@ include::if-and-unless.adoc[]
 include::case.adoc[]
 include::cond.adoc[]
 include::with-and-for.adoc[]
+include::variable-assignment-with-control-structures.adoc[]
 

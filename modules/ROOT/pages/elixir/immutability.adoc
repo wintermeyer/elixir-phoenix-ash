@@ -18,7 +18,8 @@ inconsistencies. This is particularly beneficial in concurrent and distributed
 systems, where multiple processes may need to access and operate on the same
 data.
 
-NOTE: There is no way I can convince you of the importance of immutability in
-these few sentences. You'll get a feeling and better understanding while coding
-Elixir. No need to worry about it now.
+NOTE: I thought a lot about this chapter and how to explain immutability and how
+complex the explaination should be. At the end of the day I came to the
+conculsion that it is not necessary to understand immutability in order to learn
+Elixir. Don't stress yourself with this.
 

@@ -1,0 +1,34 @@
+[[variable-assignment-with-control-structures]]
+=== Variable Assignment with Control Structures ===
+indexterm:[Control Structures,Variable Assignment]
+
+One of the unique characteristics of control structures in Elixir is their ability to return a value, which can be assigned to a variable. This is possible because these expressions always return a value.
+
+Here's an example of assigning the result of an if expression to a variable:
+
+[source,elixir]
+
+iex> num = 5
+iex> comparison_result = if num > 3 do
+...> "#{num} is greater than 3"
+...> else
+...> "#{num} is not greater than 3"
+...> end
+iex> IO.puts(comparison_result)
+5 is greater than 3
+
+This approach can be extended to other control structures such as unless, case, and even custom defined ones:
+
+[source,elixir]
+
+iex> num = 2
+iex> comparison_result = case num do
+...> 1 -> "one"
+...> 2 -> "two"
+...> _ -> "other"
+...> end
+iex> IO.puts(comparison_result)
+two
+
+The last expression executed within the block will be the returned value of the control structure. If the condition does not pass and there is no else clause, the expression returns `nil``.
+

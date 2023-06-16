@@ -10,8 +10,8 @@ single-line.
 ==== Multi-line Syntax
 indexterm:[Control Structures,Multi-line Syntax]
 
-For more complex conditions or actions, or when including an `else` clause, the 
-multi-line syntax is more appropriate. This uses `do...end` to wrap the 
+For complex conditions or actions, or when including an `else` clause, the 
+multi-line syntax is most appropriate. It uses `do...end` to wrap the 
 executed code block.
 
 [source,elixir]
@@ -55,44 +55,10 @@ iex> unless num > 3, do: IO.puts("#{num} is not greater than 3")
 ----
 
 Both styles are equally valid; the choice depends on the specific use case and 
-code readability. Remember, `if`, `unless`, and `else` are expressions, not 
-statements. This means they always return a value, which can be assigned to a 
-variable or used in a larger expression.
+code readability. 
 
-==== Variable Assignment with `if` and `unless`
-indexterm:[Control Structures,Variable Assignment]
-
-One of the unique characteristics of `if` and `unless` in Elixir is their ability to return a value, which can be assigned to a variable. This is possible because, unlike some other languages, these are expressions and not statements.
-
-Here's an example of assigning the result of an `if` expression to a variable:
-
-[source,elixir]
-----
-iex> num = 5
-iex> comparison_result = if num > 3 do
-...>   "#{num} is greater than 3"
-...> else
-...>   "#{num} is not greater than 3"
-...> end
-iex> IO.puts(comparison_result)
-5 is greater than 3
-----
-
-Similarly, you can assign the result of an `unless` expression to a variable:
-
-[source,elixir]
-----
-iex> num = 2
-iex> comparison_result = unless num > 3 do
-...>   "#{num} is not greater than 3"
-...> else
-...>   "#{num} is greater than 3"
-...> end
-iex> IO.puts(comparison_result)
-2 is not greater than 3
-----
-
-The returned value of the `if` or `unless` expression is the last expression executed within the block. If the condition does not pass, and there is no `else` clause, the expression returns `nil`.
+IMPORTANT: Remember, `if`, `unless`, and `else` are expressions, not statements. **They always return a value**, which can be 
+assigned to a variable or used in a larger expression.
 
 ==== `if/2` is a Macro
 indexterm:[Control Structures,if/2]
