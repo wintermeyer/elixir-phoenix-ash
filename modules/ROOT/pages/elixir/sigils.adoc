@@ -1,0 +1,211 @@
+[[sigils]]
+## Sigils
+indexterm:["Sigils"]
+
+Sigils are another way of representing literals. A literal is a notation for representing a fixed value in source code. Sigils start with a tilde (`~`) character, which is followed by a letter, and then there is some content surrounded by delimiters. There are 8 different delimiters (having different delimiters means that you can choose one which reduces the need to escape characters in the content).
+
+[source,elixir]
+----
+~s/example text/
+~s|example text|
+~s"example text"
+~s'example text'
+~s(example text)
+~s[example text]
+~s{example text}
+~s<example text>
+----
+
+In the following sections, we will explore some of the most commonly used sigils in Elixir: `~s` for strings, `~r` for regular expressions, `~w` for word lists, and those for date/time structs. It is also possible for you to create your own sigils.
+
+[[s_sigil]]
+### The ~s and ~S Sigils
+indexterm:[sigils,"~s and ~S"]
+
+The `~s` and `~S` sigils in Elixir are used for creating strings. 
+
+Let's look at some examples of using the `~s` sigil:
+
+[source,elixir]
+----
+iex> ~s(Hello, my friend!) <1>
+"Hello, my friend!"
+iex> ~s(He said, "I hope you are well") <2>
+"He said, \"I hope you are well\""
+iex> ~s/Hello (Goodbye)/ <3>
+"Hello (Goodbye)"
+----
+<1> In this case, we use the `()` delimiters.
+<2> We do not need to escape the double quotes (you will see that they are escaped in the output).
+<3> By changing the delimiters, we do not need to escape the parentheses.
+
+The `~S` (uppercase) sigil also creates a string, but does not support interpolation:
+
+[source,elixir]
+----
+iex> ~s(1 + 1 = #{1 + 1})
+"1 + 1 = 2" <1>
+iex> ~S(1 + 1 = #{1 + 1})
+"1 + 1 = \#{1 + 1}" <2>
+----
+<1> The result of `1 + 1` is returned instead of `#{1 + 1}`.
+<2> The content is returned as it is written, with no interpolation.
+
+[[r_sigil]]
+### The ~r Sigil - Regular expressions
+indexterm:["Regular expression"]
+indexterm:[sigils,"~r"]
+
+`~r` is the sigil used to represent a [regular expression](https://en.wikipedia.org/wiki/Regular_expression):
+
+[source,elixir]
+----
+iex> regex = ~r/bcd/
+~r/bcd/
+iex> "abcde" =~ regex
+true
+iex> "efghi" =~ regex
+false
+----
+
+As you can see, the `~r` sigil allows you to easily create regular expressions in Elixir. It checks if the given string contains the regular expression pattern.
+
+Modifiers are supported to change the behavior of the regular expressions. Two examples:
+
+- `i`: Makes the regular expression case-insensitive. 
+- `m`: Causes ^ and $ to mark the beginning and end of each line. Use \A and \z to match the end or beginning of the string.
+
+Here is an example of using the `i` modifier:
+
+[source,elixir]
+----
+iex> regex = ~r/stef/i <1>
+~r/stef/i
+iex> "Stefan" =~ regex
+true
+----
+<1> The `i` modifier makes the regular expression case-insensitive, so "stef" will match "Stefan".
+
+For a complete list of modifiers, have a look at the https://hexdocs.pm/elixir/Regex.html#module-modifiers[Regex module documentation].
+
+[[w_sigil]]
+### The ~w Sigil
+indexterm:[sigils,"~w"]
+
+The `~w` sigil in Elixir helps to create a list of words without the need for quotes around each word. You start with `~w(`, then put your words separated by spaces, and finish with `)`.
+
+Here is an example of how it is used:
+
+[source,elixir]
+
+iex> words = ~w(hello world this is Elixir)
+["hello", "world", "this", "is", "Elixir"]
+
+As you can see, it turns the words separated by spaces into a list of strings.
+
+==== Modifiers
+
+For the `~w` sigil, you can add a `c`, `s`, or `a` after the `w`, changing the type of the output.
+
+- `c` makes the elements character lists (charlists).
+- `s` makes the elements strings.
+- `a` makes the elements atoms.
+
+Here are some examples:
+
+[source,elixir]
+
+iex> ~w(hello world this is Elixir)c
+[~c"hello", ~c"world", ~c"this", ~c"is", ~c"Elixir"]
+
+iex> ~w(hello world this is Elixir)s
+["hello", "world", "this", "is", "Elixir"]
+
+iex> ~w(hello world again)a
+[:hello, :world, :again]
+
+Also note that you can use different delimiters for your `~w` sigil, not just parentheses. For example, `~w{hello world this is Elixir}`, `~w/hello world this is Elixir/` and `~w|hello world this is Elixir|` are all valid.
+
+[[date_time_sigils]]
+### Date and Time
+
+Elixir provides several date / time structs which all have their own sigils. These include the `~D` sigil for dates, `~T` for times, `~N` for naive date-times, and `~U` for UTC date-times. 
+
+You can find more information about timezones and DateTime at https://hexdocs.pm/elixir/DateTime.html
+
+#### Date
+indexterm:["Date"]
+
+Elixir provides a `%Date{}` struct that contains the fields `year`, `month`,
+`day` and `calendar`.
+
+With the `~D` sigil, you can create a new `%Date{}` struct:
+
+[source,elixir]
+----
+iex> birthday = ~D[1973-03-23]
+~D[1973-03-23]
+iex> birthday.day
+23
+iex> birthday.month
+3
+iex> birthday.year
+1973
+iex> Date.utc_today()
+~D[2020-09-23] <1>
+----
+<1> The return value for many of the functions in the `Date` module use the `~D`
+sigil.
+
+#### Time
+indexterm:["Time"]
+
+There is a `%Time{}` struct that contains the fields `hour`, `minute`, `second`,
+`microsecond` and `calendar`.
+
+With the `~T` sigil, you can create a new `%Time{}` struct:
+
+[source,elixir]
+----
+iex> now = ~T[09:29:00.0]
+~T[09:29:00.0]
+iex> now.hour
+9
+iex> Time.utc_now()
+~T[04:57:25.658722] <1>
+----
+<1> The return value for many of the functions in the `Time` module use the `~T`
+sigil.
+
+#### NaiveDateTime
+indexterm:["NaiveDateTime"]
+
+The `%NaiveDateTime{}` struct is a combination of `%Date{}` and `%Time{}`.
+
+With the `~N` sigil, you can create a new `%NaiveDateTime{}` struct:
+
+[source,elixir]
+----
+iex> timestamp = ~N[2020-05-08 09:48:00]
+~N[2020-05-08 09:48:00]
+----
+
+#### DateTime
+indexterm:["DateTime"]
+
+The `%DateTime{}` struct adds timezone information to a `%NaiveDateTime{}`.
+
+You can create a new `%DateTime{}` struct with the `~U` sigil:
+
+[source,elixir]
+----
+iex> timestamp = ~U[2029-05-08 09:59:03Z]
+~U[2029-05-08 09:59:03Z]
+iex> DateTime.utc_now()
+~U[2020-09-23 04:58:22.403482Z] <1>
+----
+<1> The return value for many of the functions in the `DateTime` module use the
+`~U` sigil.
+
+NOTE: Find more information about timezones and DateTime at https://hexdocs.pm/elixir/DateTime.html
+

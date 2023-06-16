@@ -36,4 +36,5 @@ include::data-types/index-data-types.adoc[]
 include::operators/index-operators.adoc[]
 include::logical-expressions.adoc[]
 include::enumerables.adoc[]
+include::sigils.adoc[]
 
