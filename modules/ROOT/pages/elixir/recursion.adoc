@@ -1,0 +1,103 @@
+## Recursions
+indexterm:["Recursion"]
+
+Recursion is a fundamental concept in functional programming. If you're familiar with loops in other programming languages (like `for` or `while` loops), recursion serves a similar purpose in Elixir. It allows you to perform a task repeatedly, but rather than using a loop, recursion involves a function calling itself.
+
+A recursive function is a function that solves a problem by solving smaller instances of the same problem. To prevent infinite recursion, there must be one or more base cases where the function does not call itself.
+
+Let's break this down with a couple of simple examples.
+
+### Recursion Example: Countdown
+indexterm:["Recursion", "Countdown example"]
+
+Let's imagine we want to create a countdown. Here's a simple recursive function that achieves this:
+
+[source,elixir]
+----
+iex> defmodule Example do
+...>   def countdown(1) do <1>
+...>     IO.puts "1" <2>
+...>   end
+...>
+...>   def countdown(n) when is_integer(n) and n > 1 do <3>
+...>     IO.puts Integer.to_string(n) <4>
+...>     countdown(n - 1) <5>
+...>   end
+...> end
+
+iex> Example.countdown(4) <6>
+4
+3
+2
+1
+:ok
+----
+
+<1> This is the base case: when `countdown/1` is called with the argument `1`, this function matches.
+<2> We print `1` to STDOUT using `IO.puts`.
+<3> If `countdown/1` is called with an integer greater than `1` (we don't want negative input here), this function matches.
+<4> We convert the integer to a string using `Integer.to_string(n)` and print it.
+<5> The function calls itself, but with `n` decreased by 1 - this is the recursive step.
+<6> When we test the function, it correctly counts down from `4` to `1`.
+
+The countdown function keeps calling itself, each time reducing the initial number by one, until it reaches `1`, at which point it stops, thus preventing infinite recursion.
+
+### Recursion Example: Summing a List
+indexterm:["Recursion", "Sum example"]
+
+Here's another example where we calculate the sum of a list of integers using recursion:
+
+[source,elixir]
+----
+iex> defmodule Example do
+...>   def sum([]) do <1>
+...>     0
+...>   end
+...>
+...>   def sum([head | tail]) do <2>
+...>     head + sum(tail) <3>
+...>   end
+...> end
+
+iex> Example.sum([10, 8, 12, 150]) <4>
+180
+----
+<1> The base case: the sum of an empty list is `0`.
+<2> We pattern match a list and split it into a `head` (the first element) and a `tail` (the remaining elements).
+<3> We add the `head` to the result of the recursive call, which computes the sum of the `tail`.
+<4> The function correctly computes the sum of the list.
+
+### Recursion Example: Transforming a List
+indexterm:["Recursion", "List transformation example"]
+
+You can use recursion to transform every element of a list. Let's assume we want to double the value of every element of a list:
+
+[source,elixir]
+----
+iex> defmodule Example do
+...>   def double([]) do <1>
+...>     []
+...>   end
+...>
+...>   def double([head | tail]) do
+...>     [head * 2 | double(tail)] <2>
+...>   end
+...> end
+
+iex> Example.double([10, 5, 999])
+[20, 10, 1998]
+----
+<1> Base case: An empty list results in an empty list.
+<2> We double the `head` and concatenate it with the result of the recursive call, which doubles the elements of the `tail`.
+
+### Tackling Recursion
+
+Unless you are doing this every day, you will get to problems where you know
+that recursion is a good solution, but you just can't think of a good recursion
+for it. That is normal. Don't worry.
+
+I used to say that https://www.google.com and
+https://stackoverflow.com were your friends. They still are but ChatGPT and Github Copilot have made our lives as programmers to much easier. Ask them. No embarrassment!
+
+During this book, we will work with recursions. So you'll get a better feeling for
+it.
