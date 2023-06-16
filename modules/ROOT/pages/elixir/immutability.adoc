@@ -2,24 +2,65 @@
 ## Immutability
 indexterm:[Elixir,Immutability]
 
-_Immutabilty_ is one of that magic words that you'll hear a lot in the Elixir
-community. It's one of the things that makes Elixir so fast and reliable. But
-what does it mean?
+Probably you have already heard about immutability in Elixir. What's that about?
 
-In simple terms, once you give a value to a variable in Elixir, this value stays
-the same. And that means that the given part of memory is not touched until the
-function is ended and everything is garbage collected. If you want to change the
-value of a variable, the system creates a new memory space with the new value
-while the old one still exists. This is called _immutability_.
-Counterintiutively it is much faster to just create a new memory space than to
-change the value of an existing one. And when data is immutable, it can be
-shared freely among multiple processes without the fear of data races or
-inconsistencies. This is particularly beneficial in concurrent and distributed
-systems, where multiple processes may need to access and operate on the same
-data.
+A variable points to a specific part of the memory (RAM) where the data is
+stored. In many programming languages that data can be changed to update a
+variable. In Elixir, you can't change it. But that doesn't mean that you can't
+rebind a variable to a different value just that this new value gets a new piece
+of memory and doesn't overwrite the old memory. They both coexist. Once a
+function returns a result and therefore, has finished its work, everything gets
+garbage collected (wiped blank).
 
-NOTE: I thought a lot about this chapter and how to explain immutability and how
-complex the explaination should be. At the end of the day I came to the
-conculsion that it is not necessary to understand immutability in order to learn
-Elixir. Don't stress yourself with this.
+Why is that important at all? With immutable variables, we can be sure that
+other processes can not change their values while running parallel tasks. That
+has a massive effect. In the end, it means that your Phoenix application can run
+on multiple CPUs on the same server in parallel. It even means that your Phoenix
+application can share multiple CPUs on several nodes of a server cluster in your
+data center; this makes Elixir extremely scalable and save.
 
+But doesn't that make your application slower? Funny thing: No. This way is
+faster. Since it is not efficient to change data in memory.
+
+But don't worry. It is not as complicated as it sounds. Everytime you use a
+variable it uses the value of that moment in time. It will not be
+effected/changed afterwords:
+
+[source,elixir]
+----
+iex> product = "Orange"
+"Orange"
+iex> test1 = fn -> IO.puts(product) end <1>
+#Function<21.126501267/0 in :erl_eval.expr/5>
+iex> product = "Apple"
+"Apple"
+iex> test2 = fn -> IO.puts(product) end
+#Function<21.126501267/0 in :erl_eval.expr/5>
+iex> product = "Pineapple"
+"Pineapple"
+iex> test3 = fn -> IO.puts(product) end
+#Function<21.126501267/0 in :erl_eval.expr/5>
+iex> product = "Banana"
+"Banana"
+iex> test1.() <2>
+Orange
+:ok
+iex> test2.()
+Apple
+:ok
+iex> test3.()
+Pineapple
+:ok
+iex> IO.puts(product)
+Banana
+:ok
+----
+<1> Those anonymous functions can run on totally different CPUs. Each one lives
+in its own little universe.
+<2> The value of `product` has changed multiple times. But for `test1.()` it is
+the value from that point in time when we created the function.
+
+NOTE: Do you have to understand immutability to learn Elixir? No! Don't stress 
+yourself. It is a concept that you will learn over time. Just keep it in mind 
+that it is there.
+  
