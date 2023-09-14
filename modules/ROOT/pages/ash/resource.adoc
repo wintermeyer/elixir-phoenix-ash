@@ -1,0 +1,228 @@
+[[resource]]
+## Resource
+
+Resources are the cornerstones of any Ash application. We use them to 
+model our data and define actions which are used to manipulate the data. 
+
+NOTE: In the Ash world the resources are often compared with nouns and the 
+actions with verbs.
+
+### A To-Do-List Application
+
+To dive into resources we use a simple to-do-list application as an
+example. Please use the 
+<<minimal-ash-2x-setup-guide, Minimal Ash 2.x Setup Guide>> to generate
+a new Elixir application.
+
+We want to create a `task` resource which has a `content` attribute and an 
+`id` attribute as a primary key. We also want to include the actions 
+`create`, `read`, `update` and `delete`. Ash provides those actions but we 
+have to include them into the resource.
+
+In the Ash world a resource needs to be registered via a registry to an 
+interal API. Don't think of this as an external WebAPI. Ash uses the term 
+API for an internal interface. We call our API `ToDoList`. 
+
+#### Configure the API
+
+We have to add the new API to the `:ash_apis` in our `config.exs` file.
+
+**config/config.exs**
+```elixir
+import Config
+
+config :ash, :use_all_identities_in_manage_relationship?, false
+config :app, :ash_apis, [App.ToDoList] # Add this line
+```
+
+Now we create the API module which contains the registry.
+
+**lib/app/to_do_list.ex**
+```elixir
+defmodule App.ToDoList do
+  use Ash.Api
+
+  resources do
+    # This defines the set of resources that can be used with this API
+    registry App.ToDoList.Registry
+  end
+end
+```
+
+For the resource itself we create a new directory `lib/app/to_do_list`:
+
+```bash
+$ mkdir -p lib/app/to_do_list/resources
+```
+
+Now we have to create the registry for our resources.
+
+**lib/app/to_do_list/registry.ex**
+```elixir
+defmodule App.ToDoList.Registry do
+  use Ash.Registry
+
+  entries do
+    entry App.ToDoList.Task
+  end
+end
+```
+
+#### Configure the Resource
+
+After we have created the API we can create the resource. 
+
+**lib/app/to_do_list/resources/task.ex**
+```elixir
+defmodule App.ToDoList.Task do
+  use Ash.Resource
+
+  attributes do
+    uuid_primary_key :id
+    attribute :content, :string
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+end
+```
+
+The resulting directory structure should look like this:
+
+```bash
+$ tree lib
+lib
+├── app
+│   ├── application.ex
+│   ├── to_do_list
+│   │   ├── registry.ex
+│   │   └── resources
+│   │       └── task.ex
+│   └── to_do_list.ex
+└── app.ex
+
+4 directories, 5 files
+```
+
+#### Create a Resource
+
+Fire up the IEx (Elixir’s Interactive Shell) to play around with our new application.
+
+```bash
+$ iex -S mix
+Erlang/OTP 26 [erts-14.0.2] [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> 
+```
+
+NOTE: For those who jumped into this chapter without any prior knowledge
+of Elixir: You can stop the `iex` shell with `Ctrl+C` twice.
+
+We can create a new task by using the `Ash.Changeset.for_create/3`
+function and call the `App.ToDoList.create!/1` function with that changeset:
+
+```elixir
+iex(1)> App.ToDoList.Task
+App.ToDoList.Task
+iex(2)> |> Ash.Changeset.for_create(:create, %{content: "Mow the lawn"})
+#Ash.Changeset<
+  action_type: :create,
+  action: :create,
+  attributes: %{content: "Mow the lawn"},
+  relationships: %{},
+  errors: [],
+  data: #App.ToDoList.Task<
+    __meta__: #Ecto.Schema.Metadata<:built, "">,
+    id: nil,
+    content: nil,
+    aggregates: %{},
+    calculations: %{},
+    ...
+  >,
+  valid?: true
+>
+iex(3)> |> App.ToDoList.create!()
+#App.ToDoList.Task<
+  __meta__: #Ecto.Schema.Metadata<:built, "">,
+  id: "2aface85-0e7b-4b4c-885b-22405ff612ab",
+  content: "Mow the lawn",
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+```
+
+#### Code Interface
+
+Doing a `App.ToDoList.Task |> Ash.Changeset.for_create(:create,
+%{content: "Mow the lawn"}) |> App.ToDoList.create!()` can feel a bit
+cumbersome and Ash is all about making things more productive for 
+the developer. Let's add a `code_interface` section to the `task`
+resource to create a `App.ToDoList.Task.create!/1` function so that we
+can use `App.ToDoList.Task.create!(%{content: "Mow the lawn"})` to
+create a new task.
+
+**lib/app/to_do_list/resources/task.ex**
+```elixir
+defmodule App.ToDoList.Task do
+  use Ash.Resource
+
+  attributes do
+    uuid_primary_key :id
+    attribute :content, :string
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.ToDoList
+    define :create
+  end
+end
+```
+
+After restarting the `iex` we can now create a new `task` much 
+easier:
+
+```elixir
+$ iex -S mix                              
+Compiling 2 files (.ex)
+Erlang/OTP 26 [erts-14.0.2] [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> App.ToDoList.Task.create!(%{content: "Mow the lawn"})
+#App.ToDoList.Task<
+  __meta__: #Ecto.Schema.Metadata<:built, "">,
+  id: "8e868c09-c0d0-4362-8270-09272acab769",
+  content: "Mow the lawn",
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+iex(2)>
+```
+
+The function `App.ToDoList.Task.create!/1` raises an error if
+something goes wrong (e.g. a validation error). Alternatively you can
+use `App.ToDoList.Task.create/1` which returns a tuple with the 
+status and the resource.
+
+```elixir
+iex(2)> App.ToDoList.Task.create(%{content: "Mow the lawn"}) 
+{:ok,
+ #App.ToDoList.Task<
+   __meta__: #Ecto.Schema.Metadata<:built, "">,
+   id: "a8430505-ef7e-4f64-bc2c-2a6db216d8ea",
+   content: "Mow the lawn",
+   aggregates: %{},
+   calculations: %{},
+   ...
+ >}
+iex(3)>
+```
+
+

@@ -31,4 +31,5 @@
 ** xref:ecto-basics.adoc#ecto-query[Querying the Database]
 ** xref:ecto-basics.adoc#ecto-update[Update an Entry]
 ** xref:ecto-basics.adoc#ecto-associations[Associations]
+* xref:ash/index.adoc[Ash Framework]
 * xref:index.adoc#remote-training[Remote training for beginners]

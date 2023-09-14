@@ -1,0 +1,78 @@
+[[minimal-ash-2x-setup-guide]]
+## Minimal Ash 2.x Setup Guide
+
+There are a couple of steps we need to do for every new mix project 
+which uses Ash. This guide will walk you through those steps. For this 
+book we use the very generic name `app` for the application. Please 
+use a more meaningful name for your own applications. We keep using 
+`App` in this guide to make it easier to mix and match seperate parts 
+of this book if you want to.
+
+WARNING: To use `app` as the default application name in this book has 
+one major drawback: You have to either rename old project directories or 
+delete them when creating a new one. Alternatively you can change the 
+appname with all examples to something like `app2`, 'app2', 'foobar', etc.
+
+Let's start with a fresh Mix project:
+
+```bash
+$ mix new --sup app
+$ cd app
+```
+
+We change the dependency in `mix.exs` to add Ash (find the latest 
+Ash version number at https://hex.pm/packages/ash):
+
+**mix.exs**
+```elixir
+defp deps do
+  [
+    {:ash, "~> 2.14.16"} # Add this line
+  ]
+end
+```
+
+Run `mix deps.get` to install it:
+
+```bash
+$ mix deps.get
+```
+
+To make sure that we get the right formatting for our code, we change 
+the file `.formatter.exs` to include the Ash formatter:
+
+**.formatter.exs**
+```elixir
+[
+  import_deps: [:ash], # <-- add this line
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+]
+```
+
+TIP: The Elixir formatter is a great tool to keep your code consistent. 
+It is highly recommended to use run the command `mix format` before 
+committing your code into a repository. Depending on your editor you can
+autoformat your code with it without having to run the command manually.
+
+Since this is a fresh project we need to create a `config.exs` file:
+
+```bash
+$ mkdir config
+$ touch config/config.exs
+```
+
+And add the configuration for Ash to `config/config.exs`:
+
+```elixir
+import Config
+
+config :ash, :use_all_identities_in_manage_relationship?, false
+```
+
+IMPORTANT: If not configured otherwise Ash uses
+link:https://hexdocs.pm/ash/Ash.DataLayer.Ets.html[Ash.DataLayer.Ets] as
+a database layer. ETS (Erlang Term Storage) is an in memory data store
+which is build into your Erlang system. For our training purpose this 
+is ideal because we don't have to install and configure a database (e.g.
+PostgreSQL). **But ETS does not save any data to disk!** With every 
+restart of these examples you will have to re-create the data. 
