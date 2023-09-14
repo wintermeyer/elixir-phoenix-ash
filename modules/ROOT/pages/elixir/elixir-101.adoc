@@ -38,4 +38,5 @@ include::logical-expressions.adoc[]
 include::enumerables.adoc[]
 include::sigils.adoc[]
 include::recursion.adoc[]
+include::mix.adoc[]
 

@@ -1,0 +1,221 @@
+## Exploring `mix`
+indexterm:["mix"]
+
+`mix` is a build in tool in Elixir that helps to scaffold a new Elixir project
+with a pre-defined file and directory structure which makes getting started with
+a new Elixir application much easier. You don't have to use it to create a new 
+Elixir project but it is highly recommended and is used by most Elixir developers.
+
+A simple "Hello, World!" application can be created with `mix` as follows:
+
+[source,bash]
+----
+$ mix new hello_world
+* creating README.md
+* creating .formatter.exs
+* creating .gitignore
+* creating mix.exs
+* creating lib
+* creating lib/hello_world.ex
+* creating test
+* creating test/test_helper.exs
+* creating test/hello_world_test.exs
+
+Your Mix project was created successfully.
+You can use "mix" to compile it, test it, and more:
+
+    cd hello_world
+    mix test
+
+Run "mix help" for more commands.
+----
+
+This command `mix new hello_world` created a new directory named `hello_world`
+and set up a basic Elixir application within it:
+
+[source,bash]
+----
+$ cd hello_world
+$ tree
+.
+├── README.md
+├── lib
+│   └── hello_world.ex
+├── mix.exs
+└── test
+    ├── hello_world_test.exs
+    └── test_helper.exs
+
+3 directories, 5 files
+----
+
+The `lib/hello_world.ex` file contains this code:
+
+[source,elixir]
+----
+defmodule HelloWorld do
+  @moduledoc """
+  Documentation for `HelloWorld`.
+  """
+
+  @doc """
+  Hello world.
+
+  ## Examples
+
+      iex> HelloWorld.hello()
+      :world
+
+  """
+  def hello do
+    :world
+  end
+end
+----
+
+It only contains a single function, `hello/0`, which returns the atom `:world`. 
+
+This structure serves as a starting point for your application. The complexity
+of the structure may grow as your application grows or uses more sophisticated
+frameworks such as Phoenix.
+
+## `iex -S mix`
+
+To start an `iex` with the code of your current project, you can use `iex -S mix`.
+
+[source,bash]
+----
+$ iex -S mix
+Compiling 1 file (.ex)
+Generated hello_world app
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.0) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> 
+----
+
+In this `iex` you now have access to all the functions defined in your project:
+
+[source,bash]
+----
+iex(1)> HelloWorld.hello()
+:world
+iex(2)>
+----
+
+## Code Formatting with `mix format`
+indexterm:["mix tasks", "mix format"]
+
+`mix format` is another powerful feature of `mix` that automatically formats
+your Elixir source code files according to a set of standard conventions. This
+helps keep your code clean and consistent, and can save you and your team a lot
+of time in code reviews.
+
+You can run `mix format` in the root directory of your application:
+
+[source,bash]
+----
+$ mix format
+----
+
+This command will format all Elixir files in your project. 
+
+TIP: It's a good habit to run `mix format` before committing any code to ensure
+that all code follows the same conventions.
+
+## Testing with `mix test`
+indexterm:["mix tasks", "mix test"]
+
+Elixir promotes a test-driven development (TDD) approach, and `mix` makes it
+easy to create, manage, and run tests.
+
+When you create a new project using `mix`, a `test` directory is created with a
+structure mirroring that of the `lib` directory. This is where all of your test
+files will reside. 
+
+Let's create a simple Elixir module and corresponding test. 
+
+lib/hello_world.ex
+[source,elixir]
+----
+defmodule HelloWorld do
+  def greet(name) do
+    "Hello, #{name}!"
+  end
+end
+----
+
+Now, let's write a test for the `greet` function.
+
+test/hello_world_test.exs
+[source,elixir]
+----
+defmodule HelloWorldTest do
+  use ExUnit.Case
+  doctest HelloWorld
+
+  test "greeting the world" do
+    assert HelloWorld.greet("world") == "Hello, world!"
+  end
+end
+----
+
+The `test` macro defines a test, while `assert` checks that the actual result of the function matches the expected result.
+
+You can now run the tests using `mix test`:
+
+[source,bash]
+----
+$ mix test
+....
+
+Finished in 0.05 seconds
+1 test, 0 failures
+
+Randomized with seed 12345
+----
+
+In this example, `mix test` ran 1 test, all of which passed.
+
+Elixir also supports more complex testing scenarios, such as setup and teardown operations, test tagging, and asynchronous testing. As you write more complex Elixir programs, `mix test` will become an indispensable part of your development workflow.
+
+## Custom `mix` Tasks
+indexterm:["mix tasks", "task"]
+
+`mix` allows you to define custom tasks, making it a powerful tool for automating common development tasks. These custom tasks are Elixir scripts that can be run from the command line. For example, we can define a "Hello, world!" task.
+
+Create a new directory `lib/mix/tasks` and a new file within this directory named `start.ex`:
+
+lib/mix/tasks/start.ex
+[source,elixir]
+----
+defmodule Mix.Tasks.Start do
+  use Mix.Task
+
+  def run(_) do <1>
+    IO.puts "Hello world!"
+  end
+end
+----
+<1> The `run(_)` function is the entry point for our task. It gets called when we run the task.
+
+Now, running the command `mix start` will print "Hello, world!" to the terminal:
+
+[source,bash]
+----
+$ mix start
+Compiling 1 file (.ex)
+Generated hello_world app
+Hello world!
+----
+
+The `.ex` file gets compiled and the `start` task gets run. The compile step is only done when needed. If we call `mix start` a second time, no compile is needed:
+
+[source,bash]
+----
+$ mix start
+Hello world!
+----
+
+`mix` is a vast topic, and we've only scratched the surface. But this should give you a basic understanding of how `mix` can be utilized in an Elixir application.
+
