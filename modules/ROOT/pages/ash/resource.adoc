@@ -27,18 +27,18 @@ API for an internal interface. We call our API `ToDoList`.
 
 We have to add the new API to the `:ash_apis` in our `config.exs` file.
 
-**config/config.exs**
-```elixir
+[source,elixir,title='config/config.exs']
+----
 import Config
 
 config :ash, :use_all_identities_in_manage_relationship?, false
 config :app, :ash_apis, [App.ToDoList] # Add this line
-```
+----
 
 Now we create the API module which contains the registry.
 
-**lib/app/to_do_list.ex**
-```elixir
+[source,elixir,title='lib/app/to_do_list.ex']
+----
 defmodule App.ToDoList do
   use Ash.Api
 
@@ -47,9 +47,9 @@ defmodule App.ToDoList do
     registry App.ToDoList.Registry
   end
 end
-```
+----
 
-For the resource itself we create a new directory `lib/app/to_do_list`:
+For the resource itself we create a new directory:
 
 ```bash
 $ mkdir -p lib/app/to_do_list/resources
@@ -57,8 +57,8 @@ $ mkdir -p lib/app/to_do_list/resources
 
 Now we have to create the registry for our resources.
 
-**lib/app/to_do_list/registry.ex**
-```elixir
+[source,elixir,title='lib/app/to_do_list/registry.ex']
+----
 defmodule App.ToDoList.Registry do
   use Ash.Registry
 
@@ -66,14 +66,14 @@ defmodule App.ToDoList.Registry do
     entry App.ToDoList.Task
   end
 end
-```
+----
 
 #### Configure the Resource
 
 After we have created the API we can create the resource. 
 
-**lib/app/to_do_list/resources/task.ex**
-```elixir
+[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+----
 defmodule App.ToDoList.Task do
   use Ash.Resource
 
@@ -86,7 +86,7 @@ defmodule App.ToDoList.Task do
     defaults [:create, :read, :update, :destroy]
   end
 end
-```
+----
 
 The resulting directory structure should look like this:
 
@@ -160,12 +160,13 @@ Doing a `App.ToDoList.Task |> Ash.Changeset.for_create(:create,
 %{content: "Mow the lawn"}) |> App.ToDoList.create!()` can feel a bit
 cumbersome and Ash is all about making things more productive for 
 the developer. Let's add a `code_interface` section to the `task`
-resource to create a `App.ToDoList.Task.create!/1` function so that we
-can use `App.ToDoList.Task.create!(%{content: "Mow the lawn"})` to
-create a new task.
+resource for some Ash magic which creates a 
+`App.ToDoList.Task.create!/1` function so that we can use 
+`App.ToDoList.Task.create!(%{content: "Mow the lawn"})` to create a 
+new task.
 
-**lib/app/to_do_list/resources/task.ex**
-```elixir
+[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+----
 defmodule App.ToDoList.Task do
   use Ash.Resource
 
@@ -183,7 +184,7 @@ defmodule App.ToDoList.Task do
     define :create
   end
 end
-```
+----
 
 After restarting the `iex` we can now create a new `task` much 
 easier:
@@ -225,4 +226,170 @@ iex(2)> App.ToDoList.Task.create(%{content: "Mow the lawn"})
 iex(3)>
 ```
 
+#### Validations
 
+Validation of user input is a key for a smooth running application.
+Otherwise we end up with faulty datasets in our database. For our 
+example we will add one validation for `content` to make sure that 
+content will always have a length between 1 and 255 characters. And 
+we add a second attribute `priority` which is an integer and has to 
+be either `nil` or between 1 and 3.
+
+[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+----
+defmodule App.ToDoList.Task do
+  use Ash.Resource
+
+  attributes do
+    uuid_primary_key :id
+
+    attribute :content, :string, allow_nil?: false, constraints: [min_length: 1, max_length: 255]
+    attribute :priority, :integer, allow_nil?: true, constraints: [min: 1, max: 3]
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.ToDoList
+    define :create
+  end
+end
+----
+
+Let's try to create a new task with no content. I use `Task.create!/1`
+and `Task.create/1` to show the different output of each function.
+
+```elixir
+$ iex -S mix
+Compiling 2 files (.ex)
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> App.ToDoList.Task.create()
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.Required{
+       field: :content,
+       type: :attribute,
+       resource: App.ToDoList.Task,
+       changeset: nil,
+       query: nil,
+       error_context: [],
+       vars: [],
+       path: [],
+       stacktrace: #Stacktrace<>,
+       class: :invalid
+     }
+   ],
+   stacktraces?: true,
+   changeset: #Ash.Changeset<
+     api: App.ToDoList,
+     action_type: :create,
+     action: :create,
+     attributes: %{},
+     relationships: %{},
+     errors: [
+       %Ash.Error.Changes.Required{
+         field: :content,
+         type: :attribute,
+         resource: App.ToDoList.Task,
+         changeset: nil,
+         query: nil,
+         error_context: [],
+         vars: [],
+         path: [],
+         stacktrace: #Stacktrace<>,
+         class: :invalid
+       }
+     ],
+     data: #App.ToDoList.Task<
+       __meta__: #Ecto.Schema.Metadata<:built, "">,
+       id: nil,
+       content: nil,
+       priority: nil,
+       aggregates: %{},
+       calculations: %{},
+       ...
+     >,
+     valid?: false
+   >,
+   query: nil,
+   error_context: [nil],
+   vars: [],
+   path: [],
+   stacktrace: #Stacktrace<>,
+   class: :invalid
+ }}
+iex(2)> App.ToDoList.Task.create!()
+** (Ash.Error.Invalid) Input Invalid
+
+* attribute content is required
+    (ash 2.14.16) lib/ash/api/api.ex:2169: Ash.Api.unwrap_or_raise!/3
+iex(2)>
+```
+
+Now let's see what happens when we try to create a task with a valid 
+`content` but with a `priority` which is not between 1 and 3.
+
+```elixir
+iex(2)> App.ToDoList.Task.create!(%{content: "Mown the lawn", priority: 10})
+** (Ash.Error.Invalid) Input Invalid
+
+* Invalid value provided for priority: must be less than or equal to 3.
+
+10
+
+    (ash 2.14.16) lib/ash/api/api.ex:2169: Ash.Api.unwrap_or_raise!/3
+iex(3)>
+```
+
+#### Defaults
+
+Attributes can have default values. Let's add a `is_done` boolean
+attribute with a default of `false` and a validation that doesn't allow 
+`nil` for this attribute:
+
+[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+----
+defmodule App.ToDoList.Task do
+  use Ash.Resource
+
+  attributes do
+    uuid_primary_key :id
+
+    attribute :content, :string, allow_nil?: false, constraints: [min_length: 1, max_length: 255]
+    attribute :priority, :integer, allow_nil?: true, constraints: [min: 1, max: 3]
+    attribute :is_done, :boolean, allow_nil?: false, default: false
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.ToDoList
+    define :create
+  end
+end
+----
+
+Now we can create a new task without providing a value for `is_done`:
+
+[source,elixir]
+----
+iex> App.ToDoList.Task.create(%{content: "Mown the lawn"})
+{:ok,
+ #App.ToDoList.Task<
+   __meta__: #Ecto.Schema.Metadata<:built, "">,
+   id: "07d5b3f1-b960-4390-8980-5e731251d7af",
+   content: "Mown the lawn",
+   priority: nil,
+   is_done: false,
+   aggregates: %{},
+   calculations: %{},
+   ...
+ >}
+----

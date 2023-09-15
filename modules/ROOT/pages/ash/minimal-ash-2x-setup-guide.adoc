@@ -23,14 +23,14 @@ $ cd app
 We change the dependency in `mix.exs` to add Ash (find the latest 
 Ash version number at https://hex.pm/packages/ash):
 
-**mix.exs**
-```elixir
+[source,elixir,title='mix.exs']
+----
 defp deps do
   [
     {:ash, "~> 2.14.16"} # Add this line
   ]
 end
-```
+----
 
 Run `mix deps.get` to install it:
 
@@ -41,13 +41,13 @@ $ mix deps.get
 To make sure that we get the right formatting for our code, we change 
 the file `.formatter.exs` to include the Ash formatter:
 
-**.formatter.exs**
-```elixir
+[source,elixir,title='.formatter.exs']
+----
 [
   import_deps: [:ash], # <-- add this line
   inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
 ]
-```
+----
 
 TIP: The Elixir formatter is a great tool to keep your code consistent. 
 It is highly recommended to use run the command `mix format` before 
@@ -63,11 +63,12 @@ $ touch config/config.exs
 
 And add the configuration for Ash to `config/config.exs`:
 
-```elixir
+[source,elixir,title='config/config.exs']
+----
 import Config
 
 config :ash, :use_all_identities_in_manage_relationship?, false
-```
+----
 
 IMPORTANT: If not configured otherwise Ash uses
 link:https://hexdocs.pm/ash/Ash.DataLayer.Ets.html[Ash.DataLayer.Ets] as
