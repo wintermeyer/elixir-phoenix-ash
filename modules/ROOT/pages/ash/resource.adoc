@@ -243,8 +243,15 @@ defmodule App.ToDoList.Task do
   attributes do
     uuid_primary_key :id
 
-    attribute :content, :string, allow_nil?: false, constraints: [min_length: 1, max_length: 255]
-    attribute :priority, :integer, allow_nil?: true, constraints: [min: 1, max: 3]
+    attribute :content, :string do
+      allow_nil? false
+      constraints min_length: 1, max_length: 255
+    end
+
+    attribute :priority, :integer do
+      allow_nil? true
+      constraints min: 1, max: 3
+    end
   end
 
   actions do
@@ -360,9 +367,20 @@ defmodule App.ToDoList.Task do
   attributes do
     uuid_primary_key :id
 
-    attribute :content, :string, allow_nil?: false, constraints: [min_length: 1, max_length: 255]
-    attribute :priority, :integer, allow_nil?: true, constraints: [min: 1, max: 3]
-    attribute :is_done, :boolean, allow_nil?: false, default: false
+    attribute :content, :string do
+      allow_nil? false
+      constraints min_length: 1, max_length: 255
+    end
+
+    attribute :priority, :integer do
+      allow_nil? true
+      constraints min: 1, max: 3
+    end
+
+    attribute :is_done, :boolean do
+      allow_nil? false
+      default false
+    end
   end
 
   actions do
