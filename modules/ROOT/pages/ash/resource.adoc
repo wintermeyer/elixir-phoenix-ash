@@ -87,6 +87,14 @@ defmodule App.ToDoList.Task do
 end
 ----
 
+IMPORTANT: In this example we use the 
+link:https://hexdocs.pm/ash/Ash.DataLayer.Ets.html[Ash.DataLayer.Ets] as
+a database layer. ETS (Erlang Term Storage) is an in memory data store
+which is build into your Erlang system. For our training purpose this 
+is ideal because we don't have to install and configure a database (e.g.
+PostgreSQL). **But ETS does not save any data to disk!** With every 
+restart of these examples you will have to re-create the data.
+
 The resulting directory structure should look like this:
 
 ```bash
@@ -102,7 +110,7 @@ lib
 └── app.ex
 
 4 directories, 5 files
-```
+``` 
 
 ### Create a Resource
 
@@ -410,6 +418,103 @@ iex> App.ToDoList.Task.create(%{content: "Mown the lawn"})
    ...
  >}
 ----
+
+### default_accept
+
+Sometimes a resource as an attribute which we don't want to have
+writeble for the user. Ash provides a functionality for this. 
+Within the `actions` we can use `default_accept` to define a whitelist 
+of accepted attributes.
+
+In our example application we want to allow the user to create and update 
+the `content` and `priority` attributes but not the `is_done` attribute.
+
+[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+----
+defmodule App.ToDoList.Task do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  # ...
+
+  actions do
+    default_accept [:content, :priority] # add this line
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  # ...
+end
+----
+
+Should a user try to change the `id_done` attribute in a create or update 
+the system will not accept it. See the `"cannot be changed"` message:
+
+```elixir
+$ iex -S mix
+Compiling 2 files (.ex)
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> App.ToDoList.Task.create(%{content: "Mow the lawn", is_done: true})
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.InvalidAttribute{
+       field: :is_done,
+       message: "cannot be changed",
+       private_vars: nil,
+       value: true,
+       changeset: nil,
+       query: nil,
+       error_context: [],
+       vars: [],
+       path: [],
+       stacktrace: #Stacktrace<>,
+       class: :invalid
+     }
+   ],
+   stacktraces?: true,
+   changeset: #Ash.Changeset<
+     api: App.ToDoList,
+     action_type: :create,
+     action: :create,
+     attributes: %{content: "Mow the lawn", is_done: true},
+     relationships: %{},
+     errors: [
+       %Ash.Error.Changes.InvalidAttribute{
+         field: :is_done,
+         message: "cannot be changed",
+         private_vars: nil,
+         value: true,
+         changeset: nil,
+         query: nil,
+         error_context: [],
+         vars: [],
+         path: [],
+         stacktrace: #Stacktrace<>,
+         class: :invalid
+       }
+     ],
+     data: #App.ToDoList.Task<
+       __meta__: #Ecto.Schema.Metadata<:built, "">,
+       id: nil,
+       content: nil,
+       priority: nil,
+       is_done: nil,
+       aggregates: %{},
+       calculations: %{},
+       ...
+     >,
+     valid?: false
+   >,
+   query: nil,
+   error_context: [nil],
+   vars: [],
+   path: [],
+   stacktrace: #Stacktrace<>,
+   class: :invalid
+ }}
+iex(2)> 
+```
 
 ### Read
 

@@ -70,10 +70,3 @@ import Config
 config :ash, :use_all_identities_in_manage_relationship?, false
 ----
 
-IMPORTANT: If not configured otherwise Ash uses
-link:https://hexdocs.pm/ash/Ash.DataLayer.Ets.html[Ash.DataLayer.Ets] as
-a database layer. ETS (Erlang Term Storage) is an in memory data store
-which is build into your Erlang system. For our training purpose this 
-is ideal because we don't have to install and configure a database (e.g.
-PostgreSQL). **But ETS does not save any data to disk!** With every 
-restart of these examples you will have to re-create the data. 
