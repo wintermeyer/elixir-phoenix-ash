@@ -1,24 +1,20 @@
 [[resource]]
 ## Resource
 
-Resources are the cornerstones of any Ash application. We use them to
-model our data and define actions which are used to manipulate the
-data.
+Ash resources are used to model data and define actions which are used
+to manipulate that data. In the Ash world we often compare the resources with nouns and the actions with verbs.
 
-NOTE: In the Ash world the resources are often compared with nouns and
-the actions with verbs.
-
-## A To-Do-List Application
+### To-Do-List Example
 
 To dive into resources we use a simple to-do-list application as an
-example. Please use the
+example. As a preperation for this please use the
 <<minimal-ash-2x-setup-guide, Minimal Ash 2.x Setup Guide>> to generate
 a new Elixir application.
 
 We want to create a `task` resource which has a `content` attribute
 and an `id` attribute as a primary key. We also want to include the
 actions `create`, `read`, `update` and `delete`. Ash provides those
-actions but we have to include them into the resource.
+actions for free but we have to include them into the resource.
 
 In the Ash world a resource needs to be registered via a registry to an
 interal API. Don't think of this as an external WebAPI. Ash uses the
@@ -70,31 +66,27 @@ end
 
 ### Configure the Resource
 
-After we have created the API we can create the resource.
+After we have created the API we can create the resource. For that we use `attributes`. Attributes are the fields of the resource. In our case we have two attributes: `id` and `content`. The `id` attribute is a special attribute because it is the primary key of the resource. We use the `uuid_primary_key` macro to define the `id` attribute as a primary key. The `content` attribute is a simple string.
 
 [source,elixir,title='lib/app/to_do_list/resources/task.ex']
 ----
 defmodule App.ToDoList.Task do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets <1>
 
   attributes do
     uuid_primary_key :id
     attribute :content, :string
   end
-
-  actions do
-    defaults [:create, :read, :update, :destroy]
-  end
 end
 ----
 
-IMPORTANT: In this example we use the
+<1> In this example we use the
 link:https://hexdocs.pm/ash/Ash.DataLayer.Ets.html[Ash.DataLayer.Ets] as
 a database layer. ETS (Erlang Term Storage) is an in memory data store
 which is build into your Erlang system. For our training purpose this
 is ideal because we don't have to install and configure a database (e.g.
 PostgreSQL). **But ETS does not save any data to disk!** With every
-restart of these examples you will have to re-create the data.
+restart of `iex` you have to re-create the example data.
 
 The resulting directory structure should look like this:
 
@@ -113,65 +105,15 @@ lib
 4 directories, 5 files
 ```
 
+We now have a resource but because we haven't defined any actions we
+can't do anything with it. Let's add a `create` action.
+
 ### Create a Resource
 
-Fire up the IEx (Elixir’s Interactive Shell) to play around with our new application.
-
-```bash
-$ iex -S mix
-Erlang/OTP 26 [erts-14.0.2] [...]
-
-Interactive Elixir (1.15.5) [...]
-iex(1)>
-```
-
-NOTE: For those who jumped into this chapter without any prior knowledge
-of Elixir: You can stop the `iex` shell with `Ctrl+C` twice.
-
-We can create a new task by using the `Ash.Changeset.for_create/3`
-function and call the `App.ToDoList.create!/1` function with that changeset:
-
-```elixir
-iex(1)> App.ToDoList.Task
-App.ToDoList.Task
-iex(2)> |> Ash.Changeset.for_create(:create, %{content: "Mow the lawn"})
-#Ash.Changeset<
-  action_type: :create,
-  action: :create,
-  attributes: %{content: "Mow the lawn"},
-  relationships: %{},
-  errors: [],
-  data: #App.ToDoList.Task<
-    __meta__: #Ecto.Schema.Metadata<:built, "">,
-    id: nil,
-    content: nil,
-    aggregates: %{},
-    calculations: %{},
-    ...
-  >,
-  valid?: true
->
-iex(3)> |> App.ToDoList.create!()
-#App.ToDoList.Task<
-  __meta__: #Ecto.Schema.Metadata<:built, "">,
-  id: "2aface85-0e7b-4b4c-885b-22405ff612ab",
-  content: "Mow the lawn",
-  aggregates: %{},
-  calculations: %{},
-  ...
->
-```
-
-### Code Interface
-
-Doing a `App.ToDoList.Task |> Ash.Changeset.for_create(:create,
-%{content: "Mow the lawn"}) |> App.ToDoList.create!()` can feel a bit
-cumbersome and Ash is all about making things more productive for
-the developer. Let's add a `code_interface` section to the `task`
+To create a resource we have to add the needed `create` action to the
+resource. In addition we add a `code_interface` section to the `task`
 resource for some Ash magic which creates a
-`App.ToDoList.Task.create!/1` function so that we can use
-`App.ToDoList.Task.create!(%{content: "Mow the lawn"})` to create a
-new task.
+`App.ToDoList.Task.create/1` and a `App.ToDoList.Task.create!/1` function.
 
 [source,elixir,title='lib/app/to_do_list/resources/task.ex']
 ----
@@ -184,7 +126,7 @@ defmodule App.ToDoList.Task do
   end
 
   actions do
-    defaults [:create, :read, :update, :destroy]
+    defaults [:create]
   end
 
   code_interface do
@@ -194,8 +136,7 @@ defmodule App.ToDoList.Task do
 end
 ----
 
-After restarting the `iex` we can now create a new `task` much
-easier:
+Fire up the IEx (Elixir’s Interactive Shell) to create the first task:
 
 ```elixir
 $ iex -S mix
@@ -234,13 +175,27 @@ iex(2)> App.ToDoList.Task.create(%{content: "Mow the lawn"})
 iex(3)>
 ```
 
+[NOTE]
+====
+You can still create a task the long way with the following code:
+
+[source,elixir]
+----
+App.ToDoList.Task
+|> Ash.Changeset.for_create(:create, %{content: "Mow the lawn"})
+|> App.ToDoList.create!()
+----
+
+`App.ToDoList.Task.create(%{content: "Mow the lawn"})` is just a lot more convenient.
+====
+
 ### Validations
 
 Validation of user input is a key for a smooth running application.
 Otherwise we end up with faulty datasets in our database. For our
 example we will add one validation for `content` to make sure that
 content will always have a length between 1 and 255 characters. And we
-add a second attribute `priority` which is an integer and has to be
+add an other attribute `priority` which is an integer and has to be
 either `nil` or between 1 and 3.
 
 [source,elixir,title='lib/app/to_do_list/resources/task.ex']
@@ -263,7 +218,7 @@ defmodule App.ToDoList.Task do
   end
 
   actions do
-    defaults [:create, :read, :update, :destroy]
+    defaults [:create]
   end
 
   code_interface do
@@ -392,7 +347,7 @@ defmodule App.ToDoList.Task do
   end
 
   actions do
-    defaults [:create, :read, :update, :destroy]
+    defaults [:create]
   end
 
   code_interface do
@@ -440,7 +395,7 @@ defmodule App.ToDoList.Task do
 
   actions do
     default_accept [:content, :priority] # add this line
-    defaults [:create, :read, :update, :destroy]
+    defaults [:create]
   end
 
   # ...
@@ -522,20 +477,29 @@ iex(2)>
 ### Read
 
 Writing is one thing but it only makes sense if you can read the written
-data too. To make our life a bit easier we add a `code_interface`
-section for `read`:
+data too. To make our life a bit easier we add a `read` action and a `code_interface`
+define for `read`:
 
 [source,elixir,title='lib/app/to_do_list/resources/task.ex']
 ----
 defmodule App.ToDoList.Task do
   use Ash.Resource, data_layer: Ash.DataLayer.Ets
 
-  # ...
+  attributes do
+    uuid_primary_key :id
+    attribute :content, :string
+  end
+
+  actions do
+    # add :read here
+    defaults [:create, :read]
+  end
 
   code_interface do
     define_for App.ToDoList
     define :create
-    define :read # add this line
+    # add this line
+    define :read
   end
 end
 ----
@@ -626,16 +590,28 @@ Often one wants to fetch a specific set of data by an `id`. The Ash
 defmodule App.ToDoList.Task do
   use Ash.Resource, data_layer: Ash.DataLayer.Ets
 
-  # ...
+  attributes do
+    uuid_primary_key :id
+    attribute :content, :string
+  end
+
+  actions do
+    defaults [:create, :read]
+  end
 
   code_interface do
     define_for App.ToDoList
     define :create
     define :read
-    define :by_id, get_by: [:id], action: :read # add this line
+    # add this line
+    define :by_id, get_by: [:id], action: :read <1>
   end
 end
 ----
+
+<1> This generates the functions `App.ToDoList.Task.read/1` and `App.ToDoList.Task.read!/1`
+
+Let's try it out:
 
 ```elixir
 $ iex -S mix
@@ -682,9 +658,6 @@ $ iex -S mix
 Erlang/OTP 26 [...]
 
 Interactive Elixir (1.15.5) [...]
-iex(1)> App.ToDoList.Task.by_id!("not-in-the-db")
-** (Ash.Error.Query.NotFound) record not found
-    (app 0.1.0) deps/ash/lib/ash/code_interface.ex:518: App.ToDoList.Task.by_id!/3
 iex(1)> App.ToDoList.Task.by_id("not-in-the-db")
 {:error,
  %Ash.Error.Query.NotFound{
@@ -698,5 +671,7 @@ iex(1)> App.ToDoList.Task.by_id("not-in-the-db")
    stacktrace: #Stacktrace<>,
    class: :invalid
  }}
-iex(2)>
+ iex(2)> App.ToDoList.Task.by_id!("not-in-the-db")
+ ** (Ash.Error.Query.NotFound) record not found
+     [...]
 ----
