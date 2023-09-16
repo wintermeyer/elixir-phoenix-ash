@@ -2,7 +2,8 @@
 ## Resource
 
 Ash resources are used to model data and define actions which are used
-to manipulate that data. In the Ash world we often compare the resources with nouns and the actions with verbs.
+to manipulate that data. In the Ash world we often compare the resources
+with nouns and the actions with verbs.
 
 ### To-Do-List Example
 
@@ -16,9 +17,9 @@ and an `id` attribute as a primary key. We also want to include the
 actions `create`, `read`, `update` and `delete`. Ash provides those
 actions for free but we have to include them into the resource.
 
-In the Ash world a resource needs to be registered via a registry to an
-interal API. Don't think of this as an external WebAPI. Ash uses the
-term API for an internal interface. We call our API `ToDoList`.
+In the Ash world a resource needs to be registered to an interal API.
+Don't think of this as an external WebAPI. Ash uses the term API for
+an internal programming interface. We call our API `ToDoList`.
 
 ### Configure the API
 
@@ -32,7 +33,7 @@ config :ash, :use_all_identities_in_manage_relationship?, false
 config :app, :ash_apis, [App.ToDoList] # Add this line
 ----
 
-Now we create the API module which contains the registry.
+Now we create the API module which contains the resource.
 
 [source,elixir,title='lib/app/to_do_list.ex']
 ----
@@ -40,7 +41,7 @@ defmodule App.ToDoList do
   use Ash.Api
 
   resources do
-    registry App.ToDoList.Registry
+    resource App.ToDoList.Task
   end
 end
 ----
@@ -51,22 +52,14 @@ For the resource itself we create a new directory:
 $ mkdir -p lib/app/to_do_list/resources
 ```
 
-Now we have to create the registry for our resources.
-
-[source,elixir,title='lib/app/to_do_list/registry.ex']
-----
-defmodule App.ToDoList.Registry do
-  use Ash.Registry
-
-  entries do
-    entry App.ToDoList.Task
-  end
-end
-----
-
 ### Configure the Resource
 
-After we have created the API we can create the resource. For that we use `attributes`. Attributes are the fields of the resource. In our case we have two attributes: `id` and `content`. The `id` attribute is a special attribute because it is the primary key of the resource. We use the `uuid_primary_key` macro to define the `id` attribute as a primary key. The `content` attribute is a simple string.
+After the API we create the resource. For that we use `attributes`.
+Attributes are the fields of the resource. In our case we have two
+attributes: `id` and `content`. The `id` attribute is a special
+attribute because it is the primary key of the resource. We use
+the `uuid_primary_key` macro to define the `id` attribute as a primary
+key. The `content` attribute is a simple string.
 
 [source,elixir,title='lib/app/to_do_list/resources/task.ex']
 ----
@@ -96,13 +89,12 @@ lib
 ├── app
 │   ├── application.ex
 │   ├── to_do_list
-│   │   ├── registry.ex
 │   │   └── resources
 │   │       └── task.ex
 │   └── to_do_list.ex
 └── app.ex
 
-4 directories, 5 files
+4 directories, 4 files
 ```
 
 We now have a resource but because we haven't defined any actions we
@@ -186,14 +178,15 @@ App.ToDoList.Task
 |> App.ToDoList.create!()
 ----
 
-`App.ToDoList.Task.create(%{content: "Mow the lawn"})` is just a lot more convenient.
+`App.ToDoList.Task.create(%{content: "Mow the lawn"})` is just a lot
+more convenient.
 ====
 
 ### Read
 
 Writing is one thing but it only makes sense if you can read the written
-data too. To make our life a bit easier we add a `read` action and a `code_interface`
-define for `read`:
+data too. To make our life a bit easier we add a `read` action and a
+`code_interface` define for `read`:
 
 [source,elixir,title='lib/app/to_do_list/resources/task.ex']
 ----
@@ -324,7 +317,8 @@ defmodule App.ToDoList.Task do
 end
 ----
 
-<1> This generates the functions `App.ToDoList.Task.by_id/1` and `App.ToDoList.Task.by_id!/1`
+<1> This generates the functions `App.ToDoList.Task.by_id/1` and
+`App.ToDoList.Task.by_id!/1`
 
 Let's try it out:
 
