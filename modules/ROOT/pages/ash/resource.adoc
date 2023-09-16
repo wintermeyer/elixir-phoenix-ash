@@ -108,7 +108,7 @@ lib
 We now have a resource but because we haven't defined any actions we
 can't do anything with it. Let's add a `create` action.
 
-### Create a Resource
+### Create
 
 To create a resource we have to add the needed `create` action to the
 resource. In addition we add a `code_interface` section to the `task`
