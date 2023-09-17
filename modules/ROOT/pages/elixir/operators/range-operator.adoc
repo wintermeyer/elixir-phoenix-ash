@@ -46,4 +46,3 @@ iex> Enum.to_list(1..11//3)
 ----
 
 In this example, `1..11//3` creates a range from 1 to 11 with a step of 3, resulting in the list `[1, 4, 7, 10]`.
-

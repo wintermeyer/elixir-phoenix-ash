@@ -1,6 +1,6 @@
 * xref:index.adoc#preface[Preface]
-* xref:elixir/elixir-101.adoc[Elixir Introduction]
-* xref:phoenix-basics.adoc[Phoenix Basics]
+* xref:elixir/index.adoc[Elixir]
+* xref:phoenix-basics.adoc[Phoenix Framework]
 ** xref:phoenix-basics.adoc#the-base-setup[The Base Setup]
 ** xref:phoenix-basics.adoc#hello-world[Hello World!]
 ** xref:phoenix-basics.adoc#conn-struct[The conn Struct]
