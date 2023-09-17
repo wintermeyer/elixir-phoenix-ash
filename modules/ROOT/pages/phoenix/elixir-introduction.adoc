@@ -1,0 +1,123 @@
+## mix
+indexterm:["mix"]
+
+By now, you understand the basics of Elixir. The next step is to create an
+application. In the Elixir ecosystem, this is done with the (already installed)
+command-line interface (CLI) `mix`. Let's do that for a "Hello world!"
+application:
+
+[source,bash]
+----
+$ mix new hello_world
+* creating README.md
+* creating .formatter.exs
+* creating .gitignore
+* creating mix.exs
+* creating lib
+* creating lib/hello_world.ex
+* creating test
+* creating test/test_helper.exs
+* creating test/hello_world_test.exs
+
+Your Mix project was created successfully.
+You can use "mix" to compile it, test it, and more:
+
+    cd hello_world
+    mix test
+
+Run "mix help" for more commands.
+----
+
+The command ´mix new projectname` creates a new directory with the name `projectname`
+and fills it with a default structure:
+
+[source,bash]
+----
+$ cd hello_world
+$ tree
+.
+├── README.md
+├── lib
+│   └── hello_world.ex
+├── mix.exs
+└── test
+    ├── hello_world_test.exs
+    └── test_helper.exs
+
+2 directories, 5 files
+----
+
+The Phoenix directory structure will be more involved but has the same core.
+
+## mix tasks
+indexterm:["mix tasks", "task]
+
+A task is a mechanism to start code with `mix`. For our "Hello world!"
+programme we have to create the directory `lib/mix/tasks` and create the file
+`lib/mix/tasks/start.ex` with this code:
+
+lib/mix/tasks/start.ex
+[source,elixir]
+----
+defmodule Mix.Tasks.Start do
+  use Mix.Task
+
+  def run(_) do <1>
+    IO.puts "Hello world!"
+  end
+end
+----
+<1> The `run(_)` function is the default function which gets called automatically.
+
+Now we can start the `mix start` task:
+
+[source,bash]
+----
+$ mix start
+Compiling 1 file (.ex)
+Generated hello_world app
+Hello world!
+----
+
+The `.ex` file gets compiled, and the `start` task gets run. The compile is only
+done when needed. If we call `mix start` a second time no compile is needed:
+
+[source,bash]
+----
+$ mix start
+Hello world!
+----
+
+Obviously `mix` as a topic is much more complicated. In this section, I just
+wanted to show you the very basic idea of `mix` so that you know where to search
+if you want to know what happens if you do a `mix server` with a Phoenix
+application.
+
+## mix format
+indexterm:["mix tasks", "task"]
+
+You are going to love `mix format`. You can call it in the root directory of
+your Phoenix application and it will autoformat all your Elixir source code
+files.
+
+You should use `mix format` every time you are going to commit code to a
+repository.
+
+## What else?
+
+This chapter just deals with the tip of the iceberg. It provides the basic
+knowledge that you need to start with the Phoenix Framework. There is a lot more
+to learn. But I wouldn't worry too much about that right now. You are good to
+go for the next chapter of this book. Have fun!
+
+### Elixir Books
+
+If you want to dive more into Elixir than I recommend the following
+books:
+
+- https://pragprog.com/book/cdc-elixir/learn-functional-programming-with-elixir[Learn Functional Programming with Elixir] by Ulisses Almeida (https://twitter.com/ulissesalmeida[@ulissesalmeida])
++
+In my opinion, the best beginners book for Elixir.
+- https://pragprog.com/book/elixir16/programming-elixir-1-6[Programming Elixir 1.6] by Dave Thomas (https://twitter.com/pragdave[@pragdave])
++
+Dave - as always - wrote a very book which shines a light into many details.

@@ -1,0 +1,941 @@
+[[phoenix]]
+# Phoenix
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
+
+Phoenix follows the
+https://en.wikipedia.org/wiki/Model–view–controller[Model-View-Controller] (MVC)
+architecture. If you are not familiar with that, just follow my lead. MVC is
+just a set of rules of what goes where so that everybody knows where stuff is.
+No one expects you to follow it, but it makes life easier if you do. After a
+couple of examples, you'll get a feeling for it. The same goes for the directory
+structure and the file names.
+
+In this chapter, I'll show you how you can create simple webpages which have some
+programming logic. But we will not touch the database yet - we want to take this
+one step at a time.
+
+[IMPORTANT]
+.Phoenix version
+====
+The code examples of this book are written and tested for Phoenix
+version 1.5.1 or above. Please make sure that you have a 1.5.x version
+installed.
+[source,bash]
+----
+$ mix phx.new --version
+Phoenix v1.5.1
+----
+====
+
+NOTE: In some old tutorials, or blog posts, you'll see `mix phoenix.new`,
+instead of `mix phx.new`. That is outdated. Since Phoenix version 1.3, all the
+phoenix-related mix commands start with `mix phx`.
+
+## Development Environment
+
+By default, Phoenix offers three different environments:
+
+- Development
+- Testing
+- Production
+
+In this chapter, we are only going to use the development environment. It offers
+some features which make the life of a developer easier (e.g. more verbose error
+messages and auto-reload after code changes).
+
+[[the-base-setup]]
+## The Base Setup
+
+The `mix phx.new application_name` command creates the foundation of every
+Phoenix application which generates all the needed files and the basic directory
+structure.
+
+We call our new application `demo`:
+
+[source,bash]
+----
+$ mix phx.new demo --no-ecto <1>
+* creating demo/config/config.exs
+* creating demo/config/dev.exs
+[...]
+Fetch and install dependencies? [Yn] Y <2>
+[...]
+We are almost there! The following steps are missing:
+
+    $ cd demo
+
+Start your Phoenix app with:
+
+    $ mix phx.server
+
+You can also run your app inside IEx (Interactive Elixir) as:
+
+    $ iex -S mix phx.server
+----
+<1> '--no-ecto' creates a new application without Ecto (the database connector). We don't need a database for the basic examples.
+<2> You always want to press `Y` here, and yes, it sometimes takes forever.
+
+After that, we `cd demo` into the new directory and fire up the Phoenix server
+with `mix phx.server`
+
+[source,bash]
+----
+$ cd demo
+$ mix phx.server
+Compiling 13 files (.ex) <1>
+Generated demo app
+[info] Running DemoWeb.Endpoint with cowboy 2.7.0 at 0.0.0.0:4000 (http)
+[info] Access DemoWeb.Endpoint at http://localhost:4000 <2>
+
+webpack is watching the files…
+
+Hash: f3ee21a2f5780f52f176
+Version: webpack 4.41.5
+[...]
+----
+<1> Source-Code which hasn't been compiled yet is compiled.
+<2> The URL which serves the development website: http://localhost:4000
+
+Please open the URL http://localhost:4000 in your web browser:
+
+image::hello-world-first-view.png[http://localhost:4000]
+
+On the terminal you can see the server log:
+
+[source,bash]
+----
+[info] GET /
+[debug] Processing with DemoWeb.PageController.index/2
+  Parameters: %{}
+  Pipelines: [:browser]
+[info] Sent 200 in 22ms
+----
+
+Do a reload in the browser and watch the log output:
+
+[source,bash]
+----
+[info] GET /
+[debug] Processing with DemoWeb.PageController.index/2
+  Parameters: %{}
+  Pipelines: [:browser]
+[info] Sent 200 in 426µs
+----
+
+[sidebar]
+The log says that the request was answered in 426µs. WOW!
+https://en.wikipedia.org/wiki/Microsecond[Microseconds]! That is on my old
+development laptop. That must be the great speed of Phoenix/Elixir everybody is talking about.
+
+What we see is the default `index.html.eex` page. The file extension `eex`
+stands for https://hexdocs.pm/eex/EEx.html[Embedded Elixir] and means that this
+is a mix of static HTML and dynamic Elixir code which generates HTML. These
+files are called templates and are located in the `lib/demo_web/templates/`
+directory. A new Phoenix application has two templates:
+
+[source,bash]
+----
+$ tree lib/demo_web/templates/
+lib/demo_web/templates/
+├── layout
+│   └── app.html.eex
+└── page
+    └── index.html.eex
+----
+
+NOTE: As we named our application `demo`, the subdirectory in which templates
+are stored is called `demo_web`.
+
+Let's have a look into `index.html.eex`, which contains the main content of the
+page.
+
+.lib/demo_web/templates/page/index.html.eex
+[source,html]
+----
+<section class="phx-hero">
+  <h1><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h1>
+  <p>Peace-of-mind from prototype to production</p>
+</section>
+
+<section class="row">
+  <article class="column">
+    <h2>Resources</h2>
+    <ul>
+      <li>
+        <a href="https://hexdocs.pm/phoenix/overview.html">Guides &amp; Docs</a>
+      </li>
+      <li>
+        <a href="https://github.com/phoenixframework/phoenix">Source</a>
+      </li>
+      <li>
+        <a href="https://github.com/phoenixframework/phoenix/blob/v1.5/CHANGELOG.md">v1.5 Changelog</a>
+      </li>
+    </ul>
+  </article>
+  <article class="column">
+    <h2>Help</h2>
+    <ul>
+      <li>
+        <a href="https://elixirforum.com/c/phoenix-forum">Forum</a>
+      </li>
+      <li>
+        <a href="https://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on Freenode IRC</a>
+      </li>
+      <li>
+        <a href="https://twitter.com/elixirphoenix">Twitter @elixirphoenix</a>
+      </li>
+      <li>
+        <a href="https://elixir-slackin.herokuapp.com/">Elixir on Slack</a>
+      </li>
+    </ul>
+  </article>
+</section>
+----
+
+But a bit of HTML boilerplate is missing, and that can be found in `lib/demo_web/templates/layout/app.html.eex`.
+
+.lib/demo_web/templates/layout/app.html.eex
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en"> <1>
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Demo · Phoenix Framework</title> <2>
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/> <3>
+    <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+  </head>
+  <body>
+    <header> <4>
+      <section class="container">
+        <nav role="navigation">
+          <ul>
+            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
+            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+              <li><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
+            <% end %>
+          </ul>
+        </nav>
+        <a href="https://phoenixframework.org/" class="phx-logo">
+          <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
+        </a>
+      </section>
+    </header>
+    <main role="main" class="container">
+      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p> <5>
+      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+      <%= @inner_content %> <6>
+    </main>
+  </body>
+</html>
+----
+<1> If the webpage is not in English, you will need to change the language here.
+<2> You probably want to change this to a better `<title>`.
+<3> Phoenix's asset management takes care of the CSS and JavaScript. No need to
+worry about that for now.
+<4> This is the boilerplate header you are seeing on the top of every page.
+<5> This part renders so called flash messages. We'll get to those later.
+<6> This is the line where the template's content gets included.
+
+IMPORTANT: Embedded Elixir (`.eex`) uses the `<% %>` syntax to embed Elixir
+code in HTML. `<% %>` runs the Elixir code within. `<%= %>` runs the Elixir
+code and includes the result of that as HTML in the template.
+
+Feel free to change the content of `app.html.eex` and `index.html.eex` while
+having http://localhost:4000 opened in a browser. In development mode, each save
+of those files triggers a reload of the page in the browser.
+
+[[hello-world]]
+## Hello World!
+
+This section aims to create a new dynamic page which is available at
+http://localhost:4000/hello and displays the text "Hello World!". We start with
+the base setup:
+
+[source,bash]
+----
+$ mix phx.new demo --no-ecto
+[...]
+$ cd demo
+$ mix phx.server
+----
+
+Routes are defined in `lib/demo_web/router.ex`. Let's have a look and add a new
+route for our hello world page.
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+defmodule DemoWeb.Router do
+  use DemoWeb, :router
+
+  [...]
+
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/hello", PageController, :hello <1>
+  end
+
+  [...]
+----
+<1> We use the same `PageController` as the `:index` action for our new `:hello` action (function).
+
+Because the route calls the `:hello` action in the `PageController` we have to
+add a `hello/2` function in `page_controller.ex`:
+
+.lib/demo_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.PageController do
+  use DemoWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+
+  def hello(conn, _params) do <1>
+    render(conn, "hello.html")
+  end
+end
+----
+<1> The new `hello/2` function renders the `hello.html` template.
+
+Last step: We have to create a template file. Please do so and include this
+source code in it:
+
+.lib/demo_web/templates/page/hello.html.eex
+[source,html]
+----
+<h1>Hello World!</h1>
+----
+
+Now open http://localhost:4000/hello in your browser:
+
+image::hello-world.png[http://localhost:4000/hello]
+
+### Hello World with its controller
+
+In the last section, we added the `:hello` action to the already existing
+`PageController`. But in many cases, it makes sense to create a separate
+controller. Let's do that, so you know how to.
+
+We start with changing the route:
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+defmodule DemoWeb.Router do
+  use DemoWeb, :router
+
+  [...]
+
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/hello", ExampleController, :hello <1>
+  end
+
+  [...]
+----
+<1> Yes, `ExampleController` is not a candidate for best controller name of the year. Good catch!
+
+Let's be lazy and ask Phoenix what to do next. We open http://localhost:4000/hello in the browser:
+
+image::hello-world-examplecontroller-is-undefined.png[http://localhost:4000/hello]
+
+It says `function DemoWeb.ExampleController.init/1 is undefined` which leads us
+to the next missing piece: a controller. That file needs to be named
+`example_controller.ex` and has to be saved in the `lib/demo_web/controllers`
+directory. Here is the content of it:
+
+.lib/demo_web/controllers/example_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.ExampleController do <1>
+  use DemoWeb, :controller
+
+  def hello(conn, _params) do
+    render(conn, "hello.html")
+  end
+end
+----
+<1> The module name is `DemoWeb.ExampleController`. This was defined in the
+router code above, where the `ExampleController` is under the `DemoWeb` namespace.
+
+After a reload we get a new error message: `function
+DemoWeb.ExampleView.render/2 is undefined`, so we need to create a view file,
+called `example_view.ex`, and add it to the `lib/demo_web/views` directory:
+
+.lib/demo_web/views/example_view.ex
+[source,elixir]
+----
+defmodule DemoWeb.ExampleView do <1>
+  use DemoWeb, :view
+end
+----
+<1> Important to use the right name here (e.g. 'ExampleView').
+
+A reload, and we get our final error message:
+
+image::hello-world-could-not-render-hello-html.png[http://localhost:4000/hello]
+
+The template is missing. But that is an easy fix:
+
+.lib/demo_web/templates/example/hello.html.eex
+[source,html]
+----
+<h1>Hello World!</h1>
+----
+
+And here is our good to go webpage:
+
+image::hello-world.png[http://localhost:4000/hello]
+
+### Checklist for a new page
+
+Every time you want to create a new action in a new controller, you have to take care of these steps:
+
+- Create a route in `lib/demo_web/router.ex`
+- Create a controller with the name `lib/demo_web/controllers/example_controller.ex`
+- Create an action in that controller which matches the route
+- Create a view with the name `lib/demo_web/views/example_view.ex`
+- Create a template with the name `lib/demo_web/templates/page/hello.html.eex`
+
+Phoenix will always lead you through the way. If something is missing, it will
+say so in the error message.
+
+NOTE: Obviously `demo_web`, `example_controller.ex`, `example_view.ex` and
+`hello.html.eex` are just names which fit our "Hello World!" example. In your
+own app, you will need to come up with more descriptive names.
+
+In our example, the directory and file structure of the `demo_web` subdirectory
+looks like this:
+
+[source,bash]
+----
+$ tree lib/demo_web/{cont*,temp*,view*}
+lib/demo_web/controllers
+├── example_controller.ex
+└── page_controller.ex
+lib/demo_web/templates
+├── example
+│   └── hello.html.eex
+├── layout
+│   └── app.html.eex
+└── page
+    └── index.html.eex
+lib/demo_web/views
+├── error_helpers.ex
+├── error_view.ex
+├── example_view.ex
+├── layout_view.ex
+└── page_view.ex
+----
+
+[[conn-struct]]
+## The `conn` Struct
+
+According to the
+https://en.wikipedia.org/wiki/Model–view–controller[Model-View-Controller] (MVC)
+architecture, we do our programming stuff in the controller and use the template
+just to display the results. Therefore we need a mechanism to transport this data
+from the controller into the template. That mechanism is the `conn` struct.
+Let's have a look at it:
+
+[source,bash]
+----
+$ mix phx.new demo --no-ecto <1>
+[...]
+$ cd demo
+$ mix phx.server
+----
+<1> We create a new phoenix app.
+
+We add a new route to inspect the contents of `conn`, and we add a second route
+for a playground page:
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+defmodule DemoWeb.Router do
+  use DemoWeb, :router
+
+  [...]
+
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/inspect", PageController, :inspect <1>
+    get "/playground", PageController, :playground
+  end
+
+  [...]
+----
+<1> For now, we add this route to the `PageController`.
+
+In the page controller, we add an `inspect` and a `playground` action:
+
+.lib/demo_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.PageController do
+  use DemoWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+
+  def inspect(conn, _params) do
+    render(conn, "inspect.html")
+  end
+
+  def playground(conn, _params) do
+    render(conn, "playground.html")
+  end
+end
+----
+
+And finally, we add this piece of code to the `inspect.html.eex` template:
+
+.lib/demo_web/templates/page/inspect.html.eex
+[source,html]
+----
+<pre>
+<%= inspect(@conn, pretty: true) %> <1>
+</pre>
+----
+<1> We have access to `conn` in the template by calling it `@conn`.
+
+Please open http://localhost:4000/inspect in your browser:
+
+image::inspect_conn.png[http://localhost:4000/inspect]
+
+There is quite a lot of information in the `conn` struct. Here is the complete content:
+
+[source,elixir]
+----
+%Plug.Conn{
+  adapter: {Plug.Cowboy.Conn, :...},
+  assigns: %{layout: {DemoWeb.LayoutView, "app.html"}},
+  before_send: [#Function<0.39862366/1 in Plug.CSRFProtection.call/2>,
+   #Function<2.67121911/1 in Phoenix.Controller.fetch_flash/2>,
+   #Function<0.29283909/1 in Plug.Session.before_send/2>,
+   #Function<0.24098476/1 in Plug.Telemetry.call/2>,
+   #Function<0.67312369/1 in Phoenix.LiveReloader.before_send_inject_reloader/2>],
+  body_params: %{},
+  cookies: %{},
+  halted: false,
+  host: "localhost",
+  method: "GET",
+  owner: #PID<0.855.0>,
+  params: %{},
+  path_info: ["inspect"],
+  path_params: %{},
+  port: 4000,
+  private: %{
+    DemoWeb.Router => {[], %{}},
+    :phoenix_action => :inspect,
+    :phoenix_controller => DemoWeb.PageController,
+    :phoenix_endpoint => DemoWeb.Endpoint,
+    :phoenix_flash => %{},
+    :phoenix_format => "html",
+    :phoenix_layout => {DemoWeb.LayoutView, :app},
+    :phoenix_request_logger => {"request_logger", "request_logger"},
+    :phoenix_router => DemoWeb.Router,
+    :phoenix_template => "inspect.html",
+    :phoenix_view => DemoWeb.PageView,
+    :plug_session => %{},
+    :plug_session_fetch => :done
+  },
+  query_params: %{},
+  query_string: "",
+  remote_ip: {127, 0, 0, 1},
+  req_cookies: %{},
+  req_headers: [
+    {"accept",
+     "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"},
+    {"accept-encoding", "gzip, deflate, br"},
+    {"accept-language", "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7"},
+    {"connection", "keep-alive"},
+    {"host", "localhost:4000"},
+    {"sec-fetch-dest", "document"},
+    {"sec-fetch-mode", "navigate"},
+    {"sec-fetch-site", "none"},
+    {"sec-fetch-user", "?1"},
+    {"upgrade-insecure-requests", "1"},
+    {"user-agent",
+     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"}
+  ],
+  request_path: "/inspect",
+  resp_body: nil,
+  resp_cookies: %{},
+  resp_headers: [
+    {"cache-control", "max-age=0, private, must-revalidate"},
+    {"x-request-id", "FhBrYjjxnpjbwzAAAAxD"},
+    {"x-frame-options", "SAMEORIGIN"},
+    {"x-xss-protection", "1; mode=block"},
+    {"x-content-type-options", "nosniff"},
+    {"x-download-options", "noopen"},
+    {"x-permitted-cross-domain-policies", "none"},
+    {"cross-origin-window-policy", "deny"}
+  ],
+  scheme: :http,
+  script_name: [],
+  secret_key_base: :...,
+  state: :unset,
+  status: nil
+}
+----
+
+We can use the `playground` route to display specific parts of the `conn` struct.
+
+Add the following code to the `playground.html.eex` file:
+
+.lib/demo_web/templates/page/playground.html.eex
+[source,html]
+----
+<table>
+  <tr><td>Host:</td><td><%= @conn.host %></td></tr>
+  <tr><td>Port:</td><td><%= @conn.port %></td></tr>
+</table>
+----
+
+Please open http://localhost:4000/playground to see the result.
+
+image::playground-0.png[http://localhost:4000/playground]
+
+Let me show you now how to use `conn` to transport additional data:
+
+.lib/demo_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule DemoWeb.PageController do
+  use DemoWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+
+  def inspect(conn, _params) do
+    conn
+    |> assign(:headline, "This is a test headline") <1>
+    |> render("inspect.html")
+  end
+
+  def playground(conn, _params) do
+    headline = "This is a test headline"
+
+    conn
+    |> assign(:headline, headline) <2>
+    |> render("playground.html")
+  end
+end
+
+----
+<1> With `assign/3` we can add data to the `assigns` map in the conn struct.
+The `assigns` map is where we normally put shared data.
+<2> This achieves the same result, but with a different coding style.
+
+On http://localhost:4000/inspect we see this:
+
+[source,elixir]
+----
+%Plug.Conn{
+  adapter: {Plug.Cowboy.Conn, :...},
+  assigns: %{
+    headline: "This is a test headline",
+    layout: {DemoWeb.LayoutView, "app.html"}
+  },
+[...]
+----
+
+To access that, we need to change the `playground.html.eex` template:
+
+.lib/hello_world_web/templates/page/playground.html.eex
+[source,html]
+----
+<h1><%= @headline %></h1>
+
+<table>
+  <tr>
+    <td>@conn.assigns.headline</td>
+    <td><%= @conn.assigns.headline %></td> <1>
+  </tr>
+  <tr>
+    <td>@headline</td>
+    <td><%= @headline %></td> <2>
+  </tr>
+</table>
+----
+<1> We can access the value of `headline` through the longer
+`@conn.assigns.headline`.
+<2> But normally, we access it via the shortform `@headline`. All the values in
+the `assigns` map can be accessed using the `@` prefix.
+
+image::playground-conn-assigns-headline.png[http://localhost:4000/playground]
+
+[[static-clock]]
+### Static Clock
+
+The current application always displays the same content. The easiest way to
+change that is to display the current time. For that, we are going to add a
+`timestamp` variable in the controller and display it in the template:
+
+.lib/hello_world_web/controllers/page_controller.ex
+[source,elixir]
+----
+[...]
+def playground(conn, _params) do
+  headline = "This is a test headline"
+  {:ok, timestamp} = DateTime.now("Etc/UTC")
+
+  conn
+  |> assign(:headline, headline)
+  |> assign(:timestamp, timestamp)
+  |> render("playground.html")
+end
+[...]
+----
+
+And we need to update the template as well:
+
+.lib/hello_world_web/templates/page/playground.html.eex
+[source,html]
+----
+<h1><%= @headline %></h1>
+
+<table>
+  <tr>
+    <td>Etc/UTC</td>
+    <td><%= @timestamp %></td>
+  </tr>
+</table>
+----
+
+image::playground-timestamp.png[http://localhost:4000/playground]
+
+[[links]]
+## Links
+
+The web consists of webpages which link to each other. So the next step on our
+venture for the ultimate Phoenix application is a game of ping-pong.
+`http://localhost:4000/ping` will display a link to
+`http://localhost:4000/pong` and vice versa.
+
+[source,bash]
+----
+$ mix phx.new game --no-ecto <1>
+[...]
+$ cd game
+$ mix phx.server
+----
+<1> Again, we create a new phoenix app.
+
+First, we have to set the routes for ping and pong:
+
+.lib/game_web/router.ex
+[source,elixir]
+----
+defmodule GameWeb.Router do
+  [...]
+
+  scope "/", GameWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/ping", PageController, :ping <1>
+    get "/pong", PageController, :pong <2>
+  end
+
+  [...]
+----
+<1> Sets the route for `http://localhost:4000/ping`
+<2> Sets the route for `http://localhost:4000/pong`
+
+Next we add the actions to the PageController:
+
+.lib/game_web/controllers/page_controller.ex
+[source,elixir]
+----
+defmodule GameWeb.PageController do
+  use GameWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+
+  def ping(conn, _params) do
+    render(conn, "ping.html")
+  end
+
+  def pong(conn, _params) do
+    render(conn, "pong.html")
+  end
+end
+----
+
+And create the `ping.html.eex` template:
+
+.lib/hello_world_web/templates/page/ping.html.eex
+[source,html]
+----
+<h1>Ping</h1>
+----
+
+Perfect. What a nice ping page we have created:
+
+image::ping.png[http://localhost:4000/ping]
+
+The missing pong counterpart is easy. First, create the `pong.html.eex`
+template:
+
+.lib/hello_world_web/templates/page/pong.html.eex
+[source,html]
+----
+<h1>Pong</h1>
+----
+
+Something is missing, though. As this is Ping-Pong, we need to add `href` links
+to both pages linking to each other. We could add these manually with `<a
+href="/pong">Pong</a>` but that would not be very clean.  Since we have a
+router in Phoenix, we can use that to create clean routes for our links.
+
+We either have to stop the Phoenix server (`CTRL-C` twice!) or open a new
+terminal in the same directory to run `mix phx.routes` which returns all
+known routes. Because we are only interested in the routes for `PageController`
+we `grep` for those:
+
+[source,bash]
+----
+$ mix phx.routes | grep PageController
+  page_path  GET  /       GameWeb.PageController :index
+  page_path  GET  /ping   GameWeb.PageController :ping <1>
+  page_path  GET  /pong   GameWeb.PageController :pong
+----
+<1> To set the link, we need to know the name of the path, `page_path`, and the
+name of the route, `:ping`.
+
+With that information, we can use the
+https://hexdocs.pm/phoenix_html/Phoenix.HTML.Link.html[link helper] to create that link:
+indexterm:["Link"]
+
+.lib/game_web/templates/page/ping.html.eex
+[source,html]
+----
+<h1>Ping</h1>
+
+<p>
+<%= link "Pong!", to: Routes.page_path(@conn, :pong) %> <1>
+</p>
+----
+<1> `page_path` and `:pong` action become `Routes.page_path(@conn, :pong)`
+
+We do the same on the pong page:
+
+.lib/game_web/templates/page/pong.html.eex
+[source,html]
+----
+<h1>Pong</h1>
+
+<p>
+<%= link "Ping!", to: Routes.page_path(@conn, :ping) %> <1>
+</p>
+----
+
+image::ping_with_pong_link.png[http://localhost:4000/ping]
+
+Now you can play HTML Ping-Pong.
+
+NOTE: You'll find more information about links with specific parameters or queries in the
+xref:phoenix/router.adoc[Router chapter].
+
+### Link Class
+
+Sometimes your design team wants to add a specific CSS class to a link. Here's
+how you can do that:
+
+.lib/game_web/templates/page/pong.html.eex
+[source,html]
+----
+<h1>Pong</h1>
+
+<p>
+<%= link "Ping!", to: Routes.page_path(@conn, :ping), class: "btn" %> <1>
+</p>
+----
+<1> Just add `class: "_class-name_"` to the link helper.
+
+[[static-files]]
+## Static files
+indexterm:["Static files"]
+
+Static files, such as images, the `robots.txt` file, etc., are stored in the
+`assets/static/` directory. By default the following files are already in that
+directory:
+
+[source,bash]
+----
+$ tree assets/static/
+assets/static/
+├── favicon.ico
+├── images
+│   └── phoenix.png
+└── robots.txt
+----
+
+They get delivered by the production web server without any additional
+interaction with the Phoenix application. In development, there is some
+interaction, but that has a small footprint.
+
+If you want to add a new static file to your application, you first need to add
+the file to the `assets/static/` directory. Then, you need to make sure that the
+file is allowlisted in the `plug Plug.Static` function in the
+`lib/hello_world_web/endpoint.ex`:
+
+.lib/hello_world_web/endpoint.ex
+[source,elixir]
+----
+[...]
+
+plug Plug.Static,
+  at: "/",
+  from: :hello_world,
+  gzip: false,
+  only: ~w(css fonts images js favicon.ico robots.txt ads.txt) <1>
+
+[...]
+----
+<1> All static files or directories have to be allowlisted here.
+
+[[images]]
+### Images
+
+Images are a particular case of static files. They can be stored in the
+`assets/static/images/` directory which is by default already allowlisted.
+
+In every fresh Phoenix installation you'll find the Phoenix logo file stored at
+`assets/static/images/phoenix.png`. That image is used in the default
+`app.html.eex` and there we can have a look how to access that image from within
+`.eex`:
+
+[source,bash]
+----
+$ grep "phoenix.png" lib/demo_web/templates/layout/app.html.eex
+<img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
+----
+
+You can use `Routes.static_path(@conn, "/images/phoenix.png")` to access this
+image in any `.eex` file.
+
+[[css]]
+## CSS
+
+As written in the xref:index.adoc#preface[Preface]: We'll not waste time in this
+book by making our webpages pretty. But in case you want to add some CSS to your
+demo application, you can do so by referencing the `assets/css/app.scss` file.
