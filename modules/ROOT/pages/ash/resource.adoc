@@ -280,7 +280,7 @@ iex(3)>
 #### Show
 
 Often one wants to fetch a specific set of data by an `id`. The Ash
-`code_interface` has an easy solution for us:
+`code_interface` has an easy solution for this common scenario.
 
 [source,elixir,title='lib/app/to_do_list/resources/task.ex']
 ----
