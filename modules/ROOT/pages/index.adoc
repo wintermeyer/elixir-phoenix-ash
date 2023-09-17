@@ -2,16 +2,14 @@
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-Embarking on https://www.phoenixframework.org[Phoenix Framework] and
+Embarking on https://ash-hq.org[Ash],
+https://www.phoenixframework.org[Phoenix] and
 https://elixir-lang.org[Elixir] is a steep but exciting climb. No sugar-coating
-here; **prepare for a thrilling ride, especially if Elixir is your first
-functional programming language.**
+here; prepare for a thrilling ride, especially if Elixir is your first
+functional programming language.
 
-If practical "Hello World!" examples are your learning jam, you're in the right
-place. In this book, I offer clean and small examples, not abstract theories.
-
-* *Expect bite-sized code examples.* Crafted for
-comprehension just by reading the code, with added notes for clarity.
+* *Expect bite-sized "Hello World!" code examples.* Crafted for
+comprehension just by reading the code, with added notes for clarity. No abstract theories.
 * *This is a step-by-step guide.* No prior knowledge of Phoenix or Elixir needed.
 Just understand the basics of programming and HTML.
 * *Simplicity is key here.* My goal is to get you productive ASAP. For in-depth
@@ -30,15 +28,17 @@ https://twitter.com/wintermeyer[@wintermeyer].
 
 == Seeking Help?
 
-* https://stackoverflow.com[StackOverflow]: A great place to ask https://stackoverflow.com/questions/tagged/elixir[Elixir] and https://stackoverflow.com/questions/tagged/phoenix-framework[Phoenix] questions.
+* https://stackoverflow.com[StackOverflow]: A great place to ask https://stackoverflow.com/questions/tagged/elixir[Elixir], https://stackoverflow.com/questions/tagged/phoenix-framework[Phoenix] and https://stackoverflow.com/questions/tagged/ash-framework[Ash] questions.
 * https://www.google.com[Google]: For Phoenix-related queries, add 'Phoenix
 Framework', 'Elixir' or 'Ash Framework' to refine your search.
+* Discord: https://discord.gg/elixir[Elixir], https://discord.gg/elixir[Phoenix] (#phoenix channel) and https://discord.gg/D7FNG2q[Ash] have very helpful communities.
 * Email me at sw@wintermeyer-consulting.de: Please post your question on
 StackOverflow first and include the link in your email.
 
 [[training]]
-=== Elixir and Phoenix Training
+== Elixir, Phoenix and Ash Training
 
 I offer remote and on-site Ash, Phoenix and Elixir beginner's training. No prior
 Elixir knowledge needed. Just basic programming and HTML understanding. Please
-contact me at sw@wintermeyer-consulting.de
+contact me with some information (e.g. group size, location and prefered date)
+at sw@wintermeyer-consulting.de
