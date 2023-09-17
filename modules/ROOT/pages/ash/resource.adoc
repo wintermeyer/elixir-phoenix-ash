@@ -17,23 +17,27 @@ and an `id` attribute as a primary key. We also want to include the
 actions `create`, `read`, `update` and `delete`. Ash provides those
 actions for free but we have to include them into the resource.
 
-In the Ash world a resource needs to be registered to an interal API.
-Don't think of this as an external WebAPI. Ash uses the term API for
-an internal programming interface. We call our API `ToDoList`.
+IMPORTANT: In the Ash world a resource needs to be registered to an
+interal API. Please don't think of this as an external WebAPI. Ash
+uses the term API for an internal programming interface. We call
+our API `ToDoList`.
 
-### Configure the API
+### Configure the internal API
 
-We have to add the new API to the `:ash_apis` in our `config.exs` file.
+We have to add the new internal API to the `:ash_apis` in our
+`config.exs` file.
 
 [source,elixir,title='config/config.exs']
 ----
 import Config
 
 config :ash, :use_all_identities_in_manage_relationship?, false
-config :app, :ash_apis, [App.ToDoList] # Add this line
+# Add this line
+config :app, :ash_apis, [App.ToDoList]
 ----
 
-Now we create the API module which contains the resource.
+Now we create the `ToDoList` API module which contains the
+resource `Task`.
 
 [source,elixir,title='lib/app/to_do_list.ex']
 ----
@@ -46,7 +50,7 @@ defmodule App.ToDoList do
 end
 ----
 
-For the resource itself we create a new directory:
+For the resource(s) we create a new directory:
 
 ```bash
 $ mkdir -p lib/app/to_do_list/resources
@@ -54,11 +58,10 @@ $ mkdir -p lib/app/to_do_list/resources
 
 ### Configure the Resource
 
-After the API we create the resource. For that we use `attributes`.
-Attributes are the fields of the resource. In our case we have two
-attributes: `id` and `content`. The `id` attribute is a special
-attribute because it is the primary key of the resource. We use
-the `uuid_primary_key` macro to define the `id` attribute as a primary
+The resource defines `attributes` which are the fields of the resource.
+In our case we have two attributes: `id` and `content`. The `id` attribute
+is a special attribute because it is the primary key of the resource. We
+use the `uuid_primary_key` macro to define the `id` attribute as a primary
 key. The `content` attribute is a simple string.
 
 [source,elixir,title='lib/app/to_do_list/resources/task.ex']
@@ -128,7 +131,7 @@ defmodule App.ToDoList.Task do
 end
 ----
 
-Fire up the IEx (Elixir’s Interactive Shell) to create the first task:
+Fire up the IEx (Elixir’s Interactive Shell) to create your first task:
 
 ```elixir
 $ iex -S mix
@@ -178,8 +181,7 @@ App.ToDoList.Task
 |> App.ToDoList.create!()
 ----
 
-`App.ToDoList.Task.create(%{content: "Mow the lawn"})` is just a lot
-more convenient.
+`Task.create/1` is just a lot more convenient.
 ====
 
 ### Read
@@ -240,21 +242,8 @@ iex(2)> App.ToDoList.Task.create!(%{content: "Buy milk"})
   content: "Buy milk",
   ...
 >
-iex(3)> App.ToDoList.Task.read!
-[
-  #App.ToDoList.Task<
-    __meta__: #Ecto.Schema.Metadata<:loaded>,
-    id: "22b11587-20fe-40d2-830e-50f8930c13c9",
-    content: "Buy milk",
-    ...
-  >,
-  #App.ToDoList.Task<
-    __meta__: #Ecto.Schema.Metadata<:loaded>,
-    id: "881c6c08-223c-41b1-9d61-2d3a40e478bd",
-    content: "Mow the lawn",
-    ...
-  >
-]
+iex(3)> App.ToDoList.Task.read! |> Enum.map(& &1.content)
+["Buy milk", "Mow the lawn"]
 iex(4)> App.ToDoList.Task.read
 {:ok,
  [
