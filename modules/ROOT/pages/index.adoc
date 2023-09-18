@@ -2,16 +2,17 @@
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-Learning <<elixir, Elixir>>, <<phoenix, Phoenix>> and <<ash, Ash>> is a steep
-climb. No sugar-coating. This book aims to make that ascent less steep.
-It's a guide crafted for beginners.
+Learning <<elixir/index.adoc, Elixir>>, <<phoenix/index.adoc, Phoenix>>
+and <<ash/index.adoc, Ash>> is a steep climb. No sugar-coating. This
+book aims to make that ascent less steep. It's a guide crafted for
+beginners.
 
 * *A step-by-step guide.* While no prior knowledge is required, a basic
 understanding of programming and HTML will be beneficial.
-* *Expect bite-sized "Hello World!" code examples.* Crafted for
+* *Bite-sized "Hello World!" code examples.* Crafted for
 comprehension just by reading the code, with added notes for clarity. No abstract
 programming theories.
-* *Simplicity is key here.* My goal is to get you productive ASAP. For in-depth
+* *Simplicity is key.* My goal is to get you productive ASAP. For in-depth
 exploration, there are other resources.
 * *Not a beauty contest.* We're not investing much time in aesthetics. This is
 not a CSS design book.
