@@ -2,6 +2,8 @@ site:
   title: An Elixir, Phoenix and Ash Beginner's Guide
   url: https://elixir-phoenix-ash.com
   start_page: book:index.adoc
+  keys:
+    google_analytics: 'G-B4DB8GLK8G'
 content:
   sources:
   - url: https://github.com/wintermeyer/elixir-phoenix-ash.git
