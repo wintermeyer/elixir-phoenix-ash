@@ -2,7 +2,9 @@
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-Learning /elixir/[Elixir], /phoenix/[Phoenix] and /ash/[Ash] is a
+Learning https://elixir-phoenix-ash.com/elixir/[Elixir],
+https://elixir-phoenix-ash.com/phoenix/[Phoenix] and
+https://elixir-phoenix-ash.com/ash/[Ash] is a
 steep climb. No sugar-coating. This book aims to make that ascent
 less steep. It's a guide crafted for beginners.
 
