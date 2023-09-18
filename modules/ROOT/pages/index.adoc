@@ -2,16 +2,15 @@
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-Embarking on https://ash-hq.org[Ash],
-https://www.phoenixframework.org[Phoenix] and
-https://elixir-lang.org[Elixir] is a steep but exciting climb. No sugar-coating
-here; prepare for a thrilling ride, especially if Elixir is your first
-functional programming language.
+Learning https://elixir-lang.org[Elixir], https://www.phoenixframework.org[Phoenix]
+and https://ash-hq.org[Ash] is a steep climb. No sugar-coating. This book aims
+to make that ascent less steep. It's a guide crafted for beginners.
 
+* *This is a step-by-step guide.* While no prior knowledge is required, a basic
+understanding of programming and HTML will be beneficial.
 * *Expect bite-sized "Hello World!" code examples.* Crafted for
-comprehension just by reading the code, with added notes for clarity. No abstract theories.
-* *This is a step-by-step guide.* No prior knowledge of Phoenix or Elixir needed.
-Just understand the basics of programming and HTML.
+comprehension just by reading the code, with added notes for clarity. No abstract
+programming theories.
 * *Simplicity is key here.* My goal is to get you productive ASAP. For in-depth
 exploration, there are other resources.
 * *Not a beauty contest.* We're not investing much time in aesthetics. This is
@@ -26,7 +25,7 @@ PS: Your feedback is very much appreciated. Please do email me at
 sw@wintermeyer-consulting.de and follow me on Twitter
 https://twitter.com/wintermeyer[@wintermeyer].
 
-== Seeking Help?
+== Seeking more help?
 
 * https://stackoverflow.com[StackOverflow]: A great place to ask https://stackoverflow.com/questions/tagged/elixir[Elixir], https://stackoverflow.com/questions/tagged/phoenix-framework[Phoenix] and https://stackoverflow.com/questions/tagged/ash-framework[Ash] questions.
 * https://www.google.com[Google]: For Phoenix-related queries, add 'Phoenix
@@ -38,7 +37,6 @@ StackOverflow first and include the link in your email.
 [[training]]
 == Elixir, Phoenix and Ash Training
 
-I offer remote and on-site Ash, Phoenix and Elixir beginner's training. No prior
-Elixir knowledge needed. Just basic programming and HTML understanding. Please
-contact me with some information (e.g. group size, location and prefered date)
-at sw@wintermeyer-consulting.de
+I offer remote and on-site Elixir, Phoenix and Ash beginner's training in English
+and German. Please contact me with background information (e.g. group size,
+location and prefered date) at sw@wintermeyer-consulting.de to discuss details.
