@@ -1,0 +1,39 @@
+name: Build and Deploy Antora Site
+
+on:
+  push:
+    branches:
+      - main  # adjust this if your primary branch is named differently
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'  # Antora is known to work well with this version, but you can adjust as needed
+
+    - name: Install Antora
+      run: |
+        npm install -g antora
+
+    - name: Build the Antora site
+      run: |
+        antora --fetch antora-playbook.yml  # Replace 'antora-playbook.yml' with your playbook's name if different
+
+    - name: Deploy to Linux server via SCP
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        SERVER: ${{ secrets.SERVER_ADDRESS }}
+        USERNAME: ${{ secrets.SERVER_USERNAME }}
+        TARGET: ${{ secrets.SERVER_TARGET_DIRECTORY }}
+      run: |
+        echo "$DEPLOY_KEY" > deploy_key
+        chmod 600 deploy_key
+        scp -i deploy_key -r ./build/site/* $USERNAME@$SERVER:$TARGET
+        rm -f deploy_key
