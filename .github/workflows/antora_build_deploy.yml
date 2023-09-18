@@ -32,8 +32,10 @@ jobs:
         SERVER: ${{ secrets.SERVER_ADDRESS }}
         USERNAME: ${{ secrets.SERVER_USERNAME }}
         TARGET: ${{ secrets.SERVER_TARGET_DIRECTORY }}
+        KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_ENTRY }}
       run: |
         echo "$DEPLOY_KEY" > deploy_key
         chmod 600 deploy_key
-        scp -i deploy_key -r ./build/site/* $USERNAME@$SERVER:$TARGET
-        rm -f deploy_key
+        echo "$KNOWN_HOSTS" > known_hosts
+        scp -i deploy_key -o UserKnownHostsFile=known_hosts -r ./build/site/* $USERNAME@$SERVER:$TARGET
+        rm -f deploy_key known_hosts
