@@ -22,6 +22,8 @@ interal API. Please don't think of this as an external WebAPI. Ash
 uses the term API for an internal programming interface. We call
 our API `ToDoList`.
 
+video::tYCL0Rk12no[youtube]
+
 ### Configure the internal API
 
 We have to add the new internal API to the `:ash_apis` in our
