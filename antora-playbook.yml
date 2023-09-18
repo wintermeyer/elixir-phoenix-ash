@@ -1,19 +1,13 @@
 site:
   title: An Elixir, Phoenix and Ash Beginner's Guide
   # the 404 page and sitemap files only get generated when the url property is set
-  url: https://elixir-phoenix-ash.com/
-  start_page: phoenix::index.adoc
+  url: https://elixir-phoenix-ash.com
+  start_page: book::ROOT:index.adoc
 content:
   sources:
-  - url: .
-    edit_url: false
+  - url: https://github.com/wintermeyer/elixir-phoenix-ash.git
     branches: HEAD
 
-  # - url: git@github.com:wintermeyer/phoenix-book.git
-  #   branches: master
-  #   # setting edit_url to false disables the Edit this Page link for any page that originates from this repository
-  #   # the same thing can be achieved by adding empty credentials (i.e., @) in front of the domain in the URL
-  #   edit_url: false
 ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
