@@ -29,6 +29,10 @@ jobs:
       run: |
         antora --fetch antora-playbook.yml  # Replace 'antora-playbook.yml' with your playbook's name if different
 
+    - name: Replace internal index.html links to directories with trailing slash
+        run: |
+          find ./build/site -name "*.html" -exec sed -i 's@href="\([^"]*\)/index.html"@href="\1/"@g' {} \;
+
     - name: Deploy to Linux server via SCP
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
