@@ -2,11 +2,11 @@
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-Learning https://elixir-lang.org[Elixir], https://www.phoenixframework.org[Phoenix]
-and https://ash-hq.org[Ash] is a steep climb. No sugar-coating. This book aims
-to make that ascent less steep. It's a guide crafted for beginners.
+Learning <<elixir, Elixir>>, <<phoenix, Phoenix>> and <<ash, Ash>> is a steep
+climb. No sugar-coating. This book aims to make that ascent less steep.
+It's a guide crafted for beginners.
 
-* *This is a step-by-step guide.* While no prior knowledge is required, a basic
+* *A step-by-step guide.* While no prior knowledge is required, a basic
 understanding of programming and HTML will be beneficial.
 * *Expect bite-sized "Hello World!" code examples.* Crafted for
 comprehension just by reading the code, with added notes for clarity. No abstract

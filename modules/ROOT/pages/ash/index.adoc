@@ -1,22 +1,20 @@
-[[ash_framework]]
+[[ash]]
 = Ash Framework
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-The link:https://ash-hq.org[Ash Framework] is a tool to work with 
-resources which represent your data. It is a set of conventions and 
-rules about how to do that. By using Ash you'll get a lot of 
-functionality for free. A popular example for this are the GraphQL 
-and RESTful JSON APIs. It takes litterly minutes to create them on 
+The link:https://ash-hq.org[Ash Framework] is a tool to work with
+resources which represent your data. It is a set of conventions and
+rules about how to do that. By using Ash you'll get a lot of
+functionality for free. A popular example for this are the GraphQL
+and RESTful JSON APIs. It takes litterly minutes to create them on
 a given Ash project.
 
-We do not build one big monolithic application in this book but use 
-smaller examples to describe features. This has the disadvantage that 
-I have to repeat some boilerplate code in each example. But it has 
-the big advantage that you can easily understand each example without 
-the rest of the book. If a specific feature is of no interest for you 
+We do not build one big monolithic application in this book but use
+smaller examples to describe features. This has the disadvantage that
+I have to repeat some boilerplate code in each example. But it has
+the big advantage that you can easily understand each example without
+the rest of the book. If a specific feature is of no interest for you
 just skip that section.
 
 include::minimal-ash-2x-setup-guide.adoc[]
 include::resource.adoc[]
-
-
