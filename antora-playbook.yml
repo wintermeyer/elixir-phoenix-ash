@@ -1,12 +1,11 @@
 site:
   title: An Elixir, Phoenix and Ash Beginner's Guide
-  # the 404 page and sitemap files only get generated when the url property is set
   url: https://elixir-phoenix-ash.com
   start_page: book::ROOT:index.adoc
 content:
   sources:
   - url: https://github.com/wintermeyer/elixir-phoenix-ash.git
-    branches: HEAD
+    branches: main
 
 ui:
   bundle:

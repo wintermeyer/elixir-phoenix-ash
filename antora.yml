@@ -1,6 +1,6 @@
 name: book
 title: An Elixir, Phoenix and Ash Beginner's Guide
-version: '2.0.0'
+version: main
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/nav.adoc
