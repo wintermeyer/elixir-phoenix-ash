@@ -2,6 +2,9 @@
 # Phoenix LiveView Basics
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
+WARNING: This document may not be up to date with the latest Phoenix/LiveView
+version. I am working on an updated version.
+
 LiveView, according to the
 https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html[documentation],
 "provides rich, real-time user experiences with server-rendered HTML".
@@ -735,4 +738,3 @@ triggers `handle_event/3`.
 Please open your browser at http://localhost:4000/search and give it a try.
 
 image::liveview_airport_search_autocomplete.png[http://localhost:4000/search]
-

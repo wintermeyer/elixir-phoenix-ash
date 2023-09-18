@@ -1,4 +1,4 @@
-[[resource]]
+[[ash-resource]]
 ## Resource
 
 Ash resources are used to model data and define actions which are used

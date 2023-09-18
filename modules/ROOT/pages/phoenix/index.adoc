@@ -1,5 +1,5 @@
 [[phoenix]]
-# Phoenix
+# Phoenix Framework
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Phoenix follows the
