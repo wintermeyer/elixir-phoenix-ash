@@ -21,3 +21,9 @@ IMPORTANT: To bid goodbye to IEx, give `CTRL-C` a double tap or a single `CTRL-\
 TIP: IEx provides autocomplete (just tap `TAB` when you're unsure) and a command
 history (the arrow-up key is your friend).
 
+[NOTE]
+====
+In case you prefer a video tutorial have a look at "IEx Basics in 55 Seconds".
+
+video::TOkD6GxKy6Q[youtube]
+====
