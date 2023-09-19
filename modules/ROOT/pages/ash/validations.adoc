@@ -1,3 +1,4 @@
+[[ash-validations]]
 ## Validations
 
 Validation of user input is a key for a smooth running application.

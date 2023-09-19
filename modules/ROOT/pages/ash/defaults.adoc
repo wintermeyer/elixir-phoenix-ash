@@ -1,3 +1,4 @@
+[[ash-defaults]]
 ## Defaults
 
 Attributes can have default values. Let's add a `is_done` boolean
