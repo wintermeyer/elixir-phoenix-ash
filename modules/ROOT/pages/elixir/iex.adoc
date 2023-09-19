@@ -23,7 +23,8 @@ history (the arrow-up key is your friend).
 
 [NOTE]
 ====
-In case you prefer a video tutorial have a look at "IEx Basics in 55 Seconds".
+If prefer video tutorials have a look at the "IEx Basics in 55 Seconds" video in our
+https://www.youtube.com/@elixir-phoenix-ash[YouTube Channel @elixir-phoenix-ash].
 
-video::TOkD6GxKy6Q[youtube,width=640]
+video::TOkD6GxKy6Q[youtube,width=640,height=360]
 ====

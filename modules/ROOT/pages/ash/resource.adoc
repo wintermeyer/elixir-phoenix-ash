@@ -24,10 +24,12 @@ our API `ToDoList`.
 
 [NOTE]
 ====
-In case you prefer a video tutorial you can watch the basics of this
-section here:
+If prefer video tutorials have a look at the 3 minute video
+"Ash Resource - Create, Read, Update and Destroy" in our
+https://www.youtube.com/@elixir-phoenix-ash[YouTube Channel @elixir-phoenix-ash].
 
-video::tYCL0Rk12no[youtube,width=640]
+
+video::tYCL0Rk12no[youtube,width=640,height=360]
 ====
 
 ### Configure the internal API
