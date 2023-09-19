@@ -21,9 +21,10 @@ IMPORTANT: To bid goodbye to IEx, give `CTRL-C` a double tap or a single `CTRL-\
 TIP: IEx provides autocomplete (just tap `TAB` when you're unsure) and a command
 history (the arrow-up key is your friend).
 
-[NOTE]
+[TIP]
 ====
-If prefer video tutorials have a look at the "IEx Basics in 55 Seconds" video in our
+Do you like video tutorials? Have a look at the "IEx Basics in 55 Seconds" video
+in our
 https://www.youtube.com/@elixir-phoenix-ash[YouTube Channel @elixir-phoenix-ash].
 
 video::TOkD6GxKy6Q[youtube,width=640,height=360]

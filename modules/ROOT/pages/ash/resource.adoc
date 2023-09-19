@@ -22,9 +22,9 @@ interal API. Please don't think of this as an external WebAPI. Ash
 uses the term API for an internal programming interface. We call
 our API `ToDoList`.
 
-[NOTE]
+[TIP]
 ====
-If prefer video tutorials have a look at the 3 minute video
+Do you like video tutorials? Have a look at the 3 minute video
 "Ash Resource - Create, Read, Update and Destroy" in our
 https://www.youtube.com/@elixir-phoenix-ash[YouTube Channel @elixir-phoenix-ash].
 
