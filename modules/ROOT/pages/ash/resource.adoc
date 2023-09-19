@@ -26,7 +26,7 @@ our API `ToDoList`.
 ====
 Do you like video tutorials? Have a look at the 3 minute video
 "Ash Resource - Create, Read, Update and Destroy" in our
-https://www.youtube.com/@elixir-phoenix-ash[YouTube Channel @elixir-phoenix-ash].
+https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
 
 
 video::tYCL0Rk12no[youtube,width=640,height=360]
