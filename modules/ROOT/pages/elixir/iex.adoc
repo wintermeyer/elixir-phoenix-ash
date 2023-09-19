@@ -25,5 +25,5 @@ history (the arrow-up key is your friend).
 ====
 In case you prefer a video tutorial have a look at "IEx Basics in 55 Seconds".
 
-video::TOkD6GxKy6Q[youtube]
+video::TOkD6GxKy6Q[youtube,width=640]
 ====

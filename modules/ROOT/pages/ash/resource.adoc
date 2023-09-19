@@ -27,7 +27,7 @@ our API `ToDoList`.
 In case you prefer a video tutorial you can watch the basics of this
 section here:
 
-video::tYCL0Rk12no[youtube]
+video::tYCL0Rk12no[youtube,width=640]
 ====
 
 ### Configure the internal API
