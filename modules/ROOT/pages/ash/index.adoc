@@ -18,3 +18,5 @@ just skip that section.
 
 include::minimal-ash-2x-setup-guide.adoc[]
 include::resource.adoc[]
+include::validations.adoc[]
+include::defaults.adoc[]

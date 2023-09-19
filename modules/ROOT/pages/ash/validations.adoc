@@ -1,0 +1,124 @@
+## Validations
+
+Validation of user input is a key for a smooth running application.
+Otherwise we end up with faulty datasets in our database. For our
+example we will add one validation for `content` to make sure that
+content will always have a length between 1 and 255 characters. And we
+add an other attribute `priority` which is an integer and has to be
+either `nil` or between 1 and 3.
+
+[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+----
+defmodule App.ToDoList.Task do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+
+    attribute :content, :string do
+      allow_nil? false
+      constraints min_length: 1, max_length: 255
+    end
+
+    attribute :priority, :integer do
+      allow_nil? true
+      constraints min: 1, max: 3
+    end
+  end
+
+  actions do
+    defaults [:create]
+  end
+
+  code_interface do
+    define_for App.ToDoList
+    define :create
+  end
+end
+----
+
+Let's try to create a new task with no content. I use `Task.create!/1`
+and `Task.create/1` to show the different output of each function.
+
+```elixir
+$ iex -S mix
+Compiling 2 files (.ex)
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> App.ToDoList.Task.create()
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.Required{
+       field: :content,
+       type: :attribute,
+       resource: App.ToDoList.Task,
+       changeset: nil,
+       query: nil,
+       error_context: [],
+       vars: [],
+       path: [],
+       stacktrace: #Stacktrace<>,
+       class: :invalid
+     }
+   ],
+   stacktraces?: true,
+   changeset: #Ash.Changeset<
+     api: App.ToDoList,
+     action_type: :create,
+     action: :create,
+     attributes: %{},
+     relationships: %{},
+     errors: [
+       %Ash.Error.Changes.Required{
+         field: :content,
+         type: :attribute,
+         resource: App.ToDoList.Task,
+         changeset: nil,
+         query: nil,
+         error_context: [],
+         vars: [],
+         path: [],
+         stacktrace: #Stacktrace<>,
+         class: :invalid
+       }
+     ],
+     data: #App.ToDoList.Task<
+       __meta__: #Ecto.Schema.Metadata<:built, "">,
+       id: nil,
+       content: nil,
+       priority: nil,
+       ...
+     >,
+     valid?: false
+   >,
+   query: nil,
+   error_context: [nil],
+   vars: [],
+   path: [],
+   stacktrace: #Stacktrace<>,
+   class: :invalid
+ }}
+iex(2)> App.ToDoList.Task.create!()
+** (Ash.Error.Invalid) Input Invalid
+
+* attribute content is required
+    (ash 2.14.16) lib/ash/api/api.ex:2169: Ash.Api.unwrap_or_raise!/3
+iex(2)>
+```
+
+Now let's see what happens when we try to create a task with a valid
+`content` but with a `priority` which is not between 1 and 3.
+
+```elixir
+iex(2)> App.ToDoList.Task.create!(%{content: "Mown the lawn", priority: 10})
+** (Ash.Error.Invalid) Input Invalid
+
+* Invalid value provided for priority: must be less than or equal to 3.
+
+10
+
+    (ash 2.14.16) lib/ash/api/api.ex:2169: Ash.Api.unwrap_or_raise!/3
+iex(3)>
+```
