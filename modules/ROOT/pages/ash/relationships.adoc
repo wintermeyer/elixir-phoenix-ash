@@ -166,7 +166,11 @@ iex(3)> fruits = Category.create!(%{name: "Fruits"}) <2>
   name: "Fruits",
   ...
 >
-iex(4)> orange = Product.create!(%{name: "Orange", price: 0.15, category_id: fruits.id}) <3>
+iex(4)> orange = Product.create!(%{
+                   name: "Orange",
+                   price: 0.15,
+                   category_id: fruits.id
+                 }) <3>
 #App.Shop.Product<
   category: #Ash.NotLoaded<:relationship>,
   __meta__: #Ecto.Schema.Metadata<:loaded>,
@@ -192,7 +196,7 @@ iex(5)> App.Shop.load(orange, :category) <4>
    category_id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
    ...
  >}
-iex(6)> second_orange = Product.by_name!("Orange", load: [:category])
+iex(6)> orange2 = Product.by_name!("Orange", load: [:category])
 #App.Shop.Product<
   category: #App.Shop.Category<
     __meta__: #Ecto.Schema.Metadata<:loaded>,
@@ -207,14 +211,14 @@ iex(6)> second_orange = Product.by_name!("Orange", load: [:category])
   category_id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
   ...
 >
-iex(7)> second_orange.category
+iex(7)> orange2.category
 #App.Shop.Category<
   __meta__: #Ecto.Schema.Metadata<:loaded>,
   id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
   name: "Fruits",
   ...
 >
-iex(8)> second_orange.category.name
+iex(8)> orange2.category.name
 "Fruits"
 ```
 
