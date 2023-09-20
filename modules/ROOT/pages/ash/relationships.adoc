@@ -555,11 +555,21 @@ defmodule App.Shop.Tag do
   end
 
   relationships do
-    many_to_many :products, App.Shop.Product, through: App.Shop.ProductTag
+    many_to_many :products, App.Shop.Product do
+      through App.Shop.ProductTag
+      source_attribute_on_join_resource :tag_id
+      destination_attribute_on_join_resource :product_id
+    end
   end
 
   actions do
-    defaults [:create, :read, :update, :destroy]
+    defaults [:read, :update, :destroy]
+
+    create :create do
+      primary? true
+      argument :products, {:array, :map}
+      change manage_relationship(:products, type: :append_and_remove, on_no_match: :create)
+    end
   end
 
   code_interface do
@@ -610,14 +620,20 @@ defmodule App.Shop.Product do
 
   relationships do
     many_to_many :tags, App.Shop.Tag do
-      through: App.Shop.ProductTag
+      through App.Shop.ProductTag
       source_attribute_on_join_resource :product_id
       destination_attribute_on_join_resource :tag_id
     end
   end
 
   actions do
-    defaults [:create, :read, :update, :destroy]
+    defaults [:read, :update, :destroy]
+
+    create :create do
+      primary? true
+      argument :tags, {:array, :map}
+      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+    end
   end
 
   code_interface do
