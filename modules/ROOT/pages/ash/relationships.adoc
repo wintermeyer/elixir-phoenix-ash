@@ -257,6 +257,7 @@ defmodule App.Shop.Category do
     define :create
     define :read
     define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
     define :update
     define :destroy
   end
@@ -269,6 +270,126 @@ example, a `Category` has many `Products`. For that to work we need a
 and destination_attribute defaults to <snake_cased_last_part_of_module_name>_id.
 To override those defaults have a look at
 https://hexdocs.pm/ash/relationships.html and https://ash-hq.org/docs/dsl/ash-resource#relationships-has_many
+
+Let's play with the new relationship:
+
+```elixir
+ iex -S mix
+Compiling 1 file (.ex)
+Erlang/OTP 26 [erts-14.0.2] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [jit]
+
+Interactive Elixir (1.15.5) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> alias App.Shop.Product
+App.Shop.Product
+iex(2)> alias App.Shop.Category
+App.Shop.Category
+iex(3)> fruits = Category.create!(%{name: "Fruits"}) <1>
+#App.Shop.Category<
+  products: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+  name: "Fruits",
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+iex(4)> Product.create!(%{name: "Orange", category_id: fruits.id}) <2>
+#App.Shop.Product<
+  category: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "3ec1c834-70a8-403d-8814-3070c77b525e",
+  name: "Orange",
+  price: nil,
+  category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+iex(5)> Product.create!(%{name: "Banana", category_id: fruits.id})
+#App.Shop.Product<
+  category: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "460d8cfa-2dad-4da0-95db-45012aa33621",
+  name: "Banana",
+  price: nil,
+  category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+iex(6)> App.Shop.load(fruits, :products) <3>
+{:ok,
+ #App.Shop.Category<
+   products: [
+     #App.Shop.Product<
+       category: #Ash.NotLoaded<:relationship>,
+       __meta__: #Ecto.Schema.Metadata<:loaded>,
+       id: "3ec1c834-70a8-403d-8814-3070c77b525e",
+       name: "Orange",
+       price: nil,
+       category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+       aggregates: %{},
+       calculations: %{},
+       ...
+     >,
+     #App.Shop.Product<
+       category: #Ash.NotLoaded<:relationship>,
+       __meta__: #Ecto.Schema.Metadata<:loaded>,
+       id: "460d8cfa-2dad-4da0-95db-45012aa33621",
+       name: "Banana",
+       price: nil,
+       category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+       aggregates: %{},
+       calculations: %{},
+       ...
+     >
+   ],
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+   name: "Fruits",
+   aggregates: %{},
+   calculations: %{},
+   ...
+ >}
+iex(7)> Category.by_name!("Fruits", load: [:products]) <4>
+#App.Shop.Category<
+  products: [
+    #App.Shop.Product<
+      category: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "3ec1c834-70a8-403d-8814-3070c77b525e",
+      name: "Orange",
+      price: nil,
+      category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+      aggregates: %{},
+      calculations: %{},
+      ...
+    >,
+    #App.Shop.Product<
+      category: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "460d8cfa-2dad-4da0-95db-45012aa33621",
+      name: "Banana",
+      price: nil,
+      category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+      aggregates: %{},
+      calculations: %{},
+      ...
+    >
+  ],
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+  name: "Fruits",
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+```
+
+<1> We create a category for fruits.
+<2> We create two products and assign them to the fruits category.
+<3> We load the products for the fruits category.
+<4> We sideload all the products for the fruits category.
 
 [[ash-has_one]]
 ### has_one
