@@ -2,14 +2,24 @@
 = Ash Framework
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-The link:https://ash-hq.org[Ash Framework] is a tool to work with
-resources which represent your data. It is a set of conventions and
-rules about how to do that. By using Ash you'll get a lot of
-functionality for free. A popular example for this are the GraphQL
-and RESTful JSON APIs. It takes litterly minutes to create them on
-a given Ash project.
+The link:https://ash-hq.org[Ash Framework] is currently the most
+powerful and productive set of tools in the Phoenix ecosystem for developers.
+I wrote this book to have written material for my beginner's
+training (please write me an email to sw@wintermeyer-consulting.de if you are
+interested in a training). But sharing is caring so I decided to make most
+of it available online too.
 
-We do not build one big monolithic application in this book but use
+The Ash Framework does offer a lot of documentation and a vibrant
+community which is ready to help on link:https://discord.gg/elixir[Discord].
+But Discord is not everyone's cup of tea (some companies don't allow
+the usage at all) and the official documentation is often a bit too theoretical.
+
+This beginner's book provides small copy-and-pastable examples. In addition
+I publish short tutorial videos - without sound so that you can watch them in
+the office too - on the
+link:https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube channel].
+
+I do not build one big monolithic application in this book but use
 smaller examples to describe features. This has the disadvantage that
 I have to repeat some boilerplate code in each example. But it has
 the big advantage that you can easily understand each example without
