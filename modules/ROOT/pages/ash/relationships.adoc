@@ -496,7 +496,11 @@ $ iex -S mix
 Erlang/OTP 26 [...]
 
 Interactive Elixir (1.15.5) [...]
-iex(1)> orange = App.Shop.Product.create!(%{name: "Orange", price: 0.2})
+iex(1)> alias App.Shop.Product
+App.Shop.Product
+iex(2)> alias App.Shop.Promotion
+App.Shop.Promotion
+iex(3)> orange = Product.create!(%{name: "Orange", price: 0.2})
 #App.Shop.Product<
   promotion: #Ash.NotLoaded<:relationship>,
   category: #Ash.NotLoaded<:relationship>,
@@ -507,7 +511,7 @@ iex(1)> orange = App.Shop.Product.create!(%{name: "Orange", price: 0.2})
   category_id: nil,
   ...
 >
-iex(2)> {:ok, promotion} = App.Shop.Promotion.create(%{name: "15% off", rebate: 15, product_id: orange.id})
+iex(4)> {:ok, promotion} = Promotion.create(%{name: "15% off", rebate: 15, product_id: orange.id})
 {:ok,
  #App.Shop.Promotion<
    product: #Ash.NotLoaded<:relationship>,
@@ -518,7 +522,7 @@ iex(2)> {:ok, promotion} = App.Shop.Promotion.create(%{name: "15% off", rebate: 
    product_id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
    ...
  >}
-iex(3)> App.Shop.load(orange, :promotion) <1>
+iex(5)> App.Shop.load(orange, :promotion) <1>
 {:ok,
  #App.Shop.Product<
    promotion: #App.Shop.Promotion<
@@ -541,4 +545,4 @@ iex(3)> App.Shop.load(orange, :promotion) <1>
 ```
 
 <1> By default the promotion is not sideloaded. We have to load it manually.
-<2> This is the way to sideload relationships.
+<2> This is the way to sideload the promotion relationship.
