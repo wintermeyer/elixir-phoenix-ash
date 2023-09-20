@@ -1,7 +1,8 @@
 [[ash-relationships]]
 ## Relationships
 
-Relationships define connections between resources.
+Relationships define connections between resources. In any application this
+is the bread and butter of the data modeling.
 
 ### Setup
 
@@ -49,6 +50,7 @@ defmodule App.Shop.Product do
     define :create
     define :read
     define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
     define :update
     define :destroy
   end
@@ -81,6 +83,7 @@ defmodule App.Shop.Category do
     define :create
     define :read
     define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
     define :update
     define :destroy
   end
@@ -130,6 +133,7 @@ defmodule App.Shop.Product do
     define :create
     define :read
     define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
     define :update
     define :destroy
   end
@@ -144,7 +148,81 @@ https://hexdocs.pm/ash/relationships.html and https://ash-hq.org/docs/dsl/ash-re
 <3> By default the attribute `category_id` is not writable (see https://ash-hq.org/docs/dsl/ash-resource#relationships-belongs_to-attribute_writable-).
 To make it writable we need to set `attribute_writable?` to `true`. Only than we can create a `Product` with a `Category` in on call.
 
-[[ash-has_one]]
+```elixir
+$ iex -S mix
+Compiling 3 files (.ex)
+Generated app app
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> alias App.Shop.Product <1>
+App.Shop.Product
+iex(2)> alias App.Shop.Category
+App.Shop.Category
+iex(3)> fruits = Category.create!(%{name: "Fruits"}) <2>
+#App.Shop.Category<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
+  name: "Fruits",
+  ...
+>
+iex(4)> orange = Product.create!(%{name: "Orange", price: 0.15, category_id: fruits.id}) <3>
+#App.Shop.Product<
+  category: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "6870b44b-67ed-4186-97ed-bbfffd1fc2a0",
+  name: "Orange",
+  price: Decimal.new("0.15"),
+  category_id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
+  ...
+>
+iex(5)> App.Shop.load(orange, :category) <4>
+{:ok,
+ #App.Shop.Product<
+   category: #App.Shop.Category<
+     __meta__: #Ecto.Schema.Metadata<:loaded>,
+     id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
+     name: "Fruits",
+     ...
+   >,
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "6870b44b-67ed-4186-97ed-bbfffd1fc2a0",
+   name: "Orange",
+   price: Decimal.new("0.15"),
+   category_id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
+   ...
+ >}
+iex(6)> second_orange = Product.by_name!("Orange", load: [:category])
+#App.Shop.Product<
+  category: #App.Shop.Category<
+    __meta__: #Ecto.Schema.Metadata<:loaded>,
+    id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
+    name: "Fruits",
+    ...
+  >,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "6870b44b-67ed-4186-97ed-bbfffd1fc2a0",
+  name: "Orange",
+  price: Decimal.new("0.15"),
+  category_id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
+  ...
+>
+iex(7)> second_orange.category
+#App.Shop.Category<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
+  name: "Fruits",
+  ...
+>
+iex(8)> second_orange.category.name
+"Fruits"
+```
+
+<1> Let's save a bit of typing by creating shorter Aliases.
+<2> Create a new `Category` for "Fruits" and store it in the variable `fruits`.
+<3> Create a new `Product` for "Orange" which belongs to the `Category` "Fruits" and store it in the variable `orange`.
+<4> One way to get the `Category` of a `Product` if that wasn't sideloaded initially.
+<5> Sideload the `Category` of the `Product` when fetching The `Product from the database.
 
 [[ash-has_many]]
 ### has_many
@@ -290,9 +368,9 @@ Let's use it in the `iex` console:
 
 ```elixir
 $ iex -S mix
-Erlang/OTP 26 [erts-14.0.2] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [jit]
+Erlang/OTP 26 [...]
 
-Interactive Elixir (1.15.5) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.15.5) [...]
 iex(1)> orange = App.Shop.Product.create!(%{name: "Orange", price: 0.2})
 #App.Shop.Product<
   promotion: #Ash.NotLoaded<:relationship>,
@@ -302,8 +380,6 @@ iex(1)> orange = App.Shop.Product.create!(%{name: "Orange", price: 0.2})
   name: "Orange",
   price: Decimal.new("0.2"),
   category_id: nil,
-  aggregates: %{},
-  calculations: %{},
   ...
 >
 iex(2)> {:ok, promotion} = App.Shop.Promotion.create(%{name: "15% off", rebate: 15, product_id: orange.id})
@@ -315,8 +391,6 @@ iex(2)> {:ok, promotion} = App.Shop.Promotion.create(%{name: "15% off", rebate: 
    name: "15% off",
    rebate: 15,
    product_id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
-   aggregates: %{},
-   calculations: %{},
    ...
  >}
 iex(3)> App.Shop.load(orange, :promotion) <1>
@@ -329,8 +403,6 @@ iex(3)> App.Shop.load(orange, :promotion) <1>
      name: "15% off",
      rebate: 15,
      product_id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
-     aggregates: %{},
-     calculations: %{},
      ...
    >,
    category: #Ash.NotLoaded<:relationship>,
@@ -339,11 +411,9 @@ iex(3)> App.Shop.load(orange, :promotion) <1>
    name: "Orange",
    price: Decimal.new("0.2"),
    category_id: nil,
-   aggregates: %{},
-   calculations: %{},
    ...
  >}
-iex(4)>
 ```
 
-<1> By default the promotion is not autoloaded. We have to load it manually.
+<1> By default the promotion is not sideloaded. We have to load it manually.
+<2> This is the way to sideload relationships.
