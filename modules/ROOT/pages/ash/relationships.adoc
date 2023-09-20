@@ -276,9 +276,9 @@ Let's play with the new relationship:
 ```elixir
  iex -S mix
 Compiling 1 file (.ex)
-Erlang/OTP 26 [erts-14.0.2] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [jit]
+Erlang/OTP 26 [...]
 
-Interactive Elixir (1.15.5) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.15.5) [...]
 iex(1)> alias App.Shop.Product
 App.Shop.Product
 iex(2)> alias App.Shop.Category
@@ -289,8 +289,6 @@ iex(3)> fruits = Category.create!(%{name: "Fruits"}) <1>
   __meta__: #Ecto.Schema.Metadata<:loaded>,
   id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
   name: "Fruits",
-  aggregates: %{},
-  calculations: %{},
   ...
 >
 iex(4)> Product.create!(%{name: "Orange", category_id: fruits.id}) <2>
@@ -301,8 +299,6 @@ iex(4)> Product.create!(%{name: "Orange", category_id: fruits.id}) <2>
   name: "Orange",
   price: nil,
   category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
-  aggregates: %{},
-  calculations: %{},
   ...
 >
 iex(5)> Product.create!(%{name: "Banana", category_id: fruits.id})
@@ -313,8 +309,6 @@ iex(5)> Product.create!(%{name: "Banana", category_id: fruits.id})
   name: "Banana",
   price: nil,
   category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
-  aggregates: %{},
-  calculations: %{},
   ...
 >
 iex(6)> App.Shop.load(fruits, :products) <3>
@@ -361,8 +355,6 @@ iex(7)> Category.by_name!("Fruits", load: [:products]) <4>
       name: "Orange",
       price: nil,
       category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
-      aggregates: %{},
-      calculations: %{},
       ...
     >,
     #App.Shop.Product<
@@ -372,16 +364,12 @@ iex(7)> Category.by_name!("Fruits", load: [:products]) <4>
       name: "Banana",
       price: nil,
       category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
-      aggregates: %{},
-      calculations: %{},
       ...
     >
   ],
   __meta__: #Ecto.Schema.Metadata<:loaded>,
   id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
   name: "Fruits",
-  aggregates: %{},
-  calculations: %{},
   ...
 >
 ```
@@ -444,6 +432,7 @@ defmodule App.Shop.Promotion do
     define :create
     define :read
     define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
     define :update
     define :destroy
   end
@@ -470,12 +459,7 @@ defmodule App.Shop.Product do
   end
 
   actions do
-    defaults [:read, :update, :destroy]
-
-    create :create do
-      argument :category_id, :uuid
-      change manage_relationship(:category_id, :category, type: :append_and_remove)
-    end
+    defaults [:create, :read, :update, :destroy]
   end
 
   code_interface do
@@ -483,6 +467,7 @@ defmodule App.Shop.Product do
     define :create
     define :read
     define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
     define :update
     define :destroy
   end
@@ -546,3 +531,207 @@ iex(5)> App.Shop.load(orange, :promotion) <1>
 
 <1> By default the promotion is not sideloaded. We have to load it manually.
 <2> This is the way to sideload the promotion relationship.
+
+[[ash-many_to_many]]
+### many_to_many
+
+`many_to_many` is a special case of `has_many` where the relationship is
+symmetric. That means that the relationship is defined on both sides of the
+relationship. A good example is a `Tag` Resource that can be assigned to
+multiple `Product` Resources and a `Product` Resource can have multiple `Tag`
+Resources assigned to it.
+
+For this to work we not just need a `Tag` resource but also a `ProductTag`
+which is the join table between `Tag` and `Product`.
+
+[source,elixir,title='lib/app/shop/resources/tag.ex']
+----
+defmodule App.Shop.Tag do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+  end
+
+  relationships do
+    many_to_many :products, App.Shop.Product, through: App.Shop.ProductTag
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop/resources/product_tag.ex']
+----
+defmodule App.Shop.ProductTag do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  relationships do
+    belongs_to :product, App.Shop.Product do
+      primary_key? true
+      allow_nil? false
+    end
+
+    belongs_to :tag, App.Shop.Tag do
+      primary_key? true
+      allow_nil? false
+    end
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  relationships do
+    many_to_many :tags, App.Shop.Tag do
+      through: App.Shop.ProductTag
+      source_attribute_on_join_resource :product_id
+      destination_attribute_on_join_resource :tag_id
+    end
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Api
+
+  resources do
+    resource App.Shop.Product
+    resource App.Shop.ProductTag
+    resource App.Shop.Tag
+  end
+end
+----
+
+Let's use it in the `iex` console:
+
+```elixir
+$ iex -S mix
+Compiling 3 files (.ex)
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> good_deal_tag = App.Shop.Tag.create!(%{name: "Good deal"}) <1>
+#App.Shop.Tag<
+  products: #Ash.NotLoaded<:relationship>,
+  products_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "82b7e8af-69b9-4f35-b32a-0b6b2bed1d15",
+  name: "Good deal",
+  ...
+>
+iex(2)> yellow_tag = App.Shop.Tag.create!(%{name: "Yellow"}) <2>
+#App.Shop.Tag<
+  products: #Ash.NotLoaded<:relationship>,
+  products_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "d04aa5ef-195e-4dd8-9c5a-5c73e6f44afe",
+  name: "Yellow",
+  ...
+>
+iex(3)> App.Shop.Product.create!(%{
+            name: "Banana",
+            tags: [good_deal_tag, yellow_tag]
+            }) <3>
+#App.Shop.Product<
+  tags: [
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "82b7e8af-69b9-4f35-b32a-0b6b2bed1d15",
+      name: "Good deal",
+      ...
+    >,
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "d04aa5ef-195e-4dd8-9c5a-5c73e6f44afe",
+      name: "Yellow",
+      ...
+    >
+  ],
+  tags_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "d3551abf-cf43-4c7f-94f1-ea7228d87cf1",
+  name: "Banana",
+  price: nil,
+  ...
+>
+iex(4)> App.Shop.Product.by_name!("Banana", load: [:tags]) <4>
+#App.Shop.Product<
+  tags: [
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "82b7e8af-69b9-4f35-b32a-0b6b2bed1d15",
+      name: "Good deal",
+      ...
+    >,
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "d04aa5ef-195e-4dd8-9c5a-5c73e6f44afe",
+      name: "Yellow",
+      ...
+    >
+  ],
+  ...
+  ],
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "d3551abf-cf43-4c7f-94f1-ea7228d87cf1",
+  name: "Banana",
+  price: nil,
+  ...
+>
+```
+
+<1> Create a tag named "Good deal".
+<2> Create a tag named "Yellow".
+<3> Create a product named "Banana" and associate it with the two tags.
+<4> Retrieve the product by name and sideload its tags.
