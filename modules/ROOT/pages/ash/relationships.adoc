@@ -1,0 +1,349 @@
+[[ash-relationships]]
+## Relationships
+
+Relationships define connections between resources.
+
+### Setup
+
+We discuss relationships in the context of a simple online shop. Please
+use <<minimal-ash-2x-setup-guide, Minimal Ash 2.x Setup Guide>> to generate
+a new Elixir application. After that include or adapt the following files for a
+`Product` resource:
+
+[source,elixir,title='config/config.exs']
+----
+import Config
+
+config :ash, :use_all_identities_in_manage_relationship?, false
+config :app, :ash_apis, [App.Shop]
+----
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Api
+
+  resources do
+    resource App.Shop.Product
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+[[ash-belongs-to]]
+### belongs_to
+
+The `belongs_to` macro defines a relationship between two resources. In our
+example, a `Product` belongs to a `Category`. For that to work we need a
+`Category` resource:
+
+[source,elixir,title='lib/app/shop/resources/category.ex']
+----
+defmodule App.Shop.Category do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+And we need to add it to the internal API:
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Api
+
+  resources do
+    resource App.Shop.Product
+    resource App.Shop.Category
+  end
+end
+----
+
+To configure the `belongs_to` relationship to `Category` we add one
+line to the `Product` resource:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  relationships do <1>
+    belongs_to :category, App.Shop.Category do <2>
+      attribute_writable? true <3>
+    end
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> The `relationships` macro defines relationships between resources.
+<2> The source_attribute is defined as :<relationship_name>_id of
+the type :uuid on the source resource and the destination_attribute
+is assumed to be :id. To override those defaults have a look at
+https://hexdocs.pm/ash/relationships.html and https://ash-hq.org/docs/dsl/ash-resource#relationships-belongs_to
+<3> By default the attribute `category_id` is not writable (see https://ash-hq.org/docs/dsl/ash-resource#relationships-belongs_to-attribute_writable-).
+To make it writable we need to set `attribute_writable?` to `true`. Only than we can create a `Product` with a `Category` in on call.
+
+[[ash-has_one]]
+
+[[ash-has_many]]
+### has_many
+
+Using the <<ash-belongs_to, belongs_to>> example and setup we can now add a
+`has_many` relationship to the `Category` resource:
+
+[source,elixir,title='lib/app/shop/resources/category.ex']
+----
+defmodule App.Shop.Category do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+  end
+
+  relationships do
+    has_many :products, App.Shop.Product <1>
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> The `has_many` macro defines a relationship between two resources. In our
+example, a `Category` has many `Products`. For that to work we need a
+`Product` resource. By default, the source_attribute is assumed to be `:id`
+and destination_attribute defaults to <snake_cased_last_part_of_module_name>_id.
+To override those defaults have a look at
+https://hexdocs.pm/ash/relationships.html and https://ash-hq.org/docs/dsl/ash-resource#relationships-has_many
+
+[[ash-has_one]]
+### has_one
+
+NOTE: I do not know if I ever used `has_one` in a real world application. But
+for the sake of completeness, I pull out an example out of thin air for this.
+
+`has_one` is similar to `belongs_to` except that the reference attribute is
+on the destination resource, instead of the source.
+
+Let's assume we run special promotions in our shop (so and so many percent
+rebate off). But each product can only have one promotion and each promotion
+can only be used for one product. I know! It is just an example for `has_one`.
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Api
+
+  resources do
+    resource App.Shop.Product
+    resource App.Shop.Category
+    resource App.Shop.Promotion
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop/resources/promotion.ex']
+----
+defmodule App.Shop.Promotion do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :rebate, :integer
+    attribute :product_id, :uuid
+  end
+
+  relationships do
+    belongs_to :product, App.Shop.Product do
+      attribute_writable? true
+    end
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  relationships do
+    belongs_to :category, App.Shop.Category do
+      attribute_writable? true
+    end
+
+    has_one :promotion, App.Shop.Promotion
+  end
+
+  actions do
+    defaults [:read, :update, :destroy]
+
+    create :create do
+      argument :category_id, :uuid
+      change manage_relationship(:category_id, :category, type: :append_and_remove)
+    end
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+Let's use it in the `iex` console:
+
+```elixir
+$ iex -S mix
+Erlang/OTP 26 [erts-14.0.2] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [jit]
+
+Interactive Elixir (1.15.5) - press Ctrl+C to exit (type h() ENTER for help)
+iex(1)> orange = App.Shop.Product.create!(%{name: "Orange", price: 0.2})
+#App.Shop.Product<
+  promotion: #Ash.NotLoaded<:relationship>,
+  category: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
+  name: "Orange",
+  price: Decimal.new("0.2"),
+  category_id: nil,
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+iex(2)> {:ok, promotion} = App.Shop.Promotion.create(%{name: "15% off", rebate: 15, product_id: orange.id})
+{:ok,
+ #App.Shop.Promotion<
+   product: #Ash.NotLoaded<:relationship>,
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "68901cef-f2c5-46bb-a737-d6c248d36347",
+   name: "15% off",
+   rebate: 15,
+   product_id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
+   aggregates: %{},
+   calculations: %{},
+   ...
+ >}
+iex(3)> App.Shop.load(orange, :promotion) <1>
+{:ok,
+ #App.Shop.Product<
+   promotion: #App.Shop.Promotion<
+     product: #Ash.NotLoaded<:relationship>,
+     __meta__: #Ecto.Schema.Metadata<:loaded>,
+     id: "68901cef-f2c5-46bb-a737-d6c248d36347",
+     name: "15% off",
+     rebate: 15,
+     product_id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
+     aggregates: %{},
+     calculations: %{},
+     ...
+   >,
+   category: #Ash.NotLoaded<:relationship>,
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
+   name: "Orange",
+   price: Decimal.new("0.2"),
+   category_id: nil,
+   aggregates: %{},
+   calculations: %{},
+   ...
+ >}
+iex(4)>
+```
+
+<1> By default the promotion is not autoloaded. We have to load it manually.

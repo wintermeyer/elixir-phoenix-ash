@@ -35,3 +35,4 @@
 ** xref:ash/resource.adoc[Resource]
 ** xref:ash/validations.adoc[Validations]
 ** xref:ash/defaults.adoc[Defaults]
+** xref:ash/relationships.adoc[Relationships]

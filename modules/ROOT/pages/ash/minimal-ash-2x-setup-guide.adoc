@@ -44,7 +44,8 @@ the file `.formatter.exs` to include the Ash formatter:
 [source,elixir,title='.formatter.exs']
 ----
 [
-  import_deps: [:ash], # <-- add this line
+  # add the next line
+  import_deps: [:ash],
   inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
 ]
 ----
