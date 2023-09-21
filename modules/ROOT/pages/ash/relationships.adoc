@@ -60,9 +60,20 @@ end
 [[ash-belongs-to]]
 ### belongs_to
 
-The `belongs_to` macro defines a relationship between two resources. In our
-example, a `Product` belongs to a `Category`. For that to work we need a
-`Category` resource:
+The `belongs_to` macro defines a relationship between two resources.
+
+[TIP]
+====
+Do you like video tutorials? Have a look at the video tutorial
+"belongs_to in 2 minutes" in our
+https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
+
+
+video::lP8YtkXD3RE[youtube,width=640,height=360]
+====
+
+In our shop example, a `Product` belongs to a `Category`.
+For that to work we need a new `Category` resource:
 
 [source,elixir,title='lib/app/shop/resources/category.ex']
 ----
