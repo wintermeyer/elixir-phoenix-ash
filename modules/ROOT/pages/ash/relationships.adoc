@@ -57,7 +57,7 @@ defmodule App.Shop.Product do
 end
 ----
 
-[[ash-belongs-to]]
+[[ash-belongs_to]]
 ### belongs_to
 
 The `belongs_to` macro defines a relationship between two resources.
