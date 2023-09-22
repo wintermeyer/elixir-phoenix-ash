@@ -239,7 +239,7 @@ iex(8)> orange2.category.name
 <4> One way to get the `Category` of a `Product` if that wasn't sideloaded initially.
 <5> Sideload the `Category` of the `Product` when fetching The `Product from the database.
 
-#### Sideload a Relationship by Default
+#### Sideload a belongs_to Relationship by Default
 
 In case you always want to sideload the `Category` of the `Product` without adding
 `load: [:category]` to every call you can do the following:
@@ -401,8 +401,6 @@ iex(6)> App.Shop.load(fruits, :products) <3>
        name: "Orange",
        price: nil,
        category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
-       aggregates: %{},
-       calculations: %{},
        ...
      >,
      #App.Shop.Product<
@@ -412,8 +410,6 @@ iex(6)> App.Shop.load(fruits, :products) <3>
        name: "Banana",
        price: nil,
        category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
-       aggregates: %{},
-       calculations: %{},
        ...
      >
    ],
@@ -453,10 +449,61 @@ iex(7)> Category.by_name!("Fruits", load: [:products]) <4>
 >
 ```
 
-<1> We create a category for fruits.
-<2> We create two products and assign them to the fruits category.
-<3> We load the products for the fruits category.
-<4> We sideload all the products for the fruits category.
+<1> Create a category for fruits.
+<2> Create two products and assign them to the fruits category.
+<3> Load the products for the fruits category.
+<4> Sideload all the products for the fruits category.
+
+#### Sideload a has_many Relationship by Default
+
+In case you always want to sideload all `products` of a `category` without
+adding `load: [:category]` to every call you can do the following:
+
+[source,elixir,title='lib/app/shop/resources/category.ex']
+----
+defmodule App.Shop.Category do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+  end
+
+  relationships do
+    has_many :products, App.Shop.Product
+  end
+
+  actions do
+    defaults [:create, :update, :destroy] <1>
+
+    read :read do
+      primary? true <2>
+      prepare build(load: [:products]) <3>
+    end
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> Don't forget to remove `:read` from the defaults when you add a custom `read` action.
+<2> See https://ash-hq.org/docs/guides/ash/latest/topics/actions#primary-actions
+<3> Always sideload all `products` when fetching a `Category`.
+
+Let's test it in the iex:
+
+```elixir
+iex(17)> Category.by_name!("Fruits").products |> Enum.map(& &1.name)
+["Orange", "Banana"]
+```
 
 [[ash-has_one]]
 ### has_one
