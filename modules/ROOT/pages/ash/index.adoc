@@ -4,8 +4,9 @@ Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 The link:https://ash-hq.org[Ash Framework] is currently the most
 powerful and productive set of tools in the Phoenix ecosystem for developers.
-I wrote this book to have written material for my beginner's
-training (please write me an email to sw@wintermeyer-consulting.de if you are
+I wrote this book to have written material for beginner's
+training I offer (shameless plug: please write me an email to
+sw@wintermeyer-consulting.de if you are
 interested in a training). But sharing is caring so I decided to make most
 of it available online too.
 
@@ -25,6 +26,13 @@ I have to repeat some boilerplate code in each example. But it has
 the big advantage that you can easily understand each example without
 the rest of the book. If a specific feature is of no interest for you
 just skip that section.
+
+NOTE:
+====
+Ash has often multiple ways to achieve the same goal. I see little value
+of showing all of them in a beginner's book. Instead I always pick the way
+which makes the most sense to me.
+====
 
 include::minimal-ash-2x-setup-guide.adoc[]
 include::resource.adoc[]

@@ -239,6 +239,74 @@ iex(8)> orange2.category.name
 <4> One way to get the `Category` of a `Product` if that wasn't sideloaded initially.
 <5> Sideload the `Category` of the `Product` when fetching The `Product from the database.
 
+#### Sideload a Relationship by Default
+
+In case you always want to sideload the `Category` of the `Product` without adding
+`load: [:category]` to every call you can do the following:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  relationships do
+    belongs_to :category, App.Shop.Category do
+      attribute_writable? true
+    end
+  end
+
+  actions do
+    defaults [:create, :update, :destroy] <1>
+
+    read :read do
+      primary? true <2>
+      prepare build(load: [:category]) <3>
+    end
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> Don't forget to remove `:read` from the defaults when you add a custom `read` action.
+<2> See https://ash-hq.org/docs/guides/ash/latest/topics/actions#primary-actions
+<3> Always sideload the `Category` when fetching a `Product`.
+
+Let's test it in the iex:
+
+```elixir
+iex(9)> Product.by_name("Orange")
+{:ok,
+ #App.Shop.Product<
+   category: #App.Shop.Category<
+     __meta__: #Ecto.Schema.Metadata<:loaded>,
+     id: "22ab0824-18ac-4daa-9a13-defd0b8bcd73",
+     name: "Fruits",
+     ...
+   >,
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "24348935-6148-4c75-9bf1-55f74ac9397a",
+   name: "Orange",
+   price: Decimal.new("0.15"),
+   category_id: "22ab0824-18ac-4daa-9a13-defd0b8bcd73",
+   ...
+ >}
+```
+
 [[ash-has_many]]
 ### has_many
 
