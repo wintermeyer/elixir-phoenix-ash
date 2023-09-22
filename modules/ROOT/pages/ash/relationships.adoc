@@ -64,10 +64,9 @@ The `belongs_to` macro defines a relationship between two resources.
 
 [TIP]
 ====
-Do you like video tutorials? Have a look at the video tutorial
+Do you like video tutorials? Have a look at
 "belongs_to in 2 minutes" in our
 https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
-
 
 video::lP8YtkXD3RE[youtube,width=640,height=360]
 ====
@@ -309,6 +308,17 @@ iex(9)> Product.by_name("Orange")
 
 [[ash-has_many]]
 ### has_many
+
+`has_many` is the oposite site of a `belongs_to` relationship. In our shop example a `Category` has many `Products`.
+
+[TIP]
+====
+Do you like video tutorials? Have a look at
+"has_many in 2m 19s" in our
+https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
+
+video::jQZGHl4B4fU[youtube,width=640,height=360]
+====
 
 Using the <<ash-belongs_to, belongs_to>> example and setup we can now add a
 `has_many` relationship to the `Category` resource:
