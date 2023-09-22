@@ -353,7 +353,7 @@ https://hexdocs.pm/ash/relationships.html and https://ash-hq.org/docs/dsl/ash-re
 Let's play with the new relationship:
 
 ```elixir
- iex -S mix
+$ iex -S mix
 Compiling 1 file (.ex)
 Erlang/OTP 26 [...]
 
