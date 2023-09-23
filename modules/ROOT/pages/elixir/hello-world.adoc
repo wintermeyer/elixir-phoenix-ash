@@ -35,4 +35,4 @@ of arguments that function accepts. A module can contain multiple functions with
 the same name as long as they all have a different arity.
 
 We discuss modules and functions more detailed in
-xref:modules-and-functions.adoc[modules and functions].
+xref:elixir/modules-and-functions.adoc[modules and functions].
