@@ -8,7 +8,7 @@ is the bread and butter of the data modeling.
 ### Setup
 
 We discuss relationships in the context of a simple online shop. Please
-use <<minimal-ash-2x-setup-guide, Minimal Ash 2.x Setup Guide>> to generate
+use xref:minimal-ash-2x-setup-guide.adoc[Minimal Ash 2.x Setup Guide] to generate
 a new Elixir application. After that include or adapt the following files for a
 `Product` resource:
 

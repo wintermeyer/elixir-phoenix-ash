@@ -5,12 +5,13 @@ Ash resources are used to model data and define actions which are used
 to manipulate that data. In the Ash world we often compare the resources
 with nouns and the actions with verbs.
 
+[[ash-resource-to_do_list_example]]
 ### To-Do-List Example
 
 To dive into resources we use a simple to-do-list application as an
 example. As a preperation for this please use the
-<<minimal-ash-2x-setup-guide, Minimal Ash 2.x Setup Guide>> to generate
-a new Elixir application.
+xref:minimal-ash-2x-setup-guide.adoc[Minimal Ash 2.x Setup Guide] to
+generate a new Elixir application.
 
 We want to create a `task` resource which has a `content` attribute
 and an `id` attribute as a primary key. We also want to include the

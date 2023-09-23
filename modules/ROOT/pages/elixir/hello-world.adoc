@@ -28,11 +28,11 @@ Let's have a quick look at `IO.puts/1`:
 - `IO` is the name of the https://hexdocs.pm/elixir/IO.html[IO
 module]. A module is collection of functions. It is a way to organize code.
 Normally a module has to be loaded with `require` or `import` but since the `IO`
-module is so essential it gets loaded automatically. 
+module is so essential it gets loaded automatically.
 - `puts/1` is the name of a
 function. The final `1` of `IO.puts/1` is called a <<function-arity>>. The arity represents the number
 of arguments that function accepts. A module can contain multiple functions with
 the same name as long as they all have a different arity.
 
-We discuss modules and functions more detailed in <<modules-and-functions>>.
-
+We discuss modules and functions more detailed in
+xref:modules-and-functions.adoc[modules and functions].
