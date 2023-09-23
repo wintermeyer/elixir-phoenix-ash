@@ -10,7 +10,7 @@ with nouns and the actions with verbs.
 
 To dive into resources we use a simple to-do-list application as an
 example. As a preperation for this please use the
-xref:minimal-ash-2x-setup-guide.adoc[Minimal Ash 2.x Setup Guide] to
+xref:ash/minimal-ash-2x-setup-guide.adoc[Minimal Ash 2.x Setup Guide] to
 generate a new Elixir application.
 
 We want to create a `task` resource which has a `content` attribute
