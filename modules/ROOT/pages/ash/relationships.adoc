@@ -4,6 +4,7 @@
 Relationships define connections between resources. In any application this
 is the bread and butter of the data modeling.
 
+[[ash-relationships-setup]]
 ### Setup
 
 We discuss relationships in the context of a simple online shop. Please
@@ -673,12 +674,14 @@ iex(5)> App.Shop.load(orange, :promotion) <1>
 
 `many_to_many` is a special case of `has_many` where the relationship is
 symmetric. That means that the relationship is defined on both sides of the
-relationship. A good example is a `Tag` Resource that can be assigned to
-multiple `Product` Resources and a `Product` Resource can have multiple `Tag`
-Resources assigned to it.
+relationship. A good example is a `Tag` resource that can be assigned to
+multiple (or none) `Product` resources and a `Product` resource has multiple
+(or none) `Tag` resources assigned to it.
 
-For this to work we not just need a `Tag` resource but also a `ProductTag`
-which is the join table between `Tag` and `Product`.
+To keep our source code minimal we go back to the
+<<ash-relationship-setup, relationship setup>> code which has just the
+`Product` resource. We add a `Tag` and a `ProductTag` resource which is
+the join table between `Tag` and `Product`.
 
 [source,elixir,title='lib/app/shop/resources/tag.ex']
 ----
@@ -805,7 +808,7 @@ Compiling 3 files (.ex)
 Erlang/OTP 26 [...]
 
 Interactive Elixir (1.15.5) [...]
-iex(1)> good_deal_tag = App.Shop.Tag.create!(%{name: "Good deal"}) <1>
+iex(1)> good_deal = App.Shop.Tag.create!(%{name: "Good deal"}) <1>
 #App.Shop.Tag<
   products: #Ash.NotLoaded<:relationship>,
   products_join_assoc: #Ash.NotLoaded<:relationship>,
@@ -814,7 +817,7 @@ iex(1)> good_deal_tag = App.Shop.Tag.create!(%{name: "Good deal"}) <1>
   name: "Good deal",
   ...
 >
-iex(2)> yellow_tag = App.Shop.Tag.create!(%{name: "Yellow"}) <2>
+iex(2)> yellow = App.Shop.Tag.create!(%{name: "Yellow"}) <2>
 #App.Shop.Tag<
   products: #Ash.NotLoaded<:relationship>,
   products_join_assoc: #Ash.NotLoaded<:relationship>,
@@ -825,7 +828,7 @@ iex(2)> yellow_tag = App.Shop.Tag.create!(%{name: "Yellow"}) <2>
 >
 iex(3)> App.Shop.Product.create!(%{
             name: "Banana",
-            tags: [good_deal_tag, yellow_tag]
+            tags: [good_deal, yellow]
             }) <3>
 #App.Shop.Product<
   tags: [
