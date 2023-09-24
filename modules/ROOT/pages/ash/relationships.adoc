@@ -684,8 +684,8 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 (or none) `Tag` resources assigned to it.
 
 To keep our source code minimal we go back to the
-<<ash-relationship-setup, relationship setup>> code which has just the
-`Product` resource. We add a `Tag` and a `ProductTag` resource which is
+<<ash-relationships-setup, relationship setup>> code which has just the
+`Product` resource and add a `Tag` and a `ProductTag` resource which is
 the join table between `Tag` and `Product`.
 
 [source,elixir,title='lib/app/shop/resources/tag.ex']
