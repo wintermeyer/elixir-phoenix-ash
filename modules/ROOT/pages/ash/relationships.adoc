@@ -1,5 +1,6 @@
 [[ash-relationships]]
 ## Relationships
+indexterm:[Ash, Relationships]
 
 Relationships define connections between resources. In any application this
 is the bread and butter of the data modeling.
@@ -60,6 +61,7 @@ end
 
 [[ash-belongs_to]]
 ### belongs_to
+indexterm:[Ash, belongs_to]
 
 The `belongs_to` macro defines a relationship between two resources.
 
@@ -309,6 +311,7 @@ iex(9)> Product.by_name("Orange")
 
 [[ash-has_many]]
 ### has_many
+indexterm:[Ash, has_many]
 
 `has_many` is the oposite site of a `belongs_to` relationship. In our shop example a `Category` has many `Products`.
 
@@ -518,6 +521,7 @@ iex(17)> Category.by_name!("Fruits").products |> Enum.map(& &1.name)
 
 [[ash-has_one]]
 ### has_one
+indexterm:[Ash, has_one]
 
 NOTE: I do not know if I ever used `has_one` in a real world application. But
 for the sake of completeness, I pull out an example out of thin air for this.
@@ -671,6 +675,7 @@ iex(5)> App.Shop.load(orange, :promotion) <1>
 
 [[ash-many_to_many]]
 ### many_to_many
+indexterm:[Ash, many_to_many]
 
 `many_to_many` is a special case of `has_many` where the relationship is
 symmetric. That means that the relationship is defined on both sides of the
@@ -1048,3 +1053,70 @@ iex(9)> Product.by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <5
 
 The between resource `ProductTag` is automatically updated.
 And by update I mean that one entry was deleted.
+
+#### Sideload a many_to_many Relationship by Default
+
+This works the same way as the previous `has_many` example:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  relationships do
+    many_to_many :tags, App.Shop.Tag do
+      through App.Shop.ProductTag
+      source_attribute_on_join_resource :product_id
+      destination_attribute_on_join_resource :tag_id
+    end
+  end
+
+  actions do
+    defaults [:destroy] <1>
+
+    read :read do
+      primary? true <2>
+      prepare build(load: [:tags]) <3>
+    end
+
+    create :create do
+      primary? true
+      argument :tags, {:array, :map}
+      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+    end
+
+    update :update do
+      primary? true
+      argument :tags, {:array, :map}
+      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+    end
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> Don't forget to remove `:read` from the defaults when you add a custom `read` action.
+<2> See https://ash-hq.org/docs/guides/ash/latest/topics/actions#primary-actions
+<3> Always sideload all `tags` when fetching a `product`.
+
+Let's test it in the iex:
+
+```elixir
+iex(15)> App.Shop.Product.by_name!("Banana").tags |> Enum.map(& &1.name)
+["Yellow", "Good deal"]
+```

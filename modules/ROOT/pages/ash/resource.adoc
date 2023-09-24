@@ -1,5 +1,6 @@
 [[ash-resource]]
 ## Resource
+indexterm:[Ash, Resource]
 
 Ash resources are used to model data and define actions which are used
 to manipulate that data. In the Ash world we often compare the resources
