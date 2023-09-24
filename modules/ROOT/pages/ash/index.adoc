@@ -27,12 +27,9 @@ the big advantage that you can easily understand each example without
 the rest of the book. If a specific feature is of no interest for you
 just skip that section.
 
-NOTE:
-====
-Ash has often multiple ways to achieve the same goal. I see little value
-of showing all of them in a beginner's book. Instead I always pick the way
-which makes the most sense to me.
-====
+NOTE: Ash often provides multiple ways to achieve the same goal. I see
+little value of displaying all of them in a beginner's book. I just
+pick and describe one.
 
 include::minimal-ash-2x-setup-guide.adoc[]
 include::resource.adoc[]

@@ -890,3 +890,161 @@ iex(4)> App.Shop.Product.by_name!("Banana", load: [:tags]) <4>
 <2> Create a tag named "Yellow".
 <3> Create a product named "Banana" and associate it with the two tags.
 <4> Retrieve the product by name and sideload its tags.
+
+[[ash-many_to_many-update]]
+#### Update many_to_many relationships
+
+Sometimes we want to update the `tags` of a `product` resource.
+It feels most natural to do it via the `update` action of the `product` resource.
+For that to work we have to define a custom `:update` action that will update the `tags`
+relationship. We can more or less copy the code from the `:create` action for that:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  relationships do
+    many_to_many :tags, App.Shop.Tag do
+      through App.Shop.ProductTag
+      source_attribute_on_join_resource :product_id
+      destination_attribute_on_join_resource :tag_id
+    end
+  end
+
+  actions do
+    defaults [:read, :destroy]
+
+    create :create do
+      primary? true
+      argument :tags, {:array, :map}
+      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+    end
+
+    update :update do <1>
+      primary? true
+      argument :tags, {:array, :map}
+      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+    end
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> Same as the `:create` action.
+
+Let's use it in the `iex` console. We first create a product
+with two tags and than we update it to have only one tag:
+
+```elixir
+$ iex -S mix
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> alias App.Shop.Tag
+App.Shop.Tag
+iex(2)> alias App.Shop.Product
+App.Shop.Product
+iex(3)> good_deal = Tag.create!(%{name: "Good deal"})
+#App.Shop.Tag<
+  products: #Ash.NotLoaded<:relationship>,
+  products_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "34603537-c96d-4dbc-a8bb-e22489c3e5ea",
+  name: "Good deal",
+  ...
+>
+iex(4)> yellow = Tag.create!(%{name: "Yellow"})
+#App.Shop.Tag<
+  products: #Ash.NotLoaded<:relationship>,
+  products_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "1ad4b16c-77ac-4d6d-8b7a-e40348f651f0",
+  name: "Yellow",
+  ...
+>
+iex(5)> Product.create!(%{name: "Banana", tags: [yellow, good_deal]}) <1>
+#App.Shop.Product<
+  tags: [
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "1ad4b16c-77ac-4d6d-8b7a-e40348f651f0",
+      name: "Yellow",
+      ...
+    >,
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "34603537-c96d-4dbc-a8bb-e22489c3e5ea",
+      name: "Good deal",
+      ...
+    >
+  ],
+  tags_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c885b447-4bcd-4d05-8a2f-f3b1cfde4949",
+  name: "Banana",
+  price: nil,
+  ...
+>
+iex(6)> Product.by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <2>
+["Yellow", "Good deal"]
+iex(7)> banana = Product.by_name!("Banana") <3>
+#App.Shop.Product<
+  tags: #Ash.NotLoaded<:relationship>,
+  tags_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c885b447-4bcd-4d05-8a2f-f3b1cfde4949",
+  name: "Banana",
+  price: nil,
+  ...
+>
+iex(8)> Product.update!(banana, %{tags: [yellow]}) <4>
+#App.Shop.Product<
+  tags: [
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "1ad4b16c-77ac-4d6d-8b7a-e40348f651f0",
+      name: "Yellow",
+      ...
+    >
+  ],
+  tags_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c885b447-4bcd-4d05-8a2f-f3b1cfde4949",
+  name: "Banana",
+  price: nil,
+  ...
+>
+iex(9)> Product.by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <5>
+["Yellow"]
+```
+
+<1> Create a new product with two tags.
+<2> Query the just created product and print the two tag names.
+<3> Store the product in the variable `banana` for later use.
+<4> Update the product to have only one tag.
+<5> Double check that the product really only has one tag.
+
+The between resource `ProductTag` is automatically updated.
+And by update I mean that one entry was deleted.
