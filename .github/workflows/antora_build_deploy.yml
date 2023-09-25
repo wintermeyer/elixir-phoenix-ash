@@ -34,13 +34,9 @@ jobs:
         SITE_CSS=$(cat ./build/site/antora-assets/css/site.css)
         SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra.css)
         COMBINED_CSS="$SITE_CSS $SITE_EXTRA_CSS"
-        # Use a placeholder for the CSS
-        PLACEHOLDER="CSS_PLACEHOLDER"
         find ./build/site/ -name "*.html" | while read -r file; do
-          # Insert the placeholder after the <head> tag
-          sed -i "s|<head>|<head><style>$PLACEHOLDER</style>|" "$file"
-          # Replace the placeholder with the actual CSS content
-          sed -i "s|$PLACEHOLDER|$COMBINED_CSS|" "$file"
+          # Use awk to insert the CSS content after the <head> tag
+          awk -v css="$COMBINED_CSS" '/<head>/ {print; print "<style>" css "</style>"; next} 1' "$file" > "$file".tmp && mv "$file".tmp "$file"
           # Remove the original link tags
           sed -i "/antora-assets\/css\/site.css/d" "$file"
           sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
