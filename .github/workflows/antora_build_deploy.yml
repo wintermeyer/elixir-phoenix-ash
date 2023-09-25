@@ -38,29 +38,29 @@ jobs:
         awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site.css > ./build/site/antora-assets/css/site_temp.css && mv ./build/site/antora-assets/css/site_temp.css ./build/site/antora-assets/css/site.css
         awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site-extra.css > ./build/site/antora-assets/css/site-extra_temp.css && mv ./build/site/antora-assets/css/site-extra_temp.css ./build/site/antora-assets/css/site-extra.css
 
-    - name: Optimize and Inline CSS for each HTML file
-      run: |
-        find ./build/site/ -name "*.html" | while read -r file; do
-          # Optimize CSS for the current HTML file
-          purgecss --css ./build/site/antora-assets/css/site.css --content "$file" --output ./build/site/antora-assets/css/site_temp.css
-          purgecss --css ./build/site/antora-assets/css/site-extra.css --content "$file" --output ./build/site/antora-assets/css/site-extra_temp.css
+    # - name: Optimize and Inline CSS for each HTML file
+    #   run: |
+    #     find ./build/site/ -name "*.html" | while read -r file; do
+    #       # Optimize CSS for the current HTML file
+    #       purgecss --css ./build/site/antora-assets/css/site.css --content "$file" --output ./build/site/antora-assets/css/site_temp.css
+    #       purgecss --css ./build/site/antora-assets/css/site-extra.css --content "$file" --output ./build/site/antora-assets/css/site-extra_temp.css
 
-          # Combine the optimized CSS files
-          SITE_CSS=$(cat ./build/site/antora-assets/css/site_temp.css)
-          SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra_temp.css)
-          COMBINED_CSS="$SITE_CSS $SITE_EXTRA_CSS"
+    #       # Combine the optimized CSS files
+    #       SITE_CSS=$(cat ./build/site/antora-assets/css/site_temp.css)
+    #       SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra_temp.css)
+    #       COMBINED_CSS="$SITE_CSS $SITE_EXTRA_CSS"
 
-          # Inline the combined optimized CSS into the current HTML file
-          awk -v css="$COMBINED_CSS" '/<head>/ {print; print "<style>" css "</style>"; next} 1' "$file" > "$file".tmp && mv "$file".tmp "$file"
+    #       # Inline the combined optimized CSS into the current HTML file
+    #       awk -v css="$COMBINED_CSS" '/<head>/ {print; print "<style>" css "</style>"; next} 1' "$file" > "$file".tmp && mv "$file".tmp "$file"
 
-          # Remove the original link tags from the current HTML file
-          sed -i "/antora-assets\/css\/site.css/d" "$file"
-          sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
+    #       # Remove the original link tags from the current HTML file
+    #       sed -i "/antora-assets\/css\/site.css/d" "$file"
+    #       sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
 
-          # Clean up temporary CSS files
-          rm ./build/site/antora-assets/css/site_temp.css
-          rm ./build/site/antora-assets/css/site-extra_temp.css
-        done
+    #       # Clean up temporary CSS files
+    #       rm ./build/site/antora-assets/css/site_temp.css
+    #       rm ./build/site/antora-assets/css/site-extra_temp.css
+    #     done
 
 
 
@@ -99,7 +99,7 @@ jobs:
 
     - name: Zopfli compress all HTML and CSS files
       run: |
-          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i30 {} \;
+          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i20 {} \;
 
     - name: Brotli compress all HTML and CSS files
       run: |
