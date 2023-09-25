@@ -44,8 +44,8 @@ jobs:
         echo "module.exports = {" > purgecss.config.js
         echo "  content: []," >> purgecss.config.js
         echo "  css: []," >> purgecss.config.js
-        echo "  whitelist: ['toc', 'embedded', 'toc-menu']," >> purgecss.config.js
-        echo "  safelist: ['toc', 'embedded', 'toc-menu']," >> purgecss.config.js
+        echo "  whitelist: ['toc', 'embedded', 'toc-menu', 'copy-button', 'copy-toast', 'source-lang', 'source-toolbox']," >> purgecss.config.js
+        echo "  safelist: ['toc', 'embedded', 'toc-menu', 'copy-button', 'copy-toast', 'source-lang', 'source-toolbox']," >> purgecss.config.js
         echo "  output: './build/site/antora-assets/css/'" >> purgecss.config.js
         echo "};" >> purgecss.config.js
 
