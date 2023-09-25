@@ -31,8 +31,8 @@ jobs:
 
     - name: Replace paths in CSS files
       run: |
-        sed -i 's|url(../|url(/antora-assets/|g)' ./build/site/antora-assets/css/site.css
-        sed -i 's|url(../|url(/antora-assets/|g)' ./build/site/antora-assets/css/site-extra.css
+        sed -i 's|url(\.\./|url(/antora-assets/|g)' ./build/site/antora-assets/css/site.css
+        sed -i 's|url(\.\./|url(/antora-assets/|g)' ./build/site/antora-assets/css/site-extra.css
 
     - name: Inline CSS and remove original link tags
       run: |
