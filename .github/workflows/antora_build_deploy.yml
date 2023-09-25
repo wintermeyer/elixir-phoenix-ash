@@ -34,6 +34,15 @@ jobs:
         awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site.css > ./build/site/antora-assets/css/site_temp.css && mv ./build/site/antora-assets/css/site_temp.css ./build/site/antora-assets/css/site.css
         awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site-extra.css > ./build/site/antora-assets/css/site-extra_temp.css && mv ./build/site/antora-assets/css/site-extra_temp.css ./build/site/antora-assets/css/site-extra.css
 
+    - name: Install clean-css-cli
+      run: |
+        npm install -g clean-css-cli
+
+    - name: Minify CSS files
+      run: |
+        cleancss -o ./build/site/antora-assets/css/site.css ./build/site/antora-assets/css/site.css
+        cleancss -o ./build/site/antora-assets/css/site-extra.css ./build/site/antora-assets/css/site-extra.css
+
     - name: Inline CSS and remove original link tags
       run: |
         SITE_CSS=$(cat ./build/site/antora-assets/css/site.css)
