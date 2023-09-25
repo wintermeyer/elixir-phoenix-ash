@@ -209,7 +209,7 @@ iex(5)> App.Shop.load(orange, :category) <4>
    category_id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
    ...
  >}
-iex(6)> orange2 = Product.by_name!("Orange", load: [:category])
+iex(6)> orange2 = Product.by_name!("Orange", load: [:category]) <5>
 #App.Shop.Product<
   category: #App.Shop.Category<
     __meta__: #Ecto.Schema.Metadata<:loaded>,
@@ -806,6 +806,7 @@ end
 # TODO: iex Example
 
 [[ash-many_to_many-sideloading]]
+#### many_to_many sideloading
 
 [source,elixir,title='lib/app/shop.ex']
 ----
