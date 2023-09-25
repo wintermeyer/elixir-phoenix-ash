@@ -29,47 +29,77 @@ jobs:
       run: |
         antora --fetch antora-playbook.yml  # Replace 'antora-playbook.yml' with your playbook's name if different
 
-    - name: Replace paths in CSS files using awk
+    - name: Install PurgeCSS
       run: |
-        awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site.css > ./build/site/antora-assets/css/site_temp.css && mv ./build/site/antora-assets/css/site_temp.css ./build/site/antora-assets/css/site.css
-        awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site-extra.css > ./build/site/antora-assets/css/site-extra_temp.css && mv ./build/site/antora-assets/css/site-extra_temp.css ./build/site/antora-assets/css/site-extra.css
+        npm install -g purgecss
 
-    - name: Install clean-css-cli
+    - name: Optimize and Inline CSS for each HTML file
       run: |
-        npm install -g clean-css-cli
-
-    - name: Minify CSS files
-      run: |
-        cleancss -o ./build/site/antora-assets/css/site.css ./build/site/antora-assets/css/site.css
-        cleancss -o ./build/site/antora-assets/css/site-extra.css ./build/site/antora-assets/css/site-extra.css
-
-    - name: Inline CSS and remove original link tags
-      run: |
-        SITE_CSS=$(cat ./build/site/antora-assets/css/site.css)
-        SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra.css)
-        COMBINED_CSS="$SITE_CSS $SITE_EXTRA_CSS"
         find ./build/site/ -name "*.html" | while read -r file; do
-          # Use awk to insert the CSS content after the <head> tag
+          # Optimize CSS for the current HTML file
+          purgecss --css ./build/site/antora-assets/css/site.css --content "$file" --output ./build/site/antora-assets/css/site_temp.css
+          purgecss --css ./build/site/antora-assets/css/site-extra.css --content "$file" --output ./build/site/antora-assets/css/site-extra_temp.css
+
+          # Combine the optimized CSS files
+          SITE_CSS=$(cat ./build/site/antora-assets/css/site_temp.css)
+          SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra_temp.css)
+          COMBINED_CSS="$SITE_CSS $SITE_EXTRA_CSS"
+
+          # Inline the combined optimized CSS into the current HTML file
           awk -v css="$COMBINED_CSS" '/<head>/ {print; print "<style>" css "</style>"; next} 1' "$file" > "$file".tmp && mv "$file".tmp "$file"
-          # Remove the original link tags
+
+          # Remove the original link tags from the current HTML file
           sed -i "/antora-assets\/css\/site.css/d" "$file"
           sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
+
+          # Clean up temporary CSS files
+          rm ./build/site/antora-assets/css/site_temp.css
+          rm ./build/site/antora-assets/css/site-extra_temp.css
         done
 
-    - name: Install html-minifier
-      run: |
-        npm install -g html-minifier
 
-    - name: Aggressively minify HTML files
-      run: |
-        find ./build/site/ -name "*.html" | while read -r file; do
-          html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --collapse-boolean-attributes --sort-attributes --sort-class-name < "$file" > "$file".tmp
-          mv "$file".tmp "$file"
-        done
+
+    # - name: Replace paths in CSS files using awk
+    #   run: |
+    #     awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site.css > ./build/site/antora-assets/css/site_temp.css && mv ./build/site/antora-assets/css/site_temp.css ./build/site/antora-assets/css/site.css
+    #     awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site-extra.css > ./build/site/antora-assets/css/site-extra_temp.css && mv ./build/site/antora-assets/css/site-extra_temp.css ./build/site/antora-assets/css/site-extra.css
+
+    # - name: Install clean-css-cli
+    #   run: |
+    #     npm install -g clean-css-cli
+
+    # - name: Minify CSS files
+    #   run: |
+    #     cleancss -o ./build/site/antora-assets/css/site.css ./build/site/antora-assets/css/site.css
+    #     cleancss -o ./build/site/antora-assets/css/site-extra.css ./build/site/antora-assets/css/site-extra.css
+
+    # - name: Inline CSS and remove original link tags
+    #   run: |
+    #     SITE_CSS=$(cat ./build/site/antora-assets/css/site.css)
+    #     SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra.css)
+    #     COMBINED_CSS="$SITE_CSS $SITE_EXTRA_CSS"
+    #     find ./build/site/ -name "*.html" | while read -r file; do
+    #       # Use awk to insert the CSS content after the <head> tag
+    #       awk -v css="$COMBINED_CSS" '/<head>/ {print; print "<style>" css "</style>"; next} 1' "$file" > "$file".tmp && mv "$file".tmp "$file"
+    #       # Remove the original link tags
+    #       sed -i "/antora-assets\/css\/site.css/d" "$file"
+    #       sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
+    #     done
+
+    # - name: Install html-minifier
+    #   run: |
+    #     npm install -g html-minifier
+
+    # - name: Aggressively minify HTML files
+    #   run: |
+    #     find ./build/site/ -name "*.html" | while read -r file; do
+    #       html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --collapse-boolean-attributes --sort-attributes --sort-class-name < "$file" > "$file".tmp
+    #       mv "$file".tmp "$file"
+    #     done
 
     - name: Zopfli compress all HTML and CSS files
       run: |
-          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i40 {} \;
+          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i30 {} \;
 
     - name: Brotli compress all HTML and CSS files
       run: |
