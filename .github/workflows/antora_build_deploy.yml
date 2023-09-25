@@ -47,6 +47,16 @@ jobs:
           sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
         done
 
+    - name: Install html-minifier
+      run: |
+        npm install -g html-minifier
+
+    - name: Minify HTML files
+      run: |
+        find ./build/site/ -name "*.html" | while read -r file; do
+          html-minifier --input "$file" --output "$file" --collapse-whitespace --remove-comments --minify-js --minify-css
+        done
+
     - name: Zopfli compress all HTML and CSS files
       run: |
           find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli {} \;
