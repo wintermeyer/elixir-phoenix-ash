@@ -56,16 +56,16 @@ jobs:
           sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
         done
 
-    # - name: Install html-minifier
-    #   run: |
-    #     npm install -g html-minifier
+    - name: Install html-minifier
+      run: |
+        npm install -g html-minifier
 
-    # - name: Aggressively minify HTML files
-    #   run: |
-    #     find ./build/site/ -name "*.html" | while read -r file; do
-    #       html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --collapse-boolean-attributes --sort-attributes --sort-class-name --remove-empty-elements < "$file" > "$file".tmp
-    #       mv "$file".tmp "$file"
-    #     done
+    - name: Aggressively minify HTML files
+      run: |
+        find ./build/site/ -name "*.html" | while read -r file; do
+          html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --collapse-boolean-attributes --sort-attributes --sort-class-name < "$file" > "$file".tmp
+          mv "$file".tmp "$file"
+        done
 
     - name: Zopfli compress all HTML and CSS files
       run: |
