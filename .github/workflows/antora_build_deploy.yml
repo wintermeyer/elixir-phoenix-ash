@@ -40,10 +40,16 @@ jobs:
 
     - name: Optimize and Inline CSS for each HTML file
       run: |
+        WHITELIST_CLASSES=".toc {} .embedded {} .toc-menu {}"
+
         find ./build/site/ -name "*.html" | while read -r file; do
+          # Append whitelisted classes to the CSS files
+          echo "$WHITELIST_CLASSES" >> ./build/site/antora-assets/css/site.css
+          echo "$WHITELIST_CLASSES" >> ./build/site/antora-assets/css/site-extra.css
+
           # Optimize CSS for the current HTML file
-          purgecss --content "$file" --css ./build/site/antora-assets/css/site.css --output ./build/site/antora-assets/css/site_temp.css --whitelist toc --whitelist embedded --whitelist toc-menu
-          purgecss --content "$file" --css ./build/site/antora-assets/css/site-extra.css --output ./build/site/antora-assets/css/site-extra_temp.css --whitelist toc --whitelist embedded --whitelist toc-menu
+          purgecss --content "$file" --css ./build/site/antora-assets/css/site.css --output ./build/site/antora-assets/css/site_temp.css
+          purgecss --content "$file" --css ./build/site/antora-assets/css/site-extra.css --output ./build/site/antora-assets/css/site-extra_temp.css
 
           # Combine the optimized CSS files
           SITE_CSS=$(cat ./build/site/antora-assets/css/site_temp.css)
@@ -97,13 +103,13 @@ jobs:
     #       mv "$file".tmp "$file"
     #     done
 
-    - name: Zopfli compress all HTML and CSS files
-      run: |
-          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i20 {} \;
+    # - name: Zopfli compress all HTML and CSS files
+    #   run: |
+    #       find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i20 {} \;
 
-    - name: Brotli compress all HTML and CSS files
-      run: |
-        find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec brotli {} \;
+    # - name: Brotli compress all HTML and CSS files
+    #   run: |
+    #     find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec brotli {} \;
 
     - name: Deploy to Linux server via rsync
       env:
