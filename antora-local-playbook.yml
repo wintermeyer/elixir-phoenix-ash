@@ -1,0 +1,20 @@
+site:
+  title: An Elixir, Phoenix and Ash Beginner's Guide
+  url: https://elixir-phoenix-ash.com
+  start_page: book:index.adoc
+  keys:
+    google_analytics: 'G-B4DB8GLK8G'
+content:
+  sources:
+  - url: .
+    edit_url: false
+    branches: HEAD
+
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+  output_dir: antora-assets
+  supplemental_files: ./supplemental-ui
+runtime:
+  fetch: true

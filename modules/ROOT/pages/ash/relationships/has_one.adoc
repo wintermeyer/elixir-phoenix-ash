@@ -1,0 +1,152 @@
+[[ash-has_one]]
+### has_one
+indexterm:[Ash, has_one]
+
+NOTE: I do not know if I ever used `has_one` in a real world application. But
+for the sake of completeness, I pull out an example out of thin air for this.
+
+`has_one` is similar to `belongs_to` except that the reference attribute is
+on the destination resource, instead of the source.
+
+Let's assume we run special promotions in our shop (so and so many percent
+rebate off). But each product can only have one promotion and each promotion
+can only be used for one product. I know! It is just an example for `has_one`.
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Api
+
+  resources do
+    resource App.Shop.Product
+    resource App.Shop.Category
+    resource App.Shop.Promotion
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop/resources/promotion.ex']
+----
+defmodule App.Shop.Promotion do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :rebate, :integer
+    attribute :product_id, :uuid
+  end
+
+  relationships do
+    belongs_to :product, App.Shop.Product do
+      attribute_writable? true
+    end
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  relationships do
+    belongs_to :category, App.Shop.Category do
+      attribute_writable? true
+    end
+
+    has_one :promotion, App.Shop.Promotion
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+Let's use it in the `iex` console:
+
+```elixir
+$ iex -S mix
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> alias App.Shop.Product
+App.Shop.Product
+iex(2)> alias App.Shop.Promotion
+App.Shop.Promotion
+iex(3)> orange = Product.create!(%{name: "Orange", price: 0.2})
+#App.Shop.Product<
+  promotion: #Ash.NotLoaded<:relationship>,
+  category: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
+  name: "Orange",
+  price: Decimal.new("0.2"),
+  category_id: nil,
+  ...
+>
+iex(4)> {:ok, promotion} = Promotion.create(%{name: "15% off", rebate: 15, product_id: orange.id})
+{:ok,
+ #App.Shop.Promotion<
+   product: #Ash.NotLoaded<:relationship>,
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "68901cef-f2c5-46bb-a737-d6c248d36347",
+   name: "15% off",
+   rebate: 15,
+   product_id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
+   ...
+ >}
+iex(5)> App.Shop.load(orange, :promotion) <1>
+{:ok,
+ #App.Shop.Product<
+   promotion: #App.Shop.Promotion<
+     product: #Ash.NotLoaded<:relationship>,
+     __meta__: #Ecto.Schema.Metadata<:loaded>,
+     id: "68901cef-f2c5-46bb-a737-d6c248d36347",
+     name: "15% off",
+     rebate: 15,
+     product_id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
+     ...
+   >,
+   category: #Ash.NotLoaded<:relationship>,
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
+   name: "Orange",
+   price: Decimal.new("0.2"),
+   category_id: nil,
+   ...
+ >}
+```
+
+<1> By default the promotion is not sideloaded. We have to load it manually.

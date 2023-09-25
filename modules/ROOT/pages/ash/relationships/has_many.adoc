@@ -1,0 +1,210 @@
+[[ash-has_many]]
+### has_many
+indexterm:[Ash, has_many]
+
+Think of `has_many` as the oposite site of a `belongs_to` relationship.
+In our shop example a `Category` has many `Products`.
+
+[TIP]
+====
+Do you like video tutorials? Have a look at
+"has_many in 2m 19s" in our
+https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
+
+video::jQZGHl4B4fU[youtube,width=640,height=360]
+====
+
+Using the xref:ash/relationships/belongs_to.adoc[belongs_to] example and setup we
+can now add a `has_many` relationship to the `Category` resource:
+
+[source,elixir,title='lib/app/shop/resources/category.ex']
+----
+defmodule App.Shop.Category do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+  end
+
+  relationships do
+    has_many :products, App.Shop.Product <1>
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> The `has_many` macro defines a relationship between two resources. In our
+example, a `Category` has many `Products`. For that to work we need a
+`Product` resource. By default, the source_attribute is assumed to be `:id`
+and destination_attribute defaults to <snake_cased_last_part_of_module_name>_id.
+To override those defaults have a look at
+https://hexdocs.pm/ash/relationships.html and https://ash-hq.org/docs/dsl/ash-resource#relationships-has_many
+
+Let's play with the new relationship:
+
+```elixir
+$ iex -S mix
+Compiling 1 file (.ex)
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> alias App.Shop.Product
+App.Shop.Product
+iex(2)> alias App.Shop.Category
+App.Shop.Category
+iex(3)> fruits = Category.create!(%{name: "Fruits"}) <1>
+#App.Shop.Category<
+  products: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+  name: "Fruits",
+  ...
+>
+iex(4)> Product.create!(%{name: "Orange", category_id: fruits.id}) <2>
+#App.Shop.Product<
+  category: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "3ec1c834-70a8-403d-8814-3070c77b525e",
+  name: "Orange",
+  price: nil,
+  category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+  ...
+>
+iex(5)> Product.create!(%{name: "Banana", category_id: fruits.id})
+#App.Shop.Product<
+  category: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "460d8cfa-2dad-4da0-95db-45012aa33621",
+  name: "Banana",
+  price: nil,
+  category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+  ...
+>
+iex(6)> App.Shop.load(fruits, :products) <3>
+{:ok,
+ #App.Shop.Category<
+   products: [
+     #App.Shop.Product<
+       category: #Ash.NotLoaded<:relationship>,
+       __meta__: #Ecto.Schema.Metadata<:loaded>,
+       id: "3ec1c834-70a8-403d-8814-3070c77b525e",
+       name: "Orange",
+       price: nil,
+       category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+       ...
+     >,
+     #App.Shop.Product<
+       category: #Ash.NotLoaded<:relationship>,
+       __meta__: #Ecto.Schema.Metadata<:loaded>,
+       id: "460d8cfa-2dad-4da0-95db-45012aa33621",
+       name: "Banana",
+       price: nil,
+       category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+       ...
+     >
+   ],
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+   name: "Fruits",
+   aggregates: %{},
+   calculations: %{},
+   ...
+ >}
+iex(7)> Category.by_name!("Fruits", load: [:products]) <4>
+#App.Shop.Category<
+  products: [
+    #App.Shop.Product<
+      category: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "3ec1c834-70a8-403d-8814-3070c77b525e",
+      name: "Orange",
+      price: nil,
+      category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+      ...
+    >,
+    #App.Shop.Product<
+      category: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "460d8cfa-2dad-4da0-95db-45012aa33621",
+      name: "Banana",
+      price: nil,
+      category_id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+      ...
+    >
+  ],
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c77919cf-0a28-4394-96f1-28f70f1d748a",
+  name: "Fruits",
+  ...
+>
+```
+
+<1> Create a category for fruits.
+<2> Create two products and assign them to the fruits category.
+<3> Load the products for the fruits category.
+<4> Sideload all the products for the fruits category.
+
+#### Sideload a has_many Relationship by Default
+
+In case you always want to sideload all `products` of a `category` without
+adding `load: [:category]` to every call you can do the following:
+
+[source,elixir,title='lib/app/shop/resources/category.ex']
+----
+defmodule App.Shop.Category do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+  end
+
+  relationships do
+    has_many :products, App.Shop.Product
+  end
+
+  actions do
+    defaults [:create, :update, :destroy] <1>
+
+    read :read do
+      primary? true <2>
+      prepare build(load: [:products]) <3>
+    end
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> Don't forget to remove `:read` from the defaults when you add a custom `read` action.
+<2> See https://ash-hq.org/docs/guides/ash/latest/topics/actions#primary-actions
+<3> Always sideload all `products` when fetching a `Category`.
+
+Let's test it in the iex:
+
+```elixir
+iex(17)> Category.by_name!("Fruits").products |> Enum.map(& &1.name)
+["Orange", "Banana"]
+```

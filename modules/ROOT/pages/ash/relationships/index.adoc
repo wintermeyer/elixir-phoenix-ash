@@ -1,0 +1,65 @@
+[[ash-relationships]]
+## Relationships
+indexterm:[Ash, Relationships]
+
+Relationships define connections between resources. In any application this
+is the bread and butter of the data modeling.
+
+[[ash-relationships-setup]]
+### Setup
+
+We discuss relationships in the context of a simple online shop. Please
+use xref:ash/minimal-ash-2x-setup-guide.adoc[Minimal Ash 2.x Setup Guide] to generate
+a new Elixir application. After that include or adapt the following files for a
+`Product` resource:
+
+[source,elixir,title='config/config.exs']
+----
+import Config
+
+config :ash, :use_all_identities_in_manage_relationship?, false
+config :app, :ash_apis, [App.Shop]
+----
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Api
+
+  resources do
+    resource App.Shop.Product
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+include::belongs_to.adoc[]
+include::has_many.adoc[]
+include::has_one.adoc[]
+include::many_to_many.adoc[]

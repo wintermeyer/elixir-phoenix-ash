@@ -32,7 +32,7 @@ little value of displaying all of them in a beginner's book. I just
 pick and describe one.
 
 include::minimal-ash-2x-setup-guide.adoc[]
-include::resource.adoc[]
+include::resources/index.adoc[]
 include::validations.adoc[]
 include::defaults.adoc[]
-include::relationships.adoc[]
+include::relationships/index.adoc[]
