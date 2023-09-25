@@ -44,8 +44,8 @@ jobs:
         echo "module.exports = {" > purgecss.config.js
         echo "  content: []," >> purgecss.config.js
         echo "  css: []," >> purgecss.config.js
-        echo "  whitelist: ['toc', 'embedded', 'toc-menu', 'copy-button', 'copy-toast', 'source-lang', 'source-toolbox', 'anchor']," >> purgecss.config.js
-        echo "  safelist: ['toc', 'embedded', 'toc-menu', 'copy-button', 'copy-toast', 'source-lang', 'source-toolbox', 'anchor']," >> purgecss.config.js
+        # echo "  whitelist: ['toc', 'embedded', 'toc-menu', 'copy-button', 'copy-toast', 'source-lang', 'source-toolbox', 'anchor', 'a.anchor']," >> purgecss.config.js
+        echo "  safelist: ['toc', 'embedded', 'toc-menu', 'copy-button', 'copy-toast', 'source-lang', 'source-toolbox', 'hljs-comment', 'hljs-symbol', 'hljs-string', 'hljs', 'language-elixir', 'highlightjs', 'highlight']," >> purgecss.config.js
         echo "  output: './build/site/antora-assets/css/'" >> purgecss.config.js
         echo "};" >> purgecss.config.js
 
@@ -71,49 +71,24 @@ jobs:
           rm ./build/site/antora-assets/css/site-extra_temp.css
         done
 
+    - name: Install html-minifier
+      run: |
+        npm install -g html-minifier
 
+    - name: Aggressively minify HTML files
+      run: |
+        find ./build/site/ -name "*.html" | while read -r file; do
+          html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --collapse-boolean-attributes --sort-attributes --sort-class-name < "$file" > "$file".tmp
+          mv "$file".tmp "$file"
+        done
 
+    - name: Zopfli compress all HTML and CSS files
+      run: |
+          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i20 {} \;
 
-    # - name: Install clean-css-cli
-    #   run: |
-    #     npm install -g clean-css-cli
-
-    # - name: Minify CSS files
-    #   run: |
-    #     cleancss -o ./build/site/antora-assets/css/site.css ./build/site/antora-assets/css/site.css
-    #     cleancss -o ./build/site/antora-assets/css/site-extra.css ./build/site/antora-assets/css/site-extra.css
-
-    # - name: Inline CSS and remove original link tags
-    #   run: |
-    #     SITE_CSS=$(cat ./build/site/antora-assets/css/site.css)
-    #     SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra.css)
-    #     COMBINED_CSS="$SITE_CSS $SITE_EXTRA_CSS"
-    #     find ./build/site/ -name "*.html" | while read -r file; do
-    #       # Use awk to insert the CSS content after the <head> tag
-    #       awk -v css="$COMBINED_CSS" '/<head>/ {print; print "<style>" css "</style>"; next} 1' "$file" > "$file".tmp && mv "$file".tmp "$file"
-    #       # Remove the original link tags
-    #       sed -i "/antora-assets\/css\/site.css/d" "$file"
-    #       sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
-    #     done
-
-    # - name: Install html-minifier
-    #   run: |
-    #     npm install -g html-minifier
-
-    # - name: Aggressively minify HTML files
-    #   run: |
-    #     find ./build/site/ -name "*.html" | while read -r file; do
-    #       html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --collapse-boolean-attributes --sort-attributes --sort-class-name < "$file" > "$file".tmp
-    #       mv "$file".tmp "$file"
-    #     done
-
-    # - name: Zopfli compress all HTML and CSS files
-    #   run: |
-    #       find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i20 {} \;
-
-    # - name: Brotli compress all HTML and CSS files
-    #   run: |
-    #     find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec brotli {} \;
+    - name: Brotli compress all HTML and CSS files
+      run: |
+        find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec brotli {} \;
 
     - name: Deploy to Linux server via rsync
       env:
