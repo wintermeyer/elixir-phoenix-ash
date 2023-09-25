@@ -685,7 +685,7 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 
 To keep our source code minimal we go back to the
 <<ash-relationships-setup, relationship setup>> code which has just the
-`Product` resource and add a `Tag` and a `ProductTag` resource which is
+`Product` resource and add a `Tag` and a `ProductTag` resource that is
 the join table between `Tag` and `Product`.
 
 [source,elixir,title='lib/app/shop/resources/tag.ex']
@@ -699,7 +699,7 @@ defmodule App.Shop.Tag do
   end
 
   relationships do
-    many_to_many :products, App.Shop.Product do
+    many_to_many :products, App.Shop.Product do <1>
       through App.Shop.ProductTag
       source_attribute_on_join_resource :tag_id
       destination_attribute_on_join_resource :product_id
@@ -712,7 +712,7 @@ defmodule App.Shop.Tag do
     create :create do
       primary? true
       argument :products, {:array, :map}
-      change manage_relationship(:products, type: :append_and_remove, on_no_match: :create)
+      change manage_relationship(:products, type: :append_and_remove, on_no_match: :create) <2>
     end
   end
 
@@ -728,16 +728,20 @@ defmodule App.Shop.Tag do
 end
 ----
 
+<1> The configuration for the `many_to_many` relationship to `product`.
+<2> This allows us to create a `Tag` resource with a list of `Product` resources
+    assigned to it.
+
 [source,elixir,title='lib/app/shop/resources/product_tag.ex']
 ----
 defmodule App.Shop.ProductTag do
   use Ash.Resource, data_layer: Ash.DataLayer.Ets
 
   actions do
-    defaults [:create, :read, :update, :destroy]
+    defaults [:create, :read, :destroy] <1>
   end
 
-  relationships do
+  relationships do <2>
     belongs_to :product, App.Shop.Product do
       primary_key? true
       allow_nil? false
@@ -751,6 +755,9 @@ defmodule App.Shop.ProductTag do
 end
 ----
 
+<1> No need for an `:update` action. Entries in the join table are immutable. You can delete but not change them.
+<2> The clue between the `Product` and the `Tag` resources.
+
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
 defmodule App.Shop.Product do
@@ -763,7 +770,7 @@ defmodule App.Shop.Product do
   end
 
   relationships do
-    many_to_many :tags, App.Shop.Tag do
+    many_to_many :tags, App.Shop.Tag do <1>
       through App.Shop.ProductTag
       source_attribute_on_join_resource :product_id
       destination_attribute_on_join_resource :tag_id
@@ -776,7 +783,7 @@ defmodule App.Shop.Product do
     create :create do
       primary? true
       argument :tags, {:array, :map}
-      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create) <2>
     end
   end
 
@@ -791,6 +798,14 @@ defmodule App.Shop.Product do
   end
 end
 ----
+
+<1> The configuration for the `many_to_many` relationship to `tag`.
+<2> This allows us to create a `Product` resource with a list of `Tag` resources
+    assigned to it.
+
+# TODO: iex Example
+
+[[ash-many_to_many-sideloading]]
 
 [source,elixir,title='lib/app/shop.ex']
 ----
