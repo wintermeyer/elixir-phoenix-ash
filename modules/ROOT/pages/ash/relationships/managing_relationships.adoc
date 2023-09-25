@@ -1,0 +1,231 @@
+[[ash-managing_relationships]]
+### Managing Relationships
+
+In the xref:ash/relationships/has_many.adoc[has_many] and
+xref:ash/relationships/many_to_many.adoc[many_to_many]
+sections we already saw how to create and update relationships. However
+there are additional options available which often make sense to use.
+Especially when you want your logic to be portable (e.g. available via
+a REST or GraphQL API).
+
+In the xref:ash/relationships/many_to_many.adoc[many_to_many] example with
+products and tags we were able to create a product with two tags with
+this code:
+
+```elixir
+iex> yellow = App.Shop.Tag.create!(%{name: "Yellow"})
+iex> good_deal = App.Shop.Tag.create!(%{name: "Good deal"})
+iex> App.Shop.Product.create!(%{name: "Banana", tags: [yellow, good_deal]})
+```
+
+We have to create the tags first and then pass them to the product.
+Wouldn't it be nice to have a `add_tag: %{name: "Yellow"}` argument
+available? Guess what!? Ash can help. Let's have a look what needs to
+be added at the product resource:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :price, :decimal
+  end
+
+  relationships do
+    many_to_many :tags, App.Shop.Tag do
+      through App.Shop.ProductTag
+      source_attribute_on_join_resource :product_id
+      destination_attribute_on_join_resource :tag_id
+    end
+  end
+
+  actions do
+    defaults [:destroy]
+
+    read :read do
+      primary? true
+      prepare build(load: [:tags]) <1>
+    end
+
+    create :create do
+      primary? true
+      argument :tags, {:array, :map}
+
+      argument :add_tag, :map do
+        allow_nil? true <2>
+      end
+
+      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+      change manage_relationship(:add_tag, :tags, type: :create)
+    end
+
+    update :update do
+      primary? true
+      argument :tags, {:array, :map}
+
+      argument :add_tag, :map do
+        allow_nil? true
+      end
+
+      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+      change manage_relationship(:add_tag, :tags, type: :create)
+    end
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> Strictly speaking we do not need the preload here but it makes it a bit easier to debug.
+<2> Change that to `true` in case you want to make sure that a tag is always added.
+
+I (we?) don't want to have multiple tags with the same name. So I added a
+unique identity to the tag resource:
+
+[source,elixir,title='lib/app/shop/resources/tag.ex']
+----
+defmodule App.Shop.Tag do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+  end
+
+  identities do
+    # identity :unique_name, [:name] <1>
+
+    identity :name, [:name] do <2>
+      pre_check_with App.Shop <3>
+    end
+  end
+
+  relationships do
+    many_to_many :products, App.Shop.Product do
+      through App.Shop.ProductTag
+      source_attribute_on_join_resource :tag_id
+      destination_attribute_on_join_resource :product_id
+    end
+  end
+
+  actions do
+    defaults [:read, :update, :destroy]
+
+    create :create do
+      primary? true
+      argument :products, {:array, :map}
+
+      change manage_relationship(:products,
+               type: :append_and_remove,
+               on_no_match: :create,
+               use_identities: [:unique_name]
+             )
+    end
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+<1> Use this if you use a PostgreSQL database.
+<2> Use this if your use a ETS data layer like we do in this example.
+<3> Since ETS doesn't support unique indexes we have to check for uniqueness before we create it.
+
+```elixir
+$ iex -S mix
+iex(1)> banana = App.Shop.Product.create!(%{name: "Banana", add_tag: %{name: "Yellow"}}) <1>
+#App.Shop.Product<
+  tags: [
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "747d1802-8269-4b0f-b7f8-e2b66098334e",
+      name: "Yellow",
+      ...
+    >
+  ],
+  tags_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "ce306c71-c928-43a8-b6c2-e6bd28a50408",
+  name: "Banana",
+  price: nil,
+  ...
+>
+iex(2)> App.Shop.Product.update!(banana, %{add_tag: %{name: "Good Deal"}}) <2>
+#App.Shop.Product<
+  tags: [
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "69dc7da7-5533-4f51-aded-dd64da292b1b",
+      name: "Good Deal",
+      ...
+    >,
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "a6d4949a-c985-480e-94a0-0507934a2cb6",
+      name: "Good Deal",
+      ...
+    >
+  ],
+  tags_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "6e70a0d4-6a26-4edc-8e54-813690522dbc",
+  name: "Banana",
+  price: nil,
+  ...
+>
+iex(3)> App.Shop.Product.update!(banana, %{add_tag: %{name: "Yellow"}}) <3>
+** (Ash.Error.Invalid) Input Invalid
+
+* name: has already been taken
+    at add_tag
+[...]
+iex(3)> App.Shop.Product.update(banana, %{add_tag: %{name: "Yellow"}}) <4>
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.InvalidChanges{
+       fields: [:name],
+       message: "has already been taken",
+       validation: nil,
+       value: nil,
+       changeset: nil,
+       query: nil,
+       error_context: [],
+       vars: [],
+       path: [:add_tag],
+       stacktrace: #Stacktrace<>,
+       class: :invalid
+     }
+   ],
+[...]
+```
+
+<1> Create a new product with a tag.
+<2> Add a new tag to the product.
+<3> Try to add a tag with the same name as the first tag. This fails.
+<4> Same uniqueness check but this time we don't raise an error but return an error tuple.

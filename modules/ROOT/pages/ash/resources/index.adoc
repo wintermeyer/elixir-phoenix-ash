@@ -519,3 +519,5 @@ iex(4)>
 ```
 
 <1> Because the task is destroyed we can't find it anymore.
+
+include::defaults.adoc[]

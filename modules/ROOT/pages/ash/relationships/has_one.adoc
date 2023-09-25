@@ -96,7 +96,8 @@ end
 
 Let's use it in the `iex` console:
 
-```elixir
+[source,elixir]
+----
 $ iex -S mix
 Erlang/OTP 26 [...]
 
@@ -147,6 +148,6 @@ iex(5)> App.Shop.load(orange, :promotion) <1>
    category_id: nil,
    ...
  >}
-```
+----
 
 <1> By default the promotion is not sideloaded. We have to load it manually.

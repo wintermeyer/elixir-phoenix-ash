@@ -34,5 +34,4 @@ pick and describe one.
 include::minimal-ash-2x-setup-guide.adoc[]
 include::resources/index.adoc[]
 include::validations.adoc[]
-include::defaults.adoc[]
 include::relationships/index.adoc[]

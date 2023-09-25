@@ -1,5 +1,5 @@
 [[ash-defaults]]
-## Defaults
+### Defaults
 
 Attributes can have default values. Let's add a `is_done` boolean
 attribute with a default of `false` and a validation that doesn't allow
