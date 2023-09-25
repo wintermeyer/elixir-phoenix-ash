@@ -33,13 +33,16 @@ jobs:
       run: |
         SITE_CSS=$(cat ./build/site/antora-assets/css/site.css)
         SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra.css)
-        COMBINED_CSS="<style>$SITE_CSS $SITE_EXTRA_CSS</style>"
+        # Escape ampersands as they are special in the replacement section of sed
+        SITE_CSS_ESCAPED=$(echo "$SITE_CSS" | sed 's|&|\\&|g')
+        SITE_EXTRA_CSS_ESCAPED=$(echo "$SITE_EXTRA_CSS" | sed 's|&|\\&|g')
+        COMBINED_CSS="<style>$SITE_CSS_ESCAPED $SITE_EXTRA_CSS_ESCAPED</style>"
         find ./build/site/ -name "*.html" | while read -r file; do
           # Inline the combined CSS
           sed -i "s|<head>|<head>$COMBINED_CSS|" "$file"
           # Remove the original link tags
-          sed -i "/antora-assets\/css\/site.css/d" "$file"
-          sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
+          sed -i "|antora-assets/css/site.css|d" "$file"
+          sed -i "|antora-assets/css/site-extra.css|d" "$file"
         done
 
     - name: Zopfli compress all HTML and CSS files
