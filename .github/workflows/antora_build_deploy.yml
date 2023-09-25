@@ -45,7 +45,7 @@ jobs:
         echo "  content: []," >> purgecss.config.js
         echo "  css: []," >> purgecss.config.js
         echo "  safelist: {" >> purgecss.config.js
-        echo "    standard: ['embedded', /toc/, /copy/, /source/, /hljs/, 'language-elixir', 'language-bash', /highlight/, /arabic/, 'colist', 'conum']," >> purgecss.config.js
+        echo "    standard: ['embedded', /toc.*/, /copy.*/, /source.*/, /hljs.*/, 'language-elixir', 'language-bash', /highlight.*/, /arabic.*/, 'colist', 'conum']," >> purgecss.config.js
         echo "    deep: [/blue$/]," >> purgecss.config.js
         echo "    greedy: [/yellow$/]" >> purgecss.config.js
         echo "  }," >> purgecss.config.js
@@ -93,13 +93,13 @@ jobs:
     #       mv "$file".tmp "$file"
     #     done
 
-    - name: Zopfli compress all HTML and CSS files
-      run: |
-          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i20 {} \;
+    # - name: Zopfli compress all HTML and CSS files
+    #   run: |
+    #       find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i20 {} \;
 
-    - name: Brotli compress all HTML and CSS files
-      run: |
-        find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec brotli {} \;
+    # - name: Brotli compress all HTML and CSS files
+    #   run: |
+    #     find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec brotli {} \;
 
     - name: Deploy to Linux server via rsync
       env:
