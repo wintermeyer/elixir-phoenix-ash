@@ -13,8 +13,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Install rsync and brotli
-      run: sudo apt-get install -y rsync brotli
+    - name: Install rsync, zopfli and brotli
+      run: sudo apt-get install -y rsync brotli zopfli
 
     - name: Setup Node.js
       uses: actions/setup-node@v2
@@ -29,9 +29,13 @@ jobs:
       run: |
         antora --fetch antora-playbook.yml  # Replace 'antora-playbook.yml' with your playbook's name if different
 
-    - name: Brotli compress all HTML files
+    - name: Zopfli compress all HTML and CSS files
       run: |
-        find ./build/site/ -name "*.html" -exec brotli {} \;
+          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli {} \;
+
+    - name: Brotli compress all HTML and CSS files
+      run: |
+        find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec brotli {} \;
 
     - name: Deploy to Linux server via SCP
       env:
