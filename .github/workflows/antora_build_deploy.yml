@@ -29,10 +29,10 @@ jobs:
       run: |
         antora --fetch antora-playbook.yml  # Replace 'antora-playbook.yml' with your playbook's name if different
 
-    - name: Inline CSS and remove original link tags
+    - name: Inline CSS with fixed paths and remove original link tags
       run: |
-        SITE_CSS=$(cat ./build/site/antora-assets/css/site.css)
-        SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra.css)
+        SITE_CSS=$(cat ./build/site/antora-assets/css/site.css | sed 's|url(../|url(/antora-assets/|g)')
+        SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra.css | sed 's|url(../|url(/antora-assets/|g)')
         COMBINED_CSS="$SITE_CSS $SITE_EXTRA_CSS"
         find ./build/site/ -name "*.html" | while read -r file; do
           # Use awk to insert the CSS content after the <head> tag
