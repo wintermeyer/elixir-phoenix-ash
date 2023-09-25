@@ -45,7 +45,7 @@ jobs:
         echo "  content: []," >> purgecss.config.js
         echo "  css: []," >> purgecss.config.js
         # echo "  whitelist: ['toc', 'embedded', 'toc-menu', 'copy-button', 'copy-toast', 'source-lang', 'source-toolbox', 'anchor', 'a.anchor']," >> purgecss.config.js
-        echo "  safelist: ['toc', 'embedded', 'toc-menu', 'copy-button', 'copy-toast', 'source-lang', 'source-toolbox', 'hljs-comment', 'hljs-symbol', 'hljs-string', 'hljs', 'hljs-class', 'hljs-keyword', 'hljs-title', 'hljs-symbol', 'language-elixir', 'language-bash', 'highlightjs', 'highlight', 'source-toolbox']," >> purgecss.config.js
+        echo "  safelist: ['toc', 'embedded', 'toc-menu', 'copy-button', 'copy-toast', 'source-lang', 'source-toolbox', 'hljs-comment', 'hljs-symbol', 'hljs-string', 'hljs', 'hljs-class', 'hljs-keyword', 'hljs-title', 'hljs-symbol', 'language-elixir', 'language-bash', 'highlightjs', 'highlight', 'source-toolbox', 'arabic', 'colist', 'conum']," >> purgecss.config.js
         echo "  output: './build/site/antora-assets/css/'" >> purgecss.config.js
         echo "};" >> purgecss.config.js
 
@@ -71,16 +71,16 @@ jobs:
           rm ./build/site/antora-assets/css/site-extra_temp.css
         done
 
-    - name: Install html-minifier
-      run: |
-        npm install -g html-minifier
+    # - name: Install html-minifier
+    #   run: |
+    #     npm install -g html-minifier
 
-    - name: Aggressively minify HTML files
-      run: |
-        find ./build/site/ -name "*.html" | while read -r file; do
-          html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --collapse-boolean-attributes --sort-attributes --sort-class-name < "$file" > "$file".tmp
-          mv "$file".tmp "$file"
-        done
+    # - name: Aggressively minify HTML files
+    #   run: |
+    #     find ./build/site/ -name "*.html" | while read -r file; do
+    #       html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --collapse-boolean-attributes --sort-attributes --sort-class-name < "$file" > "$file".tmp
+    #       mv "$file".tmp "$file"
+    #     done
 
     - name: Zopfli compress all HTML and CSS files
       run: |
