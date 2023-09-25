@@ -29,6 +29,19 @@ jobs:
       run: |
         antora --fetch antora-playbook.yml  # Replace 'antora-playbook.yml' with your playbook's name if different
 
+    - name: Inline CSS and remove original link tags
+      run: |
+        SITE_CSS=$(cat ./build/site/antora-assets/css/site.css)
+        SITE_EXTRA_CSS=$(cat ./build/site/antora-assets/css/site-extra.css)
+        COMBINED_CSS="<style>$SITE_CSS $SITE_EXTRA_CSS</style>"
+        find ./build/site/ -name "*.html" | while read -r file; do
+          # Inline the combined CSS
+          sed -i "s|<head>|<head>$COMBINED_CSS|" "$file"
+          # Remove the original link tags
+          sed -i "/antora-assets\/css\/site.css/d" "$file"
+          sed -i "/antora-assets\/css\/site-extra.css/d" "$file"
+        done
+
     - name: Zopfli compress all HTML and CSS files
       run: |
           find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli {} \;
