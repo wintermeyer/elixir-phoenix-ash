@@ -69,7 +69,7 @@ jobs:
 
     - name: Zopfli compress all HTML and CSS files
       run: |
-          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i50 {} \;
+          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i40 {} \;
 
     - name: Brotli compress all HTML and CSS files
       run: |
