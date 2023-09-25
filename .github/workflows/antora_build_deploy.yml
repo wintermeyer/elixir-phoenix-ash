@@ -54,7 +54,8 @@ jobs:
     - name: Minify HTML files
       run: |
         find ./build/site/ -name "*.html" | while read -r file; do
-          html-minifier --input "$file" --output "$file" --collapse-whitespace --remove-comments --minify-js --minify-css
+          html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css < "$file" > "$file".tmp
+          mv "$file".tmp "$file"
         done
 
     - name: Zopfli compress all HTML and CSS files
