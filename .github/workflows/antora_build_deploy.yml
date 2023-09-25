@@ -69,13 +69,13 @@ jobs:
 
     - name: Zopfli compress all HTML and CSS files
       run: |
-          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli {} \;
+          find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec zopfli --i50 {} \;
 
     - name: Brotli compress all HTML and CSS files
       run: |
         find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec brotli {} \;
 
-    - name: Deploy to Linux server via SCP
+    - name: Deploy to Linux server via rsync
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         SERVER: ${{ secrets.SERVER_ADDRESS }}
