@@ -63,7 +63,7 @@ jobs:
     - name: Aggressively minify HTML files
       run: |
         find ./build/site/ -name "*.html" | while read -r file; do
-          html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --minify-url --collapse-boolean-attributes --sort-attributes --sort-class-name --remove-empty-elements < "$file" > "$file".tmp
+          html-minifier --collapse-whitespace --remove-comments --minify-js --minify-css --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --use-short-doctype --collapse-boolean-attributes --sort-attributes --sort-class-name --remove-empty-elements < "$file" > "$file".tmp
           mv "$file".tmp "$file"
         done
 
