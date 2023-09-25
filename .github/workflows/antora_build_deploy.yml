@@ -29,10 +29,10 @@ jobs:
       run: |
         antora --fetch antora-playbook.yml  # Replace 'antora-playbook.yml' with your playbook's name if different
 
-    - name: Replace paths in CSS files
+    - name: Replace paths in CSS files using awk
       run: |
-        sed -i 's|url(\.\./|url(/antora-assets/|g)' ./build/site/antora-assets/css/site.css
-        sed -i 's|url(\.\./|url(/antora-assets/|g)' ./build/site/antora-assets/css/site-extra.css
+        awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site.css > ./build/site/antora-assets/css/site_temp.css && mv ./build/site/antora-assets/css/site_temp.css ./build/site/antora-assets/css/site.css
+        awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site-extra.css > ./build/site/antora-assets/css/site-extra_temp.css && mv ./build/site/antora-assets/css/site-extra_temp.css ./build/site/antora-assets/css/site-extra.css
 
     - name: Inline CSS and remove original link tags
       run: |
