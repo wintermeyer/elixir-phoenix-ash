@@ -33,6 +33,11 @@ jobs:
       run: |
         npm install -g purgecss
 
+    - name: Replace paths in CSS files using awk
+      run: |
+        awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site.css > ./build/site/antora-assets/css/site_temp.css && mv ./build/site/antora-assets/css/site_temp.css ./build/site/antora-assets/css/site.css
+        awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site-extra.css > ./build/site/antora-assets/css/site-extra_temp.css && mv ./build/site/antora-assets/css/site-extra_temp.css ./build/site/antora-assets/css/site-extra.css
+
     - name: Optimize and Inline CSS for each HTML file
       run: |
         find ./build/site/ -name "*.html" | while read -r file; do
@@ -58,11 +63,6 @@ jobs:
         done
 
 
-
-    # - name: Replace paths in CSS files using awk
-    #   run: |
-    #     awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site.css > ./build/site/antora-assets/css/site_temp.css && mv ./build/site/antora-assets/css/site_temp.css ./build/site/antora-assets/css/site.css
-    #     awk '{gsub(/url\(..\//, "url(/antora-assets/"); print}' ./build/site/antora-assets/css/site-extra.css > ./build/site/antora-assets/css/site-extra_temp.css && mv ./build/site/antora-assets/css/site-extra_temp.css ./build/site/antora-assets/css/site-extra.css
 
     # - name: Install clean-css-cli
     #   run: |
