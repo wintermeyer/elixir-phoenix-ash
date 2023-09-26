@@ -232,7 +232,7 @@ iex(10)> Tag.read!(load: [:products]) |>
 ```
 
 [[ash-many_to_many-sideloading]]
-#### many_to_many sideloading
+#### many_to_many sideloading by default
 
 Be default Ash will not load the join table entries. You can change this with the
 `:load` option in the `:read` action:
@@ -348,141 +348,49 @@ relationship. We can more or less copy the code from the `:create` action for th
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
-defmodule App.Shop.Product do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
-
-  attributes do
-    uuid_primary_key :id
-    attribute :name, :string
-    attribute :price, :decimal
-  end
-
-  relationships do
-    many_to_many :tags, App.Shop.Tag do
-      through App.Shop.ProductTag
-      source_attribute_on_join_resource :product_id
-      destination_attribute_on_join_resource :tag_id
-    end
-  end
-
+  # [...]
   actions do
     defaults [:read, :destroy]
 
     create :create do
       primary? true
       argument :tags, {:array, :map}
-      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+
+      change manage_relationship(:tags,
+               type: :append_and_remove,
+               on_no_match: :create
+             )
     end
 
     update :update do <1>
       primary? true
       argument :tags, {:array, :map}
-      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
+
+      change manage_relationship(:tags,
+               type: :append_and_remove,
+               on_no_match: :create
+             )
     end
   end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
-  end
-end
+  # [...]
 ----
 
-<1> Same as the `:create` action.
+<1> Same as the `:create` action just with `:update`.
 
 Let's use it in the `iex` console. We first create a product
 with two tags and than we update it to have only one tag:
 
 ```elixir
 $ iex -S mix
-Erlang/OTP 26 [...]
-
-Interactive Elixir (1.15.5) [...]
 iex(1)> alias App.Shop.Tag
-App.Shop.Tag
 iex(2)> alias App.Shop.Product
-App.Shop.Product
 iex(3)> good_deal = Tag.create!(%{name: "Good deal"})
-#App.Shop.Tag<
-  products: #Ash.NotLoaded<:relationship>,
-  products_join_assoc: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "34603537-c96d-4dbc-a8bb-e22489c3e5ea",
-  name: "Good deal",
-  ...
->
 iex(4)> yellow = Tag.create!(%{name: "Yellow"})
-#App.Shop.Tag<
-  products: #Ash.NotLoaded<:relationship>,
-  products_join_assoc: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "1ad4b16c-77ac-4d6d-8b7a-e40348f651f0",
-  name: "Yellow",
-  ...
->
 iex(5)> Product.create!(%{name: "Banana", tags: [yellow, good_deal]}) <1>
-#App.Shop.Product<
-  tags: [
-    #App.Shop.Tag<
-      products: #Ash.NotLoaded<:relationship>,
-      products_join_assoc: #Ash.NotLoaded<:relationship>,
-      __meta__: #Ecto.Schema.Metadata<:loaded>,
-      id: "1ad4b16c-77ac-4d6d-8b7a-e40348f651f0",
-      name: "Yellow",
-      ...
-    >,
-    #App.Shop.Tag<
-      products: #Ash.NotLoaded<:relationship>,
-      products_join_assoc: #Ash.NotLoaded<:relationship>,
-      __meta__: #Ecto.Schema.Metadata<:loaded>,
-      id: "34603537-c96d-4dbc-a8bb-e22489c3e5ea",
-      name: "Good deal",
-      ...
-    >
-  ],
-  tags_join_assoc: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "c885b447-4bcd-4d05-8a2f-f3b1cfde4949",
-  name: "Banana",
-  price: nil,
-  ...
->
 iex(6)> Product.by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <2>
 ["Yellow", "Good deal"]
 iex(7)> banana = Product.by_name!("Banana") <3>
-#App.Shop.Product<
-  tags: #Ash.NotLoaded<:relationship>,
-  tags_join_assoc: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "c885b447-4bcd-4d05-8a2f-f3b1cfde4949",
-  name: "Banana",
-  price: nil,
-  ...
->
 iex(8)> Product.update!(banana, %{tags: [yellow]}) <4>
-#App.Shop.Product<
-  tags: [
-    #App.Shop.Tag<
-      products: #Ash.NotLoaded<:relationship>,
-      products_join_assoc: #Ash.NotLoaded<:relationship>,
-      __meta__: #Ecto.Schema.Metadata<:loaded>,
-      id: "1ad4b16c-77ac-4d6d-8b7a-e40348f651f0",
-      name: "Yellow",
-      ...
-    >
-  ],
-  tags_join_assoc: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "c885b447-4bcd-4d05-8a2f-f3b1cfde4949",
-  name: "Banana",
-  price: nil,
-  ...
->
 iex(9)> Product.by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <5>
 ["Yellow"]
 ```
@@ -495,70 +403,3 @@ iex(9)> Product.by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <5
 
 The between resource `ProductTag` is automatically updated.
 And by update I mean that one entry was deleted.
-
-#### Sideload a many_to_many Relationship by Default
-
-This works the same way as the previous `has_many` example:
-
-[source,elixir,title='lib/app/shop/resources/product.ex']
-----
-defmodule App.Shop.Product do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
-
-  attributes do
-    uuid_primary_key :id
-    attribute :name, :string
-    attribute :price, :decimal
-  end
-
-  relationships do
-    many_to_many :tags, App.Shop.Tag do
-      through App.Shop.ProductTag
-      source_attribute_on_join_resource :product_id
-      destination_attribute_on_join_resource :tag_id
-    end
-  end
-
-  actions do
-    defaults [:destroy] <1>
-
-    read :read do
-      primary? true <2>
-      prepare build(load: [:tags]) <3>
-    end
-
-    create :create do
-      primary? true
-      argument :tags, {:array, :map}
-      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
-    end
-
-    update :update do
-      primary? true
-      argument :tags, {:array, :map}
-      change manage_relationship(:tags, type: :append_and_remove, on_no_match: :create)
-    end
-  end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
-  end
-end
-----
-
-<1> Don't forget to remove `:read` from the defaults when you add a custom `read` action.
-<2> See https://ash-hq.org/docs/guides/ash/latest/topics/actions#primary-actions
-<3> Always sideload all `tags` when fetching a `product`.
-
-Let's test it in the iex:
-
-```elixir
-iex(15)> App.Shop.Product.by_name!("Banana").tags |> Enum.map(& &1.name)
-["Yellow", "Good deal"]
-```
