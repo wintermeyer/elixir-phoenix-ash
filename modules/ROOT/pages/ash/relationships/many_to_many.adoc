@@ -8,18 +8,18 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 
 [source]
 ----
-+------------+     +------------+     +--------+
-| Product    |     | ProductTag |     | Tag    |
-+------------+     +------------+     +--------+
-| product_id |<--->| product_id |     | tag_id |
-| Name       |     | tag_id     |<--->| Name   |
-| Price      |     |            |     |        |
-+------------+     +------------+     +--------+
++---------+     +------------+     +--------+
+| Product |     | ProductTag |     | Tag    |
++---------+     +------------+     +--------+
+| id      |<--->| product_id |     | Name   |
+| Name    |     | tag_id     |<--->| id     |
+| Price   |     |            |     |        |
++---------+     +------------+     +--------+
 ----
 
-To keep our source code minimal we go back to the
+To keep our source code footprint minimal we use the
 xref:ash/relationships/index.adoc#ash-relationships-setup[relationship setup]
- code which has just the `Product` resource and add a `Tag` and a
+ example code which has just the `Product` resource and add a `Tag` and a
  `ProductTag` resource that is the join table between `Tag` and `Product`.
 
 [source,elixir,title='lib/app/shop/resources/tag.ex']

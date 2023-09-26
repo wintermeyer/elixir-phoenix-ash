@@ -2,7 +2,20 @@
 ### belongs_to
 indexterm:[Ash, belongs_to]
 
-The `belongs_to` macro defines a relationship between two resources.
+The `belongs_to` macro defines a relationship between two resources. In
+our shop example, a `Product` belongs to a `Category`.
+
+[source]
+----
++----------+      +-------------+
+| Category |      | Product     |
++----------+      +-------------+
+| id       |<-----| category_id |
+| Name     |      | id          |
+|          |      | Name        |
+|          |      | Price       |
++----------+      +-------------+
+----
 
 [TIP]
 ====
@@ -13,8 +26,7 @@ https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel]
 video::lP8YtkXD3RE[youtube,width=640,height=360]
 ====
 
-In our shop example, a `Product` belongs to a `Category`.
-For that to work we need a new `Category` resource:
+We need a new `Category` resource:
 
 [source,elixir,title='lib/app/shop/resources/category.ex']
 ----

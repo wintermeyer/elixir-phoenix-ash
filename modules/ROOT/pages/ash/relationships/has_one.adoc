@@ -7,7 +7,20 @@ on the destination resource, instead of the source.
 
 Let's assume we run special promotions in our shop (so and so many percent
 rebate off). But each product can only have one promotion and each promotion
-can only be used for one product. I know! It is just an example for `has_one`.
+can only be used for one product.
+
+[source]
+----
++---------+      +------------+
+| Product |      | Promotion  |
++---------+      +------------+
+| id      |----->| product_id |
+| Name    |      | id         |
+| Price   |      | Rebate     |
++---------+      +------------+
+----
+
+Let's adjust our source code accordingly:
 
 [source,elixir,title='lib/app/shop.ex']
 ----

@@ -2,8 +2,20 @@
 ### has_many
 indexterm:[Ash, has_many]
 
-Think of `has_many` as the oposite site of a `belongs_to` relationship.
+Think of `has_many` as the opposite site of a `belongs_to` relationship.
 In our shop example a `Category` has many `Products`.
+
+[source]
+----
++----------+      +-------------+
+| Category |      | Product     |
++----------+      +-------------+
+| id       |----->| category_id |
+| Name     |      | id          |
+|          |      | Name        |
+|          |      | Price       |
++----------+      +-------------+
+----
 
 [TIP]
 ====
