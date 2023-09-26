@@ -149,8 +149,8 @@ end
 
 Let's use the following data for our example.
 
-NOTE: Ash will not use the these integer IDs but UUIDs. I use
-integer in the example table because it's easier to read for humans.
+NOTE: Ash does use UUIDs. I use integer IDs in the example
+table because it's easier to read for humans.
 
 [source]
 ----
@@ -187,7 +187,7 @@ ProductTag:
 <1> Not a complete list of all real world combinations.
 I am aware that cherries can be sweet too. 😉
 
-We open the iex and create all the products with their tags.
+Open the iex and create all the products with their tags.
 
 ```elixir
 $ iex -S mix
@@ -234,109 +234,109 @@ iex(10)> Tag.read!(load: [:products]) |>
 [[ash-many_to_many-sideloading]]
 #### many_to_many sideloading
 
-[source,elixir,title='lib/app/shop.ex']
-----
-defmodule App.Shop do
-  use Ash.Api
+Be default Ash will not load the join table entries. You can change this with the
+`:load` option in the `:read` action:
 
-  resources do
-    resource App.Shop.Product
-    resource App.Shop.ProductTag
-    resource App.Shop.Tag
-  end
-end
+[source,elixir,title='lib/app/product.ex']
 ----
+  # [...]
+
+  actions do
+    defaults [:update, :destroy] <1>
+
+    read :read do
+      primary? true
+      prepare build(load: [:tags]) <2>
+    end
+
+    create :create do
+      primary? true
+      argument :tags, {:array, :map}
+
+      change manage_relationship(:tags,
+               type: :append_and_remove,
+               on_no_match: :create
+             )
+    end
+  end
+
+  # [...]
+----
+
+<1> Don't forget to remove `:read` here.
+<2> Always sideload the `tags` relationship.
+
+[source,elixir,title='lib/app/product.ex']
+----
+  # [...]
+
+  actions do
+    defaults [:update, :destroy] <1>
+
+    read :read do
+      primary? true
+      prepare build(load: [:products]) <2>
+    end
+
+    create :create do
+      primary? true
+      argument :products, {:array, :map}
+
+      change manage_relationship(:products,
+               type: :append_and_remove,
+               on_no_match: :create
+             )
+    end
+  end
+
+  # [...]
+----
+
+<1> Don't forget to remove `:read` here.
+<2> Always sideload the `products` relationship.
 
 Let's use it in the `iex` console:
 
 ```elixir
 $ iex -S mix
-Compiling 3 files (.ex)
-Erlang/OTP 26 [...]
+iex(1)> alias App.Shop.Tag
+iex(2)> alias App.Shop.Product
+iex(3)> sweet = Tag.create!(%{name: "Sweet"})
+iex(4)> tropical = Tag.create!(%{name: "Tropical"})
+iex(5)> red = Tag.create!(%{name: "Red"})
+iex(6)> Product.create!(%{name: "Apple", tags: [sweet, red]})
+iex(7)> Product.create!(%{name: "Banana", tags: [sweet, tropical]})
+iex(8)> Product.create!(%{name: "Cherry", tags: [red]})
 
-Interactive Elixir (1.15.5) [...]
-iex(1)> good_deal = App.Shop.Tag.create!(%{name: "Good deal"}) <1>
-#App.Shop.Tag<
-  products: #Ash.NotLoaded<:relationship>,
-  products_join_assoc: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "82b7e8af-69b9-4f35-b32a-0b6b2bed1d15",
-  name: "Good deal",
-  ...
->
-iex(2)> yellow = App.Shop.Tag.create!(%{name: "Yellow"}) <2>
-#App.Shop.Tag<
-  products: #Ash.NotLoaded<:relationship>,
-  products_join_assoc: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "d04aa5ef-195e-4dd8-9c5a-5c73e6f44afe",
-  name: "Yellow",
-  ...
->
-iex(3)> App.Shop.Product.create!(%{
-            name: "Banana",
-            tags: [good_deal, yellow]
-            }) <3>
-#App.Shop.Product<
-  tags: [
-    #App.Shop.Tag<
-      products: #Ash.NotLoaded<:relationship>,
-      products_join_assoc: #Ash.NotLoaded<:relationship>,
-      __meta__: #Ecto.Schema.Metadata<:loaded>,
-      id: "82b7e8af-69b9-4f35-b32a-0b6b2bed1d15",
-      name: "Good deal",
-      ...
-    >,
-    #App.Shop.Tag<
-      products: #Ash.NotLoaded<:relationship>,
-      products_join_assoc: #Ash.NotLoaded<:relationship>,
-      __meta__: #Ecto.Schema.Metadata<:loaded>,
-      id: "d04aa5ef-195e-4dd8-9c5a-5c73e6f44afe",
-      name: "Yellow",
-      ...
-    >
-  ],
-  tags_join_assoc: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "d3551abf-cf43-4c7f-94f1-ea7228d87cf1",
-  name: "Banana",
-  price: nil,
-  ...
->
-iex(4)> App.Shop.Product.by_name!("Banana", load: [:tags]) <4>
-#App.Shop.Product<
-  tags: [
-    #App.Shop.Tag<
-      products: #Ash.NotLoaded<:relationship>,
-      products_join_assoc: #Ash.NotLoaded<:relationship>,
-      __meta__: #Ecto.Schema.Metadata<:loaded>,
-      id: "82b7e8af-69b9-4f35-b32a-0b6b2bed1d15",
-      name: "Good deal",
-      ...
-    >,
-    #App.Shop.Tag<
-      products: #Ash.NotLoaded<:relationship>,
-      products_join_assoc: #Ash.NotLoaded<:relationship>,
-      __meta__: #Ecto.Schema.Metadata<:loaded>,
-      id: "d04aa5ef-195e-4dd8-9c5a-5c73e6f44afe",
-      name: "Yellow",
-      ...
-    >
-  ],
-  ...
-  ],
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "d3551abf-cf43-4c7f-94f1-ea7228d87cf1",
-  name: "Banana",
-  price: nil,
-  ...
->
+iex(9)> Product.read! |> <1>
+...(9)> Enum.map(fn product ->
+...(9)>   %{
+...(9)>     product_name: product.name,
+...(9)>     tag_names: Enum.map(product.tags, & &1.name)
+...(9)>   }
+...(9)> end)
+[
+  %{product_name: "Banana", tag_names: ["Sweet", "Tropical"]},
+  %{product_name: "Apple", tag_names: ["Sweet", "Red"]},
+  %{product_name: "Cherry", tag_names: ["Red"]}
+]
+
+iex(10)> Tag.read! |> <2>
+...(10)> Enum.map(fn tag ->
+...(10)>   %{
+...(10)>     tag_name: tag.name,
+...(10)>     product_names: Enum.map(tag.products, & &1.name)
+...(10)>   }
+...(10)> end)
+[
+  %{tag_name: "Tropical", product_names: ["Banana"]},
+  %{tag_name: "Red", product_names: ["Cherry", "Apple"]},
+  %{tag_name: "Sweet", product_names: ["Apple", "Banana"]}
+]
 ```
 
-<1> Create a tag named "Good deal".
-<2> Create a tag named "Yellow".
-<3> Create a product named "Banana" and associate it with the two tags.
-<4> Retrieve the product by name and sideload its tags.
+<1> We don't have to specify `load: [:tags]` here because we set it as the default in the `:read` action.
+<2> We don't have to specify `load: [:tags]` here because we set it as the default in the `:read` action.
 
 [[ash-many_to_many-update]]
 #### Update many_to_many relationships
