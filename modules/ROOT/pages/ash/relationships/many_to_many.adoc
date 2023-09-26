@@ -403,3 +403,70 @@ iex(9)> Product.by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <5
 
 The between resource `ProductTag` is automatically updated.
 And by update I mean that one entry was deleted.
+
+[[ash-many_to_many-uniqueness]]
+#### Unique Tags
+
+We don't want to have multiple tags with the same name. But right
+now this is possible:
+
+```elixir
+$ iex -S mix
+iex(1)> alias App.Shop.Tag
+iex(2)> Tag.create!(%{name: "Yellow"}).id
+"d206b758-253d-4f06-9773-5423ae1f6027"
+iex(3)> Tag.create!(%{name: "Yellow"}).id
+"5d66386c-bb02-4a8e-bf2a-5457477a6da2"
+iex(4)> Tag.create!(%{name: "Yellow"}).id
+"3497214e-83a0-43bd-b087-143af5ef8c37"
+iex(5)> Tag.read! |> Enum.map(& &1.name)
+["Yellow", "Yellow", "Yellow"]
+```
+
+We can fix this with `identities` in the resource:
+
+[source,elixir,title='lib/app/shop/resources/tag.ex']
+----
+defmodule App.Shop.Tag do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+  end
+
+  identities do
+    # identity :unique_name, [:name] <1>
+
+    identity :name, [:name] do <2>
+      pre_check_with App.Shop <3>
+    end
+  end
+  # [...]
+----
+
+<1> Use this if you use a PostgreSQL database. Don't forget to run a `mix ash.codegen` after you added it.
+<2> Use this if your use a ETS data layer like we do in this example.
+<3> Since ETS doesn't support unique indexes we have to check for uniqueness before we create it.
+
+Now we can not create multiple tags with the same name anymore:
+
+```elixir
+$ iex -S mix
+iex(1)> alias App.Shop.Tag
+iex(2)> Tag.create!(%{name: "Yellow"}).id
+"f03e163f-5a17-4ea4-b708-f2089234d642"
+iex(3)> Tag.create!(%{name: "Yellow"}).id
+** (Ash.Error.Invalid) Input Invalid
+
+* name: has already been taken
+    (ash 2.14.18) lib/ash/api/api.ex:2179: Ash.Api.unwrap_or_raise!/3
+iex(3)> Tag.create(%{name: "Yellow"}).id
+** (KeyError) key :id not found in: {:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.InvalidChanges{
+       fields: [:name],
+       message: "has already been taken",
+       [...]
+```
