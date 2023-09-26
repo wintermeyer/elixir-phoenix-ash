@@ -470,3 +470,67 @@ iex(3)> Tag.create(%{name: "Yellow"}).id
        message: "has already been taken",
        [...]
 ```
+
+[[ash-many_to_many-add_tag]]
+#### add_tag action
+
+Sometimes it is useful to have an `add_tag` argument that creates
+and adds a new tag to a new product in one go (
+e.g. `create!(%{name: "Banana", add_tag: %{name: "Yellow"}})`):
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+  # [...]
+  actions do
+    defaults [:read, :destroy, :update]
+
+    create :create do <1>
+      primary? true
+      argument :tags, {:array, :map}
+
+      argument :add_tag, :map do
+        allow_nil? true
+      end
+
+      change manage_relationship(:tags,
+               type: :append_and_remove,
+               on_no_match: :create
+             )
+
+      change manage_relationship(
+               :add_tag,
+               :tags,
+               type: :create
+             )
+    end
+  end
+  [...]
+----
+
+<1> You can copy-paste the code for `update :update do` too
+if you want to be able to add tags to existing products.
+
+Let's test it:
+
+```elixir
+$ iex -S mix
+iex(1)> App.Shop.Product.create!(%{name: "Banana", add_tag: %{name: "Yellow"}})
+#App.Shop.Product<
+  tags: [
+    #App.Shop.Tag<
+      products: #Ash.NotLoaded<:relationship>,
+      products_join_assoc: #Ash.NotLoaded<:relationship>,
+      __meta__: #Ecto.Schema.Metadata<:loaded>,
+      id: "9b95f8cf-9f95-409a-81d3-b6a66e470d2b",
+      name: "Yellow",
+      ...
+    >
+  ],
+  tags_join_assoc: #Ash.NotLoaded<:relationship>,
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "52049582-c3cb-458c-bbac-0ba36e57e234",
+  name: "Banana",
+  price: nil,
+  ...
+>
+```
