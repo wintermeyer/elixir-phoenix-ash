@@ -61,6 +61,6 @@ end
 
 include::belongs_to.adoc[]
 include::has_many.adoc[]
-include::has_one.adoc[]
 include::many_to_many.adoc[]
+include::has_one.adoc[]
 include::managing_relationships.adoc[]

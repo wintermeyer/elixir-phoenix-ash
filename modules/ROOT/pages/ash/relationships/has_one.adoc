@@ -2,9 +2,6 @@
 ### has_one
 indexterm:[Ash, has_one]
 
-NOTE: I do not know if I ever used `has_one` in a real world application. But
-for the sake of completeness, I pull out an example out of thin air for this.
-
 `has_one` is similar to `belongs_to` except that the reference attribute is
 on the destination resource, instead of the source.
 
@@ -96,8 +93,7 @@ end
 
 Let's use it in the `iex` console:
 
-[source,elixir]
-----
+```elixir
 $ iex -S mix
 Erlang/OTP 26 [...]
 
@@ -148,6 +144,12 @@ iex(5)> App.Shop.load(orange, :promotion) <1>
    category_id: nil,
    ...
  >}
-----
+```
 
-<1> By default the promotion is not sideloaded. We have to load it manually.
+<1> We have to load the promotion explicitly. It is not loaded by default.
+
+[NOTE]
+====
+If you haven't missed `has_one` in your life so fare I wouldn't use it at all.
+xref:ash/relationships/index.adoc#ash-belongs_to[belongs_to] is probably the better choice.
+====
