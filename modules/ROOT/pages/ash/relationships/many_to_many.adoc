@@ -11,9 +11,9 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 +---------+     +------------+     +--------+
 | Product |     | ProductTag |     | Tag    |
 +---------+     +------------+     +--------+
-| id      |<--->| product_id |     | Name   |
-| Name    |     | tag_id     |<--->| id     |
-| Price   |     |            |     |        |
+| id      |<--->| product_id |     | name   |
+| name    |     | tag_id     |<--->| id     |
+| price   |     |            |     |        |
 +---------+     +------------+     +--------+
 ----
 

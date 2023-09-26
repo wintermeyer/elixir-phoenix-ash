@@ -15,8 +15,8 @@ can only be used for one product.
 | Product |      | Promotion  |
 +---------+      +------------+
 | id      |----->| product_id |
-| Name    |      | id         |
-| Price   |      | Rebate     |
+| name    |      | id         |
+| price   |      | rebate     |
 +---------+      +------------+
 ----
 

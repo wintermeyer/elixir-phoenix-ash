@@ -11,9 +11,9 @@ our shop example, a `Product` belongs to a `Category`.
 | Category |      | Product     |
 +----------+      +-------------+
 | id       |<-----| category_id |
-| Name     |      | id          |
-|          |      | Name        |
-|          |      | Price       |
+| name     |      | id          |
+|          |      | name        |
+|          |      | price       |
 +----------+      +-------------+
 ----
 

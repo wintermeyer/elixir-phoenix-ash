@@ -11,9 +11,9 @@ In our shop example a `Category` has many `Products`.
 | Category |      | Product     |
 +----------+      +-------------+
 | id       |----->| category_id |
-| Name     |      | id          |
-|          |      | Name        |
-|          |      | Price       |
+| name     |      | id          |
+|          |      | name        |
+|          |      | price       |
 +----------+      +-------------+
 ----
 
