@@ -1,3 +1,4 @@
+[[ash-many_to_many]]
 ### many_to_many
 
 `many_to_many` is a special case of `has_many` where the relationship is
@@ -195,6 +196,7 @@ defmodule App.Shop do
 end
 ----
 
+[[ash-many_to_many_example_usage]]
 #### Example Usage in iex
 
 Let's use the following data for our example.
