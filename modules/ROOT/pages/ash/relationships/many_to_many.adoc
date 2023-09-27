@@ -25,15 +25,14 @@ xref:ash/relationships/index.adoc#ash-relationships-setup[relationship setup].
 
 [source, bash]
 ----
-mix new --sup app
-cd app
+mix new --sup app && cd app
 awk '/defp deps do/,/\[/ {
        if ($0 ~ /\[/) {
            print $0;
            print "{:ash, \"~> 2.15.0\"}";
            next;
        }
-   } 1' mix.exs > mix.exs.tmp && \
+   } 1' mix.exs > mix.exs.tmp
 mv mix.exs.tmp mix.exs
 mix deps.get
 echo '[
