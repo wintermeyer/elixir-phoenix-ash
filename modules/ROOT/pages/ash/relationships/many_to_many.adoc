@@ -18,6 +18,9 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 +---------+     +------------+     +--------+
 ----
 
+[[ash-many_to_many_setup]]
+#### Setup
+
 The easiest way to proceed is to create a fresh Ash app. Please move
 or delete an already existing Ash app if you have one under
 the directory name `app`. Feel free to copy and paste the following
@@ -196,8 +199,8 @@ defmodule App.Shop do
 end
 ----
 
-[[ash-many_to_many_example_usage]]
-#### Example Usage in iex
+[[ash-many_to_many_iex_example]]
+#### Example in the iex
 
 Let's use the following data for our example.
 
