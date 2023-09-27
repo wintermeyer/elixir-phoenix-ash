@@ -1,0 +1,1 @@
+// TO-DO https://ash-hq.org/docs/guides/ash/latest/topics/embedded-resources
