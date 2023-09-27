@@ -27,7 +27,7 @@ Ash version number at https://hex.pm/packages/ash):
 ----
 defp deps do
   [
-    {:ash, "~> 2.14.16"} # Add this line
+    {:ash, "~> 2.15.0"} # Add this line
   ]
 end
 ----
