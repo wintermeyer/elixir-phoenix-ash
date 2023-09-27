@@ -17,13 +17,41 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 +---------+     +------------+     +--------+
 ----
 
-To keep our source code footprint minimal we use the
-xref:ash/relationships/index.adoc#ash-relationships-setup[relationship setup]
-example code which has just the `Product` resource. If you want to you
-can delete the `Category` resource (`lib/app/shop/resources/category.ex`)
-because we don't need it for this example.
+The easiest way to proceed is to create a fresh Ash app.
+Feel free to copy and paste the following lines in your terminal
+or do it step by step following xref:ash/relationships/index.adoc#ash-relationships-setup[relationship setup].
 
-We add a `Tag` resource and as a join table a `ProductTag` resource.
+[source, bash]
+----
+mix new --sup app
+cd app
+awk '/defp deps do/,/\[/ {
+       if ($0 ~ /\[/) {
+           print $0;
+           print "{:ash, \"~> 2.15.0\"}";
+           next;
+       }
+   } 1' mix.exs > mix.exs.tmp && \
+mv mix.exs.tmp mix.exs
+mix deps.get
+echo '[
+  import_deps: [:ash],
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+]' > .formatter.exs
+mkdir config
+echo 'import Config
+config :ash, :use_all_identities_in_manage_relationship?, false
+config :app, :ash_apis, [App.Shop]' > config/config.exs
+mix format
+----
+
+We need the following resources:
+
+- `Product`
+- `Tag`
+- `ProductTag` (which will be the clue between them)
+
+Please create the following files:
 
 [source,elixir,title='lib/app/shop/resources/tag.ex']
 ----
@@ -99,8 +127,6 @@ end
 
 <1> No need for an `:update` action. Entries in the join table are immutable. You can delete but not change them.
 <2> The clue between the `Product` and the `Tag` resources.
-
-For the `Product` resource we add the `tags` relationship:
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
