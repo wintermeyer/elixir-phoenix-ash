@@ -205,23 +205,14 @@ table because it's easier to read for humans.
 
 [source]
 ----
-Product:
-+----+--------+
-| id | name   |
-+----+--------+
-| 1  | Apple  |
-| 2  | Banana |
-| 3  | Cherry |
-+----+--------+
-
-Tag:
-+----+---------+
-| id | Name    |
-+----+---------+
-| 1  | Sweet   |
-| 2  | Tropical|
-| 3  | Red     |
-+----+---------+
+Product:              Tag:
++----+--------+       +----+----------+
+| id | name   |       | id | Name     |
++----+--------+       +----+----------+
+| 1  | Apple  |       | 1  | Sweet    |
+| 2  | Banana |       | 2  | Tropical |
+| 3  | Cherry |       | 3  | Red      |
++----+--------+       +----+----------+
 
 ProductTag:
 +-----------+-------+
