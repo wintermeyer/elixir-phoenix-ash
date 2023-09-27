@@ -19,8 +19,11 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 
 To keep our source code footprint minimal we use the
 xref:ash/relationships/index.adoc#ash-relationships-setup[relationship setup]
- example code which has just the `Product` resource and add a `Tag` and a
- `ProductTag` resource that is the join table between `Tag` and `Product`.
+example code which has just the `Product` resource. If you want to you
+can delete the `Category` resource (`lib/app/shop/resources/category.ex`)
+because we don't need it for this example.
+
+We add a `Tag` resource and as a join table a `ProductTag` resource.
 
 [source,elixir,title='lib/app/shop/resources/tag.ex']
 ----
@@ -45,12 +48,12 @@ defmodule App.Shop.Tag do
 
     create :create do
       primary? true
-      argument :products, {:array, :map}
+      argument :products, {:array, :map} <2>
 
       change manage_relationship(:products,
                type: :append_and_remove,
                on_no_match: :create
-             ) <2>
+             ) <3>
     end
   end
 
@@ -67,7 +70,8 @@ end
 ----
 
 <1> The configuration for the `many_to_many` relationship to `product`.
-<2> This allows us to create a `Tag` resource with a list of `Product` resources
+<2> Now we can use the `products: []` argument to do this: `Tag.create!(%{name: "Sweet", products: [apple, cherry]})`
+<3> This uses the `products: []` argument to create a `Tag` resource with a list of `Product` resources
     assigned to it.
 
 [source,elixir,title='lib/app/shop/resources/product_tag.ex']
@@ -96,6 +100,8 @@ end
 <1> No need for an `:update` action. Entries in the join table are immutable. You can delete but not change them.
 <2> The clue between the `Product` and the `Tag` resources.
 
+For the `Product` resource we add the `tags` relationship:
+
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
 defmodule App.Shop.Product do
@@ -120,12 +126,12 @@ defmodule App.Shop.Product do
 
     create :create do
       primary? true
-      argument :tags, {:array, :map}
+      argument :tags, {:array, :map} <2>
 
       change manage_relationship(:tags,
                type: :append_and_remove,
                on_no_match: :create
-             ) <2>
+             ) <3>
     end
   end
 
@@ -142,8 +148,25 @@ end
 ----
 
 <1> The configuration for the `many_to_many` relationship to `tag`.
-<2> This allows us to create a `Product` resource with a list of `Tag` resources
+<2> Now we can use the `tags: []` argument to do this: `Product.create!(%{name: "Banana", tags: [sweet, tropical]})`
+<3> This uses the `tags: []` argument to create a `Product` resource with a list of `Tag` resources
     assigned to it.
+
+Finally we have to add the `Tag` and `ProductTag` resources to the
+`App.Shop` API module.
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Api
+
+  resources do
+    resource App.Shop.Product
+    resource App.Shop.ProductTag
+    resource App.Shop.Tag
+  end
+end
+----
 
 #### Example Usage in iex
 
