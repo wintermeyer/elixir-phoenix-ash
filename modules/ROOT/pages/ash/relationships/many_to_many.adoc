@@ -17,9 +17,11 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 +---------+     +------------+     +--------+
 ----
 
-The easiest way to proceed is to create a fresh Ash app.
-Feel free to copy and paste the following lines in your terminal
-or do it step by step following xref:ash/relationships/index.adoc#ash-relationships-setup[relationship setup].
+The easiest way to proceed is to create a fresh Ash app. Please move
+or delete an already existing Ash app if you have one under
+the directory name `app`. Feel free to copy and paste the following
+lines in your terminal or do it step by step following
+xref:ash/relationships/index.adoc#ash-relationships-setup[relationship setup].
 
 [source, bash]
 ----
@@ -45,11 +47,11 @@ config :app, :ash_apis, [App.Shop]' > config/config.exs
 mix format
 ----
 
-We need the following resources:
+We need the following resources for our `many_to_many` example:
 
 - `Product`
 - `Tag`
-- `ProductTag` (which will be the clue between them)
+- `ProductTag` (which will be the clue between the two other resources)
 
 Please create the following files:
 
