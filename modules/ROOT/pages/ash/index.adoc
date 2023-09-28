@@ -16,12 +16,12 @@ and very often a mystery in itself. This book and the
 link:https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube channel]
 is my attempt to fill this gap.
 
-Please do not hesitate to contact me by email at
-sw@wintermeyer-consulting.de if you have any questions or feedback.
-And please do contact me in case you need onsite or remote training.
+Please do contact me by email at sw@wintermeyer-consulting.de in
+case you need onsite or remote training.
 
 TIP: The official support channel of the Ash Framework community
-can be found at https://elixirforum.com
+can be found at https://elixirforum.com The Ash community is very
+welcoming. So don't be shy and ask any question there.
 
 include::minimal-ash-2x-setup-guide.adoc[]
 include::resources/index.adoc[]
