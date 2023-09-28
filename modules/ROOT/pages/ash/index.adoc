@@ -10,7 +10,7 @@ does not help you a lot in the beginning to grasp what it is.
 May I ask you for a rain check about the Ash elevator pich?
 I have to think more about it. Thank you!
 
-Like the Phoenix the Ash Framework has no shortage of
+Like the Phoenix Framework the Ash Framework has no shortage of
 written documentation. But most of it is not beginner friendly
 and very often a mystery in itself. This book and the
 link:https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube channel]
