@@ -18,6 +18,15 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 +---------+     +------------+     +--------+
 ----
 
+[TIP]
+====
+Do you like video tutorials? Have a look at
+"many_to_many Resources in Ash Framework Tutorial (4m 22s)" in our
+https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
+
+video::Xh2z8hz2RLY[youtube,width=640,height=360]
+====
+
 [[ash-many_to_many_setup]]
 #### Setup
 
@@ -54,7 +63,7 @@ We need the following resources for our `many_to_many` example:
 
 - `Product`
 - `Tag`
-- `ProductTag` (which will be the clue between the two other resources)
+- `ProductTag` (which will be the glue between the two other resources)
 
 Please create the following files:
 
@@ -131,7 +140,7 @@ end
 ----
 
 <1> No need for an `:update` action. Entries in the join table are immutable. You can delete but not change them.
-<2> The clue between the `Product` and the `Tag` resources.
+<2> The glue between the `Product` and the `Tag` resources.
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
