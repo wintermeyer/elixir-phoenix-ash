@@ -48,7 +48,6 @@ iex> true xor true
 false
 ----
 
-Sure, here's an elaboration of the text:
 
 [[short-circuit-operators]]
 === Short-Circuit Operators
