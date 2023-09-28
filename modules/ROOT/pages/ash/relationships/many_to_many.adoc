@@ -42,7 +42,7 @@ mix new --sup app && cd app
 awk '/defp deps do/,/\[/ {
        if ($0 ~ /\[/) {
            print $0;
-           print "{:ash, \"~> 2.15.0\"}";
+           print "{:ash, \"~> 2.15.1\"}";
            next;
        }
    } 1' mix.exs > mix.exs.tmp
@@ -54,7 +54,6 @@ echo '[
 ]' > .formatter.exs
 mkdir config
 echo 'import Config
-config :ash, :use_all_identities_in_manage_relationship?, false
 config :app, :ash_apis, [App.Shop]' > config/config.exs
 mix format
 ----

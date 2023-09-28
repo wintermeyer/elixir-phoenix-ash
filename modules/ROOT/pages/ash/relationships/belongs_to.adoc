@@ -114,11 +114,6 @@ To make it writable we need to set `attribute_writable?` to `true`. Only than we
 
 ```elixir
 $ iex -S mix
-Compiling 3 files (.ex)
-Generated app app
-Erlang/OTP 26 [...]
-
-Interactive Elixir (1.15.5) [...]
 iex(1)> alias App.Shop.Product <1>
 App.Shop.Product
 iex(2)> alias App.Shop.Category

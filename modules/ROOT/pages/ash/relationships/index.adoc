@@ -10,14 +10,13 @@ is the bread and butter of the data modeling.
 
 We discuss relationships in the context of a simple online shop. Please
 use xref:ash/minimal-ash-2x-setup-guide.adoc[Minimal Ash 2.x Setup Guide] to generate
-a new Elixir application. After that include or adapt the following files for a
+a new Elixir application. After that create or adapt the following files for a
 `Product` resource:
 
 [source,elixir,title='config/config.exs']
 ----
 import Config
 
-config :ash, :use_all_identities_in_manage_relationship?, false
 config :app, :ash_apis, [App.Shop]
 ----
 
@@ -27,10 +26,12 @@ defmodule App.Shop do
   use Ash.Api
 
   resources do
-    resource App.Shop.Product
+    resource App.Shop.Product <1>
   end
 end
 ----
+
+<1> We always have to create an internal API and include all resources in it.
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----

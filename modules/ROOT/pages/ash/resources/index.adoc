@@ -36,15 +36,12 @@ video::tYCL0Rk12no[youtube,width=640,height=360]
 
 ### Configure the internal API
 
-We have to add the new internal API to the `:ash_apis` in our
-`config.exs` file.
+We have to add an internal API a `config.exs` file.
 
 [source,elixir,title='config/config.exs']
 ----
 import Config
 
-config :ash, :use_all_identities_in_manage_relationship?, false
-# Add this line
 config :app, :ash_apis, [App.ToDoList]
 ----
 

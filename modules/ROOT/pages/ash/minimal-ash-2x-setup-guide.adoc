@@ -27,7 +27,7 @@ Ash version number at https://hex.pm/packages/ash):
 ----
 defp deps do
   [
-    {:ash, "~> 2.15.0"} # Add this line
+    {:ash, "~> 2.15.1"} # Add this line
   ]
 end
 ----
@@ -53,19 +53,3 @@ the file `.formatter.exs` to include the Ash formatter:
 TIP: The Elixir formatter is a great tool to keep your code consistent.
 It is highly recommended to use run the command `mix format` before
 committing your code into a repository.
-
-Since this is a fresh project we need to create a `config.exs` file:
-
-```bash
-$ mkdir config
-$ touch config/config.exs
-```
-
-And add the configuration for Ash to `config/config.exs`:
-
-[source,elixir,title='config/config.exs']
-----
-import Config
-
-config :ash, :use_all_identities_in_manage_relationship?, false
-----
