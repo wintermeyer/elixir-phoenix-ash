@@ -2,34 +2,26 @@
 = Ash Framework
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-The link:https://ash-hq.org[Ash Framework] is currently the most
-powerful and productive set of tools in the Phoenix ecosystem for developers.
-I wrote this book to have written material for beginner's
-training I offer (shameless plug: please write me an email to
-sw@wintermeyer-consulting.de if you are
-interested in a training). But sharing is caring so I decided to make most
-of it available online too.
+link:https://ash-hq.org[ash-hq.org] says
+*"Model your domain, derive the rest"* and that
+makes sense once you understand the basics of the Ash Framework. But it
+does not help you a lot in the beginning to grasp what it is.
 
-The Ash Framework does offer a lot of documentation and a vibrant
-community which is ready to help on link:https://discord.gg/elixir[Discord].
-But Discord is not everyone's cup of tea (some companies don't allow
-the usage at all) and the official documentation is often a bit too theoretical.
+May I ask you for a rain check about the Ash elevator pich?
+I have to think more about it. Thank you!
 
-This beginner's book provides small copy-and-pastable examples. In addition
-I publish short tutorial videos - without sound so that you can watch them in
-the office too - on the
-link:https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube channel].
+Like the Phoenix the Ash Framework has no shortage of
+written documentation. But most of it is not beginner friendly
+and very often a mystery in itself. This book and the
+link:https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube channel]
+is my attempt to fill this gap.
 
-I do not build one big monolithic application in this book but use
-smaller examples to describe features. This has the disadvantage that
-I have to repeat some boilerplate code in each example. But it has
-the big advantage that you can easily understand each example without
-the rest of the book. If a specific feature is of no interest for you
-just skip that section.
+Please do not hesitate to contact me by email at
+sw@wintermeyer-consulting.de if you have any questions or feedback.
+And please do contact me in case you need onsite or remote training.
 
-NOTE: Ash often provides multiple ways to achieve the same goal. I see
-little value of displaying all of them in a beginner's book. I just
-pick and describe one.
+TIP: The official support channel of the Ash Framework community
+can be found at https://elixirforum.com
 
 include::minimal-ash-2x-setup-guide.adoc[]
 include::resources/index.adoc[]
