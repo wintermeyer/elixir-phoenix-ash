@@ -33,6 +33,6 @@
 ** xref:phoenix/ecto-basics.adoc#ecto-associations[Associations]
 * xref:ash/index.adoc[Ash Framework]
 ** xref:ash/resources/index.adoc[Resources]
-** xref:ash/validations.adoc[Validations]
 ** xref:ash/relationships/index.adoc[Relationships]
+** xref:ash/validations/index.adoc[Validations]
 * xref:acknowledgments.adoc[Acknowledgments]
