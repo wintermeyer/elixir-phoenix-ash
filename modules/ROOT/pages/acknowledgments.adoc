@@ -1,0 +1,13 @@
+# Acknowledgments
+
+A lot of different people made it possible to create this book.
+
+## The Gods
+
+- José Valim, for creating Elixir and the Phoenix Framework
+- Chris McCord, for creating the Phoenix Framework
+- Zach Daniel, for creating the Phoenix Framework
+
+## Bug Hunters
+
+- [@digitalcohesion](https://github.com/digitalcohesion) 2023-09-29

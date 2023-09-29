@@ -3,11 +3,22 @@
 indexterm:[Pattern Matching, Match Operator]
 indexterm:[Pattern Matching]
 
-In various programming languages, the equals sign (`=`) signifies assignment. For example, `x = 5` generally reads as "Let `x` be equal to 5." Elixir, however, assigns a slightly different role to the equals sign.
+In various programming languages, the equals sign (`=`) signifies assignment.
+For example, `x = 5` generally reads as "Let `x` be equal to 5." Elixir, however,
+assigns a slightly different role to the equals sign.
 
-In Elixir, `=` acts as the _match operator_—trying to match the right side of the expression with its left side. When we say `x = 5` in Elixir, we are essentially telling the language, "Match `x` to the value 5." If `x` is unbound or has no assigned value, Elixir will bind `x` to 5, making it behave similarly to an assignment operator. But if `x` already holds a value, Elixir will attempt to match this value with 5, which may yield a different result.
+In Elixir, `=` acts as the _match operator. Trying to match the right side of
+the expression with its left side. When we say `x = 5` in Elixir, we are essentially
+telling the language, "Match `x` to the value 5." If `x` is unbound or has no
+assigned value, Elixir will bind `x` to 5, making it behave similarly to an
+assignment operator. But if `x` already holds a value, Elixir will attempt to rebind
+it. Older versions of Elixir did throw an error in this case, but this
+behavior was changed for a better user experience.
 
-For instance, if `x` already equals 5 and we attempt `x = 7`, Elixir will throw a `MatchError`—it can't match 5 with 7:
+this value with 5, which may yield a different result.
+
+For instance, if `x` already equals 5 and we attempt `x = 7`, Elixir will throw a
+`MatchError`—it can't match 5 with 7:
 
 [source,elixir]
 ----
@@ -299,7 +310,7 @@ iex(1)> cart = {"apple", "orange", "banana"}
 {"apple", "orange", "banana"}
 iex(2)> {first, _, _} = cart <1>
 {"apple", "orange", "banana"}
-iex(3)> IO.puts(first) 
+iex(3)> IO.puts(first)
 "apple"
 
 iex(4)> cart2 = ["apple", "orange", "banana", "pineapple"]
@@ -309,9 +320,9 @@ iex(5)> [head | _tail] = cart2 <2>
 iex(6)> IO.puts(head)
 "apple"
 ----
-<1> We use wildcards `_` to ignore "orange" and "banana" in the `cart` tuple 
+<1> We use wildcards `_` to ignore "orange" and "banana" in the `cart` tuple
 while pattern matching the first item to `first`.
-<2> With the list `cart2`, we pattern match the first item to `head`, ignoring 
-the rest of the list by prefixing `_` to `tail`. 
+<2> With the list `cart2`, we pattern match the first item to `head`, ignoring
+the rest of the list by prefixing `_` to `tail`.
 
 NOTE: Using `_tail` instead of just `_` increases the readability of the code.
