@@ -360,3 +360,88 @@ Let's add an attribute `use_by_date` to our product. Obviously that would be
 a date. But we also want to make sure that the date is in the future or at least
 today. We need to write a custom validation for that. There is no preset
 directory for that. `
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? false
+
+      constraints min_length: 3,
+                  max_length: 255,
+                  match: ~r/^[a-zA-Z- ]*$/,
+                  trim?: false
+    end
+
+    attribute :description, :string do
+      constraints max_length: 512
+    end
+
+    attribute :price, :decimal do
+      allow_nil? false
+      constraints min: 0.01
+    end
+
+    attribute :stock_quantity, :integer do
+      allow_nil? false
+      constraints min: 0
+    end
+
+    attribute :use_by_date, :date do
+      allow_nil? false
+    end
+  end
+
+  validations do
+    validate {App.Validations.InTheFutureOrToday, field: :use_by_date}
+  end
+  [...]
+----
+
+[source,elixir,title='lib/app/validations/in_the_future_or_today.ex']
+----
+defmodule App.Validations.InTheFutureOrToday do
+  use Ash.Resource.Validation
+
+  def validate(changeset, opts) do
+    case Ash.Changeset.fetch_argument_or_change(changeset, opts[:field]) do
+      :error ->
+        # in this case, they aren't changing the field, or providing an argument by the same name
+        :ok
+
+      {:ok, value} ->
+        case Date.compare(Date.utc_today(), value) do
+          :gt ->
+            {:error, field: opts[:field], message: "must be in the future or today"}
+
+          _ ->
+            :ok
+        end
+    end
+  end
+end
+----
+
+Let's try it out:
+
+```elixir
+$ iex -S mix
+iex(1)> App.Shop.Product.create!(%{
+                                   name: "Apple",
+                                   price: 0.1,
+                                   stock_quantity: 5,
+                                   use_by_date: ~D[2023-09-28]
+                                 })
+** (Ash.Error.Invalid) Input Invalid
+
+* Invalid value provided for use_by_date: must be in the future or today.
+
+nil
+
+    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+```
