@@ -48,15 +48,13 @@ iex> true xor true
 false
 ----
 
-Sure, here's an elaboration of the text:
-
 [[short-circuit-operators]]
 === Short-Circuit Operators
 indexterm:[Elixir,Short-Circuit Operators]
 
 In addition to the boolean operators `and`, `or`, and `not`, Elixir provides `&&`, `||`, and `!` as equivalent short-circuit operators. Short-circuit evaluation, also known as minimal evaluation, is a method of evaluation in which the second argument is executed or evaluated only if the first argument does not suffice to determine the value of the expression.
 
-However, these operators handle non-boolean values differently than their counterparts, which is important to understand to avoid unexpected behavior in your Elixir programs. 
+However, these operators handle non-boolean values differently than their counterparts, which is important to understand to avoid unexpected behavior in your Elixir programs.
 
 * `&&` operator: indexterm:[Elixir,Operators,&&]
 This operator returns the first value if it is falsy (either `false` or `nil`). Otherwise, it returns the second value. This is why it only evaluates the second argument if the first one is truthy.
@@ -86,5 +84,4 @@ This operator negates the truthiness of the value. It returns `false` for all tr
 iex> !1
 false
 ----
-Here, `!1` returns `false` because `1` is considered a truthy value in Elixir. 
-
+Here, `!1` returns `false` because `1` is considered a truthy value in Elixir.
