@@ -356,6 +356,7 @@ iex(4)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity
 
 ### Custom Validations
 
-INFO: WIP. This is just a placeholder which will be filled with content later on.
-
-// attribute :use_by_date, :date
+Let's add an attribute `use_by_date` to our product. Obviously that would be
+a date. But we also want to make sure that the date is in the future or at least
+today. We need to write a custom validation for that. There is no preset
+directory for that. `

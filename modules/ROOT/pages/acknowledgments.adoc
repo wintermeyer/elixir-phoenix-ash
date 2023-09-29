@@ -4,9 +4,9 @@ A lot of different people made it possible to create this book.
 
 ## The Gods
 
-- José Valim (https://twitter.com/josevalim[@josevalim], for creating Elixir
-- Chris McCord (https://twitter.com/chris_mccord[@chris_mccord], for creating the Phoenix Framework
-- Zach Daniel (https://twitter.com/ZachSDaniel1[@ZachSDaniel1], for creating the Ash Framework
+- José Valim (https://twitter.com/josevalim[@josevalim]), for creating Elixir
+- Chris McCord (https://twitter.com/chris_mccord[@chris_mccord]), for creating the Phoenix Framework
+- Zach Daniel (https://twitter.com/ZachSDaniel1[@ZachSDaniel1]), for creating the Ash Framework
 
 ## Bug Hunters
 
