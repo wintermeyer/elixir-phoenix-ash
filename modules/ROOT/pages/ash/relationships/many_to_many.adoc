@@ -30,33 +30,7 @@ video::Xh2z8hz2RLY[youtube,width=640,height=360]
 [[ash-many_to_many_setup]]
 #### Setup
 
-The easiest way to proceed is to create a fresh Ash app. Please move
-or delete an already existing Ash app if you have one under
-the directory name `app`. Feel free to copy and paste the following
-lines in your terminal or do it step by step following
-xref:ash/relationships/index.adoc#ash-relationships-setup[relationship setup].
-
-[source, bash]
-----
-mix new --sup app && cd app
-awk '/defp deps do/,/\[/ {
-       if ($0 ~ /\[/) {
-           print $0;
-           print "{:ash, \"~> 2.15.1\"}";
-           next;
-       }
-   } 1' mix.exs > mix.exs.tmp
-mv mix.exs.tmp mix.exs
-mix deps.get
-echo '[
-  import_deps: [:ash],
-  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
-]' > .formatter.exs
-mkdir config
-echo 'import Config
-config :app, :ash_apis, [App.Shop]' > config/config.exs
-mix format
-----
+include::ash/setup-fresh-app.adoc[]
 
 We need the following resources for our `many_to_many` example:
 
