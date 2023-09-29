@@ -1,0 +1,25 @@
+[[ash-action-validations]]
+## Action Validations
+
+INFO: WIP. This is just a placeholder which will be filled with content later on.
+
+//TODO: Add content here
+
+```elixir
+actions do
+  create :create do
+    validate compare(:age, greater_than_or_equal_to: 18)
+  end
+end
+
+# or
+
+validations do
+  validate present([:foo, :bar], at_least: 1) do
+    on [:create, :update]
+    where present(:baz)
+  end
+end
+```
+
+// TODO: https://hexdocs.pm/ash/validations.html#builtin-validations

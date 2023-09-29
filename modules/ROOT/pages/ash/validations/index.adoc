@@ -1,0 +1,16 @@
+[[ash-validations]]
+## Validations
+
+Within Ash we have two different types of validations:
+
+- Attribute Validations
+  Those are used to validate the input data before it is saved to the
+  database.
+- Action Validations
+  Those are used to validate the input data before an action is executed.
+
+You could use action validations to validate attributes but not
+vice versa.
+
+include::attributes.adoc[]
+include::actions.adoc[]

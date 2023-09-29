@@ -1,0 +1,361 @@
+[[ash-attributes-validations]]
+## Attributes Validations
+
+Validation of user input is a key for a smooth running application.
+Otherwise it ends up with faulty or empty datasets in the database.
+
+### Setup an Example Application
+
+include::ash/setup-fresh-app.adoc[]
+
+Our example application for validations is an online shop. For that
+we need a `Product` resource. Please create the following files:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :name, :string
+    attribute :description, :string
+    attribute :price, :decimal
+    attribute :stock_quantity, :integer
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  code_interface do
+    define_for App.Shop
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :by_name, get_by: [:name], action: :read
+    define :update
+    define :destroy
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Api
+
+  resources do
+    resource App.Shop.Product
+  end
+end
+----
+
+### Required Attributes
+
+One of the simplest validation is a check that an attribute is not
+`nil`. This is done with the `allow_nil?/1` function. We want to
+be sure that `name`, `price` and `stock_quantity` are always set.
+Please adjust the `attributes` block in `lib/app/shop/resources/product.ex`:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+[...]
+  attributes do
+    uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? false
+    end
+
+    attribute :description, :string
+
+    attribute :price, :decimal do
+      allow_nil? false
+    end
+
+    attribute :stock_quantity, :integer do
+      allow_nil? false
+    end
+  end
+[...]
+----
+
+Now let's try to create a product without a name:
+
+```elixir
+$ iex -S mix
+iex(1)> App.Shop.Product.create!(%{price: 10.0, stock_quantity: 3})
+** (Ash.Error.Invalid) Input Invalid
+
+* attribute name is required
+    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+```
+
+Perfect. The validation works.
+
+### min, max, min_length and max_length
+
+Sometimes we want to make sure that an attribute has a minimal or
+maximal length. For that we can use the https://ash-hq.org/docs/guides/ash/latest/topics/constraints[constraints/1 function].
+Let's add a minimal length of 3 characters and a maximal length
+of 255 characters for the `name` attribute. And while we are at it
+let us add a maximum of 512 characters for the `description` attribute.
+
+But what about the numbers? We want to make sure that the `price` is
+always greater than 0 and the `stock_quantity` is always greater than
+or equal to 0. For that we can use the `constraints/1` function with
+the `min` and `max` options.
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+[...]
+  attributes do
+    uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? false
+      constraints min_length: 3, max_length: 255
+    end
+
+    attribute :description, :string do
+      constraints max_length: 512
+    end
+
+    attribute :price, :decimal do
+      allow_nil? false
+      constraints min: 0.01
+    end
+
+    attribute :stock_quantity, :integer do
+      allow_nil? false
+      constraints min: 0
+    end
+  end
+[...]
+
+Testing the validation:
+
+```elixir
+iex(7)> App.Shop.Product.create!(%{name: "Y", price: 0, stock_quantitiy: -1})
+** (Ash.Error.Invalid) Input Invalid
+
+* attribute stock_quantity is required <1>
+* Invalid value provided for price: must be more than or equal to 0.01. <2>
+
+0
+
+* Invalid value provided for name: length must be greater than or equal to 3. <3>
+
+"Y"
+
+    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+```
+
+<1> stock_quantity can not be nil and has to be greater than or equal to 0.
+<2> name can not be nil and has to have at least 3 characters.
+<3> price can not be nil and has to be greater than or equal to 0.01.
+
+[NOTE]
+====
+I do prefer to use the non-! version of the create function. I use the !
+version in this text because it is easier to show the error messages. So
+just once I show you the result of the non-! version:
+
+```elixir
+iex(7)> App.Shop.Product.create(%{name: "Y", price: 0, stock_quantitiy: -1})
+{:error,
+ %Ash.Error.Invalid{
+  [...]
+     %Ash.Error.Changes.InvalidAttribute{
+       field: :price,
+       message: "must be more than or equal to %{min}",
+       [...]
+     },
+     %Ash.Error.Changes.InvalidAttribute{
+       field: :name,
+       message: "length must be greater than or equal to %{min}",
+       [...]
+     }
+   ],
+[...]
+```
+====
+
+### Pattern Matching
+
+Assuming that we only want to have characters an the `-` in the name of
+a product we can use `match?/1` to check if the name matches a regular
+expression. Let's add this to the `name` attribute:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+    [...]
+    attribute :name, :string do
+      allow_nil? false
+
+      constraints min_length: 3,
+                  max_length: 255,
+                  match: ~r/^[a-zA-Z-]*$/
+    end
+    [...]
+----
+
+Let's test it:
+
+```elixir
+$ iex -S mix
+iex(1)> App.Shop.Product.create!(%{name: "Banana2023", price: 0.1, stock_quantity: 20}) <1>
+** (Ash.Error.Invalid) Input Invalid
+
+* Invalid value provided for name: must match the pattern ~r/^[a-zA-Z-]*$/.
+
+"Banana2023"
+
+    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+iex(1)> App.Shop.Product.create!(%{name: "Banana", price: 0.1, stock_quantity: 20})
+#App.Shop.Product<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "c29444dc-7da2-4849-b251-b851a745112a",
+  name: "Banana",
+  description: nil,
+  price: Decimal.new("0.1"),
+  stock_quantity: 20,
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+iex(2)>
+```
+
+<1> The name "Banana2023" does not match the pattern.
+
+### Uniqueness
+
+In many other frameworks uniquness of an attribute is part of the validation.
+Ash has a different approach. It uses `identities` and to make matters worse
+there is a difference between ETS and PostgreSQL here.
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+  [...]
+  attributes do
+    uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? false
+      constraints min_length: 3,
+                  max_length: 255,
+                  match: ~r/^[a-zA-Z-]*$/
+    end
+
+    attribute :description, :string do
+      constraints max_length: 512
+    end
+
+    attribute :price, :decimal do
+      allow_nil? false
+      constraints min: 0.01
+    end
+
+    attribute :stock_quantity, :integer do
+      allow_nil? false
+      constraints min: 0
+    end
+  end
+
+  identities do
+    # identity :unique_name, [:name] <1>
+
+    identity :name, [:name] do <2>
+      pre_check_with App.Shop
+    end
+  end
+  [...]
+----
+
+<1> This is the code you'd need to use for PostgreSQL. It is commented out
+because we are using ETS in this example.
+<2> This is the ETS version. Delete it in case you want to use PostgreSQL.
+
+Let's try to create a product with the same name twice:
+
+```elixir
+$ iex -S mix
+iex(1)> App.Shop.Product.create!(%{name: "Banana", price: 0.1, stock_quantity: 12})
+#App.Shop.Product<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "321070d5-6cec-4054-a99a-c5036a80e7d0",
+  name: "Banana",
+  description: nil,
+  price: Decimal.new("0.1"),
+  stock_quantity: 12,
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+iex(2)> App.Shop.Product.create!(%{name: "Banana", price: 0.2, stock_quantity: 1})
+** (Ash.Error.Invalid) Input Invalid
+
+* name: has already been taken
+    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+iex(2)>
+```
+
+#### Trim
+
+What happens if you add a could of spaces at the end of a name? Let's try it:
+
+```elixir
+$ iex -S mix
+iex(1)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity: 12})
+#App.Shop.Product<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "5b9b53f4-6109-4757-a8b7-9aaf1acda1f3",
+  name: "Banana",
+  ...
+>
+```
+
+Those spaces get trimmed automatically. This is the default behavior and normaly what
+you want because humans and auto fill browsers tend to add spaces at the end of a string.
+
+In case you do want to keep those spaces you can use `trim: false`:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+    [...]
+    attribute :name, :string do
+      allow_nil? false
+
+      constraints min_length: 3,
+                  max_length: 255,
+                  match: ~r/^[a-zA-Z- ]*$/,
+                  trim?: false
+    end
+    [...]
+----
+
+NOTE: I did sneek in a space in the regular expression. Because otherwise the
+validation for "Banana   " would fail.
+
+```elixir
+iex(4)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity: 12})
+#App.Shop.Product<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "b1793ac1-4bfb-4f4f-9b3a-42a64c30378b",
+  name: "Banana   ",
+  description: nil,
+  price: Decimal.new("0.1"),
+  stock_quantity: 12,
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+```
+
+### Custom Validations
+
+INFO: WIP. This is just a placeholder which will be filled with content later on.
+
+// attribute :use_by_date, :date
