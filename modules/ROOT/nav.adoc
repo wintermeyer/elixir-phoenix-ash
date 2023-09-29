@@ -35,3 +35,4 @@
 ** xref:ash/resources/index.adoc[Resources]
 ** xref:ash/validations.adoc[Validations]
 ** xref:ash/relationships/index.adoc[Relationships]
+* xref:acknowledgments.adoc[Acknowledgments]
