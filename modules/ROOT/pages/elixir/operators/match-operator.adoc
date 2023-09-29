@@ -15,17 +15,10 @@ assignment operator. But if `x` already holds a value, Elixir will attempt to re
 it. Older versions of Elixir did throw an error in this case, but this
 behavior was changed for a better user experience.
 
-this value with 5, which may yield a different result.
-
-For instance, if `x` already equals 5 and we attempt `x = 7`, Elixir will throw a
-`MatchError`—it can't match 5 with 7:
-
 [source,elixir]
 ----
 iex> x = 5
 5
-iex> x = 7
-** (MatchError) no match of right hand side value: 7
 ----
 
 Elixir's pattern matching becomes even more robust with more complex data types like tuples or lists:
