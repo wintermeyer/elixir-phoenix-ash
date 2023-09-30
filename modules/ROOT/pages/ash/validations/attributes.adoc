@@ -1,8 +1,10 @@
 [[ash-attributes-validations]]
 ## Attributes Validations
 
-Validation of user input is a key for a smooth running application.
-Otherwise it ends up with faulty or empty datasets in the database.
+In the following sections we will learn how to make sure that
+only the kind of data we want to have is stored in the database.
+There are different ways of doing that. We will start with the
+simplest one and then move on to more complex validations.
 
 ### Setup an Example Application
 
@@ -53,7 +55,7 @@ end
 
 ### Required Attributes
 
-One of the simplest validation is a check that an attribute is not
+The simplest validation is a check that an attribute is not
 `nil`. This is done with the `allow_nil?/1` function. We want to
 be sure that `name`, `price` and `stock_quantity` are always set.
 Please adjust the `attributes` block in `lib/app/shop/resources/product.ex`:
@@ -93,6 +95,34 @@ iex(1)> App.Shop.Product.create!(%{price: 10.0, stock_quantity: 3})
 ```
 
 Perfect. The validation works.
+
+[NOTE]
+====
+In a tutorial I prefer to use the `!` version of the create function. Because
+it is easier to show the error messages.
+
+But while programming I prefer to use the non-! version of the create function:
+
+```elixir
+iex(6)> App.Shop.Product.create(%{price: 10.0, stock_quantity: 3})
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.Required{
+       field: :name,
+       type: :attribute,
+       resource: App.Shop.Product,
+       changeset: nil,
+       query: nil,
+       error_context: [],
+       vars: [],
+       path: [],
+       stacktrace: #Stacktrace<>,
+       class: :invalid
+     }
+[...]
+```
+====
 
 ### min, max, min_length and max_length
 
@@ -156,32 +186,6 @@ iex(7)> App.Shop.Product.create!(%{name: "Y", price: 0, stock_quantitiy: -1})
 <2> name can not be nil and has to have at least 3 characters.
 <3> price can not be nil and has to be greater than or equal to 0.01.
 
-[NOTE]
-====
-I do prefer to use the non-! version of the create function. I use the !
-version in this text because it is easier to show the error messages. So
-just once I show you the result of the non-! version:
-
-```elixir
-iex(7)> App.Shop.Product.create(%{name: "Y", price: 0, stock_quantitiy: -1})
-{:error,
- %Ash.Error.Invalid{
-  [...]
-     %Ash.Error.Changes.InvalidAttribute{
-       field: :price,
-       message: "must be more than or equal to %{min}",
-       [...]
-     },
-     %Ash.Error.Changes.InvalidAttribute{
-       field: :name,
-       message: "length must be greater than or equal to %{min}",
-       [...]
-     }
-   ],
-[...]
-```
-====
-
 ### Pattern Matching
 
 Assuming that we only want to have characters an the `-` in the name of
@@ -230,11 +234,65 @@ iex(2)>
 
 <1> The name "Banana2023" does not match the pattern.
 
+#### Trim
+
+What happens if you add a could of spaces at the end of a name? Let's try it:
+
+```elixir
+$ iex -S mix
+iex(1)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity: 12})
+#App.Shop.Product<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "5b9b53f4-6109-4757-a8b7-9aaf1acda1f3",
+  name: "Banana",
+  ...
+>
+```
+
+Those spaces get trimmed automatically. This is the default behavior and normaly what
+you want because humans and auto fill browsers sometimes add spaces at the end of a
+form field on a webpage.
+
+In case you want to keep those spaces you can use `trim: false`:
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+    [...]
+    attribute :name, :string do
+      allow_nil? false
+
+      constraints min_length: 3,
+                  max_length: 255,
+                  match: ~r/^[a-zA-Z- ]*$/,
+                  trim?: false
+    end
+    [...]
+----
+
+NOTE: I did sneek in a space in the regular expression. Because otherwise the
+validation for "Banana   " would fail.
+
+```elixir
+iex(4)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity: 12})
+#App.Shop.Product<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "b1793ac1-4bfb-4f4f-9b3a-42a64c30378b",
+  name: "Banana   ",
+  description: nil,
+  price: Decimal.new("0.1"),
+  stock_quantity: 12,
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+```
+
 ### Uniqueness
 
 In many other frameworks uniquness of an attribute is part of the validation.
 Ash has a different approach. It uses `identities` and to make matters worse
-there is a difference between ETS and PostgreSQL here.
+there is a difference between ETS and PostgreSQL. In PostgreSQL the database
+takes care of uniqueness. In ETS you have to do it yourself.
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
@@ -287,11 +345,6 @@ iex(1)> App.Shop.Product.create!(%{name: "Banana", price: 0.1, stock_quantity: 1
   __meta__: #Ecto.Schema.Metadata<:loaded>,
   id: "321070d5-6cec-4054-a99a-c5036a80e7d0",
   name: "Banana",
-  description: nil,
-  price: Decimal.new("0.1"),
-  stock_quantity: 12,
-  aggregates: %{},
-  calculations: %{},
   ...
 >
 iex(2)> App.Shop.Product.create!(%{name: "Banana", price: 0.2, stock_quantity: 1})
@@ -302,64 +355,37 @@ iex(2)> App.Shop.Product.create!(%{name: "Banana", price: 0.2, stock_quantity: 1
 iex(2)>
 ```
 
-#### Trim
-
-What happens if you add a could of spaces at the end of a name? Let's try it:
-
-```elixir
-$ iex -S mix
-iex(1)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity: 12})
-#App.Shop.Product<
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "5b9b53f4-6109-4757-a8b7-9aaf1acda1f3",
-  name: "Banana",
-  ...
->
-```
-
-Those spaces get trimmed automatically. This is the default behavior and normaly what
-you want because humans and auto fill browsers tend to add spaces at the end of a string.
-
-In case you do want to keep those spaces you can use `trim: false`:
-
-[source,elixir,title='lib/app/shop/resources/product.ex']
-----
-    [...]
-    attribute :name, :string do
-      allow_nil? false
-
-      constraints min_length: 3,
-                  max_length: 255,
-                  match: ~r/^[a-zA-Z- ]*$/,
-                  trim?: false
-    end
-    [...]
-----
-
-NOTE: I did sneek in a space in the regular expression. Because otherwise the
-validation for "Banana   " would fail.
-
-```elixir
-iex(4)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity: 12})
-#App.Shop.Product<
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "b1793ac1-4bfb-4f4f-9b3a-42a64c30378b",
-  name: "Banana   ",
-  description: nil,
-  price: Decimal.new("0.1"),
-  stock_quantity: 12,
-  aggregates: %{},
-  calculations: %{},
-  ...
->
-```
-
 ### Custom Validations
 
 Let's add an attribute `use_by_date` to our product. Obviously that would be
-a date. But we also want to make sure that the date is in the future or at least
-today. We need to write a custom validation for that. There is no preset
-directory for that. `
+a date. But we also want to make sure that the date is not in the past. We
+need to write a custom validation for that.
+
+[source,elixir,title='lib/app/validations/in_the_future_or_today.ex']
+----
+defmodule App.Validations.InTheFutureOrToday do
+  use Ash.Resource.Validation
+
+  def validate(changeset, opts) do
+    case Ash.Changeset.fetch_argument_or_change(changeset, opts[:field]) do
+      :error ->
+        # in this case, they aren't changing the field
+        :ok
+
+      {:ok, value} ->
+        case Date.compare(Date.utc_today(), value) do
+          :gt ->
+            {:error, field: opts[:field], message: "must be in the future or today"}
+
+          _ ->
+            :ok
+        end
+    end
+  end
+end
+----
+
+That validation can be used like this:
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
@@ -374,7 +400,7 @@ defmodule App.Shop.Product do
 
       constraints min_length: 3,
                   max_length: 255,
-                  match: ~r/^[a-zA-Z- ]*$/,
+                  match: ~r/^[a-zA-Z-]*$/,
                   trim?: false
     end
 
@@ -398,34 +424,12 @@ defmodule App.Shop.Product do
   end
 
   validations do
-    validate {App.Validations.InTheFutureOrToday, field: :use_by_date}
+    validate {App.Validations.InTheFutureOrToday, field: :use_by_date} <1>
   end
   [...]
 ----
 
-[source,elixir,title='lib/app/validations/in_the_future_or_today.ex']
-----
-defmodule App.Validations.InTheFutureOrToday do
-  use Ash.Resource.Validation
-
-  def validate(changeset, opts) do
-    case Ash.Changeset.fetch_argument_or_change(changeset, opts[:field]) do
-      :error ->
-        # in this case, they aren't changing the field, or providing an argument by the same name
-        :ok
-
-      {:ok, value} ->
-        case Date.compare(Date.utc_today(), value) do
-          :gt ->
-            {:error, field: opts[:field], message: "must be in the future or today"}
-
-          _ ->
-            :ok
-        end
-    end
-  end
-end
-----
+<1> Here we are using the validation.
 
 Let's try it out:
 
@@ -435,7 +439,7 @@ iex(1)> App.Shop.Product.create!(%{
                                    name: "Apple",
                                    price: 0.1,
                                    stock_quantity: 5,
-                                   use_by_date: ~D[2023-09-28]
+                                   use_by_date: ~D[2008-11-10]
                                  })
 ** (Ash.Error.Invalid) Input Invalid
 
