@@ -30,7 +30,7 @@ video::Xh2z8hz2RLY[youtube,width=640,height=360]
 [[ash-many_to_many_setup]]
 #### Setup
 
-include::ash/setup-fresh-app.adoc[]
+include::../setup-fresh-app.adoc[]
 
 We need the following resources for our `many_to_many` example:
 

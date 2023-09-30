@@ -8,7 +8,7 @@ simplest one and then move on to more complex validations.
 
 ### Setup an Example Application
 
-include::ash/setup-fresh-app.adoc[]
+include::../setup-fresh-app.adoc[]
 
 Our example application for validations is an online shop. For that
 we need a `Product` resource. Please create the following files:
@@ -429,7 +429,7 @@ defmodule App.Shop.Product do
   [...]
 ----
 
-<1> Here we are using the validation.
+<1> Here we are using the validation `App.Validations.InTheFutureOrToday`.
 
 Let's try it out:
 
