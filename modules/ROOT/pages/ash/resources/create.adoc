@@ -1,0 +1,80 @@
+### Create
+
+To create a resource we have to add the needed `create` action to the
+resource. In addition we add a `code_interface` section to the `task`
+resource for some Ash magic which creates a
+`App.ToDoList.Task.create/1` and a `App.ToDoList.Task.create!/1` function.
+
+[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+----
+defmodule App.ToDoList.Task do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :content, :string
+  end
+
+  actions do
+    defaults [:create]
+  end
+
+  code_interface do
+    define_for App.ToDoList
+    define :create
+  end
+end
+----
+
+Fire up the IEx (Elixir’s Interactive Shell) to create your first task:
+
+```elixir
+$ iex -S mix
+Compiling 2 files (.ex)
+Erlang/OTP 26 [erts-14.0.2] [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> App.ToDoList.Task.create!(%{content: "Mow the lawn"})
+#App.ToDoList.Task<
+  __meta__: #Ecto.Schema.Metadata<:built, "">,
+  id: "8e868c09-c0d0-4362-8270-09272acab769",
+  content: "Mow the lawn",
+  aggregates: %{},
+  calculations: %{},
+  ...
+>
+iex(2)>
+```
+
+The function `App.ToDoList.Task.create!/1` raises an error if
+something goes wrong (e.g. a validation error). Alternatively you can
+use `App.ToDoList.Task.create/1` which returns a tuple with the status
+and the resource.
+
+```elixir
+iex(2)> App.ToDoList.Task.create(%{content: "Mow the lawn"})
+{:ok,
+ #App.ToDoList.Task<
+   __meta__: #Ecto.Schema.Metadata<:built, "">,
+   id: "a8430505-ef7e-4f64-bc2c-2a6db216d8ea",
+   content: "Mow the lawn",
+   aggregates: %{},
+   calculations: %{},
+   ...
+ >}
+iex(3)>
+```
+
+[NOTE]
+====
+You can still create a task the long way with the following code:
+
+[source,elixir]
+----
+App.ToDoList.Task
+|> Ash.Changeset.for_create(:create, %{content: "Mow the lawn"})
+|> App.ToDoList.create!()
+----
+
+`Task.create/1` is just a lot more convenient.
+====

@@ -1,0 +1,64 @@
+### Update
+
+Ash provides a simple way to update a resource and by now you can
+probably guess how it works:
+
+[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+----
+defmodule App.ToDoList.Task do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+    attribute :content, :string
+  end
+
+  actions do
+    # add :update to the list
+    defaults [:create, :read, :update]
+  end
+
+  code_interface do
+    define_for App.ToDoList
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    # add this line
+    define :update
+  end
+end
+----
+
+Let's try it out:
+
+```elixir
+$ iex -S mix
+Erlang/OTP 26 [...]
+
+Interactive Elixir (1.15.5) [...]
+iex(1)> alias App.ToDoList.Task
+App.ToDoList.Task
+iex(2)> {:ok, task} = Task.create(%{content: "Mow the lawn"})
+{:ok,
+ #App.ToDoList.Task<
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "d4c8cb9a-10b7-45f4-bece-dcea0fd16e5f",
+   content: "Mow the lawn",
+   ...
+ >}
+iex(3)> Task.update(task, %{content: "Play golf"})
+{:ok,
+ #App.ToDoList.Task<
+   __meta__: #Ecto.Schema.Metadata<:loaded>,
+   id: "d4c8cb9a-10b7-45f4-bece-dcea0fd16e5f",
+   content: "Play golf",
+   ...
+ >}
+iex(4)> Task.update!(task, %{content: "Buy milk"})
+#App.ToDoList.Task<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "d4c8cb9a-10b7-45f4-bece-dcea0fd16e5f",
+  content: "Buy milk",
+  ...
+>
+```
