@@ -98,8 +98,8 @@ Perfect. The validation works.
 
 [NOTE]
 ====
-In a tutorial I prefer to use the `!` version of the create function. Because
-it is easier to show the error messages.
+In a written tutorial I prefer to use the `!` version of the create function.
+Because it is easier to show the error messages (it takes up less real estate).
 
 But while programming I prefer to use the non-! version of the create function:
 
