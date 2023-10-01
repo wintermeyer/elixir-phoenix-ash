@@ -225,7 +225,8 @@ iex(1)> App.Shop.Product.create!(%{name: "Banana2023",
 "Banana2023"
 
     (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
-iex(1)> App.Shop.Product.create!(%{name: "Banana",
+
+iex(2)> App.Shop.Product.create!(%{name: "Banana",
                                    price: 0.1,
                                    stock_quantity: 20})
 #App.Shop.Product<
@@ -235,8 +236,6 @@ iex(1)> App.Shop.Product.create!(%{name: "Banana",
   description: nil,
   price: Decimal.new("0.1"),
   stock_quantity: 20,
-  aggregates: %{},
-  calculations: %{},
   ...
 >
 iex(2)>
@@ -297,8 +296,6 @@ iex(4)> App.Shop.Product.create!(%{name: "Banana   ",
   description: nil,
   price: Decimal.new("0.1"),
   stock_quantity: 12,
-  aggregates: %{},
-  calculations: %{},
   ...
 >
 ====
