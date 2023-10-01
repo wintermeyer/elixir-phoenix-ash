@@ -17,6 +17,17 @@ and very often a mystery in itself. This book and the
 link:https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube channel]
 is my endeavor to bridge this knowledge gap.
 
+If a section doesn't resonate with you, skip it. You can circle back later
+if needed. I recommend reading the book in order (start with xref:resources/index.adoc[resources]),
+but it's not required.
+
 For feedback or inquiries about training (both onsite and remote), please reach out to me at sw@wintermeyer-consulting.de.
 
 TIP: For official support, visit the Ash Framework community on https://elixirforum.com. The community is incredibly welcoming, so don't hesitate to pose any questions you might have. See you there!
+
+* xref:ash/resources/index.adoc[Resources]
+* xref:ash/relationships/index.adoc[Relationships]
+* xref:ash/constraints/index.adoc[Constraints]
+* xref:ash/validations/index.adoc[Validations]
+* xref:ash/identities/index.adoc[Identities]
+* xref:acknowledgments.adoc[Acknowledgments]
