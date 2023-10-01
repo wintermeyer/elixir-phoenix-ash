@@ -163,10 +163,12 @@ the `min` and `max` options.
     end
   end
 [...]
+----
 
 Testing the validation:
 
-```elixir
+[source,elixir]
+----
 iex(7)> App.Shop.Product.create!(%{name: "Y", price: 0, stock_quantitiy: -1})
 ** (Ash.Error.Invalid) Input Invalid
 
@@ -180,7 +182,7 @@ iex(7)> App.Shop.Product.create!(%{name: "Y", price: 0, stock_quantitiy: -1})
 "Y"
 
     (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
-```
+----
 
 <1> stock_quantity can not be nil and has to be greater than or equal to 0.
 <2> name can not be nil and has to have at least 3 characters.
@@ -430,7 +432,6 @@ defmodule App.Shop.Product do
   end
   [...]
 ----
-
 <1> Here we are using the validation `App.Validations.InTheFutureOrToday`.
 
 
