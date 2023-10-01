@@ -125,8 +125,7 @@ iex(6)> App.Shop.Product.create(%{price: 10.0,
 [[ash-allow-empty]]
 ### allow_empty?
 
-Sometimes we want to allow empty strings. So `allow_nil?` is not
-an option for those cases.
+Sometimes we want to allow empty strings.
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
@@ -169,8 +168,7 @@ Perfect. The validation works.
 ### min, max, min_length and max_length
 
 Sometimes we want to make sure that an attribute has a minimal or
-maximal length. For that we can use the https://ash-hq.org/docs/guides/ash/latest/topics/constraints[constraints/1 function].
-Let's add a minimal length of 3 characters and a maximal length
+maximal length. Let's add a minimal length of 3 characters and a maximal length
 of 255 characters for the `name` attribute. And while we are at it
 let us add a maximum of 512 characters for the `description` attribute.
 

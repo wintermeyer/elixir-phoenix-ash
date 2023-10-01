@@ -8,8 +8,8 @@ a thing too. Contraints work for attributes and arguments.
 NOTE: Different datatypes have different constraints.
 You can use `:allow_empty?` for `string` but not for `integer`.
 
-I give you a kickstart here. Read more about constraints in the
-official Ash documentation at
+Need more information about contraints? Have a look at the official Ash
+documentation at
 https://ash-hq.org/docs/guides/ash/latest/topics/constraints[Constraints].
 
 include::attribute-constraints.adoc[]
