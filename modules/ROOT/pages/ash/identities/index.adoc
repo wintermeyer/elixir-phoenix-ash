@@ -1,0 +1,72 @@
+[[ash-identities]]
+## Identities
+
+In many other frameworks uniquness of an attribute is part of the validation.
+Ash has a different approach. It uses `identities` and to make matters worse
+there is a difference between ETS and PostgreSQL. In PostgreSQL the database
+takes care of uniqueness. In ETS you have to do it yourself.
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+  [...]
+  attributes do
+    uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? false
+      constraints min_length: 3,
+                  max_length: 255,
+                  match: ~r/^[a-zA-Z-]*$/
+    end
+
+    attribute :description, :string do
+      constraints max_length: 512
+    end
+
+    attribute :price, :decimal do
+      allow_nil? false
+      constraints min: 0.01
+    end
+
+    attribute :stock_quantity, :integer do
+      allow_nil? false
+      constraints min: 0
+    end
+  end
+
+  identities do
+    # identity :unique_name, [:name] <1>
+
+    identity :name, [:name] do <2>
+      pre_check_with App.Shop
+    end
+  end
+  [...]
+----
+
+<1> This is the code you'd need to use for PostgreSQL. It is commented out
+because we are using ETS in this example.
+<2> This is the ETS version. Delete it in case you want to use PostgreSQL.
+
+Let's try to create a product with the same name twice:
+
+```elixir
+$ iex -S mix
+iex(1)> App.Shop.Product.create!(%{name: "Banana",
+                                   price: 0.1,
+                                   stock_quantity: 12})
+#App.Shop.Product<
+  __meta__: #Ecto.Schema.Metadata<:loaded>,
+  id: "321070d5-6cec-4054-a99a-c5036a80e7d0",
+  name: "Banana",
+  ...
+>
+iex(2)> App.Shop.Product.create!(%{name: "Banana",
+                                   price: 0.2,
+                                   stock_quantity: 1})
+** (Ash.Error.Invalid) Input Invalid
+
+* name: has already been taken
+    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+iex(2)>
+```

@@ -1,0 +1,16 @@
+[[ash-constraints]]
+## Constraints
+
+Contraints can be used to validate input data. This can be a
+bit misleading for newbies because in addition validations are
+a thing too. Contraints work for attributes and arguments.
+
+NOTE: Different datatypes have different constraints.
+You can use `:allow_empty?` for `string` but not for `integer`.
+
+I give you a kickstart here. Read more about constraints in the
+official Ash documentation at
+https://ash-hq.org/docs/guides/ash/latest/topics/constraints[Constraints].
+
+include::attribute-constraints.adoc[]
+include::argument-constraints.adoc[]

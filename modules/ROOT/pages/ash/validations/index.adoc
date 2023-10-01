@@ -1,10 +1,7 @@
 [[ash-validations]]
 ## Validations
 
-In case you are joining us from the Ruby on Rails world (as I did initially),
-you will find the whole Ash validation system a bit different - even strange.
-
-There are two areas where validations are used:
+In Ash there are two areas where validations are used:
 
 - Attributes
   Those are used to validate the input data before it is saved to the
