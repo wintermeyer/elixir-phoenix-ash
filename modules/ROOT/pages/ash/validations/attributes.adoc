@@ -87,7 +87,8 @@ Now let's try to create a product without a name:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{price: 10.0, stock_quantity: 3})
+iex(1)> App.Shop.Product.create!(%{price: 10.0,
+                                   stock_quantity: 3})
 ** (Ash.Error.Invalid) Input Invalid
 
 * attribute name is required
@@ -104,7 +105,8 @@ Because it is easier to show the error messages (it takes up less real estate).
 But while programming I prefer to use the non-! version of the create function:
 
 ```elixir
-iex(6)> App.Shop.Product.create(%{price: 10.0, stock_quantity: 3})
+iex(6)> App.Shop.Product.create(%{price: 10.0,
+                                  stock_quantity: 3})
 {:error,
  %Ash.Error.Invalid{
    errors: [
@@ -169,7 +171,9 @@ Testing the validation:
 
 [source,elixir]
 ----
-iex(7)> App.Shop.Product.create!(%{name: "Y", price: 0, stock_quantitiy: -1})
+iex(7)> App.Shop.Product.create!(%{name: "Y",
+                                   price: 0,
+                                   stock_quantitiy: -1})
 ** (Ash.Error.Invalid) Input Invalid
 
 * attribute stock_quantity is required <1>
@@ -211,7 +215,9 @@ Let's test it:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{name: "Banana2023", price: 0.1, stock_quantity: 20}) <1>
+iex(1)> App.Shop.Product.create!(%{name: "Banana2023",
+                                   price: 0.1,
+                                   stock_quantity: 20}) <1>
 ** (Ash.Error.Invalid) Input Invalid
 
 * Invalid value provided for name: must match the pattern ~r/^[a-zA-Z-]*$/.
@@ -219,7 +225,9 @@ iex(1)> App.Shop.Product.create!(%{name: "Banana2023", price: 0.1, stock_quantit
 "Banana2023"
 
     (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
-iex(1)> App.Shop.Product.create!(%{name: "Banana", price: 0.1, stock_quantity: 20})
+iex(1)> App.Shop.Product.create!(%{name: "Banana",
+                                   price: 0.1,
+                                   stock_quantity: 20})
 #App.Shop.Product<
   __meta__: #Ecto.Schema.Metadata<:loaded>,
   id: "c29444dc-7da2-4849-b251-b851a745112a",
@@ -242,7 +250,9 @@ What happens if you add a could of spaces at the end of a name? Let's try it:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity: 12})
+iex(1)> App.Shop.Product.create!(%{name: "Banana   ",
+                                   price: 0.1,
+                                   stock_quantity: 12})
 #App.Shop.Product<
   __meta__: #Ecto.Schema.Metadata<:loaded>,
   id: "5b9b53f4-6109-4757-a8b7-9aaf1acda1f3",
@@ -277,7 +287,9 @@ I did sneek in a space in the regular expression. Because otherwise the
 validation for "Banana   " would fail.
 
 ```elixir
-iex(4)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity: 12})
+iex(4)> App.Shop.Product.create!(%{name: "Banana   ",
+                                   price: 0.1,
+                                   stock_quantity: 12})
 #App.Shop.Product<
   __meta__: #Ecto.Schema.Metadata<:loaded>,
   id: "b1793ac1-4bfb-4f4f-9b3a-42a64c30378b",
@@ -344,14 +356,18 @@ Let's try to create a product with the same name twice:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{name: "Banana", price: 0.1, stock_quantity: 12})
+iex(1)> App.Shop.Product.create!(%{name: "Banana",
+                                   price: 0.1,
+                                   stock_quantity: 12})
 #App.Shop.Product<
   __meta__: #Ecto.Schema.Metadata<:loaded>,
   id: "321070d5-6cec-4054-a99a-c5036a80e7d0",
   name: "Banana",
   ...
 >
-iex(2)> App.Shop.Product.create!(%{name: "Banana", price: 0.2, stock_quantity: 1})
+iex(2)> App.Shop.Product.create!(%{name: "Banana",
+                                   price: 0.2,
+                                   stock_quantity: 1})
 ** (Ash.Error.Invalid) Input Invalid
 
 * name: has already been taken
