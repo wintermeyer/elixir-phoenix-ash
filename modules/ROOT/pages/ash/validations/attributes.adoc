@@ -269,7 +269,9 @@ In case you want to keep those spaces you can use `trim: false`:
     [...]
 ----
 
-NOTE: I did sneek in a space in the regular expression. Because otherwise the
+[NOTE]
+====
+I did sneek in a space in the regular expression. Because otherwise the
 validation for "Banana   " would fail.
 
 ```elixir
@@ -285,7 +287,7 @@ iex(4)> App.Shop.Product.create!(%{name: "Banana   ", price: 0.1, stock_quantity
   calculations: %{},
   ...
 >
-```
+====
 
 ### Uniqueness
 
@@ -430,6 +432,7 @@ defmodule App.Shop.Product do
 ----
 
 <1> Here we are using the validation `App.Validations.InTheFutureOrToday`.
+
 
 Let's try it out:
 
