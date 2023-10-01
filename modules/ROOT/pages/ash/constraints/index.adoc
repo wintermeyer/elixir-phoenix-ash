@@ -2,7 +2,7 @@
 ## Constraints
 
 Contraints can be used to validate input data. This can be a
-bit misleading for newbies because in addition xref:ash-validations[validations] are
+bit misleading for newbies because in addition xref:ash/validations/index.adoc[validations] are
 a thing too. Contraints work for attributes and arguments.
 
 NOTE: Different datatypes have different constraints.
