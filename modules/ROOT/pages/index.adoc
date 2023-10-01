@@ -13,8 +13,7 @@ understanding of programming and HTML will be beneficial.
 * *Bite-sized "Hello World!" code examples.* Crafted for
 comprehension just by reading the code, with added notes for clarity. No abstract
 programming theories.
-* *Simplicity is key.* My goal is to get you productive ASAP. For in-depth
-exploration, there are other resources.
+* *Simplicity is key.* My goal is to get you productive ASAP.
 * *Not a beauty contest.* We're not investing much time in aesthetics. This is
 not a CSS design book.
 
@@ -26,15 +25,6 @@ Stefan Wintermeyer
 PS: Your feedback is very much appreciated. Please do email me at
 sw@wintermeyer-consulting.de and follow me on Twitter
 https://twitter.com/wintermeyer[@wintermeyer].
-
-== Seeking more help?
-
-* https://stackoverflow.com[StackOverflow]: A great place to ask https://stackoverflow.com/questions/tagged/elixir[Elixir], https://stackoverflow.com/questions/tagged/phoenix-framework[Phoenix] and https://stackoverflow.com/questions/tagged/ash-framework[Ash] questions.
-* https://www.google.com[Google]: For Phoenix-related queries, add 'Phoenix
-Framework', 'Elixir' or 'Ash Framework' to refine your search.
-* Discord: https://discord.gg/elixir[Elixir], https://discord.gg/elixir[Phoenix] (#phoenix channel) and https://discord.gg/D7FNG2q[Ash] have very helpful communities.
-* Email me at sw@wintermeyer-consulting.de: Please post your question on
-StackOverflow first and include the link in your email.
 
 [[training]]
 == Elixir, Phoenix and Ash Training

@@ -2,28 +2,21 @@
 = Ash Framework
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-link:https://ash-hq.org[ash-hq.org] says
-*"Model your domain, derive the rest"* and that
-makes sense once you understand the basics of the Ash Framework. But it
-does not help you a lot in the beginning to grasp what it is.
+The Ash Framework's official site, link:https://ash-hq.org[ash-hq.org],
+proclaims, *"Model your domain, derive the rest."* While this statement
+resonates once you're familiar with Ash, it might not immediately clarify the
+framework's essence for newcomers.
 
-May I ask you for a rain check about the Ash elevator pich?
-I have to think more about it. Thank you!
+Believe me, investing time in understanding Ash is worthwhile. My background is
+rooted in Ruby on Rails, and I transitioned to Phoenix for its speed and
+scalability. However, Ash elevates the development process to an other level.
 
 Like the Phoenix Framework the Ash Framework has no shortage of
-written documentation. But most of it is not beginner friendly
+online documentation. But most of it is not beginner friendly
 and very often a mystery in itself. This book and the
 link:https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube channel]
-is my attempt to fill this gap.
+is my endeavor to bridge this knowledge gap.
 
-Please do contact me by email at sw@wintermeyer-consulting.de in
-case you need onsite or remote training.
+For feedback or inquiries about training (both onsite and remote), please reach out to me at sw@wintermeyer-consulting.de.
 
-TIP: The official support channel of the Ash Framework community
-can be found at https://elixirforum.com The Ash community is very
-welcoming. So don't be shy and ask any question there.
-
-include::minimal-ash-2x-setup-guide.adoc[]
-include::resources/index.adoc[]
-include::relationships/index.adoc[]
-include::validations/index.adoc[]
+TIP: For official support, visit the Ash Framework community on https://elixirforum.com. The community is incredibly welcoming, so don't hesitate to pose any questions you might have. See you there!
