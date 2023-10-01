@@ -467,4 +467,4 @@ nil
     (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
 ```
 
-With custom validations you can do pretty much anything you want.
+With custom validations you can solve pretty much any validation problem.
