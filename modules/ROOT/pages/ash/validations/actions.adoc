@@ -1,7 +1,10 @@
 [[ash-action-validations]]
 ## Action Validations
 
-INFO: WIP. This is just a placeholder which will be filled with content later on.
+[INFO]
+====
+WIP. This is just a placeholder which will be filled with content
+in the next couple of days.
 
 //TODO: Add content here
 
@@ -23,3 +26,4 @@ end
 ```
 
 // TODO: https://hexdocs.pm/ash/validations.html#builtin-validations
+====
