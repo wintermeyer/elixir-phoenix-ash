@@ -139,7 +139,7 @@ the `min` and `max` options.
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
-[...]
+  [...]
   attributes do
     uuid_primary_key :id
 
@@ -162,7 +162,7 @@ the `min` and `max` options.
       constraints min: 0
     end
   end
-[...]
+  [...]
 ----
 
 Testing the validation:
