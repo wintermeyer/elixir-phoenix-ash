@@ -1,10 +1,20 @@
 [[ash-identities]]
 ## Identities
 
-In many other frameworks uniquness of an attribute is part of the validation.
-Ash has a different approach. It uses `identities` and to make matters worse
-there is a difference between ETS and PostgreSQL. In PostgreSQL the database
-takes care of uniqueness. In ETS you have to do it yourself.
+Identities do just one thing: They tell Ash that a certain attribute or
+combination of attributes is unique. This is useful for things like usernames,
+email addresses, etc. Ash uses this information to do some background magic
+(e.g. it creates a unique index in a PostgreSQL database).
+
+Identities are not part of the validation process. They are checked before the
+validation. This is important because it means that you can use identities to
+check for uniqueness of attributes that are not part of the validation.
+
+### ETS
+
+If you are using ETS - the non persisting database we use for most of our examples -
+you have to implement a `pre_check_with` callback in the resource because ETS
+does not offer an unique index like PostgreSQL does.
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
@@ -14,59 +24,112 @@ takes care of uniqueness. In ETS you have to do it yourself.
 
     attribute :name, :string do
       allow_nil? false
-      constraints min_length: 3,
-                  max_length: 255,
-                  match: ~r/^[a-zA-Z-]*$/
-    end
-
-    attribute :description, :string do
-      constraints max_length: 512
     end
 
     attribute :price, :decimal do
       allow_nil? false
-      constraints min: 0.01
     end
 
-    attribute :stock_quantity, :integer do
-      allow_nil? false
-      constraints min: 0
-    end
   end
 
   identities do
-    # identity :unique_name, [:name] <1>
-
-    identity :name, [:name] do <2>
-      pre_check_with App.Shop
+    identity :unique_name, [:name] do
+      pre_check_with App.Shop <1>
     end
   end
   [...]
 ----
 
-<1> This is the code you'd need to use for PostgreSQL. It is commented out
-because we are using ETS in this example.
-<2> This is the ETS version. Delete it in case you want to use PostgreSQL.
+<1> This `pre_check` is used to check if the identity is unique.
+
+### PostgreSQL
+
+In PostgreSQL you just use the `identity` macro to define an identity. It takes
+two arguments: The name of the identity and a list of attributes that should be
+unique.
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+  [...]
+  attributes do
+    uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? false
+    end
+
+    attribute :price, :decimal do
+      allow_nil? false
+    end
+
+  end
+
+  identities do
+    identity :unique_name, [:name] <1>
+  end
+  [...]
+----
+
+<1> This is the identity. It is called `unique_name` and it makes sure that the
+`name` attribute is unique.
+
+### Test in iex
 
 Let's try to create a product with the same name twice:
 
 ```elixir
 $ iex -S mix
 iex(1)> App.Shop.Product.create!(%{name: "Banana",
-                                   price: 0.1,
-                                   stock_quantity: 12})
+                                   price: 0.1})
 #App.Shop.Product<
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "321070d5-6cec-4054-a99a-c5036a80e7d0",
-  name: "Banana",
-  ...
+    __meta__: #Ecto.Schema.Metadata<:loaded>,
+    id: "321070d5-6cec-4054-a99a-c5036a80e7d0",
+    name: "Banana",
+    ...
 >
 iex(2)> App.Shop.Product.create!(%{name: "Banana",
-                                   price: 0.2,
-                                   stock_quantity: 1})
+                                   price: 0.2})
 ** (Ash.Error.Invalid) Input Invalid
 
 * name: has already been taken
     (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+
 iex(2)>
 ```
+
+### Identities with multiple attributes
+
+Sometimes you have to combine multiple attributes. I can not think of a good example
+in our product resource. So let's discuss this in a immaginary resource
+for flight reservations. A passenger can book a flight which is represented by
+a flight number and a date. We want to make sure that a passenger can only book
+the same flight once per day.
+
+[source,elixir,title='lib/app/shop/resources/product.ex']
+----
+defmodule App.Airline.Reservation do
+  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+
+  attributes do
+    uuid_primary_key :id
+
+    attribute :passenger_id, :integer
+    attribute :flight_number, :string
+    attribute :date, :date
+  end
+
+  actions do
+    defaults [:create, :read, :update, :destroy]
+  end
+
+  identities do
+    # identity :unique_booking, [:passenger_id, :flight_number, :date] <1>
+
+    identity :unique_booking, [:passenger_id, :flight_number, :date] do
+      pre_check_with App.Airline
+    end
+  end
+end
+----
+
+<1> This would be the PostgreSQL version.
