@@ -29,7 +29,6 @@ does not offer an unique index like PostgreSQL does.
     attribute :price, :decimal do
       allow_nil? false
     end
-
   end
 
   identities do
@@ -61,7 +60,6 @@ unique.
     attribute :price, :decimal do
       allow_nil? false
     end
-
   end
 
   identities do
@@ -93,14 +91,12 @@ iex(2)> App.Shop.Product.create!(%{name: "Banana",
 
 * name: has already been taken
     (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
-
-iex(2)>
 ```
 
 ### Identities with multiple attributes
 
 Sometimes you have to combine multiple attributes. I can not think of a good example
-in our product resource. So let's discuss this in a immaginary resource
+in our product resource. So let's discuss this in a imaginary resource
 for flight reservations. A passenger can book a flight which is represented by
 a flight number and a date. We want to make sure that a passenger can only book
 the same flight once per day.
