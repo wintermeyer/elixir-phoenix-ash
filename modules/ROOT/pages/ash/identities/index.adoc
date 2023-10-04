@@ -1,7 +1,7 @@
 [[ash-identities]]
 ## Identities
 
-Identities do just one thing: They tell Ash that a certain attribute or
+Identities do one thing only: They tell Ash that a certain attribute or
 combination of attributes is unique. This is useful for things like usernames,
 email addresses, etc. Ash uses this information to do some background magic
 (e.g. it creates a unique index in a PostgreSQL database).
@@ -129,7 +129,56 @@ defmodule App.Airline.Reservation do
       pre_check_with App.Airline
     end
   end
+
+  code_interface do
+    define_for App.Airline
+    define :create
+    define :read
+    define :by_id, get_by: [:id], action: :read
+    define :update
+    define :destroy
+  end
 end
 ----
 
 <1> This would be the PostgreSQL version.
+
+### Case Insensitive Identities
+
+Sometimes you want to make sure that an attribute is unique but you don't want
+to care about the case. For example you want to make sure that an email address
+is unique but you don't want to care about the case.
+
+In those cases you can use the https://hexdocs.pm/ash/Ash.Type.CiString.html[:ci_string type].
+It is a string that is stored in the database as a string but it is compared
+case insensitive.
+
+[source,elixir,title='lib/app/shop/resources/customer.ex']
+----
+  [...]
+  attributes do
+    uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? false
+    end
+
+    attribute :email, :ci_string do
+      allow_nil? false
+    end
+  end
+
+  identities do
+    # identity :unique_email, [:email] <1>
+
+    identity :unique_email, [:email] do
+      pre_check_with App.Shop
+    end
+  end
+  [...]
+----
+
+<1> Use this version for PostgreSQL.
+
+IMPORTANT: PostgreSQL users have to add the `citext` extension. See the
+https://hexdocs.pm/ash_postgres/AshPostgres.Repo.html[AshPostgres.Repo behaviour].
