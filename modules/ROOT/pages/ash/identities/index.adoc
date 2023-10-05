@@ -1,14 +1,14 @@
 [[ash-identities]]
 ## Identities
 
-Identities do one thing only: They tell Ash that a certain attribute or
-combination of attributes is unique. This is useful for things like usernames,
+Identities do just one thing: They tell Ash that a certain attribute or
+combination of attributes is unique. Which means that a value of that attribute
+can only exist once in the database. This can be useful for things like usernames,
 email addresses, etc. Ash uses this information to do some background magic
 (e.g. it creates a unique index in a PostgreSQL database).
 
-Identities are not part of the validation process. They are checked before the
-validation. This is important because it means that you can use identities to
-check for uniqueness of attributes that are not part of the validation.
+IMPORTANT: Identities are not part of the validation process. They are checked
+before the validation.
 
 ### ETS
 
