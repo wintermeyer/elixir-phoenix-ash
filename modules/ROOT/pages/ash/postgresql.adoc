@@ -249,6 +249,9 @@ $ mix ash_postgres.drop
 The database for App.Repo has been dropped
 ```
 
+NOTE: Please run `mix ash_postgres.create` now in case you ran
+the drop command by accident while working this tutorial.
+
 ### Migrate the Database
 
 The database has been created but it is still empty. We need to
@@ -256,7 +259,7 @@ migrate it. Migrations are used to track changes in the database
 layout.
 
 Ash provides a "let me do it for you" command to generate migrations
-for all resources in your application. It is called `mix ash.codegen`.
+for all resources in your application. It is called `mix ash.codegen`
 
 ```elixir
 $ mix ash.codegen
@@ -318,7 +321,7 @@ Indexes:
     "products_pkey" PRIMARY KEY, btree (id)
 ```
 
-Let's add some more attributes to the `Product` resource:
+Let's add two attributes to the `Product` resource:
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
@@ -357,7 +360,7 @@ end
 <2> A :price attribute of type :decimal.
 <3> A :by_name action that can be used to find a product by its name.
 
-For them to be added to the database we need to gnerate a
+For them to be added to the database we need to generate a
 migration and than run it:
 
 ```elixir
@@ -452,7 +455,8 @@ we can check the table again:
 (2 rows)
 ```
 
-You are all set now!
+Congratulation! You setup your first Ash application with a
+PostgreSQL database.
 
 TIP: Never forget to run `mix ash.codegen` and `ash_postgres.migrate`
 after you have changed your resources. Otherwise the changes will
