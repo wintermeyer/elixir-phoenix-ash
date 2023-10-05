@@ -333,6 +333,7 @@ In case you want to keep those spaces you can use `trim: false`:
 ====
 I did sneek in a space in the regular expression. Because otherwise the
 validation for `"Banana   "` would fail.
+====
 
 ```elixir
 iex(4)> App.Shop.Product.create!(%{name: "Banana   ",
@@ -347,4 +348,4 @@ iex(4)> App.Shop.Product.create!(%{name: "Banana   ",
   stock_quantity: 12,
   ...
 >
-====
+```
