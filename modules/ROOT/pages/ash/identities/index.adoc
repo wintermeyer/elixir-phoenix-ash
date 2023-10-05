@@ -80,6 +80,9 @@ unique.
 <1> This is the identity. It is called `unique_name` and it makes sure that the
 `name` attribute is unique.
 
+IMPORTANT: Don't forget to run a `mix ash.codegen` and a
+`mix ecto.migrate` after adding an identity.
+
 ### Test in iex
 
 Let's try to create a product with the same name twice:

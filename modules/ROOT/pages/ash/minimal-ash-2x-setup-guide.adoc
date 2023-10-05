@@ -25,11 +25,13 @@ Ash version number at https://hex.pm/packages/ash):
 
 [source,elixir,title='mix.exs']
 ----
+[...]
 defp deps do
   [
     {:ash, "~> 2.15.8"} # Add this line
   ]
 end
+[...]
 ----
 
 Run `mix deps.get` to install it:

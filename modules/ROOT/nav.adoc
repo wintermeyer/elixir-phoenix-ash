@@ -37,4 +37,5 @@
 ** xref:ash/constraints/index.adoc[Constraints]
 ** xref:ash/validations/index.adoc[Validations]
 ** xref:ash/identities/index.adoc[Identities]
+** xref:ash/postgresql.adoc[PostgreSQL]
 * xref:acknowledgments.adoc[Acknowledgments]
