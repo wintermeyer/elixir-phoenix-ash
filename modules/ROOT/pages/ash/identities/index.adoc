@@ -10,6 +10,15 @@ email addresses, etc. Ash uses this information to do some background magic
 IMPORTANT: Identities are not part of the validation process. They are checked
 before the validation.
 
+[TIP]
+====
+Do you like video tutorials? Have a look at
+"Identities" in our
+https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
+
+video::u35x8mZC_ew[youtube,width=640,height=360]
+====
+
 ### ETS
 
 If you are using ETS - the non persisting database we use for most of our examples -
