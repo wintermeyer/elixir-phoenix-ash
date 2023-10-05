@@ -10,7 +10,7 @@ mix new --sup app && cd app
 awk '/defp deps do/,/\[/ {
        if ($0 ~ /\[/) {
            print $0;
-           print "{:ash, \"~> 2.15.7\"}";
+           print "{:ash, \"~> 2.15.8\"}";
            next;
        }
    } 1' mix.exs > mix.exs.tmp

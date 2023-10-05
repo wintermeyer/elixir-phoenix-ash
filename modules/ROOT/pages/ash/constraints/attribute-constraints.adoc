@@ -97,7 +97,7 @@ iex(1)> App.Shop.Product.create!(%{price: 10.0,
 ** (Ash.Error.Invalid) Input Invalid
 
 * attribute name is required
-    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
 ```
 
 Perfect. The validation works.
@@ -158,7 +158,7 @@ iex(1)> App.Shop.Product.create!(%{name: "Banana", price: 0.1, stock_quantity: 5
 ** (Ash.Error.Invalid) Input Invalid
 
 * attribute description is required
-    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
 iex(1)> App.Shop.Product.create!(%{name: "Banana", description: "", price: 0.1, stock_quantity: 5})
 #App.Shop.Product<
   __meta__: #Ecto.Schema.Metadata<:loaded>,
@@ -232,7 +232,7 @@ iex(7)> App.Shop.Product.create!(%{name: "Y",
 
 "Y"
 
-    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
 ----
 
 <1> stock_quantity can not be nil and has to be greater than or equal to 0.
@@ -272,7 +272,7 @@ iex(1)> App.Shop.Product.create!(%{name: "Banana2023",
 
 "Banana2023"
 
-    (ash 2.15.6) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
 
 iex(2)> App.Shop.Product.create!(%{name: "Banana",
                                    price: 0.1,
