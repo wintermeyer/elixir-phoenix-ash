@@ -458,6 +458,6 @@ we can check the table again:
 Congratulation! You setup your first Ash application with a
 PostgreSQL database.
 
-TIP: Never forget to run `mix ash.codegen` and `ash_postgres.migrate`
+TIP: Never forget to run `mix ash.codegen` and `mix ash_postgres.migrate`
 after you have changed your resources. Otherwise the changes will
 not be reflected in the database.

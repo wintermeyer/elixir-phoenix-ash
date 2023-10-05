@@ -204,4 +204,5 @@ defmodule App.Repo do
 end
 ----
 
+After that change run `mix ash.codegen` and `mix ash_postgres.migrate`
 ====
