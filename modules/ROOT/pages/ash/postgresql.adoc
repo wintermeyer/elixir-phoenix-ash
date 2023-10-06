@@ -170,6 +170,7 @@ end
 NOTE: Now I'd like to show you how to create the database but
 that is only possible when we have at least one resource.
 
+[[ashpostgres-datalayer]]
 ### Add AshPostgres to a Resource
 
 As an example we add a minimal `Product` resource to our
@@ -252,14 +253,14 @@ The database for App.Repo has been dropped
 NOTE: Please run `mix ash_postgres.create` now in case you ran
 the drop command by accident while working this tutorial.
 
-### Migrate the Database
+[[ash-codegen]]
+### mix ash.codegen
 
-The database has been created but it is still empty. We need to
-migrate it. Migrations are used to track changes in the database
-layout.
+`mix ash.codegen` scans your application for resources and when
+they changed it generates migrations for those changes.
 
-Ash provides a "let me do it for you" command to generate migrations
-for all resources in your application. It is called `mix ash.codegen`
+We created the database but it is still empty. It is time to use
+`mix ash.codegen` to create a migration for the `Product` resource.
 
 ```elixir
 $ mix ash.codegen
@@ -360,8 +361,7 @@ end
 <2> A :price attribute of type :decimal.
 <3> A :by_name action that can be used to find a product by its name.
 
-For them to be added to the database we need to generate a
-migration and than run it:
+Now we see how `mix ash.codegen` works:
 
 ```elixir
 $ mix ash.codegen
@@ -374,8 +374,8 @@ No extensions to install
 Generating Tenant Migrations:
 
 Generating Migrations:
-* creating priv/repo/migrations/20231005155818_migrate_resources2.exs
-stefan@Bimini app % mix ash_postgres.migrate
+* creating priv/repo/migrations/20231005155818_migrate_resources2.exs <1>
+$ mix ash_postgres.migrate <2>
 
 17:58:36.046 [info] == Running 20231005155818 App.Repo.Migrations.MigrateResources2.up/0 forward
 
@@ -385,7 +385,10 @@ stefan@Bimini app % mix ash_postgres.migrate
 $
 ```
 
-Just because we are courious we check the table again:
+<1> `mix ash.codegen` created a new migration file which includes the new attributes.
+<2> `mix ash_postgres.migrate` runs the migration.
+
+Because we are curious we check the table again:
 
 ```bash
 $ psql -h localhost -U postgres -d shop_dev -c "\d products"
@@ -400,7 +403,7 @@ Indexes:
     "products_pkey" PRIMARY KEY, btree (id)
 ```
 
-The table is created. Time to add some data.
+Time to add two products:
 
 ```elixir
 $ iex -S mix
@@ -412,7 +415,9 @@ iex(2)> Product.create!(%{name: "Banana", price: 0.10})
 begin []
 
 18:04:58.777 [debug] QUERY OK db=3.9ms
-INSERT INTO "products" ("id","name","price") VALUES ($1,$2,$3) RETURNING "price","name","id" ["4d7e383b-ce7b-44d0-818c-290eaa8b0532", "Banana", Decimal.new("0.1")]
+INSERT INTO "products" ("id","name","price") VALUES ($1,$2,$3)
+RETURNING "price","name","id" ["4d7e383b-ce7b-44d0-818c-290eaa8b0532",
+"Banana", Decimal.new("0.1")] <1>
 
 18:04:58.781 [debug] QUERY OK db=0.8ms
 commit []
@@ -429,7 +434,9 @@ iex(3)> Product.create!(%{name: "Pineapple", price: 0.50})
 begin []
 
 18:05:24.887 [debug] QUERY OK db=0.6ms
-INSERT INTO "products" ("id","name","price") VALUES ($1,$2,$3) RETURNING "price","name","id" ["e854a911-4cda-4693-bd49-db200b675ded", "Pineapple", Decimal.new("0.5")]
+INSERT INTO "products" ("id","name","price") VALUES ($1,$2,$3)
+RETURNING "price","name","id" ["e854a911-4cda-4693-bd49-db200b675ded",
+"Pineapple", Decimal.new("0.5")]
 
 18:05:24.888 [debug] QUERY OK db=0.6ms
 commit []
@@ -442,6 +449,8 @@ commit []
 >
 iex(4)>
 ```
+
+<1> In development mode you see these SQL debugging messages.
 
 After pressing `Ctrl-C` two times to exit the `iex` session
 we can check the table again:
