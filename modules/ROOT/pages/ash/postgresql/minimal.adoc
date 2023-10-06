@@ -1,7 +1,7 @@
 [[postgresql-minimal]]
 ## PostgreSQL Data Layer Minimal Setup
 
-We start with a fresh project and call the application `app`:
+We start with a fresh project and give the new application the name `app`:
 
 ```bash
 $ mix new --sup app
@@ -9,9 +9,9 @@ $ cd app
 ```
 
 NOTE: Please go to xref:ash/postgresql/phoenix.adoc[PostgreSQL Data Layer Ash + Phoenix Framework Setup]
-if you search for an Ash + Phoenix Framework setup.
+if you are looking for an Ash + Phoenix Framework setup.
 
-We add Ash and AshPostgres as a dependency:
+Add Ash and AshPostgres as a dependency:
 
 [source,elixir,title='mix.exs']
 ----
@@ -25,8 +25,8 @@ end
 [...]
 ----
 
-<1> Add Ash as a dependency. Find the latest version number at https://hex.pm/packages/ash
-<2> Add AshPostgres as a dependency. Find the latest version number at https://hex.pm/packages/ash_postgres
+<1> Find the latest version number at https://hex.pm/packages/ash
+<2> Find the latest version number at https://hex.pm/packages/ash_postgres
 
 Run `mix deps.get` to install it:
 
@@ -159,15 +159,15 @@ end
 
 <1> Add this line.
 
-NOTE: Now I'd like to show you how to create the database but
-that is only possible when we have at least one resource.
+To create a new database the app has to have at least one resource.
+The creation of a resource is the next step.
 
 [[ashpostgres-datalayer]]
 ### Add AshPostgres to a Resource
 
 As an example we add a minimal `Product` resource to our
 application. The resource is more or less empty. We add
-more attributes later during migrations.
+more attributes later.
 
 [source,elixir,title='lib/app/shop/resources/product.ex']
 ----
@@ -217,13 +217,14 @@ defmodule App.Shop do
 end
 ----
 
-NOTE: The `products` table is not yet created. Not even the database
+The `products` table is not yet created. Not even the database
 is created. We do that in the next step.
 
 ### Create the Database
 
-Assuming that you have PostgreSQL installed on your system, you can
-now create the database with the `mix ash_postgres.create` command:
+Assuming that you have https://www.postgresql.org[PostgreSQL] installed
+and running on your system, you can now create the database with the
+`mix ash_postgres.create` command:
 
 ```elixir
 $  mix ash_postgres.create
@@ -242,14 +243,14 @@ $ mix ash_postgres.drop
 The database for App.Repo has been dropped
 ```
 
-NOTE: Please run `mix ash_postgres.create` now in case you ran
+NOTE: Please re-run `mix ash_postgres.create` now in case you ran
 the drop command by accident while working this tutorial.
 
 [[ash-codegen]]
 ### mix ash.codegen
 
-`mix ash.codegen` scans your application for resources and when
-they changed it generates migrations for those changes.
+`mix ash.codegen` scans your application for resources, keeps track
+of them and generates migrations if things (e.g. attributes) change.
 
 We created the database but it is still empty. It is time to use
 `mix ash.codegen` to create a migration for the `Product` resource.
@@ -316,6 +317,27 @@ $ psql -h localhost -U postgres -d shop_dev -c "\d products"
 Indexes:
     "products_pkey" PRIMARY KEY, btree (id)
 ```
+
+[[ash_postgres-rollback]]
+### mix ash_postgres.rollback
+
+Sometimes you want to undo a migration. You can do that with
+`mix ash_postgres.rollback`:
+
+```elixir
+$ mix ash_postgres.rollback
+
+14:29:49.017 [info] == Running 20231006105336 App.Repo.Migrations.MigrateResources5.down/0 forward
+
+14:29:49.018 [info] drop table products
+
+14:29:49.019 [info] == Migrated 20231006105336 in 0.0s
+```
+
+NOTE: In case you just did a rollback in this example you want to migrate again
+with `mix ash_postgres.migrate` before you continue.
+
+### Add Attributes to a Resource
 
 Let's add two attributes to the `Product` resource:
 
@@ -398,7 +420,7 @@ Indexes:
     "products_pkey" PRIMARY KEY, btree (id)
 ```
 
-Time to add two products (a Banana and a Pineapple):
+Time to add two entries into the products table (a Banana and a Pineapple):
 
 ```elixir
 $ iex -S mix
@@ -459,9 +481,9 @@ we can check the table again:
 (2 rows)
 ```
 
-Congratulation! You setup your first Ash application with a
+Congratulation! You just created your first Ash application with a
 PostgreSQL database.
 
 TIP: **Never forget to run `mix ash.codegen`** and `mix ash_postgres.migrate`
-after you changed your resources. Otherwise the changes will not be reflected
+after you change a resource. Otherwise the changes will not be reflected
 in the database.
