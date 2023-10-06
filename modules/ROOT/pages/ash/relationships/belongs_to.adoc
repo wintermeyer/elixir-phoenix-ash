@@ -23,7 +23,7 @@ Do you like video tutorials? Have a look at
 "belongs_to in 2 minutes" in our
 https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
 
-video::lP8YtkXD3RE[youtube,width=640,height=360]
+video::lP8YtkXD3RE[youtube,width=480,height=270]
 ====
 
 We need a new `Category` resource:

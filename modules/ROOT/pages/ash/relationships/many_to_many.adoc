@@ -24,7 +24,7 @@ Do you like video tutorials? Have a look at
 "many_to_many Resources in Ash Framework Tutorial (4m 22s)" in our
 https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
 
-video::Xh2z8hz2RLY[youtube,width=640,height=360]
+video::Xh2z8hz2RLY[youtube,width=480,height=270]
 ====
 
 [[ash-many_to_many_setup]]

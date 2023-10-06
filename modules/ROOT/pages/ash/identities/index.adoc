@@ -16,7 +16,7 @@ Do you like video tutorials? Have a look at
 "Identities" in our
 https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
 
-video::u35x8mZC_ew[youtube,width=640,height=360]
+video::u35x8mZC_ew[youtube,width=480,height=270]
 ====
 
 ### ETS

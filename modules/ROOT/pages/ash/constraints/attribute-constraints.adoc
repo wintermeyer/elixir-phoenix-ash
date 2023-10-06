@@ -54,7 +54,7 @@ Do you like video tutorials? Have a look at
 "Attribute Constraints" in our
 https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
 
-video::NyfTwE4PIyM[youtube,width=640,height=360]
+video::NyfTwE4PIyM[youtube,width=480,height=270]
 ====
 
 [[ash-allow-nil]]

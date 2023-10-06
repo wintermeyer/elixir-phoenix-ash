@@ -31,7 +31,7 @@ Do you like video tutorials? Have a look at the 3 minute video
 https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
 
 
-video::tYCL0Rk12no[youtube,width=640,height=360]
+video::tYCL0Rk12no[youtube,width=480,height=270]
 ====
 
 ### Configure the internal API
