@@ -190,7 +190,8 @@ case insensitive.
 
 [IMPORTANT]
 ====
-PostgreSQL users have to add the `citext` extension. See the
+PostgreSQL users have to add the
+https://www.postgresql.org/docs/current/citext.html[citext extension]. See the
 https://hexdocs.pm/ash_postgres/AshPostgres.Repo.html[AshPostgres.Repo behaviour].
 
 [source,elixir,title='lib/app/repo.ex']
