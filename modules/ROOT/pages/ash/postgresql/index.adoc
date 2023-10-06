@@ -1,0 +1,11 @@
+[[postgresql]]
+## PostgreSQL Data Layer
+
+Many of the examples in the Ash chapters utilize ETS as the database.
+This choice is primarily due to its quick setup, making it ideal for
+tutorials. However, in real-world applications, you might prefer
+using a SQL database. In this chapter, I'll demonstrate how to set
+up PostgreSQL in an Ash application.
+
+* xref:ash/postgresql/minimal.adoc[PostgreSQL Data Layer Minimal Setup]
+* xref:ash/postgresql/phoenix.adoc[PostgreSQL Data Layer Ash + Phoenix Framework Setup]

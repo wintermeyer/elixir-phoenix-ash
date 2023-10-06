@@ -1,0 +1,7 @@
+[[postgresql-phoenix]]
+## PostgreSQL Data Layer Ash + Phoenix Framework Setup
+
+I will publish a Phoenix version of this document soon.
+
+Until then you can try to use xref:ash/postgresql/minimal.adoc[PostgreSQL Data Layer Minimal Setup]
+in your existing Phoenix project.

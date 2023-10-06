@@ -1,16 +1,5 @@
-[[postgresql]]
-## PostgreSQL
-
-Many of the examples in the Ash chapters utilize ETS as the database.
-This choice is primarily due to its quick setup, making it ideal for
-tutorials. However, in real-world applications, you might prefer
-using a SQL database. In this chapter, I'll demonstrate how to set
-up PostgreSQL in an Ash application.
-
-### Minimal Ash PostgreSQL Application
-
-IMPORTANT: This is a tutorial for a clean and minimal mix project.
-I will publish a Phoenix version of this document soon.
+[[postgresql-minimal]]
+## PostgreSQL Data Layer Minimal Setup
 
 We start with a fresh project and call the application `app`:
 
@@ -18,6 +7,9 @@ We start with a fresh project and call the application `app`:
 $ mix new --sup app
 $ cd app
 ```
+
+NOTE: Please go to xref:ash/postgresql/phoenix.adoc[PostgreSQL Data Layer Ash + Phoenix Framework Setup]
+if you search for an Ash + Phoenix Framework setup.
 
 We add Ash and AshPostgres as a dependency:
 
@@ -296,6 +288,9 @@ running the migration. In our case it looks like this:
 <1> Create a table named `products`.
 <2> Add a primary key column named `id` of type `uuid`.
 
+[[ash_postgres-migrate]]
+### mix ash_postgres.migrate
+
 Now it is time to run the migration:
 
 ```elixir
@@ -361,7 +356,7 @@ end
 <2> A :price attribute of type :decimal.
 <3> A :by_name action that can be used to find a product by its name.
 
-Now we see how `mix ash.codegen` works:
+Start `mix ash.codegen` again:
 
 ```elixir
 $ mix ash.codegen
@@ -403,7 +398,7 @@ Indexes:
     "products_pkey" PRIMARY KEY, btree (id)
 ```
 
-Time to add two products:
+Time to add two products (a Banana and a Pineapple):
 
 ```elixir
 $ iex -S mix
@@ -467,6 +462,6 @@ we can check the table again:
 Congratulation! You setup your first Ash application with a
 PostgreSQL database.
 
-TIP: Never forget to run `mix ash.codegen` and `mix ash_postgres.migrate`
-after you have changed your resources. Otherwise the changes will
-not be reflected in the database.
+TIP: **Never forget to run `mix ash.codegen`** and `mix ash_postgres.migrate`
+after you changed your resources. Otherwise the changes will not be reflected
+in the database.
