@@ -8,13 +8,6 @@ $ mix phx.new app --no-ecto
 $ cd app
 ```
 
-IMPORTANT: Using `--no-ecto` creates a Phoenix system in which you can not
-use generators such as `phx.gen.html`, `phx.gen.json`, `phx.gen.live` and
-`phx.gen.context` as usual because they generate a context file but that
-is not needed any more with Ash. You can still use the generators but
-you have to use them with the `--no-context` flag. This will generate
-most of the HTML and JSON files but skip the context.
-
 Add Ash and AshPostgres as a dependency:
 
 [source,elixir,title='mix.exs']
@@ -533,16 +526,19 @@ in the database.
 
 ### phx.gen.html
 
-Since Ash provides a different set of functions compared to the normal
-Phoenix context the `phx.gen.html` task will not work out of the box. You have
-to addapt the generated files to work with Ash. Especially the controller.
+Using `--no-ecto` creates a Phoenix system in which you can not
+use generators such as `phx.gen.html`, `phx.gen.json`, `phx.gen.live` and
+`phx.gen.context` as usual because they generate a context file but that
+is not needed any more with Ash. **You can still use the generators but
+you have to use them with the `--no-context` flag.** This will generate
+HTML and JSON files but skip the context.
 
 To give you an idea I'll show you what you have to change to get an `:index`
 and a `:show` view working.
 
 We start with the generator:
 
-```bash
+```elixir
 $ mix phx.gen.html Shop Product products name:string price:float --no-context
 * creating lib/app_web/controllers/product_controller.ex
 * creating lib/app_web/controllers/product_html/edit.html.heex
