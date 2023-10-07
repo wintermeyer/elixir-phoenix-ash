@@ -72,7 +72,7 @@ config :app,
 import_config "#{config_env()}.exs" <2>
 ----
 
-<1> Please adapt this to your application. Since we use App.Shop
+<1> Please adapt `App.Shop` to your application. Since we use App.Shop
 in most of our examples I use it here as well.
 <2> This imports the config file for the current environment.
 
