@@ -509,7 +509,7 @@ After pressing `Ctrl-C` two times to exit the `iex` session
 we can check the table again:
 
 ```bash
- psql -h localhost -U postgres -d shop_dev -c "select * from products"
+$ psql -h localhost -U postgres -d shop_dev -c "select * from products"
                   id                  |   name    | price
 --------------------------------------+-----------+-------
  7a4c1e30-09ea-421b-99dd-4db53d3140aa | Banana    |   0.1
