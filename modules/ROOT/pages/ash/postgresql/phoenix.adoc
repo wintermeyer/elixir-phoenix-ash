@@ -62,13 +62,7 @@ setup. Add the Ash Configurations to the file:
 
 [source,elixir,title='config/config.exs']
 ----
-# General application configuration
-import Config
-
-# Configures the endpoint
-config :app, AppWeb.Endpoint,
-  url: [host: "localhost"],
-  [...]
+[...]
 
 # Ash configuration
 config :app,
@@ -255,6 +249,82 @@ end
 The `products` table is not yet created. Not even the database
 is created. We do that in the next step.
 
+### Test Setup
+
+To be able to run tests we have to add some code.
+
+[source,elixir,title='test/test_helper.exs']
+----
+ExUnit.start()
+Ecto.Adapters.SQL.Sandbox.mode(App.Repo, :manual) <1>
+----
+
+<1> This line has to be added.
+
+And the following file has to be created:
+
+[source,elixir,title='test/support/data_case.ex']
+----
+defmodule App.DataCase do
+  @moduledoc """
+  This module defines the setup for tests requiring
+  access to the application's data layer.
+
+  You may define functions here to be used as helpers in
+  your tests.
+
+  Finally, if the test case interacts with the database,
+  we enable the SQL sandbox, so changes done to the database
+  are reverted at the end of every test. If you are using
+  PostgreSQL, you can even run database tests asynchronously
+  by setting `use App.DataCase, async: true`, although
+  this option is not recommended for other databases.
+  """
+
+  use ExUnit.CaseTemplate
+
+  using do
+    quote do
+      alias App.Repo
+
+      import Ecto
+      import Ecto.Changeset
+      import Ecto.Query
+      import App.DataCase
+    end
+  end
+
+  setup tags do
+    App.DataCase.setup_sandbox(tags)
+    :ok
+  end
+
+  @doc """
+  Sets up the sandbox based on the test tags.
+  """
+  def setup_sandbox(tags) do
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(App.Repo, shared: not tags[:async])
+    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+  end
+
+  @doc """
+  A helper that transforms changeset errors into a map of messages.
+
+      assert {:error, changeset} = Accounts.create_user(%{password: "short"})
+      assert "password is too short" in errors_on(changeset).password
+      assert %{password: ["password is too short"]} = errors_on(changeset)
+
+  """
+  def errors_on(changeset) do
+    Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
+      Regex.replace(~r"%{(\w+)}", message, fn _, key ->
+        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+      end)
+    end)
+  end
+end
+----
+
 ### Create the Database
 
 Assuming that you have https://www.postgresql.org[PostgreSQL] installed
@@ -430,7 +500,14 @@ Generating Tenant Migrations:
 
 Generating Migrations:
 * creating priv/repo/migrations/20231005155818_migrate_resources2.exs <1>
-$ mix ash_postgres.migrate <2>
+```
+
+<1> `mix ash.codegen` created a new migration file which includes the new attributes.
+
+Run the migration:
+
+```elixir
+$ mix ash_postgres.migrate
 
 17:58:36.046 [info] == Running 20231005155818 App.Repo.Migrations.MigrateResources2.up/0 forward
 
@@ -439,9 +516,6 @@ $ mix ash_postgres.migrate <2>
 17:58:36.050 [info] == Migrated 20231005155818 in 0.0s
 $
 ```
-
-<1> `mix ash.codegen` created a new migration file which includes the new attributes.
-<2> `mix ash_postgres.migrate` runs the migration.
 
 Because we are curious we check the table again:
 
