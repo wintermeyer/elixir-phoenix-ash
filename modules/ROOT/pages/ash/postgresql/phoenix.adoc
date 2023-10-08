@@ -325,6 +325,36 @@ defmodule App.DataCase do
 end
 ----
 
+And we have to add a new alias for the tests:
+
+[source,elixir,title='mix.exs']
+----
+[...]
+  defp aliases do
+    [
+      setup: ["deps.get", "assets.setup", "assets.build"],
+      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.build": ["tailwind default", "esbuild default"],
+      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"],
+      test: ["ash_postgres.create --quiet", "ash_postgres.migrate --quiet", "test"] <1>
+    ]
+  end
+[...]
+----
+
+<1> Add this line.
+
+Now we can run the tests:
+
+```elixir
+$ mix test
+.....
+Finished in 0.06 seconds (0.02s async, 0.04s sync)
+5 tests, 0 failures
+
+Randomized with seed 503191
+```
+
 ### Create the Database
 
 Assuming that you have https://www.postgresql.org[PostgreSQL] installed
