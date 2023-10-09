@@ -12,17 +12,17 @@ Add Ash and AshPostgres as a dependency:
 
 [source,elixir,title='mix.exs']
 ----
-[...]
+# [...]
 defp deps do
 [
     {:phoenix, "~> 1.7.7"},
     {:phoenix_html, "~> 3.3"},
-    [...]
+    # [...]
     {:ash, "~> 2.15.8"}, <1>
     {:ash_postgres, "~> 1.3.52"} <2>
   ]
 end
-[...]
+# [...]
 ----
 
 <1> Find the latest version number at https://hex.pm/packages/ash
@@ -62,7 +62,7 @@ setup. Add the Ash Configurations to the file:
 
 [source,elixir,title='config/config.exs']
 ----
-[...]
+# [...]
 
 # Ash configuration
 config :app,
@@ -84,7 +84,7 @@ Please add the following lines to the end of the `config/dev.exs` file:
 
 [source,elixir,title='config/dev.exs']
 ----
-[...]
+# [...]
 
 config :app, App.Repo,
   username: "postgres", <1>
@@ -104,7 +104,7 @@ Please add the following code to the end of `config/runtime.exs` file:
 
 [source,elixir,title='config/runtime.exs']
 ----
-[...]
+# [...]
 
 if config_env() == :prod do
   database_url =
@@ -130,7 +130,7 @@ Add the following lines to the end of the `config/test.exs` file:
 
 [source,elixir,title='config/test.exs']
 ----
-[...]
+# [...]
 
 config :app, App.Repo,
   username: "postgres",
