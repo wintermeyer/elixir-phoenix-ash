@@ -4,7 +4,7 @@ Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Initially I thought I could write a 10 page Elixir introduction with this
 chapter. Just to provide the basics to get you going for using the
-xref:phoenix/index.adoc[Phoenix] and the xref:phoenix/index.adoc[Ash Framework].
+xref:phoenix/index.adoc[Phoenix] and the xref:ash/index.adoc[Ash Framework].
 All that by avoiding any chicken-or-egg situations - where an explanation
 relies on concepts yet to be discussed.
 
