@@ -737,7 +737,7 @@ Randomized with seed 503191
 
 ### phx.gen.html
 
-Using `--no-ecto` creates a Phoenix system in which you can not
+By using `--no-ecto` we created a Phoenix system in which one can not
 use generators such as `phx.gen.html`, `phx.gen.json`, `phx.gen.live` and
 `phx.gen.context` as usual because they generate a context file but that
 is not needed any more with Ash. **You can still use the generators but
