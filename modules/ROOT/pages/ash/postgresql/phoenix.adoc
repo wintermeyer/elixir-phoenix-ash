@@ -663,14 +663,14 @@ As requested by the generator we add the resource to the routes:
 
 [source,elixir,title='lib/app_web/router.ex']
 ----
-  [...]
+  # [...]
   scope "/", AppWeb do
     pipe_through :browser
 
     get "/", PageController, :home
     resources "/products", ProductController, only: [:index, :show] <1>
   end
-  [...]
+  # [...]
 ----
 
 <1> Since we only want to implement the `:index` and `:show` actions we
