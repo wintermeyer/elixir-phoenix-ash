@@ -249,6 +249,35 @@ end
 The `products` table is not yet created. Not even the database
 is created. We do that in the next step.
 
+### Create the Database
+
+Assuming that you have https://www.postgresql.org[PostgreSQL] installed
+and running on your system, you can now create the database with the
+`mix ash_postgres.create` command:
+
+```elixir
+$  mix ash_postgres.create
+Compiling 2 files (.ex)
+Generated app app
+The database for App.Repo has been created
+```
+
+NOTE: Now is the first time you could actually start the Phoenix server
+with `mix phx.server` without getting an error.
+
+### Drop the Database
+
+In case you need to drop (delete) the database you can use the
+`mix ash_postgres.drop` command:
+
+```elixir
+$ mix ash_postgres.drop
+The database for App.Repo has been dropped
+```
+
+NOTE: Please re-run `mix ash_postgres.create` now in case you ran
+the drop command by accident while working this tutorial.
+
 ### Test Setup
 
 To be able to run tests we have to add some code.
@@ -354,35 +383,6 @@ Finished in 0.06 seconds (0.02s async, 0.04s sync)
 
 Randomized with seed 503191
 ```
-
-### Create the Database
-
-Assuming that you have https://www.postgresql.org[PostgreSQL] installed
-and running on your system, you can now create the database with the
-`mix ash_postgres.create` command:
-
-```elixir
-$  mix ash_postgres.create
-Compiling 2 files (.ex)
-Generated app app
-The database for App.Repo has been created
-```
-
-NOTE: Now is the first time you could actually start the Phoenix server
-with `mix phx.server` without getting an error.
-
-### Drop the Database
-
-In case you need to drop (delete) the database you can use the
-`mix ash_postgres.drop` command:
-
-```elixir
-$ mix ash_postgres.drop
-The database for App.Repo has been dropped
-```
-
-NOTE: Please re-run `mix ash_postgres.create` now in case you ran
-the drop command by accident while working this tutorial.
 
 [[ash-codegen]]
 ### mix ash.codegen
@@ -627,6 +627,113 @@ PostgreSQL database.
 TIP: **Never forget to run `mix ash.codegen` and `mix ash_postgres.migrate`**
 after you change a resource. Otherwise the changes will not be reflected
 in the database.
+
+### Test Setup
+
+To be able to run tests which use the database we have to add
+some more code.
+
+[source,elixir,title='test/test_helper.exs']
+----
+ExUnit.start()
+Ecto.Adapters.SQL.Sandbox.mode(App.Repo, :manual) <1>
+----
+
+<1> This line has to be added.
+
+And the following file has to be created:
+
+[source,elixir,title='test/support/data_case.ex']
+----
+defmodule App.DataCase do
+  @moduledoc """
+  This module defines the setup for tests requiring
+  access to the application's data layer.
+
+  You may define functions here to be used as helpers in
+  your tests.
+
+  Finally, if the test case interacts with the database,
+  we enable the SQL sandbox, so changes done to the database
+  are reverted at the end of every test. If you are using
+  PostgreSQL, you can even run database tests asynchronously
+  by setting `use App.DataCase, async: true`, although
+  this option is not recommended for other databases.
+  """
+
+  use ExUnit.CaseTemplate
+
+  using do
+    quote do
+      alias App.Repo
+
+      import Ecto
+      import Ecto.Changeset
+      import Ecto.Query
+      import App.DataCase
+    end
+  end
+
+  setup tags do
+    App.DataCase.setup_sandbox(tags)
+    :ok
+  end
+
+  @doc """
+  Sets up the sandbox based on the test tags.
+  """
+  def setup_sandbox(tags) do
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(App.Repo, shared: not tags[:async])
+    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+  end
+
+  @doc """
+  A helper that transforms changeset errors into a map of messages.
+
+      assert {:error, changeset} = Accounts.create_user(%{password: "short"})
+      assert "password is too short" in errors_on(changeset).password
+      assert %{password: ["password is too short"]} = errors_on(changeset)
+
+  """
+  def errors_on(changeset) do
+    Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
+      Regex.replace(~r"%{(\w+)}", message, fn _, key ->
+        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+      end)
+    end)
+  end
+end
+----
+
+And we have to add a new alias for the tests:
+
+[source,elixir,title='mix.exs']
+----
+[...]
+  defp aliases do
+    [
+      setup: ["deps.get", "assets.setup", "assets.build"],
+      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.build": ["tailwind default", "esbuild default"],
+      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"],
+      test: ["ash_postgres.create --quiet", "ash_postgres.migrate --quiet", "test"] <1>
+    ]
+  end
+[...]
+----
+
+<1> Add this line.
+
+Now we can run the tests:
+
+```elixir
+$ mix test
+.....
+Finished in 0.06 seconds (0.02s async, 0.04s sync)
+5 tests, 0 failures
+
+Randomized with seed 503191
+```
 
 ### phx.gen.html
 
