@@ -3,23 +3,18 @@
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Initially I thought I could write a 10 page Elixir introduction with this
-chapter. Just to provide the basics to get you going for using the Phoenix
-Framework. All that by avoiding any chicken-or-egg situations - where an
-explanation relies on concepts yet to be discussed.
+chapter. Just to provide the basics to get you going for using the
+xref:phoenix/index.adoc[Phoenix] and the xref:phoenix/index.adoc[Ash Framework].
+All that by avoiding any chicken-or-egg situations - where an explanation
+relies on concepts yet to be discussed.
 
 **I failed!** I ended up with a chapter about Elixir which covers a lot.
-It is not a complete reference of the language. But it should get you a very
-long way.
-
-It is meant to be read in a linear fashion. But if specific parts are too boring
-or too difficult for you, just skip them and come back later (or don't). I tried
-to provide enough context to make it possible to skip parts.
+It is meant to be read in a linear fashion. But feel free to just skip parts
+and come back later (or don't).
 
 If this is your first functional programming language you might want to get a cup
 of coffee first. It might take a while to get used to the functional programming
 paradigm. **It took me a long time too!**
-
-Buckle up and prepare for an exciting adventure into the realm of Elixir.
 
 include::elixir-version.adoc[]
 include::iex.adoc[]
