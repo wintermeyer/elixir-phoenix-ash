@@ -631,54 +631,13 @@ Finished in 0.06 seconds (0.02s async, 0.04s sync)
 Randomized with seed 503191
 ```
 
-### phx.gen.html
+### phx.gen.html Alternative
 
-By using `--no-ecto` we created a Phoenix system in which one can not
-use generators such as `phx.gen.html`, `phx.gen.json`, `phx.gen.live` and
-`phx.gen.context` as usual because they generate a context file but that
-is not needed any more with Ash. **You can still use the generators but
-you have to use them with the `--no-context` flag.** This will generate
-HTML and JSON files but skip the context.
+Right now there is no `mix phx.gen.html` like generator for Ash.
+Until someone creates one I show you how to create the files manually.
+Our aim is to have a web interface for the `Product` resource.
 
-To give you an idea I'll show you what you have to change to get an `:index`
-and a `:show` view working.
-
-We start with the generator:
-
-```elixir
-$ mix phx.gen.html Shop Product products name:string price:float --no-context
-* creating lib/app_web/controllers/product_controller.ex
-* creating lib/app_web/controllers/product_html/edit.html.heex
-* creating lib/app_web/controllers/product_html/index.html.heex
-* creating lib/app_web/controllers/product_html/new.html.heex
-* creating lib/app_web/controllers/product_html/show.html.heex
-* creating lib/app_web/controllers/product_html/product_form.html.heex
-* creating lib/app_web/controllers/product_html.ex
-* creating test/app_web/controllers/product_controller_test.exs
-
-Add the resource to your browser scope in lib/app_web/router.ex:
-
-    resources "/products", ProductController
-```
-
-As requested by the generator we add the resource to the routes:
-
-[source,elixir,title='lib/app_web/router.ex']
-----
-  # [...]
-  scope "/", AppWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-    resources "/products", ProductController, only: [:index, :show] <1>
-  end
-  # [...]
-----
-
-<1> Since we only want to implement the `:index` and `:show` actions we
-    restrict the resource to these two actions.
-
-Please addapt or replace the controller file with the following content:
+We start with the controller:
 
 [source,elixir,title='lib/app_web/controllers/product_controller.ex']
 ----
@@ -692,9 +651,55 @@ defmodule AppWeb.ProductController do
     render(conn, :index, products: products)
   end
 
+  def new(conn, _params) do
+    render(conn, :new, form: create_form())
+  end
+
+  def create(conn, %{"product" => product_params}) do
+    product_params
+    |> create_form()
+    |> AshPhoenix.Form.submit()
+    |> case do
+      {:ok, product} ->
+        conn
+        |> put_flash(:info, "Product created successfully.")
+        |> redirect(to: ~p"/products/#{product}")
+
+      {:error, form} ->
+        conn
+        |> put_flash(:error, "Product could not be created.")
+        |> render(:new, form: form)
+    end
+  end
+
   def show(conn, %{"id" => id}) do
     product = Product.by_id!(id)
     render(conn, :show, product: product)
+  end
+
+  def edit(conn, %{"id" => id}) do
+    product = Product.by_id!(id)
+
+    render(conn, :edit, product: product, form: update_form(product))
+  end
+
+  def update(conn, %{"product" => product_params, "id" => id}) do
+    product = Product.by_id!(id)
+
+    product
+    |> update_form(product_params)
+    |> AshPhoenix.Form.submit()
+    |> case do
+      {:ok, product} ->
+        conn
+        |> put_flash(:info, "Product updated successfully.")
+        |> redirect(to: ~p"/products/#{product}")
+
+      {:error, form} ->
+        conn
+        |> put_flash(:error, "Product could not be updated.")
+        |> render(:edit, product: product, form: form)
+    end
   end
 
   def delete(conn, %{"id" => id}) do
@@ -705,7 +710,130 @@ defmodule AppWeb.ProductController do
     |> put_flash(:info, "Product deleted successfully.")
     |> redirect(to: ~p"/products")
   end
+
+  defp create_form(params \\ nil) do
+    AshPhoenix.Form.for_create(Product, :create, as: "product", api: App.Shop, params: params)
+  end
+
+  defp update_form(product, params \\ nil) do
+    AshPhoenix.Form.for_update(product, :update, as: "product", api: App.Shop, params: params)
+  end
 end
+----
+
+The controller is pretty straight forward. We use the `AshPhoenix.Form` module
+to create the forms for the `:new` and `:edit` actions. The `:create` and `:update`
+actions are a bit more complex. We use the `AshPhoenix.Form.submit/1` function
+to submit the form. If the form is valid we redirect to the `:show` action.
+If the form is invalid we render the `:new` or `:edit` action again.
+The `AshPhoenix.Form.submit/1` function returns a tuple with `:ok` or `:error`
+and the form. If the form is valid the `:ok` tuple is returned.
+If the form is invalid the `:error` tuple is returned.
+The `AshPhoenix.Form.submit/1` function also adds the errors to the form.
+This is why we can render the form again and the errors are displayed.
+
+[source,elixir,title='lib/app_web/controllers/product_html/index.html.heex']
+----
+<.header>
+  Listing Products
+  <:actions>
+    <.link href={~p"/products/new"}>
+      <.button>New Product</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="products" rows={@products} row_click={&JS.navigate(~p"/products/#{&1}")}>
+  <:col :let={product} label="Name"><%= product.name %></:col>
+  <:col :let={product} label="Price"><%= product.price %></:col>
+  <:action :let={product}>
+    <div class="sr-only">
+      <.link navigate={~p"/products/#{product}"}>Show</.link>
+    </div>
+    <.link navigate={~p"/products/#{product}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={product}>
+    <.link href={~p"/products/#{product}"} method="delete" data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>
+----
+
+[source,elixir,title='lib/app_web/controllers/product_html/show.html.heex']
+----
+<.header>
+  Product <%= @product.id %>
+  <:subtitle>This is a product record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/products/#{@product}/edit"}>
+      <.button>Edit product</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Name"><%= @product.name %></:item>
+  <:item title="Price"><%= @product.price %></:item>
+</.list>
+
+<.back navigate={~p"/products"}>Back to products</.back>
+----
+
+[source,elixir,title='lib/app_web/controllers/product_html/new.html.heex']
+----
+<.header>
+  New Product
+  <:subtitle>Use this form to manage product records in your database.</:subtitle>
+</.header>
+
+<.simple_form :let={f} for={@form} action={~p"/products/"}>
+  <.error :if={@form.submitted_once?}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  <.input field={f[:name]} type="text" label="Name" />
+  <.input field={f[:price]} type="number" label="Price" step="any" />
+  <:actions>
+    <.button>Save Product</.button>
+  </:actions>
+</.simple_form>
+
+<.back navigate={~p"/products"}>Back to products</.back>
+----
+
+[source,elixir,title='lib/app_web/controllers/product_html/edit.html.heex']
+----
+<.header>
+  Edit Product <%= @product.id %>
+  <:subtitle>Use this form to manage product records in your database.</:subtitle>
+</.header>
+
+<.simple_form :let={f} for={@form} action={~p"/products/#{@product}"}>
+  <.error :if={@form.submitted_once?}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  <.input field={f[:name]} type="text" label="Name" />
+  <.input field={f[:price]} type="number" label="Price" step="any" />
+  <:actions>
+    <.button>Save Product</.button>
+  </:actions>
+</.simple_form>
+
+<.back navigate={~p"/products"}>Back to products</.back>
+----
+
+Don't forget to add the resource to the routes:
+
+[source,elixir,title='lib/app_web/router.ex']
+----
+  # [...]
+  scope "/", AppWeb do
+    pipe_through :browser
+
+    get "/", PageController, :home
+    resources "/products", ProductController
+  end
+  # [...]
 ----
 
 Now you can start the Phoenix server:
