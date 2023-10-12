@@ -45,7 +45,7 @@ jobs:
         echo "  content: []," >> purgecss.config.js
         echo "  css: []," >> purgecss.config.js
         echo "  safelist: {" >> purgecss.config.js
-        echo "    standard: ['embedded', /toc.*/, /copy.*/, /source.*/, /hljs.*/, 'language-elixir', 'language-bash', /highlight.*/, /arabic.*/, 'colist', /.*conum.*/, 'table', 'tr', 'td', 'th', 'theader', 'tbody']," >> purgecss.config.js
+        echo "    standard: ['embedded', /toc.*/, /copy.*/, /source.*/, /hljs.*/, 'language-elixir', 'language-bash', /highlight.*/, /arabic.*/, 'colist', /.*conum.*/, 'table', 'tr', 'td', 'th', 'theader', 'tbody', '.anchor']," >> purgecss.config.js
         echo "    deep: [/blue_example$/]," >> purgecss.config.js
         echo "    greedy: [/yellow_example$/]" >> purgecss.config.js
         echo "  }," >> purgecss.config.js
