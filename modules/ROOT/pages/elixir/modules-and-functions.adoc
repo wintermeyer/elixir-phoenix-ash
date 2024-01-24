@@ -221,26 +221,7 @@ iex> price_per_kg()
 ----
 Here, `import FruitShop.Apples, only: [price_per_kg: 0]` means that only the `price_per_kg/0` function from `FruitShop.Apples` is available for direct calling. This can help reduce naming conflicts and makes it clear which functions are being used from the imported module.
 
-[[import-hierarchical-modules]]
-=== Hierarchical Modules
-indexterm:["Import Hierarchical Modules"]
-
-When working with hierarchical modules, importing them can simplify access to their functions. For instance, let's use the `FruitShop.Apples` module:
-
-[source,elixir]
-----
-iex> defmodule FruitShop.Apples do
-...>   def price_per_kg() do
-...>     10
-...>   end
-...> end
-
-iex> import FruitShop.Apples
-FruitShop.Apples
-iex> price_per_kg()
-10
-----
-By importing `FruitShop.Apples`, you can call `price_per_kg/0` directly, without specifying the module name.
+An alternative to `only` is `except`, which lets you import all functions except the ones specified.
 
 [[alias-modules]]
 === Alias
