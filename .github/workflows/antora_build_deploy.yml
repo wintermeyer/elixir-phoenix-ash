@@ -19,7 +19,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # Antora is known to work well with this version, but you can adjust as needed
+        node-version: '14'
 
     - name: Install Antora
       run: |
@@ -27,7 +27,7 @@ jobs:
 
     - name: Build the Antora site
       run: |
-        antora --fetch antora-playbook.yml  # Replace 'antora-playbook.yml' with your playbook's name if different
+        antora --fetch antora-playbook.yml
 
     - name: Install PurgeCSS
       run: |
