@@ -50,14 +50,6 @@ iex> greeting = "Hello #{first_name}!" <1>
 iex> counter = 23
 iex> "Count: #{counter}"
 "Count: 23"
-
-iex> list = [72, 101, 108, 108, 111]
-iex> "The list is #{list}."
-"The list is [72, 101, 108, 108, 111]."
-
-iex> tuple = {72, 101, 108, 108, 111}
-iex> "The tuple is #{tuple}."
-"The tuple is {72, 101, 108, 108, 111}."
 ----
 <1> Here, we've used the `#{}` syntax to insert the value of the `first_name` variable into the string.
 
