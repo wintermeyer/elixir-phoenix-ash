@@ -221,19 +221,17 @@ Pattern matching with keyword lists is often used in function heads. Consider a 
 [source,elixir]
 ----
 defmodule User do
-  def greet(name, opts \\ []) do
-    greet(name, opts)
-  end
+  def greet(name, opts \\ []) <1>
 
-  defp greet(name, [role: "admin"]) do
+  def greet(name, [role: "admin"]) do
     "Welcome, #{name}. You have admin privileges."
   end
 
-  defp greet(name, [role: "moderator"]) do
+  def greet(name, [role: "moderator"]) do
     "Welcome, #{name}. You can moderate content."
   end
 
-  defp greet(name, _) do
+  def greet(name, []) do
     "Welcome, #{name}."
   end
 end
@@ -244,7 +242,9 @@ IO.puts User.greet("Bob", role: "admin") # Outputs: "Welcome, Bob. You have admi
 
 IO.puts User.greet("Carol", role: "moderator") # Outputs: "Welcome, Carol. You can moderate content."
 ----
-In this example, we define different greetings based on user roles. When calling the `greet` function, we can optionally provide a `role`. We have created private functions (`defp`) for each specific role we want to handle ("admin", "moderator"), and a fallback function for the general case.
+<1> We define a `greet/2` function header with a default value for the second argument. The default value is an empty list `[]`.
+
+In this example, we define different greetings based on user roles. When calling the `greet` function, we can optionally provide a `role`. 
 indexterm:[Pattern Matching, Keyword Lists, Roles]
 
 
