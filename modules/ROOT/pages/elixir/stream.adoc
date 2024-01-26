@@ -29,16 +29,16 @@ list
 
 The `Stream` module can be used with Elixir's pipe operator (`|>`) to create a sequence of transformations. The transformations only get executed when the stream is converted into a list or another enumerable.
 
-This is how you would use `Stream` to multiply each element by 2 and then filter out odd numbers:
+This is how you would use `Stream` to multiply each element by 3 and then filter out odd numbers:
 
 [source,elixir]
 ----
 list = [1, 2, 3, 4]
 list 
-  |> Stream.map(fn x -> x * 2 end) 
+  |> Stream.map(fn x -> x * 3 end) 
   |> Stream.filter(fn x -> rem(x, 2) == 0 end)
   |> Enum.to_list()
-# => [4, 8]
+# => [6, 12]
 ----
 
 [[commonly-used-stream-functions]]
