@@ -2,10 +2,10 @@
 === Type Conversions in Elixir
 indexterm:[Elixir,Type Conversions]
 
-In Elixir, type conversions are explicitly invoked by built-in functions. Here are some of the most commonly used functions to convert between different 
+In Elixir, type conversions are explicitly invoked by built-in functions. Here are some of the most commonly used functions to convert between different
 types:
 
-* `Integer.to_string/1`: indexterm:[Elixir,Functions,Integer.to_string/1] This 
+* `Integer.to_string/1`: indexterm:[Elixir,Functions,Integer.to_string/1] This
   function converts an integer to a string.
 +
 [source,elixir]
@@ -13,8 +13,8 @@ types:
 iex> Integer.to_string(42)
 "42"
 ----
-* `String.to_integer/1`: indexterm:[Elixir,Functions,String.to_integer/1] This 
-  function converts a string to an integer. An error is raised if the string does 
+* `String.to_integer/1`: indexterm:[Elixir,Functions,String.to_integer/1] This
+  function converts a string to an integer. An error is raised if the string does
   not represent a valid number.
 +
 [source,elixir]
@@ -22,8 +22,8 @@ iex> Integer.to_string(42)
 iex> String.to_integer("42")
 42
 ----
-* `Float.to_string/1` and `String.to_float/1`: 
-  indexterm:[Elixir,Functions,Float.to_string/1,String.to_float/1] These 
+* `Float.to_string/1` and `String.to_float/1`:
+  indexterm:[Elixir,Functions,Float.to_string/1,String.to_float/1] These
   functions convert between floating-point numbers and strings.
 +
 [source,elixir]
@@ -34,12 +34,12 @@ iex> Float.to_string(3.14)
 iex> String.to_float("3.14")
 3.14
 ----
-* `Atom.to_string/1` and `String.to_atom/1`: 
-  indexterm:[Elixir,Functions,Atom.to_string/1,String.to_atom/1] These functions 
-  convert between atoms and strings. 
-+  
-IMPORTANT: Note that `String.to_atom/1` should be used 
-sparingly because atoms are not garbage-collected, meaning that converting **a 
+* `Atom.to_string/1` and `String.to_atom/1`:
+  indexterm:[Elixir,Functions,Atom.to_string/1,String.to_atom/1] These functions
+  convert between atoms and strings.
++
+IMPORTANT: Note that `String.to_atom/1` should be used
+sparingly because atoms are not garbage-collected, meaning that converting **a
 large amount** of unique strings into atoms can exhaust your system memory.
 +
 [source,elixir]
@@ -50,20 +50,17 @@ iex> Atom.to_string(:elixir)
 iex> String.to_atom("elixir")
 :elixir
 ----
-Elixir also provides `Kernel.to_string/1` to convert any term to a string. For 
-example, lists and tuples can be converted to a string representation.
+Elixir also provides `Kernel.to_string/1` to convert some terms to a string. For
+example, lists can be converted to a string representation.
 indexterm:[Elixir,Functions,Kernel.to_string/1]
 +
 [source,elixir]
 ----
 iex> to_string([1, 2, 3])
-"[1, 2, 3]"
-
-iex> to_string({:ok, "Hello"})
-"{:ok, \"Hello\"}"
+<<1, 2, 3>> <1>
 ----
+<1> This is a so called BitString.
 
-Remember, type conversion in Elixir is explicit and must be invoked through these 
-built-in functions. This design choice, while requiring a bit more typing, can 
+Remember, type conversion in Elixir is explicit and must be invoked through these
+built-in functions. This design choice, while requiring a bit more typing, can
 help prevent bugs related to unexpected type conversions.
-
