@@ -32,11 +32,11 @@ You can also use the Capture operator to reference named functions from modules.
 
 [source,elixir]
 ----
-iex> len = &List.length/1
-&List.length/1
+iex> len = &length/1
+&:erlang.length/1
 iex> len.([1, 2, 3, 4, 5])
 5
 ----
 
-In the example above, `&List.length/1` captures the `length` function from the `List` module, which takes one argument (`/1`). This function is then assigned to the variable `len`.
+In the example above, `&length/1` captures the `length` function from the which takes one argument (`/1`). This function is then assigned to the variable `len`.
 
