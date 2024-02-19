@@ -49,7 +49,7 @@ In this example, `for` iterates over each number in the list `[1, 2, 3, 4, 5]`,
 squares each number (`num * num`), and collects the results into a new list. 
 This list is then assigned to the variable `squared_numbers`.
 
-You can also filter elements in a `for` comprehension using `when`:
+You can also filter elements in a `for` comprehension using a guard clause:
 
 [source,elixir]
 ----
