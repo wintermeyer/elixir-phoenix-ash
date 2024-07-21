@@ -93,16 +93,24 @@ jobs:
       run: |
         find ./build/site/ \( -name "*.html" -o -name "*.css" \) -exec brotli {} \;
 
-    - name: Deploy to Linux server via rsync
+    - name: Deploy to Server
       env:
-        DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-        SERVER: ${{ secrets.SERVER_ADDRESS }}
-        USERNAME: ${{ secrets.SERVER_USERNAME }}
-        TARGET: ${{ secrets.SERVER_TARGET_DIRECTORY }}
-        KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS_ENTRY }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
       run: |
-        echo "$DEPLOY_KEY" > deploy_key
-        chmod 600 deploy_key
-        echo "$KNOWN_HOSTS" > known_hosts
-        rsync -avz -e 'ssh -i deploy_key -o UserKnownHostsFile=known_hosts' --delete ./build/site/ $USERNAME@$SERVER:$TARGET
-        rm -f deploy_key known_hosts
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
+        rsync -avz --delete ./build/site/ $SERVER_USER@$SERVER_IP:$DEPLOY_PATH
+
+    - name: Log deployment success
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "logger -t deployment 'Successfully deployed to ${DEPLOY_PATH} from the GitHub repository.'"
