@@ -17,7 +17,7 @@ other processes can not change their values while running parallel tasks. That
 has a massive effect. In the end, it means that your Phoenix application can run
 on multiple CPUs on the same server in parallel. It even means that your Phoenix
 application can share multiple CPUs on several nodes of a server cluster in your
-data center; this makes Elixir extremely scalable and save.
+data center; this makes Elixir extremely scalable and safe.
 
 But doesn't that make your application slower? Funny thing: No. This way is
 faster. Since it is not efficient to change data in memory.

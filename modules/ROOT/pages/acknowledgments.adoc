@@ -12,3 +12,4 @@ A lot of different people made it possible to create this book.
 
 - https://github.com/digitalcohesion[@digitalcohesion] 2023-09-29
 - https://github.com/j0urneyK[@j0urneyK] 2024-01-24
+- https://github.com/hellosmithy[@hellosmithy] 2024-02-19
