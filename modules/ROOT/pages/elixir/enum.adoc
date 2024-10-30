@@ -26,13 +26,28 @@ For further enhancement, Elixir's pipe operator (`|>`) can be used with `Enum` f
 [source,elixir]
 ----
 list = [1, 2, 3, 4]
-list 
-  |> Enum.map(fn x -> x * 2 end) 
+list
+  |> Enum.map(fn x -> x * 3 end)
   |> Enum.filter(fn x -> rem(x, 2) == 0 end)
-# => [4, 8]
+# => [6, 12]
 ----
 
-This statement takes a list, multiplies each element by 2 using `Enum.map`, and then filters out the odd numbers using `Enum.filter`. The use of the pipe operator makes the code flow naturally and easier to read.
+This statement takes a list, multiplies each element by 3 using `Enum.map`, and then filters out the odd numbers using `Enum.filter`. The use of the pipe operator makes the code flow naturally and easier to read.
+
+[TIP]
+====
+You can also use the `&1` shorthand for anonymous functions (see xref:elixir/operators/capture-operator.adoc[Capture Operator])
+to increase code readability. Here's the previous example using the shorthand:
+
+[source,elixir]
+----
+list = [1, 2, 3, 4]
+list
+  |> Enum.map(&(&1 * 3))
+  |> Enum.filter(&rem(&1, 2) == 0)
+# => [6, 12]
+----
+====
 
 NOTE: **`Enum` functions are eager;** they execute immediately and return a result. If memory usage is a concern with very large collections, consider using the `Stream` module for lazy computation.
 
@@ -135,7 +150,7 @@ More details can be found at the official link:https://hexdocs.pm/elixir/Enum.ht
 ==== Enum.at/2,3
 indexterm:[Enum,Functions,at]
 
-Returns the element at the given `index` (zero based) or a default value. 
+Returns the element at the given `index` (zero based) or a default value.
 
 [source,elixir]
 ----
@@ -150,7 +165,7 @@ More details can be found at the official link:https://hexdocs.pm/elixir/Enum.ht
 ==== Enum.concat/1,2
 indexterm:[Enum,Functions,concat]
 
-Concatenates the collection of enumerable(s) given. 
+Concatenates the collection of enumerable(s) given.
 
 [source,elixir]
 ----
@@ -164,7 +179,7 @@ More details can be found at the official link:https://hexdocs.pm/elixir/Enum.ht
 ==== Enum.count/1,2
 indexterm:[Enum,Functions,count]
 
-Counts the enumerable items, optionally, using the provided function. 
+Counts the enumerable items, optionally, using the provided function.
 
 [source,elixir]
 ----
@@ -179,7 +194,7 @@ More details can be found at the official link:https://hexdocs.pm/elixir/Enum.ht
 ==== Enum.find/2,3
 indexterm:[Enum,Functions,find]
 
-Finds the first element for which the provided function returns a truthy value. 
+Finds the first element for which the provided function returns a truthy value.
 
 [source,elixir]
 ----
@@ -194,7 +209,7 @@ More details can be found at the official link:https://hexdocs.pm/elixir/Enum.ht
 ==== Enum.group_by/2,3
 indexterm:[Enum,Functions,group_by]
 
-Groups all items in the enumerable by the given function. 
+Groups all items in the enumerable by the given function.
 
 [source,elixir]
 ----
@@ -209,7 +224,7 @@ More details can be found at the official link:https://hexdocs.pm/elixir/Enum.ht
 ==== Enum.join/1,2
 indexterm:[Enum,Functions,join]
 
-Joins all the items in the enumerable into a single string. 
+Joins all the items in the enumerable into a single string.
 
 [source,elixir]
 ----
@@ -228,7 +243,7 @@ Returns the maximum value in the enumerable.
 
 [source,elixir]
 ----
-list = [1, 2, 3, 
+list = [1, 2, 3,
 
 4]
 Enum.max(list)
@@ -296,4 +311,3 @@ Enum.sum(list)
 ----
 
 More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#sum/1[Elixir Enum.sum/1 documentation].
-
