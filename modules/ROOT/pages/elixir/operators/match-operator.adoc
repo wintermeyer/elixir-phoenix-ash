@@ -184,35 +184,25 @@ iex> [e, f, g] = shopping_list <1>
 ==== Keyword Lists
 indexterm:[Pattern Matching, Keyword Lists]
 
-Pattern matching with keyword lists is particularly useful for function arguments, as it allows us to capture specific items in the list without having to know the exact order or the entire content of the list.
+In Elixir, **pattern matching on keyword lists is no longer recommended** due
+to strict ordering and count requirements introduced in version 1.15.
+While pattern matching was once possible, recent versions of Elixir make
+it unreliable. Keyword lists are often used for optional arguments where
+keys may be omitted, making pattern matching impractical.
 
-Here are some examples:
+Instead of pattern matching, access values directly by key using the [] syntax:
 
 [source,elixir]
 ----
 iex> list = [a: 1, b: 2, c: 3]
 [a: 1, b: 2, c: 3]
 
-iex> [a: a_val] = list
-[a: 1, b: 2, c: 3]
-iex> a_val
+iex> list[:a]
 1
 
-iex> [c: c_val] = list
-[a: 1, b: 2, c: 3]
-iex> c_val
+iex> list[:c]
 3
 ----
-In the example above, we match only the value we're interested in and ignore the rest of the list. Notice that the order of the elements in the keyword list does not matter; the pattern will match the keys regardless of where they're located in the list.
-
-It's also important to note that the pattern must match at least one key-value pair in the list. If it doesn't, you'll get a `MatchError`. For example:
-
-[source,elixir]
-----
-iex> [d: d_val] = list
-** (MatchError) no match of right hand side value: [a: 1, b: 2, c: 3]
-----
-In the above example, there's no `:d` key in the list, so the pattern match fails.
 
 #### Matching Inside Functions
 
@@ -244,7 +234,7 @@ IO.puts User.greet("Carol", role: "moderator") # Outputs: "Welcome, Carol. You c
 ----
 <1> We define a `greet/2` function header with a default value for the second argument. The default value is an empty list `[]`.
 
-In this example, we define different greetings based on user roles. When calling the `greet` function, we can optionally provide a `role`. 
+In this example, we define different greetings based on user roles. When calling the `greet` function, we can optionally provide a `role`.
 indexterm:[Pattern Matching, Keyword Lists, Roles]
 
 
