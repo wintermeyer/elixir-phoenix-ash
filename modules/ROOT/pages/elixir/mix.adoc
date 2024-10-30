@@ -1,7 +1,7 @@
 ## Exploring `mix`
 indexterm:["mix"]
 
-`mix` is a build in tool in Elixir that helps to scaffold a new Elixir project
+`mix` is a built-in tool in Elixir that helps to scaffold a new Elixir project
 with a pre-defined file and directory structure which makes getting started with
 a new Elixir application much easier. You don't have to use it to create a new 
 Elixir project but it is highly recommended and is used by most Elixir developers.
