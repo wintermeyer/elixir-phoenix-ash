@@ -145,12 +145,11 @@ iex> String.split("Hello, World!", ", ")
 ["Hello", "World!"]
 ----
 
-On the other hand, the `join` function lets you combine a list of strings into a
-single string:
+BTW: There is no `join` function in the `String` module. But you can use `Enum.join/2` for that:
 
 [source,elixir]
 ----
-iex> String.join(["Hello", "World!"], ", ")
+iex> Enum.join(["Hello", "World!"], ", ")
 "Hello, World!"
 ----
 
@@ -167,4 +166,3 @@ These are just a few examples of the many functions available in the `String`
 module. You can find the full list of functions, along with their descriptions
 and examples, in the official Elixir documentation for the String module at
 link:https://hexdocs.pm/elixir/String.html[hexdocs.pm/elixir/String.html].
-
