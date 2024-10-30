@@ -56,7 +56,7 @@ iex> ~S(1 + 1 = #{1 + 1})
 indexterm:["Regular expression"]
 indexterm:[sigils,"~r"]
 
-`~r` is the sigil used to represent a [regular expression](https://en.wikipedia.org/wiki/Regular_expression):
+`~r` is the sigil used to represent a https://en.wikipedia.org/wiki/Regular_expression[regular expression]:
 
 [source,elixir]
 ----
