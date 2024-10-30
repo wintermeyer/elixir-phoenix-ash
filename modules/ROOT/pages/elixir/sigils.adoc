@@ -114,7 +114,7 @@ For the `~w` sigil, you can add a `c`, `s`, or `a` after the `w`, changing the t
 Here are some examples:
 
 [source,elixir]
-
+----
 iex> ~w(hello world this is Elixir)c
 [~c"hello", ~c"world", ~c"this", ~c"is", ~c"Elixir"]
 
@@ -123,6 +123,7 @@ iex> ~w(hello world this is Elixir)s
 
 iex> ~w(hello world again)a
 [:hello, :world, :again]
+----
 
 Also note that you can use different delimiters for your `~w` sigil, not just parentheses. For example, `~w{hello world this is Elixir}`, `~w/hello world this is Elixir/` and `~w|hello world this is Elixir|` are all valid.
 
