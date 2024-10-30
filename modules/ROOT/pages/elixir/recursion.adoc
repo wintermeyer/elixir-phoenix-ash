@@ -97,7 +97,7 @@ that recursion is a good solution, but you just can't think of a good recursion
 for it. That is normal. Don't worry.
 
 I used to say that https://www.google.com and
-https://stackoverflow.com were your friends. They still are but ChatGPT and Github Copilot have made our lives as programmers to much easier. Ask them. No embarrassment!
+https://stackoverflow.com were your friends. They still are but ChatGPT and Github Copilot have made our lives as programmers so much easier. Ask them. No embarrassment!
 
 During this book, we will work with recursions. So you'll get a better feeling for
 it.
