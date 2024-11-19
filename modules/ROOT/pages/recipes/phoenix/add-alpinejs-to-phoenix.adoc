@@ -1,0 +1,76 @@
+[[add-alpinejs-to-phoenix]]
+# Add Alpine.js to Phoenix
+
+I hate to use JavaScript and by using LiveView I can avoid it most of the time.
+But sometimes a bit of JavaScript adds a nice touch to the user experience.
+For this I prefer to use [Alpine.js](https://alpinejs.dev/).
+
+## Setup Phoenix
+
+Let's start by creating a new basic Phoenix app:
+
+```bash
+mix phx.new example_app --no-ecto
+cd example_app
+```
+
+### Install Alpine.js
+
+```bash
+cd assets && yarn add alpinejs && cd ..
+```
+
+NOTE: If you are using npm, you can use `cd assets && npm install alpinejs && cd ..` instead.
+
+### Configure app.js
+
+Add the following to top `import` section of the `assets/js/app.js`:
+
+```javascript
+import Alpine from "alpinejs";
+window.Alpine = Alpine;
+Alpine.start();
+```
+
+Afterwards change the `let liveSocket` part to:
+
+```javascript
+let liveSocket = new LiveSocket("/live", Socket, {
+  longPollFallbackMs: 2500,
+  params: { _csrf_token: csrfToken },
+  dom: {
+    onBeforeElUpdated(from, to) {
+      if (from._x_dataStack) {
+        window.Alpine.clone(from, to);
+      }
+    },
+  },
+});
+```
+
+### Test it
+
+Open `lib/example_app_web/controllers/page_html/home_html.heex` and
+replace the content with the following example code:
+
+```html
+<div x-data="{ count: 0 }" class="flex items-center justify-center min-h-screen">
+  <button
+    x-on:click="count++"
+    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+  >
+    Increment
+  </button>
+
+  <span x-text="count" class="ml-4"></span>
+</div>
+```
+
+Start the Phoenix server:
+
+```bash
+mix phx.server
+```
+
+Open your browser and navigate to `http://localhost:4000`.
+You should see a button and a number that increments when you click the button.

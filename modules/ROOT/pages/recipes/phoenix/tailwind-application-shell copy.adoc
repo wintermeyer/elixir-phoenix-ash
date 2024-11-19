@@ -1,0 +1,20 @@
+[[tailwind-application-shell]]
+# tailwind-application-shell
+
+Most of my projects start with a basic Tailwind Application Shell.
+A basic WebGUI which contains some sort of navigation bar and offers
+a mobile first approach.
+
+This recipe uses the free layout from
+https://tailwindui.com/components/application-ui/application-shells/stacked
+
+image::recipies/tailwind-application-shell/default-phoenix-home-screen.png[http://localhost:4000]
+
+
+## Setup Phoenix
+
+```bash
+mix phx.new example_app
+cd example_app
+mix ecto.create
+```
