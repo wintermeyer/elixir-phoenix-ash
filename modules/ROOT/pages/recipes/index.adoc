@@ -8,4 +8,4 @@ do send me feedback. I always love to improve them.
 
 ## Table of Contents
 
-* xref:recipes/phoenix/add-aplinejs-to-phoenix.adoc[Add Alpine.js to Phoenix]
+* xref:recipes/phoenix/add-alpinejs-to-phoenix.adoc[Add Alpine.js to Phoenix]
