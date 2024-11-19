@@ -3,7 +3,8 @@
 
 I hate to use JavaScript and by using LiveView I can avoid it most of the time.
 But sometimes a bit of JavaScript adds a nice touch to the user experience.
-For this I prefer to use [Alpine.js](https://alpinejs.dev/).
+For this I prefer to use https://alpinejs.dev/[Alpine.js] which is a
+lightweight and easy to use JavaScript framework.
 
 ## Setup Phoenix
 
