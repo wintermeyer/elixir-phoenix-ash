@@ -1,10 +1,12 @@
 [[add-alpinejs-to-phoenix]]
 # Add Alpine.js to Phoenix
+indexterm:["Alpine.js", "JavaScript"]
 
-I hate to use JavaScript and by using LiveView I can avoid it most of the time.
-But sometimes a bit of JavaScript adds a nice touch to the user experience.
-For this I prefer to use https://alpinejs.dev/[Alpine.js] which is a
-lightweight and easy to use JavaScript framework.
+By using LiveView we can normaly avoid the use of JavaScript. But sometimes
+a bit of additional JavaScript adds a nice touch to the user experience
+(e.g. collapse of a navigation menu). For this I prefer to use
+https://alpinejs.dev/[Alpine.js] which is a lightweight and easy to use
+JavaScript framework.
 
 ## Setup Phoenix
 
@@ -21,7 +23,7 @@ cd example_app
 cd assets && yarn add alpinejs && cd ..
 ```
 
-NOTE: If you are using npm, you can use `cd assets && npm install alpinejs && cd ..` instead.
+NOTE: For npm use `cd assets && npm install alpinejs && cd ..` instead.
 
 ### Configure app.js
 
@@ -33,7 +35,7 @@ window.Alpine = Alpine;
 Alpine.start();
 ```
 
-Afterwards change the `let liveSocket` part to:
+And update the `let liveSocket` part to:
 
 ```javascript
 let liveSocket = new LiveSocket("/live", Socket, {
@@ -49,10 +51,10 @@ let liveSocket = new LiveSocket("/live", Socket, {
 });
 ```
 
-### Test it
+### Test if Alpine.js works
 
 Open `lib/example_app_web/controllers/page_html/home_html.heex` and
-replace the content with the following example code:
+replace its content with the following Alpine.js example code:
 
 ```html
 <div x-data="{ count: 0 }" class="flex items-center justify-center min-h-screen">
