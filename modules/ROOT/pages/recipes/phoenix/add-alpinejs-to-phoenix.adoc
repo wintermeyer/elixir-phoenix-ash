@@ -8,6 +8,15 @@ a bit of additional JavaScript adds a nice touch to the user experience
 https://alpinejs.dev/[Alpine.js] which is a lightweight and easy to use
 JavaScript framework.
 
+[TIP]
+====
+Do you prefer video tutorials? Find this recipe at
+"Add Alpine js to Phoenix in 60 seconds" in our
+https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
+
+video::H6yOFG6_m5k[youtube,width=480,height=270]
+====
+
 ## Setup Phoenix
 
 Let's start by creating a new basic Phoenix app:
