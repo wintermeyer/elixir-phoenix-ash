@@ -44,5 +44,6 @@
 ** xref:ash/postgresql/index.adoc[PostgreSQL]
 *** xref:ash/postgresql/minimal.adoc[Minimal]
 *** xref:ash/postgresql/phoenix.adoc[Phoenix]
+* xref:recipes/index.adoc[Recipes]
 
 * xref:acknowledgments.adoc[Acknowledgments]

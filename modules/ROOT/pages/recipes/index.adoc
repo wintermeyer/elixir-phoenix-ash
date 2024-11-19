@@ -1,0 +1,11 @@
+[[recipes]]
+= Recipes
+Stefan Wintermeyer <sw@wintermeyer-consulting.de>
+
+This is a collection of recipes which I mainly wrote for myself so I
+don't have to reinvent the wheel every time I do something. Please
+do send me feedback. I always love to improve them.
+
+## Table of Contents
+
+* xref:recipes/phoenix/add-aplinejs-to-phoenix.adoc[Add Alpine.js to Phoenix]
