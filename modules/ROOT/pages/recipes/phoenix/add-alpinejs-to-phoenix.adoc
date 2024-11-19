@@ -25,7 +25,7 @@ NOTE: If you are using npm, you can use `cd assets && npm install alpinejs && cd
 
 ### Configure app.js
 
-Add the following to top `import` section of the `assets/js/app.js`:
+Add the following to the top `import` section of the `assets/js/app.js`:
 
 ```javascript
 import Alpine from "alpinejs";
