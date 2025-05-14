@@ -1,16 +1,46 @@
-We start with a clean slate. A fresh Ash app. Please move
-or delete an already existing Ash app if you have one under
-the directory name `app`. Feel free to copy and paste the following
-lines in your terminal or do it step by step following
-xref:ash/relationships/index.adoc#ash-relationships-setup[relationship setup].
+[[setup-fresh-app]]
+## Setting Up a Fresh Ash App
 
-[source, bash]
-----
+The fastest way to get started with Ash is using Igniter, a powerful code generator for Ash applications. Igniter handles all the boilerplate setup for you, making it easy to get up and running quickly.
+
+### Using Igniter (Recommended)
+
+First, install the Igniter archive if you haven't already:
+
+```bash
+$ mix archive.install hex igniter_new
+```
+
+Then create a fresh Ash application:
+
+```bash
+$ mix igniter.new app --install ash
+$ cd app
+```
+
+For a Phoenix application with Ash and PostgreSQL support:
+
+```bash
+$ mix igniter.new app --with phx.new --install ash,ash_postgres
+$ cd app
+```
+
+Igniter will create all the necessary files and folder structure, install dependencies, and set up your configuration automatically.
+
+### Using the Interactive Web Installer
+
+You can also use the interactive web installer at https://ash-hq.org/#get-started to create a custom setup command tailored to your specific needs.
+
+### Manual Setup Alternative
+
+If you prefer the manual approach, you can follow the steps in xref:ash/ash-setup-guide.adoc#the-manual-approach-alternative[the manual approach] or use this bash script that performs the same setup:
+
+```bash
 mix new --sup app && cd app
 awk '/defp deps do/,/\[/ {
        if ($0 ~ /\[/) {
            print $0;
-           print "{:ash, \"~> 2.15.8\"}";
+           print "{:ash, \"~> 3.0\"}";
            next;
        }
    } 1' mix.exs > mix.exs.tmp
@@ -22,6 +52,6 @@ echo '[
 ]' > .formatter.exs
 mkdir config
 echo 'import Config
-config :app, :ash_apis, [App.Shop]' > config/config.exs
+config :app, :ash_domains, [App.Shop]' > config/config.exs
 mix format
-----
+```

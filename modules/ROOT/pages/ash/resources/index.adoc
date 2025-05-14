@@ -6,52 +6,52 @@ Ash resources are used to model data and define actions which are used
 to manipulate that data. In the Ash world we often compare the resources
 with nouns and the actions with verbs.
 
+In Ash 3.0, resources are grouped into domains - context boundaries where related resources
+are defined together. This helps organize your application and makes it easier to understand
+the relationships between resources.
+
 [[ash-resource-to_do_list_example]]
 ### To-Do-List Example
 
 To dive into resources we use a simple to-do-list application as an
-example. As a preperation for this please use the
-xref:ash/minimal-ash-2x-setup-guide.adoc[Minimal Ash 2.x Setup Guide] to
-generate a new Elixir application.
+example. As a preparation for this, use Igniter to create a new application:
+
+```bash
+$ mix archive.install hex igniter_new
+$ mix igniter.new app --install ash
+$ cd app
+```
+
+Alternatively, you can follow the xref:ash/ash-setup-guide.adoc[Ash Setup Guide] for other setup options.
 
 We want to create a `task` resource which has a `content` attribute
 and an `id` attribute as a primary key. We also want to include the
 actions `create`, `read`, `update` and `delete`. Ash provides those
 actions for free but we have to include them into the resource.
 
-IMPORTANT: In the Ash world a resource needs to be registered to an
-interal API. Please don't think of this as an external WebAPI. Ash
-uses the term API for an internal programming interface. We call
-our API `ToDoList`.
-
-[TIP]
-====
-Do you like video tutorials? Have a look at the 3 minute video
-"Ash Resource - Create, Read, Update and Destroy" in our
-https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
+IMPORTANT: In Ash 3.0, resources need to be registered to a domain. The domain acts
+as a boundary for related resources and provides a place to define shared functionality.
+Each domain is registered with your application's OTP app.
 
 
-video::tYCL0Rk12no[youtube,width=480,height=270]
-====
+### Configure the Domain
 
-### Configure the internal API
-
-We have to add an internal API a `config.exs` file.
+First, we need to configure our OTP app to recognize our domain:
 
 [source,elixir,title='config/config.exs']
 ----
 import Config
 
-config :app, :ash_apis, [App.ToDoList]
+config :app, :ash_domains, [App.ToDoList]
 ----
 
-Now we create the `ToDoList` API module which contains the
+Now we create the `ToDoList` domain module which contains the
 resource `Task`.
 
 [source,elixir,title='lib/app/to_do_list.ex']
 ----
 defmodule App.ToDoList do
-  use Ash.Api
+  use Ash.Domain, otp_app: :app
 
   resources do
     resource App.ToDoList.Task
@@ -62,7 +62,7 @@ end
 For the resource(s) we create a new directory:
 
 ```bash
-$ mkdir -p lib/app/to_do_list/resources
+$ mkdir -p lib/app/to_do_list
 ```
 
 ### Configure the Resource
@@ -73,10 +73,13 @@ is a special attribute because it is the primary key of the resource. We
 use the `uuid_primary_key` macro to define the `id` attribute as a primary
 key. The `content` attribute is a simple string.
 
-[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+[source,elixir,title='lib/app/to_do_list/task.ex']
 ----
 defmodule App.ToDoList.Task do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets <1>
+  use Ash.Resource, 
+    data_layer: Ash.DataLayer.Ets, 
+    domain: App.ToDoList,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
@@ -85,13 +88,15 @@ defmodule App.ToDoList.Task do
 end
 ----
 
-<1> In this example we use the
+In this example we use the
 link:https://hexdocs.pm/ash/Ash.DataLayer.Ets.html[Ash.DataLayer.Ets] as
-a database layer. ETS (Erlang Term Storage) is an in memory data store
-which is build into your Erlang system. For our training purpose this
-is ideal because we don't have to install and configure a database (e.g.
-PostgreSQL). **But ETS does not save any data to disk!** With every
-restart of `iex` you have to re-create the example data.
+a database layer. ETS (Erlang Term Storage) is an in-memory data store
+which is built into your Erlang system. For our training purpose this
+is ideal because we don't have to install and configure a database.
+
+IMPORTANT: ETS does not save any data to disk! With every restart of `iex` 
+you have to re-create the example data. For production applications, 
+you should use AshPostgres or another persistent data layer.
 
 The resulting directory structure should look like this:
 
@@ -101,12 +106,11 @@ lib
 ├── app
 │   ├── application.ex
 │   ├── to_do_list
-│   │   └── resources
-│   │       └── task.ex
+│   │   └── task.ex
 │   └── to_do_list.ex
 └── app.ex
 
-4 directories, 4 files
+3 directories, 4 files
 ```
 
 We now have a resource but because we haven't defined any actions we

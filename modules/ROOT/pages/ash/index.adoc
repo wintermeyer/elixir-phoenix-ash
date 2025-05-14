@@ -11,6 +11,10 @@ Believe me, investing time in understanding Ash is worthwhile. My background is
 rooted in Ruby on Rails, and I transitioned to Phoenix for its speed and
 scalability. However, Ash elevates the development process to an other level.
 
+NOTE: This documentation covers Ash 3.0, which brings major improvements over
+previous versions. If you're still using Ash 2.x, note that there are some
+syntax changes and new features available in version 3.0.
+
 Like the Phoenix Framework the Ash Framework has no shortage of
 online documentation. But most of it is not beginner friendly
 and very often a mystery in itself. This book and the
@@ -24,6 +28,32 @@ but it's not required.
 For feedback or inquiries about training (both onsite and remote), please reach out to me at sw@wintermeyer-consulting.de.
 
 TIP: For official support, visit the Ash Framework community on https://elixirforum.com. The community is incredibly welcoming, so don't hesitate to pose any questions you might have. See you there!
+
+## Getting Started
+
+Igniter is the recommended way to get started with Ash. It provides a powerful code generator that handles all the setup and configuration for you, so you can focus on building your application rather than configuring dependencies.
+
+To create a new Ash application, first install the Igniter archive:
+
+```bash
+$ mix archive.install hex igniter_new
+```
+
+Then create your application with Ash pre-installed:
+
+```bash
+$ mix igniter.new my_app --install ash
+```
+
+For a Phoenix application with Ash and PostgreSQL support:
+
+```bash
+$ mix igniter.new my_app --with phx.new --install ash,ash_postgres
+```
+
+You can also use the interactive web installer at https://ash-hq.org/#get-started to create a custom setup command tailored to your needs.
+
+For more details and alternative approaches, see our xref:ash/ash-setup-guide.adoc[Ash Setup Guide].
 
 ## Table of Contents
 

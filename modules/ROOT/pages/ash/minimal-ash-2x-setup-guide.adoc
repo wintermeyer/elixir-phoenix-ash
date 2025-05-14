@@ -1,5 +1,5 @@
-[[minimal-ash-2x-setup-guide]]
-## Minimal Ash 2.x Setup Guide
+[[minimal-ash-3x-setup-guide]]
+## Minimal Ash 3.x Setup Guide
 
 There are a couple of steps we need to do for every new mix project
 which uses Ash. This guide will walk you through those steps. For this
@@ -28,7 +28,7 @@ Ash version number at https://hex.pm/packages/ash):
 [...]
 defp deps do
   [
-    {:ash, "~> 2.15.8"} # Add this line
+    {:ash, "~> 3.0"}
   ]
 end
 [...]
@@ -46,7 +46,6 @@ the file `.formatter.exs` to include the Ash formatter:
 [source,elixir,title='.formatter.exs']
 ----
 [
-  # add the next line
   import_deps: [:ash],
   inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
 ]
@@ -55,3 +54,5 @@ the file `.formatter.exs` to include the Ash formatter:
 TIP: The Elixir formatter is a great tool to keep your code consistent.
 It is highly recommended to use run the command `mix format` before
 committing your code into a repository.
+
+TIP: For more powerful setup, consider using Igniter with `mix archive.install hex igniter_new` which gives you access to the `igniter.new` Mix task that can scaffold Phoenix apps with Ash and other packages pre-installed.

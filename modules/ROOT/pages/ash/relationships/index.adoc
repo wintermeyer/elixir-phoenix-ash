@@ -5,38 +5,49 @@ indexterm:[Ash, Relationships]
 Relationships define connections between resources. In any application this
 is the bread and butter of the data modeling.
 
+In Ash 3.0, relationships are defined within resources that are part of a domain.
+This allows Ash to effectively manage and navigate the connections between your data.
+
 [[ash-relationships-setup]]
 ### Setup
 
-We discuss relationships in the context of a simple online shop. Please
-use xref:ash/minimal-ash-2x-setup-guide.adoc[Minimal Ash 2.x Setup Guide] to generate
-a new Elixir application. After that create or adapt the following files for a
-`Product` resource:
+We discuss relationships in the context of a simple online shop. To get started, create a new application using Igniter:
+
+```bash
+$ mix archive.install hex igniter_new
+$ mix igniter.new app --install ash
+$ cd app
+```
+
+Alternatively, you can follow the xref:ash/ash-setup-guide.adoc[Ash Setup Guide] for other setup options.
+
+After setting up your application, create the following files for a `Product` resource:
 
 [source,elixir,title='config/config.exs']
 ----
 import Config
 
-config :app, :ash_apis, [App.Shop]
+config :app, :ash_domains, [App.Shop]
 ----
 
 [source,elixir,title='lib/app/shop.ex']
 ----
 defmodule App.Shop do
-  use Ash.Api
+  use Ash.Domain, otp_app: :app
 
   resources do
-    resource App.Shop.Product <1>
+    resource App.Shop.Product
   end
 end
 ----
 
-<1> We always have to create an internal API and include all resources in it.
-
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource, 
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
@@ -47,15 +58,25 @@ defmodule App.Shop.Product do
   actions do
     defaults [:create, :read, :update, :destroy]
   end
+end
+----
 
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
+Now let's add code interface definitions in our domain to make working with the resource easier:
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Domain, otp_app: :app
+
+  resources do
+    resource App.Shop.Product do
+      define :create_product, action: :create
+      define :read_products, action: :read
+      define :get_product_by_id, action: :read, get_by: :id
+      define :get_product_by_name, action: :read, get_by: :name
+      define :update_product, action: :update
+      define :destroy_product, action: :destroy
+    end
   end
 end
 ----

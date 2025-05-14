@@ -17,14 +17,7 @@ In our shop example a `Category` has many `Products`.
 +----------+      +-------------+
 ----
 
-[TIP]
-====
-Do you like video tutorials? Have a look at
-"has_many in 2m 19s" in our
-https://www.youtube.com/@elixir-phoenix-ash[@elixir-phoenix-ash YouTube Channel].
 
-video::jQZGHl4B4fU[youtube,width=480,height=270]
-====
 
 Using the xref:ash/relationships/belongs_to.adoc[belongs_to] example and setup we
 can now add a `has_many` relationship to the `Category` resource:

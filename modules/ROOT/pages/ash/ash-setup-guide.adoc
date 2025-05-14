@@ -1,0 +1,91 @@
+[[ash-setup-guide]]
+## Ash Setup Guide
+
+Ash provides a powerful tool called Igniter that makes setting up new projects much easier. This guide will show you the recommended approach using Igniter, as well as explaining the manual steps for those who prefer that approach.
+
+### The Igniter Approach (Recommended)
+
+Igniter is a powerful code generator that can scaffold Ash applications and add packages to existing applications. It's the recommended way to set up Ash projects.
+
+First, install the `igniter_new` archive:
+
+```bash
+$ mix archive.install hex igniter_new
+```
+
+Then create a new application with Ash pre-installed:
+
+```bash
+$ mix igniter.new app --install ash
+$ cd app
+```
+
+If you'd like to create a Phoenix application with Ash, you can use:
+
+```bash
+$ mix igniter.new app --with phx.new --install ash,ash_postgres
+$ cd app
+```
+
+This will create a new application with all the necessary dependencies, configuration files, and folder structure for working with Ash.
+
+### The Manual Approach (Alternative)
+
+If you prefer to set up your Ash application manually, here are the steps:
+
+Let's start with a fresh Mix project:
+
+```bash
+$ mix new --sup app
+$ cd app
+```
+
+We add Ash to our dependencies in `mix.exs` (find the latest version number at https://hex.pm/packages/ash):
+
+[source,elixir,title='mix.exs']
+----
+[...]
+defp deps do
+  [
+    {:ash, "~> 3.0"}
+  ]
+end
+[...]
+----
+
+Run `mix deps.get` to install it:
+
+```bash
+$ mix deps.get
+```
+
+To make sure that we get the right formatting for our code, we change
+the file `.formatter.exs` to include the Ash formatter:
+
+[source,elixir,title='.formatter.exs']
+----
+[
+  import_deps: [:ash],
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+]
+----
+
+TIP: The Elixir formatter is a great tool to keep your code consistent.
+It is highly recommended to use run the command `mix format` before
+committing your code into a repository.
+
+### Adding Ash to Existing Projects
+
+If you already have a project and want to add Ash to it, Igniter provides a convenient way:
+
+```bash
+$ mix igniter.install ash
+```
+
+This will add Ash to your dependencies and set up the necessary configuration files. If you need PostgreSQL support, you can run:
+
+```bash
+$ mix igniter.install ash_postgres
+```
+
+Igniter will guide you through the process, showing you the changes it will make and asking for confirmation before applying them.
