@@ -6,3 +6,4 @@ sandbox/*
 /public/
 /docs-site
 .vscode
+/ignore/
