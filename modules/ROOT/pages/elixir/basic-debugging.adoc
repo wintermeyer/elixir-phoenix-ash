@@ -9,7 +9,7 @@ exploring the code examples in this book.
 ### dbg/2
 indexterm:["dbg/2"]
 
-Elixir version 1.14 introduced the powerful debugging tool `dbg/2`. It not only prints the passed value, returning
+Elixir version 1.18 includes the powerful debugging tool `dbg/2`. It not only prints the passed value, returning
 it simultaneously, but also outlines the code and location. Here's an example:
 
 ```elixir

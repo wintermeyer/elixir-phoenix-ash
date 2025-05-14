@@ -7,6 +7,11 @@ plenty of times in xref:phoenix/index.adoc[Phoenix Basics], and you probably
 already understand the basics. So this is just a small chapter with some useful
 extra details.
 
+IMPORTANT: Phoenix 1.8 includes verified routes with the `~p` sigil that provides compile-time
+verification of routes. Instead of using the traditional helpers like `Routes.user_path(conn, :show, user)`,
+you can now use `~p"/users/#{user}"` which is simpler and provides compile-time safety. Phoenix 1.8 also
+introduces scopes for secure data access and authorization.
+
 All code in this chapter will result from this base application:
 
 [source,bash]

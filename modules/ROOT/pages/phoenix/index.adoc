@@ -18,12 +18,12 @@ one step at a time.
 .Phoenix version
 ====
 The code examples of this book are written and tested for Phoenix
-version 1.5.1 or above. Please make sure that you have a 1.5.x version
+version 1.8.0-rc.3 or above. Please make sure that you have a 1.8.x version
 installed.
 [source,bash]
 ----
 $ mix phx.new --version
-Phoenix v1.5.1
+Phoenix v1.8.0-rc.3
 ----
 ====
 
@@ -168,7 +168,7 @@ page.
         <a href="https://github.com/phoenixframework/phoenix">Source</a>
       </li>
       <li>
-        <a href="https://github.com/phoenixframework/phoenix/blob/v1.5/CHANGELOG.md">v1.5 Changelog</a>
+        <a href="https://github.com/phoenixframework/phoenix/blob/v1.8/CHANGELOG.md">v1.8 Changelog</a>
       </li>
     </ul>
   </article>
@@ -657,7 +657,7 @@ On http://localhost:4000/inspect we see this:
 
 To access that, we need to change the `playground.html.eex` template:
 
-.lib/hello_world_web/templates/page/playground.html.eex
+.lib/demo_web/templates/page/playground.html.eex
 [source,html]
 ----
 <h1><%= @headline %></h1>
@@ -687,7 +687,7 @@ The current application always displays the same content. The easiest way to
 change that is to display the current time. For that, we are going to add a
 `timestamp` variable in the controller and display it in the template:
 
-.lib/hello_world_web/controllers/page_controller.ex
+.lib/demo_web/controllers/page_controller.ex
 [source,elixir]
 ----
 [...]
@@ -705,7 +705,7 @@ end
 
 And we need to update the template as well:
 
-.lib/hello_world_web/templates/page/playground.html.eex
+.lib/demo_web/templates/page/playground.html.eex
 [source,html]
 ----
 <h1><%= @headline %></h1>

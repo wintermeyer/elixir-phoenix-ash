@@ -8,7 +8,8 @@ LiveView, according to the
 https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html[documentation],
 "provides rich, real-time user experiences with server-rendered HTML".
 This means that you can create modern, interactive UIs without writing any
-JavaScript.
+JavaScript. With Phoenix 1.8 and LiveView 1.0, the LiveView ecosystem has matured
+into a robust, production-ready solution for building interactive web applications.
 
 NOTE: Feel free to skip this chapter if you are not interested in developing
 apps with real-time user experiences. You can come back at any time.
@@ -63,7 +64,8 @@ You can also run your app inside IEx (Interactive Elixir) as:
     $ iex -S mix phx.server
 ----
 <1> The `--live` flag adds all the necessary components to use LiveView out of the box. For this
-example, we don't need Ecto, so we use `--no-ecto`. Phoenix 1.7+ comes with Tailwind CSS by default.
+example, we don't need Ecto, so we use `--no-ecto`. Phoenix 1.8 includes Tailwind CSS and daisyUI by default, 
+providing a complete component and theming system with built-in light and dark mode support.
 <2> Click `Y` and, depending on your internet connection, maybe grab a cup of coffee.
 
 The aim of this demo is to create a new webpage with the path `/light` which

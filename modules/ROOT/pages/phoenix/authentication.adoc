@@ -3,9 +3,9 @@
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 There are several authentication libraries that you could use with your Phoenix
-app, but instead of any of those, we are going to use
-https://hexdocs.pm/phx_gen_auth/overview.html[phx_gen_auth] to generate the
-authentication code into our app.
+app, but Phoenix 1.8 includes built-in authentication generators that support both
+password-based and magic link authentication. The `phx.gen.auth` generator allows you
+to easily add a complete authentication system to your application that scales with your needs.
 
 [[running-the-generator]]
 ## Running the Generator
@@ -25,28 +25,7 @@ correct and then create the database:
 $ mix ecto.create
 ----
 
-We now need to edit the `mix.exs` file, adding the `phx_gen_auth` dependency:
-
-.mix.exs
-[source,elixir]
-----
-  defp deps do
-    [
-      ...
-      {:phx_gen_auth, "~> 0.5", only: [:dev], runtime: false},
-      ...
-    ]
-  end
-----
-
-Then, download the dependency:
-
-[source,bash]
-----
-$ mix do deps.get, deps.compile
-----
-
-Now we are ready to run the generator:
+Now we are ready to run the authentication generator:
 
 [source,bash]
 ----
@@ -58,8 +37,9 @@ Generated auth_demo app
 [...]
 ----
 <1> In addition to creating templates, views and controllers, this command also
-creates a new `MyApp.Accounts` context and two database tables - `users` and
-`user_tokens`.
+creates a new `MyApp.Accounts` context, database tables, and sets up a scope for
+secure data access. By default, Phoenix 1.8 uses magic links for authentication,
+but password-based authentication can be enabled in user settings.
 
 After running the generator, we will need to re-fetch the dependencies and run
 the migrations. Then, we can try out our Phoenix app with authentication.

@@ -185,7 +185,7 @@ iex> [e, f, g] = shopping_list <1>
 indexterm:[Pattern Matching, Keyword Lists]
 
 In Elixir, **pattern matching on keyword lists is no longer recommended** due
-to strict ordering and count requirements introduced in version 1.15.
+to strict ordering and count requirements introduced in version 1.18.
 While pattern matching was once possible, recent versions of Elixir make
 it unreliable. Keyword lists are often used for optional arguments where
 keys may be omitted, making pattern matching impractical.
