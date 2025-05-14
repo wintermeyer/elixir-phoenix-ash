@@ -2,8 +2,7 @@
 # Phoenix LiveView Basics
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-WARNING: This document may not be up to date with the latest Phoenix/LiveView
-version. I am working on an updated version.
+WARNING: I am currently in the process of updating this document to the latest Elixir and Phoenix version. Please help me by sending me bug reports (ideally as GitHub issues). Thank you!
 
 LiveView, according to the
 https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html[documentation],
@@ -63,10 +62,9 @@ You can also run your app inside IEx (Interactive Elixir) as:
 
     $ iex -S mix phx.server
 ----
-<1> '--live' adds all the needed stuff to use LiveView out of the box. For this
-example, we don't need Ecto.
-<2> Click `Y` and, depending on your internet connection, maybe grab a cup of
-coffee.
+<1> The `--live` flag adds all the necessary components to use LiveView out of the box. For this
+example, we don't need Ecto, so we use `--no-ecto`. Phoenix 1.7+ comes with Tailwind CSS by default.
+<2> Click `Y` and, depending on your internet connection, maybe grab a cup of coffee.
 
 The aim of this demo is to create a new webpage with the path `/light` which
 offers a status of a virtual light bulb and a switch functionality to turn that
@@ -75,7 +73,7 @@ any JavaScript.
 
 First we have to add the route:
 
-.lib/hello_world_web/router.ex
+.lib/demo_web/router.ex
 [source,elixir]
 ----
 defmodule DemoWeb.Router do
@@ -86,15 +84,13 @@ defmodule DemoWeb.Router do
   scope "/", DemoWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index <1>
+    get "/", PageController, :home <1>
     live "/light", LightLive <2>
   end
 
   [...]
 ----
-<1> Because we created the app with the `--live` switch the default root path is
-already a live view. Therefore the `live` macro is used here (at the beginning
-of the line) instead of the traditional `get`.
+<1> In Phoenix 1.7+, the default root path uses a regular controller instead of a LiveView. You can change this to a LiveView if desired.
 <2> This is the new `light` route which leads to the `LightLive` module.
 
 LiveView modules are located in the `lib/demo_web/live/` directory. There we
@@ -107,27 +103,26 @@ defmodule DemoWeb.LightLive do
   use DemoWeb, :live_view
 
   def render(assigns) do <1>
-    ~L"""
-    <h1>The light is off.</h1>
+    ~H"""
+    <h1 class="text-2xl font-bold mb-4">The light is off.</h1>
     """
   end
 end
 ----
-<1> The `render/1` function renders the template. We use the `~L` sigil to
-define the template.
+<1> The `render/1` function renders the template. In Phoenix 1.7+, we use the `~H` sigil for HEEx templates instead of the deprecated `~L` sigil. Note the Tailwind CSS classes added to the h1 element.
 
 [IMPORTANT]
 ====
-In this case, we use the `~L` sigil to define the template, but for bigger
+In this case, we use the `~H` sigil to define the template inline, but for bigger
 templates, it makes more sense to create a separate template file, which would
-be a LiveEEx template (using the `.leex` extension) and be stored in the
+be a HEEx template (using the `.heex` extension) and be stored in the
 `lib/demo_web/live` directory. If you use a separate template file, the
 `render/1` function is not needed (see the Airport Code Search section for an
 example).
 
 Have a look at https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html for more information.
 ====
-indexterm:["LiveEEx Templates"]
+indexterm:["HEEx Templates"]
 
 Now, let's open the URL `http://localhost:4000/light` in the browser.
 
@@ -152,13 +147,13 @@ defmodule DemoWeb.LightLive do
   end
 
   def render(assigns) do
-    ~L"""
-    <h1>The light is <%= @light_bulb_status %>.</h1>
+    ~H"""
+    <h1 class="text-2xl font-bold mb-4">The light is <%= @light_bulb_status %>.</h1>
     """
   end
 end
 ----
-<1> Out of all the posssible parameters of `mount/3` we only need the `socket`
+<1> Out of all the possible parameters of `mount/3` we only need the `socket`
 struct for our example.
 <2> We set the initial value of the variable `light_bulb_status` to `off`.
 
@@ -170,14 +165,19 @@ To turn on the light bulb we need a button:
 [source,elixir]
 ----
 def render(assigns) do
-  ~L"""
-  <h1>The light is <%= @light_bulb_status %>.</h1>
-  <button phx-click="on">On</button> <1>
+  ~H"""
+  <h1 class="text-2xl font-bold mb-4">The light is <%= @light_bulb_status %>.</h1>
+  <button 
+    type="button" 
+    phx-click="on" 
+    class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+    On
+  </button> <1>
   """
 end
 ----
 <1> The button tag includes `phx-click="on"` which is special Phoenix code to
-trigger an event.
+trigger an event. We've added Tailwind CSS classes for styling.
 
 Now we see the button on the webpage:
 
@@ -285,49 +285,46 @@ defmodule DemoWeb.LightLive do
   use DemoWeb, :live_view
 
   def mount(_params, _session, socket) do
-    socket =
-      socket
-      |> assign(:light_bulb_status, "off")
-      |> assign(:on_button_status, "") <1>
-      |> assign(:off_button_status, "disabled")
-
+    socket = assign(socket, :light_bulb_status, "off") <1>
     {:ok, socket}
   end
 
   def render(assigns) do
-    ~L"""
-    <h1>The light is <%= @light_bulb_status %>.</h1>
-    <button phx-click="on" <%= @on_button_status %>>On</button>
-    <button phx-click="off" <%= @off_button_status %>>Off</button> <2>
+    ~H"""
+    <h1 class="text-2xl font-bold mb-4">The light is <%= @light_bulb_status %>.</h1>
+
+    <button
+      type="button"
+      phx-click="on"
+      class="px-4 py-2 rounded bg-green-600 text-white disabled:opacity-40 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+      disabled={@light_bulb_status == "on"}>
+      On
+    </button>
+
+    <button
+      type="button"
+      phx-click="off"
+      class="px-4 py-2 rounded bg-gray-600 text-white disabled:opacity-40 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+      disabled={@light_bulb_status == "off"}>
+      Off
+    </button> <2>
     """
   end
 
   def handle_event("on", _value, socket) do
-    socket =
-      socket
-      |> assign(:light_bulb_status, "on")
-      |> assign(:on_button_status, "disabled") <3>
-      |> assign(:off_button_status, "")
-
+    socket = assign(socket, :light_bulb_status, "on") <3>
     {:noreply, socket}
   end
 
   def handle_event("off", _value, socket) do
-    socket =
-      socket
-      |> assign(:light_bulb_status, "off")
-      |> assign(:on_button_status, "")
-      |> assign(:off_button_status, "disabled")
-
+    socket = assign(socket, :light_bulb_status, "off")
     {:noreply, socket}
   end
 end
 ----
-<1> We assign a value for the `on_button_status` and `off_button_status` in
-order to make the on button active and the off button inactive at the start.
-<2> We use the `@off_button_status` to disable the off button right at the
-beginning.
-<3> We toggle the values of the buttons.
+<1> We only need to track the light bulb status now, as we'll use it directly with the disabled attribute
+<2> We use the `disabled` attribute with a conditional expression to disable buttons based on the current state
+<3> We simply toggle the light bulb status in each event handler
 
 We are all set. The buttons work in the way a user would like them to work and
 all without writing a single line of JavaScript. Phoenix LiveView takes care of
@@ -603,47 +600,57 @@ end
 <3> We hardcode a list of German airports here. In a real application, this
 would include more data and probably be database driven.
 
-This time we don't use the `~L` sigil in the controller but a LiveEEx Template
+This time we don't use the `~H` sigil directly in the controller but a separate HEEx Template
 file:
 
-lib/travelagent_web/live/search_live.html.leex
+lib/travelagent_web/live/search_live.html.heex
 [source,html]
 ----
-<form phx-submit="airport_code_search">
-  <fieldset>
-    <label for="nameField">Airport Code</label>
-    <input type="text" name="airport_code" value="<%= @airport_code %>"
-    placeholder="e.g. FRA"
-    autofocus autocomplete="off" /> <1>
-    <input class="button-primary" type="submit" value="Search Airport">
-  </fieldset>
-</form>
+<div class="max-w-2xl mx-auto">
+  <form phx-submit="airport_code_search" class="mb-6">
+    <div class="space-y-4">
+      <label for="nameField" class="block text-sm font-medium text-gray-700">Airport Code</label>
+      <input 
+        type="text" 
+        name="airport_code" 
+        value={@airport_code}
+        placeholder="e.g. FRA"
+        autofocus 
+        autocomplete="off"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" /> <1>
+      <button 
+        type="submit" 
+        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        Search Airport
+      </button>
+    </div>
+  </form>
 
-<%= unless @airports == [] do %> <2>
-  <h2>Search Results</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Airport Code</th>
-        <th>Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      <%= for airport <- @airports do %>
-      <tr>
-        <td><%= airport.code %></td>
-        <td><%= airport.name %></td>
-      </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
+  <%= unless @airports == [] do %> <2>
+    <h2 class="text-xl font-semibold mb-4">Search Results</h2>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Airport Code</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <%= for airport <- @airports do %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= airport.code %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= airport.name %></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>
 ----
-<1> I think it is always a curtesy to the user to set the first input field to
-`autofocus`. And we add an `autocomplete="off"` just to be sure that the browser
-doesn't disturb the user.
-<2> When the search returns a non-empty list, a table with the results will be
-displayed.
+<1> Setting the first input field to `autofocus` improves user experience. The `autocomplete="off"` prevents browser autocomplete from interfering with our LiveView updates.
+<2> When the search returns a non-empty list, a table with the results will be displayed, styled with Tailwind CSS.
 
 Lastly, we need to update the TravelagentWeb.SearchLive module:
 
@@ -700,40 +707,48 @@ codes begin with an `h`. Without having to click on the `Search Airport` button.
 Luckily for us, we only have to make a couple of changes in the LiveEEx Template
 file to achieve this.
 
-lib/travelagent_web/live/search_live.html.leex
+lib/travelagent_web/live/search_live.html.heex
 [source,html]
 ----
-<form phx-change="airport_code_search"> <1>
-  <fieldset>
-    <label for="nameField">Airport Code</label>
-    <input type="text" name="airport_code" value="<%= @airport_code %>"
-    placeholder="e.g. FRA"
-    autofocus autocomplete="off" />
-  </fieldset>
-</form>
+<div class="max-w-2xl mx-auto">
+  <form phx-change="airport_code_search"> <1>
+    <div class="space-y-4">
+      <label for="nameField" class="block text-sm font-medium text-gray-700">Airport Code</label>
+      <input 
+        type="text" 
+        name="airport_code" 
+        value={@airport_code}
+        placeholder="e.g. FRA"
+        autofocus 
+        autocomplete="off"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+    </div>
+  </form>
 
-<%= unless @airports == [] do %>
-  <h2>Search Results</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Airport Code</th>
-        <th>Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      <%= for airport <- @airports do %>
-      <tr>
-        <td><%= airport.code %></td>
-        <td><%= airport.name %></td>
-      </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
+  <%= unless @airports == [] do %>
+    <h2 class="text-xl font-semibold mt-6 mb-4">Search Results</h2>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Airport Code</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <%= for airport <- @airports do %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= airport.code %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= airport.name %></td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>
 ----
-<1> We just have to use `phx-change` for the form. This means that each change
-triggers `handle_event/3`.
+<1> We use `phx-change` for the form instead of `phx-submit`. This means that each keystroke triggers `handle_event/3`, providing real-time feedback.
 
 Please open your browser at http://localhost:4000/search and give it a try.
 
