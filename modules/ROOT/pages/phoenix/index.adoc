@@ -23,7 +23,7 @@ installed.
 [source,bash]
 ----
 $ mix phx.new --version
-Phoenix v1.8.0-rc.3
+Phoenix installer v1.8.0-rc.3
 ----
 ====
 
