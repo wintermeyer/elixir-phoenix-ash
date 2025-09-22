@@ -308,4 +308,4 @@ while pattern matching the first item to `first`.
 <2> With the list `cart2`, we pattern match the first item to `head`, ignoring
 the rest of the list by prefixing `_` to `tail`.
 
-NOTE: Using `_tail` instead of just `_` increases the readability of the code.
+NOTE: Using `{+_tail+}` instead of just `{+_+}` increases the readability of the code.
