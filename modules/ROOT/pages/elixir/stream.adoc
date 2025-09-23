@@ -187,21 +187,3 @@ Stream.cycle([1, 2])
 
 More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#cycle/1[Elixir Stream.cycle/1 documentation].
 
-[[stream-unzip]]
-==== Stream.unzip/1
-indexterm:[Stream,Functions,unzip]
-
-The link:https://hexdocs.pm/elixir/Stream.html#unzip/1[`Stream.unzip/1`] function generates two new streams from a stream of tuples.
-
-[source,elixir]
-----
-list = [{1, "a"}, {2, "b"}, {3, "c"}]
-{left, right} = Stream.unzip(list)
-Enum.to_list(left)
-# => [1, 2, 3]
-Enum.to_list(right)
-# => ["a", "b", "c"]
-----
-
-More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#unzip/1[Elixir Stream.unzip/1 documentation].
-
