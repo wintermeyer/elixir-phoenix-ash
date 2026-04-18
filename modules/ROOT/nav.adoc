@@ -15,6 +15,8 @@
 ** xref:phoenix/phoenix-liveview-basics.adoc#counter[Counter]
 ** xref:phoenix/phoenix-liveview-basics.adoc#aiport-code-search[Airport Code Search]
 ** xref:phoenix/phoenix-liveview-basics.adoc#autocomplete[Autocomplete]
+** xref:phoenix/phoenix-liveview-basics.adoc#liveview-forms[Forms]
+** xref:phoenix/phoenix-liveview-basics.adoc#liveview-streams[Streams]
 * xref:phoenix/router.adoc[Router]
 ** xref:phoenix/router.adoc#mix-phx-routes[Display all existing routes]
 ** xref:phoenix/router.adoc#router-params[Params]

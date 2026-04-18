@@ -1,4 +1,3 @@
-[[setup-fresh-app]]
 ## Setting Up a Fresh Ash App
 
 The fastest way to get started with Ash is Igniter. One command

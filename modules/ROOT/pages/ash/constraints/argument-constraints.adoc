@@ -162,21 +162,21 @@ iex(3)> App.Shop.restock_product(product, %{
    errors: [
      %Ash.Error.Changes.InvalidArgument{
        field: :reason,
-       message: "length must be greater than or equal to %{min}",
+       message: "length must be greater than or equal to %\{min}",
        value: "x",
        vars: [min: 3],
        ...
      },
      %Ash.Error.Changes.InvalidArgument{
        field: :source,
-       message: "atom must be one of %{atom_list}, got: %{value}",
+       message: "atom must be one of %\{atom_list}, got: %\{value}",
        value: :theft,
        vars: [atom_list: "supplier, return, correction", value: :theft],
        ...
      },
      %Ash.Error.Changes.InvalidArgument{
        field: :quantity,
-       message: "must be greater than or equal to %{min}",
+       message: "must be greater than or equal to %\{min}",
        value: 0,
        vars: [min: 1],
        ...
@@ -186,7 +186,7 @@ iex(3)> App.Shop.restock_product(product, %{
 ```
 
 NOTE: The `message` template interpolates the `vars` — rendering UI
-(`AshPhoenix.Form` and friends) substitutes `%{min}` with the value
+(`AshPhoenix.Form` and friends) substitutes `+%{min}+` with the value
 from `vars`, so the user sees `"length must be greater than or equal
 to 3"`. The raw template is what lives on the error struct.
 

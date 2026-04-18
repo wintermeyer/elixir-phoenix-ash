@@ -632,3 +632,317 @@ Open http://localhost:4000/search and start typing. The list updates
 as you type.
 
 image::liveview_airport_search_autocomplete.png[http://localhost:4000/search]
+
+[[liveview-forms]]
+## Forms
+
+The airport search already used a form (`phx-submit` / `phx-change`),
+but we only ever passed one field around and we read it with
+`value={@airport_code}` by hand. Real forms have multiple fields,
+per-field errors, and need to survive a failed submit without
+losing the user's input. LiveView has a dedicated helper for that:
+`Phoenix.Component.to_form/2`.
+
+The pattern is:
+
+1. Build a form struct with `to_form(params, as: "profile")`.
+2. Render it with `<.form for={@form}>` and reference fields as
+`@form[:name]`.
+3. Handle `phx-change` to re-validate on every keystroke, and
+`phx-submit` to actually save.
+
+Route:
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    get "/", PageController, :home
+    live "/profile", ProfileLive <1>
+  end
+----
+<1> The profile route points at the new `ProfileLive` module.
+
+The LiveView itself. This example uses a plain map for validation
+so we do not pull Ecto into the project; with Ecto you would wrap
+the same shape in a `changeset`.
+
+.lib/demo_web/live/profile_live.ex
+[source,elixir]
+----
+defmodule DemoWeb.ProfileLive do
+  use DemoWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    form = to_form(%{"name" => "", "email" => ""}, as: "profile") <1>
+    {:ok, assign(socket, form: form, errors: %{}, saved: nil)}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <div class="max-w-md mx-auto p-4 space-y-4">
+      <h1 class="text-2xl font-bold">Edit profile</h1>
+
+      <.form
+        for={@form}
+        phx-change="validate"
+        phx-submit="save"
+        class="space-y-4"
+      >
+        <div>
+          <label for={@form[:name].id} class="label">Name</label> <2>
+          <input
+            type="text"
+            name={@form[:name].name}
+            id={@form[:name].id}
+            value={@form[:name].value}
+            class="input input-bordered w-full"
+          />
+          <p :if={@errors[:name]} class="text-error text-sm">
+            {@errors[:name]}
+          </p>
+        </div>
+
+        <div>
+          <label for={@form[:email].id} class="label">Email</label>
+          <input
+            type="text"
+            name={@form[:email].name}
+            id={@form[:email].id}
+            value={@form[:email].value}
+            class="input input-bordered w-full"
+          />
+          <p :if={@errors[:email]} class="text-error text-sm">
+            {@errors[:email]}
+          </p>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+      </.form>
+
+      <p :if={@saved} class="text-success">
+        Saved: {@saved["name"]} &lt;{@saved["email"]}&gt;
+      </p>
+    </div>
+    """
+  end
+
+  def handle_event("validate", %{"profile" => params}, socket) do <3>
+    {:noreply,
+     assign(socket,
+       form: to_form(params, as: "profile"),
+       errors: validate(params),
+       saved: nil
+     )}
+  end
+
+  def handle_event("save", %{"profile" => params}, socket) do <4>
+    case validate(params) do
+      errors when errors == %{} ->
+        {:noreply,
+         assign(socket,
+           form: to_form(params, as: "profile"),
+           errors: %{},
+           saved: params
+         )}
+
+      errors ->
+        {:noreply,
+         assign(socket,
+           form: to_form(params, as: "profile"),
+           errors: errors,
+           saved: nil
+         )}
+    end
+  end
+
+  defp validate(params) do
+    %{}
+    |> maybe_put_error(:name, params, &(String.length(&1) < 2), "at least 2 characters")
+    |> maybe_put_error(:email, params, &(not String.contains?(&1, "@")), "must contain @")
+  end
+
+  defp maybe_put_error(errors, field, params, pred?, message) do
+    value = params[Atom.to_string(field)] || ""
+    if pred?.(value), do: Map.put(errors, field, message), else: errors
+  end
+end
+----
+<1> `to_form/2` turns a params map (or an Ecto changeset) into a
+`Phoenix.HTML.Form` struct. The `as:` option is the form name and
+becomes the top-level key in the event payload (`"profile" => %{...}`).
+<2> `@form[:name]` returns a field struct with `.id`, `.name`, and
+`.value` pre-computed. No more hand-wiring `name="profile[name]"`.
+<3> `phx-change` fires on every keystroke. Re-assigning `form:` with
+the latest params keeps what the user typed; re-computing `errors`
+keeps the UI in sync.
+<4> `phx-submit` runs once on submit. In a real app this would
+insert a row via Ecto or an Ash action.
+
+Open http://localhost:4000/profile:
+
+image::liveview_profile_empty.png[http://localhost:4000/profile]
+
+Type an invalid `Name` ("A") and an invalid `Email` ("no-at-sign"):
+errors appear live, driven by `phx-change`:
+
+image::liveview_profile_errors.png[http://localhost:4000/profile]
+
+NOTE: The `<.form>` component also ships with built-in CSRF protection
+(it injects a hidden token when the form targets a controller). For
+LiveView forms you rarely need to think about it — LiveView carries
+the socket's CSRF token implicitly.
+
+### With Ecto or Ash
+
+Two common sources for `to_form/2`:
+
+* **Ecto.Changeset.** `to_form(changeset)` — field errors come
+straight from the changeset, so `@form[:email].errors` replaces the
+manual `@errors[:email]` map above. Phoenix's built-in generators
+use this shape.
+* **AshPhoenix.Form.** `AshPhoenix.Form.for_create(App.Blog.Post,
+:create, as: "post") |> to_form()` — Ash actions plug directly into
+LiveView forms. Field validation, relationship handling, and typed
+arguments all come along automatically. See
+https://hexdocs.pm/ash_phoenix for the full DSL.
+
+[[liveview-streams]]
+## Streams
+
+By now you might have noticed that every LiveView example keeps the
+full state of the page in `socket.assigns`: `@light_bulb_status`,
+`@counter`, the whole `@airports` list. For short lists this is fine
+— LiveView's diffing only sends the bits that changed over the wire.
+
+When the list grows to hundreds or thousands of items, re-rendering
+and re-diffing the whole assign on every update starts to hurt.
+*Streams* are LiveView 1.0's answer: the server never holds the full
+list, it just emits insert / update / delete operations and the
+browser reconciles the DOM.
+
+The pattern:
+
+1. Seed the stream in `mount/3` with `stream/3`.
+2. Render it inside an `id=...` container with
+`phx-update="stream"`.
+3. Use `stream_insert/4`, `stream_delete/3`, and friends in your
+`handle_event/3` callbacks.
+
+Route and LiveView:
+
+.lib/demo_web/router.ex
+[source,elixir]
+----
+  scope "/", DemoWeb do
+    pipe_through :browser
+
+    live "/todos", TodoLive
+  end
+----
+
+.lib/demo_web/live/todo_live.ex
+[source,elixir]
+----
+defmodule DemoWeb.TodoLive do
+  use DemoWeb, :live_view
+
+  def mount(_params, _session, socket) do
+    seed = [
+      %{id: 1, text: "Read the LiveView streams docs"},
+      %{id: 2, text: "Fix the colour picker"},
+      %{id: 3, text: "Ship the landing page"}
+    ]
+
+    {:ok,
+     socket
+     |> assign(:form, to_form(%{"text" => ""}, as: "todo"))
+     |> assign(:next_id, 4)
+     |> stream(:todos, seed)} <1>
+  end
+
+  def render(assigns) do
+    ~H"""
+    <div class="max-w-md mx-auto p-4 space-y-4">
+      <h1 class="text-2xl font-bold">Todos</h1>
+
+      <.form for={@form} phx-submit="add" class="flex gap-2">
+        <input
+          type="text"
+          name="todo[text]"
+          value=""
+          placeholder="What needs doing?"
+          class="input input-bordered flex-1"
+        />
+        <button type="submit" class="btn btn-primary">Add</button>
+      </.form>
+
+      <ul id="todos" phx-update="stream" class="space-y-1"> <2>
+        <li
+          :for={{dom_id, todo} <- @streams.todos} <3>
+          id={dom_id}
+          class="flex items-center justify-between p-2 border rounded"
+        >
+          <span>{todo.text}</span>
+          <button
+            type="button"
+            phx-click="remove"
+            phx-value-id={todo.id}
+            class="btn btn-sm btn-ghost"
+          >
+            ✕
+          </button>
+        </li>
+      </ul>
+    </div>
+    """
+  end
+
+  def handle_event("add", %{"todo" => %{"text" => text}}, socket)
+      when text != "" do
+    todo = %{id: socket.assigns.next_id, text: text}
+
+    {:noreply,
+     socket
+     |> stream_insert(:todos, todo, at: 0) <4>
+     |> assign(:next_id, socket.assigns.next_id + 1)}
+  end
+
+  def handle_event("add", _params, socket), do: {:noreply, socket}
+
+  def handle_event("remove", %{"id" => id}, socket) do
+    {:noreply, stream_delete(socket, :todos, %{id: String.to_integer(id)})} <5>
+  end
+end
+----
+<1> `stream(:todos, seed)` names the stream and seeds it with the
+initial items. Each item must have an `:id` key so LiveView can
+track it in the DOM.
+<2> `phx-update="stream"` is the magic attribute. Without it the
+template would still render, but LiveView would treat the list as
+ordinary assigns and you would lose the memory win.
+<3> Iterating over `@streams.todos` yields `{dom_id, todo}` tuples.
+The `dom_id` is what LiveView uses to target DOM nodes for updates;
+put it on the element's `id` attribute.
+<4> `stream_insert(socket, :todos, todo, at: 0)` prepends. Pass
+`at: -1` to append, or omit `at:` for append-to-end.
+<5> `stream_delete(socket, :todos, %{id: ...})` removes the matching
+item. The struct-or-map you pass only needs to expose the same key
+as the seed — here `:id`.
+
+Open http://localhost:4000/todos:
+
+image::liveview_todos.png[http://localhost:4000/todos]
+
+Add a todo, remove one. The page updates instantly, and — critically
+— `socket.assigns.streams.todos` does *not* grow with each insert.
+LiveView keeps only the delta it needs to ship to the client.
+
+NOTE: For datasets large enough that you do not want to load them
+all into memory at once, combine `stream/3` with
+`Phoenix.LiveView.stream_configure/3` and a paged read. That is
+outside this chapter; the
+https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#stream/4[official
+`stream/3` docs] are excellent.

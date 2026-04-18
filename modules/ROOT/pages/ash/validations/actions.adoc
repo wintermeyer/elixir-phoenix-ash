@@ -89,7 +89,7 @@ action:
 did not supply a sale price. Without it, every create without a sale
 price would fail because `nil < price` is not true.
 <2> Custom message; without it, Ash's default is
-`"must be less than %{less_than}"`.
+`+"must be less than %{less_than}"+`.
 
 Try a valid and an invalid create:
 
@@ -167,7 +167,7 @@ iex(3)> App.Shop.create_product(%{
    errors: [
      %Ash.Error.Changes.InvalidAttribute{
        field: :category,
-       message: "expected one of %{values}",
+       message: "expected one of %\{values}",
        value: :clothing,
        vars: [values: "food, toy, tool"],
        ...
@@ -205,7 +205,7 @@ iex(4)> App.Shop.create_product(%{name: "Nothing"})
      %Ash.Error.Changes.Required{field: :price, ...}, <1>
      %Ash.Error.Changes.InvalidChanges{
        fields: [:price, :sale_price],
-       message: "at least %{at_least} of %{keys} must be present",
+       message: "at least %\{at_least} of %\{keys} must be present",
        vars: [
          fields: [:price, :sale_price],
          keys: "price,sale_price",
