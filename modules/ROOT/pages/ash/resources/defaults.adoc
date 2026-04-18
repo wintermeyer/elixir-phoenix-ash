@@ -90,14 +90,17 @@ iex(1)> App.ToDoList.create_task(%{content: "Mow the lawn", is_done: true})
 {:error,
  %Ash.Error.Invalid{
    errors: [
-     %Ash.Error.Changes.InvalidAttribute{
-       field: :is_done,
-       message: "cannot be changed",
-       value: true,
-       class: :invalid
+     %Ash.Error.Invalid.NoSuchInput{
+       resource: App.ToDoList.Task,
+       action: :create,
+       input: :is_done,
+       inputs: MapSet.new([:priority, :content, "content", "priority"]),
+       did_you_mean: [],
+       class: :invalid,
+       ...
      }
    ],
-   class: :invalid
+   ...
  }}
 iex(2)>
 ```

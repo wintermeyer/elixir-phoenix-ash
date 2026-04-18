@@ -122,65 +122,64 @@ $ iex -S mix
 iex(1)> # Create a new category
 iex(2)> {:ok, fruits} = App.Shop.create_category(%{name: "Fruits"})
 {:ok,
- #App.Shop.Category<
-   __meta__: #Ecto.Schema.Metadata<:loaded>,
-   id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
+ %App.Shop.Category{
+   id: "cea38a50-2178-42c0-aad9-2624eec49609",
    name: "Fruits",
-   ...
- >}
+   __meta__: #Ecto.Schema.Metadata<:loaded>
+ }}
 iex(3)> # Create a new product in the "Fruits" category
 iex(4)> {:ok, orange} = App.Shop.create_product(%{
                   name: "Orange",
-                  price: 0.15,
+                  price: Decimal.new("0.15"),
                   category_id: fruits.id
                 })
 {:ok,
- #App.Shop.Product<
-   category: #Ash.NotLoaded<:relationship>,
-   __meta__: #Ecto.Schema.Metadata<:loaded>,
-   id: "6870b44b-67ed-4186-97ed-bbfffd1fc2a0",
+ %App.Shop.Product{
+   id: "fc36e094-a28d-4f78-860d-0fd1e345c1ce",
    name: "Orange",
    price: Decimal.new("0.15"),
-   category_id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
-   ...
- >}
+   category_id: "cea38a50-2178-42c0-aad9-2624eec49609",
+   category: #Ash.NotLoaded<:relationship, field: :category>,
+   __meta__: #Ecto.Schema.Metadata<:loaded>
+ }}
 iex(5)> # Load the category relationship for the orange product
 iex(6)> {:ok, orange_with_category} = Ash.load(orange, :category)
 {:ok,
- #App.Shop.Product<
-   category: #App.Shop.Category<
-     __meta__: #Ecto.Schema.Metadata<:loaded>,
-     id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
-     name: "Fruits",
-     ...
-   >,
-   __meta__: #Ecto.Schema.Metadata<:loaded>,
-   id: "6870b44b-67ed-4186-97ed-bbfffd1fc2a0",
+ %App.Shop.Product{
+   id: "fc36e094-a28d-4f78-860d-0fd1e345c1ce",
    name: "Orange",
    price: Decimal.new("0.15"),
-   category_id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
-   ...
- >}
+   category_id: "cea38a50-2178-42c0-aad9-2624eec49609",
+   category: %App.Shop.Category{
+     id: "cea38a50-2178-42c0-aad9-2624eec49609",
+     name: "Fruits",
+     __meta__: #Ecto.Schema.Metadata<:loaded>
+   },
+   __meta__: #Ecto.Schema.Metadata<:loaded>
+ }}
 iex(7)> # Fetch a product with its category pre-loaded
 iex(8)> {:ok, orange2} = App.Shop.get_product_by_name("Orange", load: [:category])
 {:ok,
- #App.Shop.Product<
-   category: #App.Shop.Category<
-     __meta__: #Ecto.Schema.Metadata<:loaded>,
-     id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
-     name: "Fruits",
-     ...
-   >,
-   __meta__: #Ecto.Schema.Metadata<:loaded>,
-   id: "6870b44b-67ed-4186-97ed-bbfffd1fc2a0",
+ %App.Shop.Product{
+   id: "fc36e094-a28d-4f78-860d-0fd1e345c1ce",
    name: "Orange",
    price: Decimal.new("0.15"),
-   category_id: "91cb42d8-45c2-451d-8261-72ae4d94a3c6",
-   ...
- >}
+   category_id: "cea38a50-2178-42c0-aad9-2624eec49609",
+   category: %App.Shop.Category{
+     id: "cea38a50-2178-42c0-aad9-2624eec49609",
+     name: "Fruits",
+     __meta__: #Ecto.Schema.Metadata<:loaded>
+   },
+   __meta__: #Ecto.Schema.Metadata<:loaded>
+ }}
 iex(9)> orange2.category.name
 "Fruits"
 ```
+
+NOTE: Ash 3.24+ inspects resources as plain `%Module{}` structs (the full
+set of attributes is visible). Older Ash tutorials may still show the
+opaque `#Module<...>` form produced by an earlier custom Inspect
+implementation.
 
 #### Sideload a belongs_to Relationship by Default
 
@@ -229,18 +228,18 @@ Let's test it in the iex:
 ```elixir
 iex(10)> {:ok, orange} = App.Shop.get_product_by_name("Orange")
 {:ok,
- #App.Shop.Product<
-   category: #App.Shop.Category<
-     __meta__: #Ecto.Schema.Metadata<:loaded>,
-     id: "22ab0824-18ac-4daa-9a13-defd0b8bcd73",
-     name: "Fruits",
-     ...
-   >,
-   __meta__: #Ecto.Schema.Metadata<:loaded>,
+ %App.Shop.Product{
    id: "24348935-6148-4c75-9bf1-55f74ac9397a",
    name: "Orange",
-   ...
- >}
+   price: Decimal.new("0.15"),
+   category_id: "22ab0824-18ac-4daa-9a13-defd0b8bcd73",
+   category: %App.Shop.Category{
+     id: "22ab0824-18ac-4daa-9a13-defd0b8bcd73",
+     name: "Fruits",
+     __meta__: #Ecto.Schema.Metadata<:loaded>
+   },
+   __meta__: #Ecto.Schema.Metadata<:loaded>
+ }}
 ```
 
 Note how the category is automatically loaded even though we didn't specify `load: [:category]`.

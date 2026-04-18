@@ -29,14 +29,14 @@ and an `id` attribute as a primary key. We also want to include the
 actions `create`, `read`, `update` and `delete`. Ash provides those
 actions for free but we have to include them into the resource.
 
-IMPORTANT: In Ash 3.0, resources need to be registered to a domain. The domain acts
-as a boundary for related resources and provides a place to define shared functionality.
-Each domain is registered with your application's OTP app.
-
+IMPORTANT: In Ash 3.x, resources live inside a *domain*. The domain is a
+context boundary for a set of related resources and a place to hang
+shared functionality (code interfaces, policies, pub/sub).
 
 ### Configure the Domain
 
-First, we need to configure our OTP app to recognize our domain:
+First, we register our domain in `config/config.exs` so Ash knows about
+it at compile time (otherwise Ash prints a warning on boot):
 
 [source,elixir,title='config/config.exs']
 ----
@@ -109,13 +109,12 @@ The resulting directory structure should look like this:
 $ tree lib
 lib
 ├── app
-│   ├── application.ex
 │   ├── to_do_list
 │   │   └── task.ex
 │   └── to_do_list.ex
 └── app.ex
 
-3 directories, 4 files
+3 directories, 3 files
 ```
 
 We now have a resource but because we haven't defined any actions we

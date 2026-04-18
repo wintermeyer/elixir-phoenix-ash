@@ -2,34 +2,41 @@
 ## Identities
 
 Identities do just one thing: They tell Ash that a certain attribute or
-combination of attributes is unique. Which means that a value of that attribute
-can only exist once in the database. This can be useful for things like usernames,
-email addresses, etc. Ash uses this information to do some background magic
-(e.g. it creates a unique index in a PostgreSQL database).
+combination of attributes is unique. Which means that a value of that
+attribute can only exist once in the database. This can be useful for
+things like usernames, email addresses, etc. Ash uses this information
+to do some background magic (e.g. it creates a unique index in a
+PostgreSQL database).
 
-IMPORTANT: Identities are not part of the validation process. They are checked
-before the validation.
-
-
+IMPORTANT: Identities are not part of the validation process. They are
+checked before the validation.
 
 ### ETS
 
-If you are using ETS - the non persisting database we use for most of our examples -
-you have to implement a `pre_check_with` callback in the resource because ETS
-does not offer an unique index like PostgreSQL does.
+If you are using ETS - the non persisting database we use for most of
+our examples - you have to implement a `pre_check_with` callback in
+the resource because ETS does not offer a unique index like PostgreSQL
+does.
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
-  [...]
+defmodule App.Shop.Product do
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
+
   attributes do
     uuid_primary_key :id
 
     attribute :name, :string do
       allow_nil? false
+      public? true
     end
 
     attribute :price, :decimal do
       allow_nil? false
+      public? true
     end
   end
 
@@ -38,43 +45,38 @@ does not offer an unique index like PostgreSQL does.
       pre_check_with App.Shop <1>
     end
   end
-  [...]
+
+  actions do
+    default_accept [:name, :price]
+    defaults [:create, :read, :update, :destroy]
+  end
+end
 ----
 
-<1> This `pre_check` is used to check if the identity is unique.
+<1> `pre_check_with App.Shop` tells Ash to run a read via that domain
+before writing, so duplicates fail with a clean changeset error
+instead of a runtime crash.
 
 ### PostgreSQL
 
-In PostgreSQL you just use the `identity` macro to define an identity. It takes
-two arguments: The name of the identity and a list of attributes that should be
-unique.
+With `AshPostgres` the database enforces uniqueness, so you only need
+the `identity` line (no `pre_check_with`):
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
-  [...]
-  attributes do
-    uuid_primary_key :id
-
-    attribute :name, :string do
-      allow_nil? false
-    end
-
-    attribute :price, :decimal do
-      allow_nil? false
-    end
-  end
-
+[...]
   identities do
     identity :unique_name, [:name] <1>
   end
-  [...]
+[...]
 ----
 
-<1> This is the identity. It is called `unique_name` and it makes sure that the
-`name` attribute is unique.
+<1> Named `unique_name`, makes `name` unique across the `products`
+table.
 
-IMPORTANT: Don't forget to run a `mix ash.codegen` and a
-`mix ecto.migrate` after adding an identity.
+IMPORTANT: Don't forget to run `mix ash.codegen <migration_name>` and
+`mix ash_postgres.migrate` after adding an identity so the unique
+index lands in the database.
 
 ### Test in iex
 
@@ -82,44 +84,46 @@ Let's try to create a product with the same name twice:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{name: "Banana",
-                                   price: 0.1})
-#App.Shop.Product<
-    __meta__: #Ecto.Schema.Metadata<:loaded>,
-    id: "321070d5-6cec-4054-a99a-c5036a80e7d0",
-    name: "Banana",
-    ...
->
-iex(2)> App.Shop.Product.create!(%{name: "Banana",
-                                   price: 0.2})
-** (Ash.Error.Invalid) Input Invalid
+iex(1)> App.Shop.create_product!(%{name: "Banana", price: Decimal.new("0.1")})
+%App.Shop.Product{
+  id: "321070d5-6cec-4054-a99a-c5036a80e7d0",
+  name: "Banana",
+  price: Decimal.new("0.1"),
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
+iex(2)> App.Shop.create_product!(%{name: "Banana", price: Decimal.new("0.2")})
+** (Ash.Error.Invalid) Invalid Error
 
 * name: has already been taken
-    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+    (ash 3.24.3) lib/ash/code_interface.ex:...: Ash.CodeInterface.create_act!/4
 ```
 
 ### Identities with multiple attributes
 
-Sometimes you have to combine multiple attributes. I can not think of a good example
-in our product resource. So let's discuss this in a imaginary resource
-for flight reservations. A passenger can book a flight which is represented by
-a flight number and a date. We want to make sure that a passenger can only book
-the same flight once per day.
+Sometimes you have to combine multiple attributes. I can not think of
+a good example in our product resource. So let's discuss this in an
+imaginary resource for flight reservations. A passenger can book a
+flight which is represented by a flight number and a date. We want to
+make sure that a passenger can only book the same flight once per day.
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/airline/reservation.ex']
 ----
 defmodule App.Airline.Reservation do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Airline,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
 
-    attribute :passenger_id, :integer
-    attribute :flight_number, :string
-    attribute :date, :date
+    attribute :passenger_id, :integer, public?: true
+    attribute :flight_number, :string, public?: true
+    attribute :date, :date, public?: true
   end
 
   actions do
+    default_accept [:passenger_id, :flight_number, :date]
     defaults [:create, :read, :update, :destroy]
   end
 
@@ -130,15 +134,6 @@ defmodule App.Airline.Reservation do
       pre_check_with App.Airline
     end
   end
-
-  code_interface do
-    define_for App.Airline
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :update
-    define :destroy
-  end
 end
 ----
 
@@ -146,26 +141,35 @@ end
 
 ### Case Insensitive Identities
 
-Sometimes you want to make sure that an attribute is unique but you don't want
-to care about the case. For example you want to make sure that an email address
-is unique but you don't want to care about the case.
+Sometimes you want to make sure that an attribute is unique but you
+don't want to care about the case. For example you want to make sure
+that an email address is unique but you don't want to care about the
+case.
 
-In those cases you can use the https://hexdocs.pm/ash/Ash.Type.CiString.html[:ci_string type].
-It is a string that is stored in the database as a string but it is compared
-case insensitive.
+In those cases you can use the
+https://hexdocs.pm/ash/Ash.Type.CiString.html[:ci_string type]. It is
+a string that is stored in the database as a string but it is
+compared case insensitive.
 
-[source,elixir,title='lib/app/shop/resources/customer.ex']
+[source,elixir,title='lib/app/shop/customer.ex']
 ----
-  [...]
+defmodule App.Shop.Customer do
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
+
   attributes do
     uuid_primary_key :id
 
     attribute :name, :string do
       allow_nil? false
+      public? true
     end
 
     attribute :email, :ci_string do
       allow_nil? false
+      public? true
     end
   end
 
@@ -176,7 +180,12 @@ case insensitive.
       pre_check_with App.Shop
     end
   end
-  [...]
+
+  actions do
+    default_accept [:name, :email]
+    defaults [:create, :read, :update, :destroy]
+  end
+end
 ----
 
 <1> Use this version for PostgreSQL.
@@ -184,7 +193,8 @@ case insensitive.
 [IMPORTANT]
 ====
 PostgreSQL users have to add the
-https://www.postgresql.org/docs/current/citext.html[citext extension]. See the
+https://www.postgresql.org/docs/current/citext.html[citext extension].
+See the
 https://hexdocs.pm/ash_postgres/AshPostgres.Repo.html[AshPostgres.Repo behaviour].
 
 [source,elixir,title='lib/app/repo.ex']
@@ -198,5 +208,6 @@ defmodule App.Repo do
 end
 ----
 
-After that change run `mix ash.codegen` and `mix ash_postgres.migrate`
+After that change run `mix ash.codegen <migration_name>` and
+`mix ash_postgres.migrate`.
 ====

@@ -127,12 +127,23 @@ and the bang version raises:
 ----
 iex(1)> App.ToDoList.get_task("not-in-the-db")
 {:error,
- %Ash.Error.Query.NotFound{
-   primary_key: nil,
-   resource: App.ToDoList.Task,
-   ...
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Query.NotFound{
+       primary_key: nil,
+       resource: App.ToDoList.Task,
+       ...
+     }
+   ]
  }}
 iex(2)> App.ToDoList.get_task!("not-in-the-db")
-** (Ash.Error.Query.NotFound) record not found
+** (Ash.Error.Invalid) Invalid Error
+[...]
+* record not found
     [...]
 ----
+
+NOTE: Ash 3.x wraps errors in `Ash.Error.Invalid` and exposes the
+individual errors in the `errors:` list. The bang version raises
+`Ash.Error.Invalid` rather than the inner error class; pattern match on
+the inner errors if you need to branch on the cause.

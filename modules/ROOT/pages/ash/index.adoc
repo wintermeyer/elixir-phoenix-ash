@@ -11,11 +11,15 @@ Believe me, investing time in understanding Ash is worthwhile. My background is
 rooted in Ruby on Rails, and I transitioned to Phoenix for its speed and
 scalability. However, Ash elevates the development process to an other level.
 
-NOTE: This documentation covers the current Ash 3.x line (3.22+ at the
+NOTE: This documentation covers the current Ash 3.x line (3.24+ at the
 time of writing). Ash 3.x is a significant evolution over 2.x: resources
 now live inside *domains*, you register actions explicitly, and the
-`Ash.Api` concept has been renamed. If you see a 2.x tutorial online,
-translate it in your head before copy-pasting.
+`Ash.Api` concept has been renamed to `Ash.Domain`. If you see a 2.x
+tutorial online, translate it in your head before copy-pasting. For
+example, `code_interface do define_for App.Shop end` in the resource is
+now a `define :name, action: :create` line on the *domain*, and
+`App.Shop.Product.create!(attrs)` has become
+`App.Shop.create_product!(attrs)`.
 
 Like the Phoenix Framework the Ash Framework has no shortage of
 online documentation. But most of it is not beginner friendly

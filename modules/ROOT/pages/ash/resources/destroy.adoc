@@ -60,13 +60,18 @@ iex(2)> App.ToDoList.destroy_task(task)
 :ok
 iex(3)> App.ToDoList.get_task(task.id) <1>
 {:error,
- %Ash.Error.Query.NotFound{
-   primary_key: nil,
-   resource: App.ToDoList.Task,
-   ...
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Query.NotFound{
+       primary_key: nil,
+       resource: App.ToDoList.Task,
+       ...
+     }
+   ]
  }}
 iex(4)>
 ```
 
 <1> The task has been destroyed, so a `get_task` lookup by the old id
-returns an error tuple.
+returns an error tuple. See xref:ash/resources/index.adoc#read[read] for
+details on Ash 3.x's `Ash.Error.Invalid` wrapper.

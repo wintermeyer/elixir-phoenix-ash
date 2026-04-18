@@ -1,38 +1,33 @@
 [[ash-attribute-constraints]]
 ### Attribute Constraints
 
-Let me show you how to use attribute contraints with an
-online shop `product` example.
+Let me show you how to use attribute constraints with an online shop
+`product` example.
 
 include::../setup-fresh-app.adoc[]
 
-Please create the following files:
+Please create the following files. We start from a `Product` resource
+without any constraints:
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
-    attribute :description, :string
-    attribute :price, :decimal
-    attribute :stock_quantity, :integer
+    attribute :name, :string, public?: true
+    attribute :description, :string, public?: true
+    attribute :price, :decimal, public?: true
+    attribute :stock_quantity, :integer, public?: true
   end
 
   actions do
+    default_accept [:name, :description, :price, :stock_quantity]
     defaults [:create, :read, :update, :destroy]
-  end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
   end
 end
 ----
@@ -40,25 +35,30 @@ end
 [source,elixir,title='lib/app/shop.ex']
 ----
 defmodule App.Shop do
-  use Ash.Api
+  use Ash.Domain, otp_app: :app
 
   resources do
-    resource App.Shop.Product
+    resource App.Shop.Product do
+      define :create_product, action: :create
+      define :list_products, action: :read
+      define :get_product_by_id, action: :read, get_by: :id
+      define :get_product_by_name, action: :read, get_by: :name
+      define :update_product, action: :update
+      define :destroy_product, action: :destroy
+    end
   end
 end
 ----
 
-
-
 [[ash-allow-nil]]
 ### allow_nil? (Required Attributes)
 
-The simplest validation is a check that an attribute is not
-`nil`. This is done with the `allow_nil?/1` function. We want to
-be sure that `name`, `price` and `stock_quantity` are always set.
-Please adjust the `attributes` block in `lib/app/shop/resources/product.ex`:
+The simplest validation is a check that an attribute is not `nil`.
+This is done with the `allow_nil?/1` option. We want to be sure that
+`name`, `price` and `stock_quantity` are always set. Please adjust the
+`attributes` block in `lib/app/shop/product.ex`:
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
 [...]
   attributes do
@@ -66,16 +66,19 @@ Please adjust the `attributes` block in `lib/app/shop/resources/product.ex`:
 
     attribute :name, :string do
       allow_nil? false
+      public? true
     end
 
-    attribute :description, :string
+    attribute :description, :string, public?: true
 
     attribute :price, :decimal do
       allow_nil? false
+      public? true
     end
 
     attribute :stock_quantity, :integer do
       allow_nil? false
+      public? true
     end
   end
 [...]
@@ -85,12 +88,12 @@ Now let's try to create a product without a name:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{price: 10.0,
+iex(1)> App.Shop.create_product!(%{price: Decimal.new("10"),
                                    stock_quantity: 3})
-** (Ash.Error.Invalid) Input Invalid
+** (Ash.Error.Invalid) Invalid Error
 
 * attribute name is required
-    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+    (ash 3.24.3) lib/ash/code_interface.ex:...: Ash.CodeInterface.create_act!/4
 ```
 
 Perfect. The validation works.
@@ -103,7 +106,7 @@ Because it is easier to show the error messages (it takes up less real estate).
 But while programming I prefer to use the non-! version of the create function:
 
 ```elixir
-iex(6)> App.Shop.Product.create(%{price: 10.0,
+iex(6)> App.Shop.create_product(%{price: Decimal.new("10"),
                                   stock_quantity: 3})
 {:error,
  %Ash.Error.Invalid{
@@ -112,15 +115,11 @@ iex(6)> App.Shop.Product.create(%{price: 10.0,
        field: :name,
        type: :attribute,
        resource: App.Shop.Product,
-       changeset: nil,
-       query: nil,
-       error_context: [],
-       vars: [],
-       path: [],
-       stacktrace: #Stacktrace<>,
-       class: :invalid
+       ...
      }
-[...]
+   ],
+   ...
+ }}
 ```
 ====
 
@@ -129,39 +128,39 @@ iex(6)> App.Shop.Product.create(%{price: 10.0,
 
 Sometimes we want to allow empty strings.
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
     [...]
     attribute :description, :string do
       allow_nil? false <1>
+      public? true
       constraints allow_empty?: true <2>
     end
     [...]
 ----
 
-<1> The `description` attribute is not allowed to be `nil`. The tricky part is the syntax here. You have to put `allow_nil?` in an extra code line.
+<1> The `description` attribute is not allowed to be `nil`.
 <2> But it is allowed to be an empty string.
 
 Now let's try to create a product. First with a nil description
-and than with an empty description:
+and then with an empty description:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{name: "Banana", price: 0.1, stock_quantity: 5})
-** (Ash.Error.Invalid) Input Invalid
+iex(1)> App.Shop.create_product!(%{name: "Banana", price: Decimal.new("0.1"), stock_quantity: 5})
+** (Ash.Error.Invalid) Invalid Error
 
 * attribute description is required
-    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
-iex(1)> App.Shop.Product.create!(%{name: "Banana", description: "", price: 0.1, stock_quantity: 5})
-#App.Shop.Product<
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
+    (ash 3.24.3) lib/ash/code_interface.ex:...: Ash.CodeInterface.create_act!/4
+iex(2)> App.Shop.create_product!(%{name: "Banana", description: "", price: Decimal.new("0.1"), stock_quantity: 5})
+%App.Shop.Product{
   id: "8334b52f-1ba0-4adb-b790-705f8e9e1291",
   name: "Banana",
   description: "",
   price: Decimal.new("0.1"),
   stock_quantity: 5,
-  ...
->
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
 ```
 
 Perfect. The validation works.
@@ -176,10 +175,10 @@ let us add a maximum of 512 characters for the `description` attribute.
 
 But what about the numbers? We want to make sure that the `price` is
 always greater than 0 and the `stock_quantity` is always greater than
-or equal to 0. For that we can use the `constraints/1` function with
-the `min` and `max` options.
+or equal to 0. For that we can use the `constraints` option with
+the `min` and `max` keys.
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
   [...]
   attributes do
@@ -187,20 +186,24 @@ the `min` and `max` options.
 
     attribute :name, :string do
       allow_nil? false
+      public? true
       constraints min_length: 3, max_length: 255
     end
 
     attribute :description, :string do
+      public? true
       constraints max_length: 512
     end
 
     attribute :price, :decimal do
       allow_nil? false
-      constraints min: 0.01
+      public? true
+      constraints min: Decimal.new("0.01")
     end
 
     attribute :stock_quantity, :integer do
       allow_nil? false
+      public? true
       constraints min: 0
     end
   end
@@ -211,39 +214,41 @@ Testing the validation:
 
 [source,elixir]
 ----
-iex(7)> App.Shop.Product.create!(%{name: "Y",
-                                   price: 0,
-                                   stock_quantitiy: -1})
-** (Ash.Error.Invalid) Input Invalid
+iex(1)> App.Shop.create_product!(%{name: "Y",
+                                   price: Decimal.new("0"),
+                                   stock_quantity: -1})
+** (Ash.Error.Invalid) Invalid Error
 
-* attribute stock_quantity is required <1>
-* Invalid value provided for price: must be more than or equal to 0.01. <2>
+* Invalid value provided for stock_quantity: must be greater than or equal to 0. <1>
 
-0
+Value: -1
+
+* Invalid value provided for price: must be greater than or equal to 0.01. <2>
+
+Value: #Decimal<0>
 
 * Invalid value provided for name: length must be greater than or equal to 3. <3>
 
-"Y"
-
-    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+Value: "Y"
 ----
 
-<1> stock_quantity can not be nil and has to be greater than or equal to 0.
-<2> name can not be nil and has to have at least 3 characters.
-<3> price can not be nil and has to be greater than or equal to 0.01.
+<1> stock_quantity has to be greater than or equal to 0.
+<2> price has to be greater than or equal to 0.01.
+<3> name has to be at least 3 characters long.
 
 [[ash-pattern-matching]]
 ### Pattern Matching
 
-Assuming that we only want to have characters an the `-` in the name of
-a product we can use `match?/1` to check if the name matches a regular
-expression. Let's add this to the `name` attribute:
+Assuming that we only want to have characters and the `-` in the name of
+a product we can use `match` in the constraints to check if the name matches
+a regular expression. Let's add this to the `name` attribute:
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
     [...]
     attribute :name, :string do
       allow_nil? false
+      public? true
 
       constraints min_length: 3,
                   max_length: 255,
@@ -256,30 +261,27 @@ Let's test it:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{name: "Banana2023",
-                                   price: 0.1,
+iex(1)> App.Shop.create_product!(%{name: "Banana2023",
+                                   description: "",
+                                   price: Decimal.new("0.1"),
                                    stock_quantity: 20}) <1>
-** (Ash.Error.Invalid) Input Invalid
+** (Ash.Error.Invalid) Invalid Error
 
-* Invalid value provided for name: must match the pattern ~r/^[a-zA-Z-]*$/.
+* Invalid value provided for name: must match the pattern "~r/^[a-zA-Z-]*$/".
 
-"Banana2023"
+Value: "Banana2023"
 
-    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
-
-iex(2)> App.Shop.Product.create!(%{name: "Banana",
-                                   price: 0.1,
+iex(2)> App.Shop.create_product!(%{name: "Banana",
+                                   price: Decimal.new("0.1"),
                                    stock_quantity: 20})
-#App.Shop.Product<
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
+%App.Shop.Product{
   id: "c29444dc-7da2-4849-b251-b851a745112a",
   name: "Banana",
   description: nil,
   price: Decimal.new("0.1"),
   stock_quantity: 20,
-  ...
->
-iex(2)>
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
 ```
 
 <1> The name "Banana2023" does not match the pattern.
@@ -287,32 +289,32 @@ iex(2)>
 [[ash-trim]]
 #### Trim
 
-What happens if you add a could of spaces at the end of a name? Let's try it:
+What happens if you add a couple of spaces at the end of a name? Let's try it:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{name: "Banana   ",
-                                   price: 0.1,
+iex(1)> App.Shop.create_product!(%{name: "Banana   ",
+                                   price: Decimal.new("0.1"),
                                    stock_quantity: 12})
-#App.Shop.Product<
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
+%App.Shop.Product{
   id: "5b9b53f4-6109-4757-a8b7-9aaf1acda1f3",
   name: "Banana",
   ...
->
+}
 ```
 
-Those spaces get trimmed automatically. This is the default behavior and normaly what
-you want because humans and auto fill browsers sometimes add spaces at the end of a
+Those spaces get trimmed automatically. This is the default behavior and normally what
+you want because humans and autofill browsers sometimes add spaces at the end of a
 form field on a webpage.
 
-In case you want to keep those spaces you can use `trim: false`:
+In case you want to keep those spaces you can use `trim?: false`:
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
     [...]
     attribute :name, :string do
       allow_nil? false
+      public? true
 
       constraints min_length: 3,
                   max_length: 255,
@@ -324,21 +326,20 @@ In case you want to keep those spaces you can use `trim: false`:
 
 [NOTE]
 ====
-I did sneek in a space in the regular expression. Because otherwise the
+I did sneak in a space in the regular expression. Because otherwise the
 validation for `"Banana   "` would fail.
 ====
 
 ```elixir
-iex(4)> App.Shop.Product.create!(%{name: "Banana   ",
-                                   price: 0.1,
+iex(4)> App.Shop.create_product!(%{name: "Banana   ",
+                                   price: Decimal.new("0.1"),
                                    stock_quantity: 12})
-#App.Shop.Product<
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
+%App.Shop.Product{
   id: "b1793ac1-4bfb-4f4f-9b3a-42a64c30378b",
   name: "Banana   ",
   description: nil,
   price: Decimal.new("0.1"),
   stock_quantity: 12,
-  ...
->
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
 ```

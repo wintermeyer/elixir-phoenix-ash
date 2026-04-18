@@ -67,6 +67,12 @@ iex(1)> App.ToDoList.create_task!(%{content: "Mow the lawn"})
 iex(2)>
 ```
 
+NOTE: Ash 3.x logs a `[debug] Creating App.ToDoList.Task: Setting %{...}`
+line before each write by default. It is harmless and the book omits it
+to keep the output compact. If you want to suppress it yourself, call
+`Logger.configure(level: :info)` at the top of your IEx session, or add
+`config :logger, level: :info` to `config/dev.exs`.
+
 The function `App.ToDoList.create_task!/1-2` raises an error if
 something goes wrong (e.g. a validation error). Alternatively you can
 use `App.ToDoList.create_task/1-2` which returns a tuple with the

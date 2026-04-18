@@ -1,46 +1,46 @@
 [[ash-attributes-validations]]
 ## Attributes Validations
 
-Validations are used when xref:ash-constraints[constraints]
-are not powerful enough.
+Validations are used when xref:ash-constraints[constraints] are not
+powerful enough.
 
-Let me show you how to use validations with an online shop
-`product` example.
+Let me show you how to use validations with an online shop `product`
+example.
 
 include::../setup-fresh-app.adoc[]
 
 Please create the following files:
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
+
     attribute :name, :string do
       allow_nil? false
+      public? true
     end
+
     attribute :price, :decimal do
       allow_nil? false
+      public? true
     end
+
     attribute :use_by_date, :date do
       allow_nil? false
+      public? true
     end
   end
 
   actions do
+    default_accept [:name, :price, :use_by_date]
     defaults [:create, :read, :update, :destroy]
-  end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
   end
 end
 ----
@@ -48,10 +48,17 @@ end
 [source,elixir,title='lib/app/shop.ex']
 ----
 defmodule App.Shop do
-  use Ash.Api
+  use Ash.Domain, otp_app: :app
 
   resources do
-    resource App.Shop.Product
+    resource App.Shop.Product do
+      define :create_product, action: :create
+      define :list_products, action: :read
+      define :get_product_by_id, action: :read, get_by: :id
+      define :get_product_by_name, action: :read, get_by: :name
+      define :update_product, action: :update
+      define :destroy_product, action: :destroy
+    end
   end
 end
 ----
@@ -59,15 +66,15 @@ end
 ### Custom Validations
 
 We only add products to our shop that are not expired. For that we add
-a custom validation for the `use_by_date` attribute. It must not be in the
-past. We need to write a custom validation for that.
+a custom validation for the `use_by_date` attribute. It must not be in
+the past. We need to write a custom validation for that.
 
 [source,elixir,title='lib/app/validations/in_the_future_or_today.ex']
 ----
 defmodule App.Validations.InTheFutureOrToday do
   use Ash.Resource.Validation
 
-  def validate(changeset, opts) do
+  def validate(changeset, opts, _context) do
     case Ash.Changeset.fetch_argument_or_change(changeset, opts[:field]) do
       :error ->
         # in this case, they aren't changing the field
@@ -86,23 +93,37 @@ defmodule App.Validations.InTheFutureOrToday do
 end
 ----
 
+NOTE: Ash 3.x passes a third `context` argument (a
+`Ash.Resource.Validation.Context`) to the `validate/3` callback. Old
+Ash 2.x tutorials show a two-argument version; adjust accordingly if
+you port code from there.
+
 That validation can be used like this:
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
+
     attribute :name, :string do
       allow_nil? false
+      public? true
     end
+
     attribute :price, :decimal do
       allow_nil? false
+      public? true
     end
+
     attribute :use_by_date, :date do
       allow_nil? false
+      public? true
     end
   end
 
@@ -111,17 +132,8 @@ defmodule App.Shop.Product do
   end
 
   actions do
+    default_accept [:name, :price, :use_by_date]
     defaults [:create, :read, :update, :destroy]
-  end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
   end
 end
 ----
@@ -131,18 +143,18 @@ Let's try it out:
 
 ```elixir
 $ iex -S mix
-iex(1)> App.Shop.Product.create!(%{
+iex(1)> App.Shop.create_product!(%{
                                    name: "Apple",
-                                   price: 0.1,
+                                   price: Decimal.new("0.1"),
                                    use_by_date: ~D[2008-11-10]
                                  })
-** (Ash.Error.Invalid) Input Invalid
+** (Ash.Error.Invalid) Invalid Error
 
 * Invalid value provided for use_by_date: must be in the future or today.
 
-nil
+Value: nil
 
-    (ash 2.15.8) lib/ash/api/api.ex:2183: Ash.Api.unwrap_or_raise!/3
+    (ash 3.24.3) lib/ash/code_interface.ex:...: Ash.CodeInterface.create_act!/4
 ```
 
 With custom validations you can solve pretty much any validation problem.

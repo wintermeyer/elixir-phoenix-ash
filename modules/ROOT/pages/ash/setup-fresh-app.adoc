@@ -1,57 +1,41 @@
 [[setup-fresh-app]]
 ## Setting Up a Fresh Ash App
 
-The fastest way to get started with Ash is using Igniter, a powerful code generator for Ash applications. Igniter handles all the boilerplate setup for you, making it easy to get up and running quickly.
-
-### Using Igniter (Recommended)
-
-First, install the Igniter archive if you haven't already:
+The fastest way to get started with Ash is Igniter. One command
+scaffolds the project, pulls Ash (and whatever else you ask for),
+and wires up the config.
 
 ```bash
 $ mix archive.install hex igniter_new
-```
-
-Then create a fresh Ash application:
-
-```bash
-$ mix igniter.new app --install ash
+$ mix igniter.new app --install ash --yes
 $ cd app
 ```
 
 For a Phoenix application with Ash and PostgreSQL support:
 
 ```bash
-$ mix igniter.new app --with phx.new --install ash,ash_postgres
+$ mix igniter.new app --with phx.new --install ash,ash_postgres --yes
 $ cd app
 ```
 
-Igniter will create all the necessary files and folder structure, install dependencies, and set up your configuration automatically.
+Igniter creates the `App.Repo` wrapper (when `ash_postgres` is
+included), the application's supervision tree, a sensible
+`.formatter.exs`, and the Postgres config for every environment. You
+still need to add the `config :app, :ash_domains, [App.Shop]` line to
+`config/config.exs` once you define your first domain, which we do in
+each chapter that uses this include.
 
-### Using the Interactive Web Installer
+### Interactive web installer
 
-You can also use the interactive web installer at https://ash-hq.org/#get-started to create a custom setup command tailored to your specific needs.
+You can also use the interactive web installer at
+https://ash-hq.org/#get-started to get a custom Igniter command
+tailored to your needs.
 
-### Manual Setup Alternative
+### Manual setup alternative
 
-If you prefer the manual approach, you can follow the steps in xref:ash/ash-setup-guide.adoc#the-manual-approach-alternative[the manual approach] or use this bash script that performs the same setup:
-
-```bash
-mix new --sup app && cd app
-awk '/defp deps do/,/\[/ {
-       if ($0 ~ /\[/) {
-           print $0;
-           print "{:ash, \"~> 3.0\"}";
-           next;
-       }
-   } 1' mix.exs > mix.exs.tmp
-mv mix.exs.tmp mix.exs
-mix deps.get
-echo '[
-  import_deps: [:ash],
-  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
-]' > .formatter.exs
-mkdir config
-echo 'import Config
-config :app, :ash_domains, [App.Shop]' > config/config.exs
-mix format
-```
+If you want to see every file Igniter would create, walk through
+xref:ash/ash-setup-guide.adoc[the Ash Setup Guide]. For a purely
+manual route, `mix new --sup app`, add `{:ash, "~> 3.0"}` to
+`mix.exs`, run `mix deps.get`, and configure `.formatter.exs` with
+`import_deps: [:ash]`. Everything else in this chapter then matches
+the Igniter flow.

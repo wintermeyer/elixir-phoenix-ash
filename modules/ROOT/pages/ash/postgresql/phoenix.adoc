@@ -1,209 +1,42 @@
 [[postgresql-phoenix]]
 ## PostgreSQL Data Layer Ash + Phoenix Framework Setup
 
-We start with a fresh project and give the new application the name `app`:
+The recommended path is Igniter. One command scaffolds a Phoenix 1.8
+project with `ash`, `ash_postgres`, and `ash_phoenix` pre-installed
+and configured:
 
 ```bash
-$ mix phx.new app --no-ecto
+$ mix archive.install hex igniter_new
+$ mix igniter.new app --with phx.new --install ash,ash_postgres,ash_phoenix --yes
 $ cd app
 ```
 
-Add Ash and AshPostgres as a dependency:
+Igniter generates the `App.Repo` wrapper, the application supervision
+tree, the config files, and the `.formatter.exs` imports for you. The
+files you end up with are the ones covered in
+xref:ash/postgresql/minimal.adoc[PostgreSQL Data Layer Minimal Setup]
+with these Phoenix-specific additions:
 
-[source,elixir,title='mix.exs']
-----
-# [...]
-defp deps do
-[
-    {:phoenix, "~> 1.7.21"},
-    {:phoenix_html, "~> 3.3"},
-    # [...]
-    {:ash, "~> 3.5.9"}, <1>
-    {:ash_postgres, "~> 2.5.19"}, <2>
-    {:ash_phoenix, "~> 2.3.0"} <3>
-  ]
-end
-# [...]
-
-<1> Find the latest version number at https://hex.pm/packages/ash
-<2> Find the latest version number at https://hex.pm/packages/ash_postgres
-<3> Find the latest version number at https://hex.pm/packages/ash_phoenix
-
-Run `mix deps.get` to install it:
-
-```bash
-$ mix deps.get
-```
-
-To make sure that we get the right formatting for our code, we change
-the file `.formatter.exs` to include the Ash and AshPostgres formatter:
-
-[source,elixir,title='.formatter.exs']
-----
-[
-  import_deps: [:phoenix, :ash, :ash_postgres, :ash_phoenix], <1>
-  plugins: [Phoenix.LiveView.HTMLFormatter],
-  inputs: ["*.{heex,ex,exs}", "{config,lib,test}/**/*.{heex,ex,exs}"]
-]
-----
-
-<1> Add `:ash, :ash_postgres` here.
-
-Next we put the `AshPostgres.Repo` wrapper around the `Ecto.Repo`:
-
-[source,elixir,title='lib/app/repo.ex']
-----
-defmodule App.Repo do
-  use AshPostgres.Repo, otp_app: :app
-end
-----
-
-We have to adapt the `config/config.exs` file to our Ash
-setup. Add the Ash Configurations to the file:
-
-[source,elixir,title='config/config.exs']
-----
-# [...]
-
-# Ash configuration
-config :app,
-  ash_apis: [App.Shop] <1>
-
-config :app,
-  ecto_repos: [App.Repo] <2>
-
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
-import_config "#{config_env()}.exs"
-----
-
-<1> Please adapt `App.Shop` to your application. Since we use App.Shop
-in most of our examples I use it here as well.
-<2> Configures the Ecto repo.
-
-Please add the following lines to the end of the `config/dev.exs` file:
-
-[source,elixir,title='config/dev.exs']
-----
-# [...]
-
-config :app, App.Repo,
-  username: "postgres", <1>
-  password: "postgres",
-  hostname: "localhost",
-  database: "shop_dev", <2>
-  port: 5432,
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
-----
-
-<1> Please use the correct username and password for your database.
-Most developers use `postgres:postgres` for the development system.
-<2> Please use the database name which makes most sense for you.
-
-Please add the following code to the end of `config/runtime.exs` file:
-
-[source,elixir,title='config/runtime.exs']
-----
-# [...]
-
-if config_env() == :prod do
-  database_url =
-    System.get_env("DATABASE_URL") || <1>
-      raise """
-      environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
-      """
-
-  config :app, App.Repo,
-    url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
-end
-----
-
-<1> Most production environments use environment variables to configure
-the database connection. This is the default for Heroku and other
-cloud providers. If you don't use environment variables, you can
-hardcode the database connection here. But in that case take extra
-security messures to protect your database credentials.
-
-Add the following lines to the end of the `config/test.exs` file:
-
-[source,elixir,title='config/test.exs']
-----
-# [...]
-
-config :app, App.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "app_test#{System.get_env("MIX_TEST_PARTITION")}",
-  pool: Ecto.Adapters.SQL.Sandbox,
-  pool_size: 10
-----
-
-Please add `App.Repo` in the children list of the `lib/app/application.ex` file:
-
-[source,elixir,title='lib/app/application.ex']
-----
-defmodule App.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
-  @moduledoc false
-
-  use Application
-
-  @impl true
-  def start(_type, _args) do
-    children = [
-      # Start the Telemetry supervisor
-      AppWeb.Telemetry,
-      # Start the PubSub system
-      {Phoenix.PubSub, name: App.PubSub},
-      # Start Finch
-      {Finch, name: App.Finch},
-      # Start the Endpoint (http/https)
-      AppWeb.Endpoint, <1>
-      # Start a worker by calling: App.Worker.start_link(arg)
-      # {App.Worker, arg}
-      App.Repo <2>
-    ]
-
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: App.Supervisor]
-    Supervisor.start_link(children, opts)
-  end
-
-  # Tell Phoenix to update the endpoint configuration
-  # whenever the application is updated.
-  @impl true
-  def config_change(changed, _new, removed) do
-    AppWeb.Endpoint.config_change(changed, removed)
-    :ok
-  end
-end
-----
-
-<1> Don't forget to add a comma here.
-<2> Add this line.
-
-Before you can start the Phoenix server you have to create a database.
-To do that your app has to have at least one resource. The creation of
-a resource is the next step.
+* `App.Repo` is added to the application's child list *alongside*
+`AppWeb.Telemetry`, `Phoenix.PubSub`, `Finch`, and `AppWeb.Endpoint`.
+* `.formatter.exs` imports `[:phoenix, :ash, :ash_postgres, :ash_phoenix]`.
+* `config/dev.exs`, `config/test.exs`, and `config/runtime.exs` carry
+the usual Postgres credentials (see the minimal setup for the full
+listings).
 
 [[ashpostgres-datalayer]]
 ### Add AshPostgres to a Resource
 
-As an example we add a minimal `Product` resource to our
-application. The resource is more or less empty. We add
-more attributes later.
+As an example we add a minimal `Product` resource to our application.
+We will add more attributes later.
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
   use Ash.Resource,
-    data_layer: AshPostgres.DataLayer <1>
+    data_layer: AshPostgres.DataLayer, <1>
+    domain: App.Shop,
+    otp_app: :app
 
   postgres do
     table "products" <2>
@@ -217,136 +50,119 @@ defmodule App.Shop.Product do
   actions do
     defaults [:create, :read, :update, :destroy]
   end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :update
-    define :destroy
-  end
 end
 ----
 
-<1> Tells Ash to use the AshPostgres.DataLayer for this resource.
+<1> Tells Ash to use the `AshPostgres.DataLayer` for this resource.
 <2> Sets the name of the table in the database.
-<3> An AshPostgres resource always has to have at least one UUID
-primary key attribute.
+<3> An AshPostgres resource always has to have at least one primary
+key attribute.
 
-Of course we need to add an internal API:
+The matching domain with the code interfaces we will call from IEx:
 
 [source,elixir,title='lib/app/shop.ex']
 ----
 defmodule App.Shop do
-  use Ash.Api
+  use Ash.Domain, otp_app: :app
 
   resources do
-    resource App.Shop.Product
+    resource App.Shop.Product do
+      define :create_product, action: :create
+      define :list_products, action: :read
+      define :get_product_by_id, action: :read, get_by: :id
+      define :update_product, action: :update
+      define :destroy_product, action: :destroy
+    end
   end
 end
 ----
 
-The `products` table is not yet created. Not even the database
-is created. We do that in the next step.
+Add the domain to `config/config.exs`:
+
+[source,elixir,title='config/config.exs']
+----
+# [...]
+config :app, :ash_domains, [App.Shop]
+# [...]
+----
+
+The `products` table is not yet created. Not even the database is
+created. We do that in the next step.
 
 ### Create the Database
 
-Assuming that you have https://www.postgresql.org[PostgreSQL] installed
-and running on your system, you can now create the database with the
-`mix ash_postgres.create` command:
+Assuming that you have https://www.postgresql.org[PostgreSQL]
+installed and running on your system, you can now create the database
+with the `mix ash_postgres.create` command:
 
-```elixir
-$  mix ash_postgres.create
-Compiling 2 files (.ex)
-Generated app app
+```bash
+$ mix ash_postgres.create
 The database for App.Repo has been created
 ```
 
-NOTE: Now is the first time you could actually start the Phoenix server
-with `mix phx.server` without getting an error.
+NOTE: Now is the first time you could actually start the Phoenix
+server with `mix phx.server` without getting an error.
 
 ### Drop the Database
 
 In case you need to drop (delete) the database you can use the
 `mix ash_postgres.drop` command:
 
-```elixir
+```bash
 $ mix ash_postgres.drop
 The database for App.Repo has been dropped
 ```
 
-NOTE: Please re-run `mix ash_postgres.create` now in case you ran
-the drop command by accident while working this tutorial.
+NOTE: Please re-run `mix ash_postgres.create` now in case you ran the
+drop command by accident while working this tutorial.
 
 [[ash-codegen]]
 ### mix ash.codegen
 
-`mix ash.codegen` scans your application for resources, keeps track
-of them and generates migrations if things (e.g. attributes) change.
+`mix ash.codegen` scans your application for resources, keeps track of
+them and generates migrations if things (e.g. attributes) change. It
+now takes a migration name as a positional argument:
 
-We created the database but it is still empty. It is time to use
-`mix ash.codegen` to create a migration for the `Product` resource.
-
-```elixir
-$ mix ash.codegen
+```bash
+$ mix ash.codegen create_products
 Running codegen for AshPostgres.DataLayer...
-Compiling 1 file (.ex)
-
-Extension Migrations:
-No extensions to install
-
-Generating Tenant Migrations:
-
-Generating Migrations:
-* creating priv/repo/migrations/20231005153554_migrate_resources1.exs
+* creating priv/resource_snapshots/repo/extensions.json
+* creating priv/repo/migrations/20260418183000_create_products_extensions_1.exs
+* creating priv/repo/migrations/20260418183001_create_products.exs
+* creating priv/resource_snapshots/repo/products/20260418183002.json
 ```
-
-It is not a bad habit to check the generated migration file before
-running the migration. In our case it looks like this:
-
-```elixir
-[...]
-  def up do
-    create table(:products, primary_key: false) do <1>
-      add :id, :uuid, null: false, primary_key: true <2>
-    end
-  end
-
-  def down do
-    drop table(:products)
-  end
-[...]
-```
-
-<1> Create a table named `products`.
-<2> Add a primary key column named `id` of type `uuid`.
 
 [[ash_postgres-migrate]]
 ### mix ash_postgres.migrate
 
-Now it is time to run the migration:
+Now run the migration:
 
-```elixir
+```bash
 $ mix ash_postgres.migrate
 
-17:08:26.221 [info] == Running 20231005150754 App.Repo.Migrations.MigrateResources1.up/0 forward
+[info] == Running 20260418183000 App.Repo.Migrations.CreateProductsExtensions1.up/0 forward
+[info] execute "CREATE OR REPLACE FUNCTION ash_elixir_or..."
+[info] == Migrated 20260418183000 in 0.0s
 
-17:08:26.222 [info] create table products
-
-17:08:26.226 [info] == Migrated 20231005150754 in 0.0s
-$
+[info] == Running 20260418183001 App.Repo.Migrations.CreateProducts.up/0 forward
+[info] create table products
+[info] == Migrated 20260418183001 in 0.0s
 ```
+
+The first migration installs Ash's SQL helper functions (`ash_elixir_or`,
+`ash_required`, `uuid_generate_v7`, and so on) via the `ash-functions`
+extension Igniter registers in `App.Repo`. The second one is the
+migration for our `Product` resource.
 
 If you want to you can check the table with `psql`:
 
 ```bash
-$ psql -h localhost -U postgres -d shop_dev -c "\d products"
+$ psql -h localhost -U postgres -d app_dev -c "\d products"
 
             Table "public.products"
- Column | Type | Collation | Nullable | Default
---------+------+-----------+----------+---------
- id     | uuid |           | not null |
+ Column | Type | Collation | Nullable |         Default
+--------+------+-----------+----------+--------------------------
+ id     | uuid |           | not null | gen_random_uuid()
 Indexes:
     "products_pkey" PRIMARY KEY, btree (id)
 ```
@@ -357,28 +173,28 @@ Indexes:
 Sometimes you want to undo a migration. You can do that with
 `mix ash_postgres.rollback`:
 
-```elixir
+```bash
 $ mix ash_postgres.rollback
 
-14:29:49.017 [info] == Running 20231006105336 App.Repo.Migrations.MigrateResources5.down/0 forward
-
-14:29:49.018 [info] drop table products
-
-14:29:49.019 [info] == Migrated 20231006105336 in 0.0s
+[info] == Running 20260418183001 App.Repo.Migrations.CreateProducts.down/0 forward
+[info] drop table products
+[info] == Migrated 20260418183001 in 0.0s
 ```
 
-NOTE: In case you just did a rollback in this example you want to migrate again
-with `mix ash_postgres.migrate` before you continue.
+NOTE: In case you just did a rollback in this example you want to
+migrate again with `mix ash_postgres.migrate` before you continue.
 
 ### Add Attributes to a Resource
 
 Let's add two attributes to the `Product` resource:
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
   use Ash.Resource,
-    data_layer: AshPostgres.DataLayer
+    data_layer: AshPostgres.DataLayer,
+    domain: App.Shop,
+    otp_app: :app
 
   postgres do
     table "products"
@@ -387,465 +203,162 @@ defmodule App.Shop.Product do
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string <1>
-    attribute :price, :float <2>
+    attribute :name, :string, public?: true <1>
+    attribute :price, :decimal, public?: true <2>
   end
 
   actions do
+    default_accept [:name, :price]
     defaults [:create, :read, :update, :destroy]
-  end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read <3>
-    define :update
-    define :destroy
   end
 end
 ----
 
-<1> A :name attribute of type :string.
-<2> A :price attribute of type :float.
-<3> A :by_name action that can be used to find a product by its name.
+<1> A `:name` attribute of type `:string`.
+<2> A `:price` attribute of type `:decimal`. Prefer `:decimal` over
+`:float` for money so rounding errors do not creep in.
 
-Start `mix ash.codegen` again:
+Also add a matching `get_product_by_name` code interface:
 
-```elixir
-$ mix ash.codegen
-Running codegen for AshPostgres.DataLayer...
-Compiling 1 file (.ex)
+[source,elixir,title='lib/app/shop.ex']
+----
+# [...]
+    resource App.Shop.Product do
+      define :create_product, action: :create
+      define :list_products, action: :read
+      define :get_product_by_id, action: :read, get_by: :id
+      define :get_product_by_name, action: :read, get_by: :name <1>
+      define :update_product, action: :update
+      define :destroy_product, action: :destroy
+    end
+# [...]
+----
 
-Extension Migrations:
-No extensions to install
+<1> A `get_product_by_name` helper that looks up a product by its
+`:name`.
 
-Generating Tenant Migrations:
-
-Generating Migrations:
-* creating priv/repo/migrations/20231005155818_migrate_resources2.exs <1>
-```
-
-<1> `mix ash.codegen` created a new migration file which includes the new attributes.
-
-Run the migration:
-
-```elixir
-$ mix ash_postgres.migrate
-
-17:58:36.046 [info] == Running 20231005155818 App.Repo.Migrations.MigrateResources2.up/0 forward
-
-17:58:36.047 [info] alter table products
-
-17:58:36.050 [info] == Migrated 20231005155818 in 0.0s
-$
-```
-
-Because we are curious we check the table again:
+Generate and run the migration:
 
 ```bash
-$ psql -h localhost -U postgres -d shop_dev -c "\d products"
+$ mix ash.codegen add_product_attributes
+Running codegen for AshPostgres.DataLayer...
+* creating priv/repo/migrations/20260418184000_add_product_attributes.exs
+* creating priv/resource_snapshots/repo/products/20260418184001.json
+
+$ mix ash_postgres.migrate
+[info] == Running 20260418184000 App.Repo.Migrations.AddProductAttributes.up/0 forward
+[info] alter table products
+[info] == Migrated 20260418184000 in 0.0s
+```
+
+Check the table again:
+
+```bash
+$ psql -h localhost -U postgres -d app_dev -c "\d products"
 
               Table "public.products"
- Column |  Type   | Collation | Nullable | Default
---------+---------+-----------+----------+---------
- id     | uuid    |           | not null |
+ Column |  Type   | Collation | Nullable |         Default
+--------+---------+-----------+----------+--------------------------
+ id     | uuid    |           | not null | gen_random_uuid()
  name   | text    |           |          |
  price  | numeric |           |          |
 Indexes:
     "products_pkey" PRIMARY KEY, btree (id)
 ```
 
-Time to add two entries into the products table (a Banana and a Pineapple):
+Time to add two entries into the products table (a Banana and a
+Pineapple):
 
 ```elixir
 $ iex -S mix
-iex(1)> alias App.Shop.Product
-App.Shop.Product
-iex(2)> Product.create!(%{name: "Banana", price: 0.10})
-[debug] QUERY OK db=0.7ms idle=825.2ms
-begin []
-[debug] QUERY OK db=0.5ms
+iex(1)> App.Shop.create_product!(%{name: "Banana", price: Decimal.new("0.10")})
+
+[debug] QUERY OK db=3.9ms
 INSERT INTO "products" ("id","name","price") VALUES ($1,$2,$3)
 RETURNING "price","name","id"
-["7a4c1e30-09ea-421b-99dd-4db53d3140aa", "Banana", 0.1] <1>
-[debug] QUERY OK db=0.2ms
-commit []
-#App.Shop.Product<
+["4d7e383b-ce7b-44d0-818c-290eaa8b0532", "Banana", Decimal.new("0.1")] <1>
+%App.Shop.Product{
   __meta__: #Ecto.Schema.Metadata<:loaded, "products">,
-  id: "7a4c1e30-09ea-421b-99dd-4db53d3140aa",
+  id: "4d7e383b-ce7b-44d0-818c-290eaa8b0532",
   name: "Banana",
-  price: 0.1,
-  aggregates: %{},
-  calculations: %{},
-  ...
->
-iex(3)> Product.create!(%{name: "Pineapple", price: 0.50})
-[debug] QUERY OK db=0.4ms idle=259.6ms
-begin []
-[debug] QUERY OK db=0.8ms
+  price: Decimal.new("0.10")
+}
+iex(2)> App.Shop.create_product!(%{name: "Pineapple", price: Decimal.new("0.50")})
+
+[debug] QUERY OK db=0.6ms
 INSERT INTO "products" ("id","name","price") VALUES ($1,$2,$3)
 RETURNING "price","name","id"
-["94980538-dc42-4a58-aa0b-a2237b493ab6", "Pineapple", 0.5]
-[debug] QUERY OK db=1.0ms
-commit []
-#App.Shop.Product<
+["e854a911-4cda-4693-bd49-db200b675ded", "Pineapple", Decimal.new("0.5")]
+%App.Shop.Product{
   __meta__: #Ecto.Schema.Metadata<:loaded, "products">,
-  id: "94980538-dc42-4a58-aa0b-a2237b493ab6",
+  id: "e854a911-4cda-4693-bd49-db200b675ded",
   name: "Pineapple",
-  price: 0.5,
-  aggregates: %{},
-  calculations: %{},
-  ...
->
-iex(4)>
+  price: Decimal.new("0.50")
+}
+iex(3)>
 ```
 
 <1> In development mode you see these SQL debugging messages.
+`Logger.configure(level: :info)` at the top of the session hides them.
 
-After pressing `Ctrl-C` two times to exit the `iex` session
-we can check the table again:
+After pressing `Ctrl-C` two times to exit the `iex` session we can
+check the table again:
 
 ```bash
-$ psql -h localhost -U postgres -d shop_dev -c "select * from products"
+$ psql -h localhost -U postgres -d app_dev -c "select * from products"
                   id                  |   name    | price
 --------------------------------------+-----------+-------
- 7a4c1e30-09ea-421b-99dd-4db53d3140aa | Banana    |   0.1
- 94980538-dc42-4a58-aa0b-a2237b493ab6 | Pineapple |   0.5
+ 4d7e383b-ce7b-44d0-818c-290eaa8b0532 | Banana    |  0.10
+ e854a911-4cda-4693-bd49-db200b675ded | Pineapple |  0.50
 (2 rows)
 ```
 
-Congratulation! You just created your first Ash application with a
-PostgreSQL database.
+Congratulations! You just created your first Ash + Phoenix application
+with a PostgreSQL database.
 
-TIP: **Never forget to run `mix ash.codegen` and `mix ash_postgres.migrate`**
-after you change a resource. Otherwise the changes will not be reflected
-in the database.
+TIP: **Never forget to run `mix ash.codegen <migration_name>` and
+`mix ash_postgres.migrate`** after you change a resource. Otherwise
+the changes will not be reflected in the database.
 
 ### Test Setup
 
-To be able to run tests which use the database we have to add
-some more code.
+Igniter wires up the test database helper for you. The generated
+`test/test_helper.exs` already calls
+`Ecto.Adapters.SQL.Sandbox.mode(App.Repo, :manual)`, and the
+`mix test` alias runs `ash_postgres.create --quiet` and
+`ash_postgres.migrate --quiet` before each test run. Run:
 
-[source,elixir,title='test/test_helper.exs']
-----
-ExUnit.start()
-Ecto.Adapters.SQL.Sandbox.mode(App.Repo, :manual) <1>
-----
-
-<1> This line has to be added.
-
-And the following file has to be created:
-
-[source,elixir,title='test/support/data_case.ex']
-----
-defmodule App.DataCase do
-  @moduledoc """
-  This module defines the setup for tests requiring
-  access to the application's data layer.
-
-  You may define functions here to be used as helpers in
-  your tests.
-
-  Finally, if the test case interacts with the database,
-  we enable the SQL sandbox, so changes done to the database
-  are reverted at the end of every test. If you are using
-  PostgreSQL, you can even run database tests asynchronously
-  by setting `use App.DataCase, async: true`, although
-  this option is not recommended for other databases.
-  """
-
-  use ExUnit.CaseTemplate
-
-  using do
-    quote do
-      alias App.Repo
-
-      import Ecto
-      import Ecto.Changeset
-      import Ecto.Query
-      import App.DataCase
-    end
-  end
-
-  setup tags do
-    App.DataCase.setup_sandbox(tags)
-    :ok
-  end
-
-  @doc """
-  Sets up the sandbox based on the test tags.
-  """
-  def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(App.Repo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
-  end
-
-  @doc """
-  A helper that transforms changeset errors into a map of messages.
-
-      assert {:error, changeset} = Accounts.create_user(%{password: "short"})
-      assert "password is too short" in errors_on(changeset).password
-      assert %{password: ["password is too short"]} = errors_on(changeset)
-
-  """
-  def errors_on(changeset) do
-    Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
-      Regex.replace(~r"%{(\w+)}", message, fn _, key ->
-        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-      end)
-    end)
-  end
-end
-----
-
-And we have to add a new alias for the tests:
-
-[source,elixir,title='mix.exs']
-----
-[...]
-  defp aliases do
-    [
-      setup: ["deps.get", "assets.setup", "assets.build"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind default", "esbuild default"],
-      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"],
-      test: ["ash_postgres.create --quiet", "ash_postgres.migrate --quiet", "test"] <1>
-    ]
-  end
-[...]
-----
-
-<1> Add this line.
-
-Now we can run the tests:
-
-```elixir
+```bash
 $ mix test
 .....
 Finished in 0.06 seconds (0.02s async, 0.04s sync)
 5 tests, 0 failures
-
-Randomized with seed 503191
 ```
 
-### phx.gen.html Alternative
+If you need a shared `App.DataCase` for tests that exercise the
+repo, copy the one Phoenix generates in stock projects (or regenerate
+with `mix phx.gen.schema` in a throwaway scratch app and lift the
+file).
 
-Right now there is no `mix phx.gen.html` like generator for Ash.
-Until someone creates one I show you how to create the files manually.
-Our aim is to have a web interface for the `Product` resource.
+### Building the Phoenix CRUD by hand
 
-We start with the controller:
+A full `phx.gen.html`-style generator for Ash does not ship with the
+framework, but the controller pattern is short once `ash_phoenix` is
+installed. Given how much this piece changes between `ash_phoenix`
+releases, we keep the detailed example in the
+link:https://hexdocs.pm/ash_phoenix[ash_phoenix documentation] rather
+than pin it here. The short version:
 
-[source,elixir,title='lib/app_web/controllers/product_controller.ex']
-----
-defmodule AppWeb.ProductController do
-  use AppWeb, :controller
+* `AshPhoenix.Form.for_create/3` and `AshPhoenix.Form.for_update/3`
+build forms compatible with the `<.simple_form>` Phoenix component,
+using `domain: App.Shop` (the old `api:` keyword is no longer valid
+in Ash 3).
+* `AshPhoenix.Form.submit/1` returns `{:ok, record}` or `{:error,
+form}` and is what you call from your `create/2` and `update/2`
+actions.
+* A one-line `resources "/products", ProductController` in
+`lib/app_web/router.ex` wires up the seven RESTful routes.
 
-  alias App.Shop.Product
-
-  def index(conn, _params) do
-    products = Product.read!()
-    render(conn, :index, products: products)
-  end
-
-  def new(conn, _params) do
-    render(conn, :new, form: create_form())
-  end
-
-  def create(conn, %{"product" => product_params}) do
-    product_params
-    |> create_form()
-    |> AshPhoenix.Form.submit()
-    |> case do
-      {:ok, product} ->
-        conn
-        |> put_flash(:info, "Product created successfully.")
-        |> redirect(to: ~p"/products/#{product}")
-
-      {:error, form} ->
-        conn
-        |> put_flash(:error, "Product could not be created.")
-        |> render(:new, form: form)
-    end
-  end
-
-  def show(conn, %{"id" => id}) do
-    product = Product.by_id!(id)
-    render(conn, :show, product: product)
-  end
-
-  def edit(conn, %{"id" => id}) do
-    product = Product.by_id!(id)
-
-    render(conn, :edit, product: product, form: update_form(product))
-  end
-
-  def update(conn, %{"product" => product_params, "id" => id}) do
-    product = Product.by_id!(id)
-
-    product
-    |> update_form(product_params)
-    |> AshPhoenix.Form.submit()
-    |> case do
-      {:ok, product} ->
-        conn
-        |> put_flash(:info, "Product updated successfully.")
-        |> redirect(to: ~p"/products/#{product}")
-
-      {:error, form} ->
-        conn
-        |> put_flash(:error, "Product could not be updated.")
-        |> render(:edit, product: product, form: form)
-    end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    product = Product.by_id!(id)
-    :ok = Product.destroy(product)
-
-    conn
-    |> put_flash(:info, "Product deleted successfully.")
-    |> redirect(to: ~p"/products")
-  end
-
-  defp create_form(params \\ nil) do
-    AshPhoenix.Form.for_create(Product, :create, as: "product", api: App.Shop, params: params)
-  end
-
-  defp update_form(product, params \\ nil) do
-    AshPhoenix.Form.for_update(product, :update, as: "product", api: App.Shop, params: params)
-  end
-end
-----
-
-The controller is pretty straight forward. We use the `AshPhoenix.Form` module
-to create the forms for the `:new` and `:edit` actions. The `:create` and `:update`
-actions are a bit more complex. We use the `AshPhoenix.Form.submit/1` function
-to submit the form. If the form is valid we redirect to the `:show` action.
-If the form is invalid we render the `:new` or `:edit` action again.
-The `AshPhoenix.Form.submit/1` function returns a tuple with `:ok` or `:error`
-and the form. If the form is valid the `:ok` tuple is returned.
-If the form is invalid the `:error` tuple is returned.
-The `AshPhoenix.Form.submit/1` function also adds the errors to the form.
-This is why we can render the form again and the errors are displayed.
-
-[source,elixir,title='lib/app_web/controllers/product_html/index.html.heex']
-----
-<.header>
-  Listing Products
-  <:actions>
-    <.link href={~p"/products/new"}>
-      <.button>New Product</.button>
-    </.link>
-  </:actions>
-</.header>
-
-<.table id="products" rows={@products} row_click={&JS.navigate(~p"/products/#{&1}")}>
-  <:col :let={product} label="Name"><%= product.name %></:col>
-  <:col :let={product} label="Price"><%= product.price %></:col>
-  <:action :let={product}>
-    <div class="sr-only">
-      <.link navigate={~p"/products/#{product}"}>Show</.link>
-    </div>
-    <.link navigate={~p"/products/#{product}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={product}>
-    <.link href={~p"/products/#{product}"} method="delete" data-confirm="Are you sure?">
-      Delete
-    </.link>
-  </:action>
-</.table>
-----
-
-[source,elixir,title='lib/app_web/controllers/product_html/show.html.heex']
-----
-<.header>
-  Product <%= @product.id %>
-  <:subtitle>This is a product record from your database.</:subtitle>
-  <:actions>
-    <.link href={~p"/products/#{@product}/edit"}>
-      <.button>Edit product</.button>
-    </.link>
-  </:actions>
-</.header>
-
-<.list>
-  <:item title="Name"><%= @product.name %></:item>
-  <:item title="Price"><%= @product.price %></:item>
-</.list>
-
-<.back navigate={~p"/products"}>Back to products</.back>
-----
-
-[source,elixir,title='lib/app_web/controllers/product_html/new.html.heex']
-----
-<.header>
-  New Product
-  <:subtitle>Use this form to manage product records in your database.</:subtitle>
-</.header>
-
-<.simple_form :let={f} for={@form} action={~p"/products/"}>
-  <.error :if={@form.submitted_once?}>
-    Oops, something went wrong! Please check the errors below.
-  </.error>
-  <.input field={f[:name]} type="text" label="Name" />
-  <.input field={f[:price]} type="number" label="Price" step="any" />
-  <:actions>
-    <.button>Save Product</.button>
-  </:actions>
-</.simple_form>
-
-<.back navigate={~p"/products"}>Back to products</.back>
-----
-
-[source,elixir,title='lib/app_web/controllers/product_html/edit.html.heex']
-----
-<.header>
-  Edit Product <%= @product.id %>
-  <:subtitle>Use this form to manage product records in your database.</:subtitle>
-</.header>
-
-<.simple_form :let={f} for={@form} action={~p"/products/#{@product}"}>
-  <.error :if={@form.submitted_once?}>
-    Oops, something went wrong! Please check the errors below.
-  </.error>
-  <.input field={f[:name]} type="text" label="Name" />
-  <.input field={f[:price]} type="number" label="Price" step="any" />
-  <:actions>
-    <.button>Save Product</.button>
-  </:actions>
-</.simple_form>
-
-<.back navigate={~p"/products"}>Back to products</.back>
-----
-
-Don't forget to add the resource to the routes:
-
-[source,elixir,title='lib/app_web/router.ex']
-----
-  # [...]
-  scope "/", AppWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-    resources "/products", ProductController
-  end
-  # [...]
-----
-
-Now you can start the Phoenix server:
-
-```bash
-$ mix phx.server
-[info] Running AppWeb.Endpoint with cowboy 2.10.0 at 127.0.0.1:4000 (http)
-[info] Access AppWeb.Endpoint at http://localhost:4000
-[watch] build finished, watching for changes...
-
-Rebuilding...
-
-Done in 147ms.
-```
-
-And open the browser at http://localhost:4000/products
+When in doubt, prefer a LiveView: `mix ash_phoenix.live` (from the
+`ash_phoenix` archive) generates the same UI as a LiveView and is the
+direction the Ash team is moving in.

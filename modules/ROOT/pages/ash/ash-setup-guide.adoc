@@ -89,3 +89,20 @@ $ mix igniter.install ash_postgres
 ```
 
 Igniter will guide you through the process, showing you the changes it will make and asking for confirmation before applying them.
+
+### Version pin at the time of writing
+
+Ash 3.x is still a moving target. The examples in this book were
+verified against the following versions:
+
+* `ash` `~> 3.24` (3.24.3 at the time of writing)
+* `ash_postgres` `~> 2.9` (2.9.0 at the time of writing)
+* `ash_phoenix` `~> 2.3`
+* `igniter_new` `~> 0.5` (the archive, plus `igniter` as a dep)
+
+Igniter pins to whatever is current when you run `mix igniter.new`,
+which means new projects will usually be one minor version ahead of
+what you see printed here. The public API has been stable since 3.0,
+so the examples should work without change. If a specific `iex` line
+fails, the most likely culprit is a renamed helper, not a broken
+example; `mix ash --help` is a good next step.
