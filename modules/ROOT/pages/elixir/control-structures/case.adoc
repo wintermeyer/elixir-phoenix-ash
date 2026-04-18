@@ -8,8 +8,13 @@ pattern that matches runs. For many Elixir programmers it is the
 go-to tool whenever a branch depends on the shape or the content of a
 value.
 
-A `case` expression evaluates an expression, and compares the result to 
-each pattern specified in the clauses. When a match is found, the associated 
+NOTE: `case` relies on *pattern matching*, Elixir's way of comparing a value
+against a shape (a number, an atom, a tuple, a list, and so on). The examples
+here show the basic idea. The xref:elixir/operators/match-operator.adoc[match
+operator chapter] covers pattern matching in full.
+
+A `case` expression evaluates an expression, and compares the result to
+each pattern specified in the clauses. When a match is found, the associated
 block of code is executed.
 
 [source,elixir]

@@ -29,12 +29,15 @@ IO.puts("Hello World!") #=> :ok
 ```
 
 NOTE: Beginners often find it odd that `dbg/2` and `IO.inspect/2` return the
-value they print. However, once you start utilizing Pipes (which we'll discuss in <<pipe-operator>>), it becomes a natural part of maintaining uninterrupted code flow
-while inspecting values in a pipe operation.
+value they print. This becomes useful later, once you chain functions together
+with the xref:elixir/operators/pipe-operator.adoc[pipe operator] (`|>`), because
+the printed value stays in the chain and the code keeps flowing.
 
-NOTE: Have you recognized that `dbg/2` has an arity of 2 but we only use one
-argument? That is possible because the second argument is optional (hence the
-`options \\ []` part).
+NOTE: The `/2` after `dbg` is the function's *arity*, the number of arguments it
+takes. So `dbg/2` is a function that accepts two arguments, even though our
+example only passes one. That works because the second argument has a default
+value, so it is optional. We cover xref:elixir/modules-and-functions.adoc#function-arity[arity]
+and default arguments in later chapters.
 
 ### IO.inspect/2
 indexterm:["IO.inspect/2"]

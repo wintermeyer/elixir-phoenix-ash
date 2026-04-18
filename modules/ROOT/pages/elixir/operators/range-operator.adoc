@@ -11,6 +11,8 @@ In Elixir, a range is created by two integers separated by the `..` operator. Th
 
 Ranges in Elixir are considered as enumerables, which means they can be used with the `Enum` module to iterate over the sequence of numbers. This capability makes the range operator a versatile tool in various situations involving sequences of numbers.
 
+NOTE: The examples below use a couple of functions from the `Enum` module as a preview. The xref:elixir/enumerables.adoc[Enumerables chapter] covers `Enum` in detail. For now it is enough to know that `Enum` offers functions to walk through things like lists or ranges.
+
 [source,elixir]
 ----
 iex> 1..5

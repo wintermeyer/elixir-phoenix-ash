@@ -101,9 +101,9 @@ iex> [1, "a", 2, false, true] -- ["a", 2] <3>
 #### Working with Lists: Head, Tail, and Other Operations
 indexterm:["Head", "Tail", "hd/1", "tl/1"]
 
-Elixir offers several built-in functions to operate on lists such as getting the first element (head) and the remaining elements (tail) using `hd/1` and `tl/1` functions. Also, functions like `length/1` provide the list's size, and various functions in the `Enum` and `List` modules assist in processing and manipulating lists.
+Elixir offers several built-in functions to operate on lists such as getting the first element (head) and the remaining elements (tail) using `hd/1` and `tl/1` functions. Also, functions like `length/1` provide the list's size, and various functions in the `List` module and the xref:elixir/enumerables.adoc[`Enum` module] (covered in the Enumerables chapter) assist in processing and manipulating lists.
 
-Here are some examples:
+Here are some examples (we use a couple of `Enum` functions as a preview, their full story is in the Enumerables chapter):
 
 [source,elixir]
 ----

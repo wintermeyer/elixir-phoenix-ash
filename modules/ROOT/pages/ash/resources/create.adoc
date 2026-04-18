@@ -1,8 +1,10 @@
 ### Create
 
 To create a resource, we need to add the `create` action to the
-resource. In Ash 3.0, we also add code interface definitions to our domain
-to create functions that make it easier to work with the resource.
+resource. In Ash 3.0, we also add a *code interface* to our domain: a
+short `define :name, action: :some_action` line that generates a plain
+Elixir function (for example `App.ToDoList.create_task/1`) so you can
+call the action directly, instead of building a changeset by hand.
 
 First, let's add the create action to our resource:
 

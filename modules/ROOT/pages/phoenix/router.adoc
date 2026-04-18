@@ -55,8 +55,20 @@ defmodule DemoWeb.Router do
 end
 ----
 
+Two concepts appear in that file that we have only glanced at so far:
+
+* A *plug* is a small, reusable step that transforms the connection (for
+example, `:fetch_session` reads the session cookie, `:protect_from_forgery`
+installs CSRF protection). Plugs are the Phoenix middleware unit.
+* A *pipeline* groups a list of plugs under a name (here `:browser` and
+`:api`). A `scope` block then says `pipe_through :browser`, which runs
+every request matched inside that scope through the plugs in the named
+pipeline.
+
 For this chapter, the `scope "/" do … end` block is all that matters.
-Each line inside it registers one route.
+Each line inside it registers one route. We revisit pipelines briefly
+in the <<scopes-and-pipelines,Scopes and pipelines>> section at the end
+of this chapter.
 
 [[mix-phx-routes]]
 ## Listing existing routes
@@ -295,10 +307,13 @@ Visit `/names/stefan` and the controller sees
 sees `%{"name" => ["stefan", "wintermeyer"]}`. Join the list back into
 a string with `Enum.join(segments, "/")` if you need the original path.
 
+[[scopes-and-pipelines]]
 ## Scopes and pipelines
 
 Everything above lived in one `scope`, but in bigger apps you split
-routes by section and by the middleware they need:
+routes by section and by the middleware they need. A `scope` groups
+routes that share a URL prefix and a module namespace; a `pipeline`
+groups the plugs those routes should run through:
 
 [source,elixir]
 ----

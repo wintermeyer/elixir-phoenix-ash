@@ -42,5 +42,7 @@ iex> add.(1, 2) <2>
 returns their sum.
 <2> Call it with two numbers to get the sum back.
 
-TIP: Using anonymous functions in Elixir is often easier with the <<capture-operator>> which is a shorthand version.
+TIP: Elixir also offers a shorthand for short anonymous functions called the
+xref:elixir/operators/capture-operator.adoc[capture operator] (`&`). We cover it
+later in the book, so don't worry about it for now.
 

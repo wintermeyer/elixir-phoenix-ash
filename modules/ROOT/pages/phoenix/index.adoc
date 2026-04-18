@@ -213,6 +213,12 @@ defmodule DemoWeb.Router do
 <1> A new `GET /hello` route that points at the `hello` action of the
 already-existing `PageController`.
 
+NOTE: `pipe_through :browser` tells Phoenix to run every request in this
+block through the `:browser` pipeline (session handling, CSRF protection,
+and so on). We cover pipelines properly in the
+xref:phoenix/router.adoc[Router chapter]. For now just leave that line
+where it is.
+
 ### Step 2: add the controller action
 
 Open `lib/demo_web/controllers/page_controller.ex` and add a matching

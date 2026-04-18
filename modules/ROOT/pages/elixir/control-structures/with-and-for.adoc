@@ -30,9 +30,11 @@ clause and print a message saying no apples were found.
 
 ==== `for` Comprehensions
 
-`for` comprehensions in Elixir provide a way to iterate over <<enumerables>> and 
-generate a new list, optionally filtering the elements. The result of this 
-operation can be assigned to a variable.
+`for` comprehensions in Elixir provide a way to iterate over
+xref:elixir/enumerables.adoc[enumerables] (lists, maps, ranges, and similar
+data structures, covered in a later chapter) and generate a new list,
+optionally filtering the elements. The result of this operation can be
+assigned to a variable.
 
 Here's an example:
 
@@ -49,7 +51,9 @@ In this example, `for` iterates over each number in the list `[1, 2, 3, 4, 5]`,
 squares each number (`num * num`), and collects the results into a new list. 
 This list is then assigned to the variable `squared_numbers`.
 
-You can also filter elements in a `for` comprehension using a guard clause:
+You can also filter elements in a `for` comprehension by adding a filter
+expression after the generator. Elements for which the expression returns
+`false` are skipped:
 
 [source,elixir]
 ----

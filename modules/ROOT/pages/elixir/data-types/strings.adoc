@@ -145,7 +145,7 @@ iex> String.split("Hello, World!", ", ")
 ["Hello", "World!"]
 ----
 
-BTW: There is no `join` function in the `String` module. But you can use `Enum.join/2` for that:
+BTW: There is no `join` function in the `String` module. But you can use `Enum.join/2` (from the xref:elixir/enumerables.adoc[`Enum` module], covered in a later chapter) for that:
 
 [source,elixir]
 ----
