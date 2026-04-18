@@ -40,6 +40,8 @@
 *** xref:ash/relationships/index.adoc#ash-has_one[has_one]
 ** xref:ash/constraints/index.adoc[Constraints]
 ** xref:ash/validations/index.adoc[Validations]
+** xref:ash/policies/index.adoc[Policies]
+** xref:ash/calculations-and-aggregates/index.adoc[Calculations and Aggregates]
 ** xref:ash/identities/index.adoc[Identities]
 ** xref:ash/postgresql/index.adoc[PostgreSQL]
 *** xref:ash/postgresql/minimal.adoc[Minimal]

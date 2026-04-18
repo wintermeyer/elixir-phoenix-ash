@@ -1,0 +1,248 @@
+[[ash-calculations-and-aggregates]]
+## Calculations and Aggregates
+
+These two features look similar at first — both expose computed
+fields on a resource — and for that reason Ash keeps them in
+separate DSL blocks.
+
+* A **calculation** is a value *derived from the record itself*:
+`full_name = first_name <> " " <> last_name`, `discount_percent =
+(price - sale_price) / price * 100`.
+* An **aggregate** is a value *derived from related records*: number
+of posts per user, sum of line-item totals per order, first comment
+on an article.
+
+Both are opt-in: you declare them on the resource, then request them
+via `load:` on a read call (or pre-load them by default in a custom
+read action). They do not inflate your base struct until you ask for
+them.
+
+include::../setup-fresh-app.adoc[]
+
+The worked example is a small blog with `User` and `Post`:
+
+[source,elixir,title='lib/app/blog/post.ex']
+----
+defmodule App.Blog.Post do
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Blog,
+    otp_app: :app
+
+  attributes do
+    uuid_primary_key :id
+    attribute :title, :string, public?: true, allow_nil?: false
+    attribute :published, :boolean, public?: true, default: false
+  end
+
+  relationships do
+    belongs_to :author, App.Blog.User do
+      allow_nil? false
+      public? true
+      source_attribute :user_id
+    end
+  end
+
+  actions do
+    default_accept [:title, :published, :user_id]
+    defaults [:create, :read, :update, :destroy]
+  end
+end
+----
+
+### Calculations: derived fields on one record
+
+Inside a `calculations do ... end` block on the `User` resource, add a
+`full_name` field built from two attributes:
+
+[source,elixir,title='lib/app/blog/user.ex']
+----
+defmodule App.Blog.User do
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Blog,
+    otp_app: :app
+
+  attributes do
+    uuid_primary_key :id
+    attribute :first_name, :string, public?: true, allow_nil?: false
+    attribute :last_name, :string, public?: true, allow_nil?: false
+  end
+
+  calculations do
+    calculate :full_name, :string, expr(first_name <> " " <> last_name) do <1>
+      public? true
+    end
+  end
+
+  actions do
+    default_accept [:first_name, :last_name]
+    defaults [:create, :read, :update, :destroy]
+  end
+end
+----
+<1> Three positional arguments: the name, the Ash type, and the
+expression. The expression uses `expr/1`, the same DSL that powers
+filters and policies, so you can reference attributes, relationship
+paths, arguments, and Ash's built-in functions.
+
+The domain exposes it with a normal code interface:
+
+[source,elixir,title='lib/app/blog.ex']
+----
+defmodule App.Blog do
+  use Ash.Domain, otp_app: :app
+
+  resources do
+    resource App.Blog.User do
+      define :create_user, action: :create
+      define :get_user, action: :read, get_by: :id
+    end
+
+    resource App.Blog.Post do
+      define :create_post, action: :create
+      define :list_posts, action: :read
+    end
+  end
+end
+----
+
+Try it out. Calculations are *not* loaded automatically; pass
+`load:` on the call (or on a custom read action):
+
+```elixir
+$ iex -S mix
+iex(1)> alice = App.Blog.create_user!(%{first_name: "Alice", last_name: "Aardvark"})
+iex(2)> alice.full_name
+#Ash.NotLoaded<:calculation, field: :full_name> <1>
+iex(3)> {:ok, loaded} = App.Blog.get_user(alice.id, load: [:full_name])
+iex(4)> loaded.full_name
+"Alice Aardvark"
+```
+<1> Same `#Ash.NotLoaded<...>` story as relationships: the field
+exists on the struct but has to be asked for.
+
+#### Arguments on a calculation
+
+Calculations can take arguments, which lets the caller parameterise
+the value at load time:
+
+[source,elixir,title='lib/app/blog/user.ex']
+----
+  calculations do
+    calculate :full_name, :string, expr(first_name <> " " <> last_name) do
+      public? true
+    end
+
+    calculate :greeting, :string, expr(^arg(:salutation) <> " " <> first_name) do
+      public? true
+      argument :salutation, :string, allow_nil?: false
+    end
+  end
+----
+
+The caller passes the argument via a keyword list:
+
+[source,elixir]
+----
+iex> App.Blog.get_user!(alice.id,
+  load: [greeting: %{salutation: "Hello,"}]
+).greeting
+"Hello, Alice"
+----
+
+### Aggregates: derived fields from related records
+
+Aggregates live in their own block and work on relationships. The
+simplest is `count/2`:
+
+[source,elixir,title='lib/app/blog/user.ex']
+----
+  relationships do
+    has_many :posts, App.Blog.Post do
+      public? true
+    end
+  end
+
+  aggregates do
+    count :posts_count, :posts do <1>
+      public? true
+    end
+
+    count :published_posts_count, :posts do
+      public? true
+      filter expr(published == true) <2>
+    end
+  end
+----
+<1> `count :posts_count, :posts` creates a lazy `:integer` field on
+`User` that counts related posts when loaded.
+<2> `filter expr(...)` narrows the aggregate. With
+`AshPostgres.DataLayer` this becomes a `COUNT(*) FILTER (WHERE
+published = true)` — no N+1.
+
+Seed some data and load both aggregates in one read:
+
+```elixir
+iex(1)> alice = App.Blog.create_user!(%{first_name: "Alice", last_name: "Aardvark"})
+iex(2)> bob = App.Blog.create_user!(%{first_name: "Bob", last_name: "Buffalo"})
+iex(3)> App.Blog.create_post!(%{title: "A1", user_id: alice.id, published: true})
+iex(4)> App.Blog.create_post!(%{title: "A2", user_id: alice.id, published: false})
+iex(5)> App.Blog.create_post!(%{title: "A3", user_id: alice.id, published: true})
+iex(6)> App.Blog.create_post!(%{title: "B1", user_id: bob.id, published: true})
+iex(7)> {:ok, loaded} =
+          App.Blog.get_user(alice.id,
+            load: [:full_name, :posts_count, :published_posts_count]
+          )
+iex(8)> %{loaded.full_name => %{all: loaded.posts_count, public: loaded.published_posts_count}}
+%{"Alice Aardvark" => %{all: 3, public: 2}}
+```
+
+Other aggregate types, all declared the same way:
+
+* `sum` — `sum :total_sold, :line_items, :quantity`
+* `first` — `first :latest_comment_body, :comments, :body` with a
+`sort` block to pick which row wins.
+* `list` — `list :tag_names, :tags, :name` returns the full list.
+* `exists` — `exists :has_published_post?, :posts` with an optional
+`filter`.
+* `avg`, `min`, `max` — the usual suspects.
+
+### Sideload by default
+
+If you always want the calculation or aggregate on every read, put
+it on a custom read action:
+
+[source,elixir,title='lib/app/blog/user.ex']
+----
+  actions do
+    default_accept [:first_name, :last_name]
+    defaults [:create, :update, :destroy]
+
+    read :read do
+      primary? true
+      prepare build(load: [:full_name, :posts_count])
+    end
+  end
+----
+
+Now `App.Blog.list_users!()` returns users with `:full_name` and
+`:posts_count` already populated, without the caller having to
+remember `load:`.
+
+### When to use which
+
+* Field depends on attributes of *the same record*, no DB roundtrip
+needed? `calculate`.
+* Field depends on *related* records (count of comments, sum of line
+items, most recent reply)? `aggregate`.
+* Need both? Use them together. A calculation can reference an
+aggregate inside its `expr(...)` — Ash evaluates aggregates first,
+so a derived `:popularity` calculation can do
+`expr(posts_count * 10 + likes_count)`.
+
+NOTE: With `AshPostgres`, both calculations and aggregates compile
+to SQL. `get_user!(id, load: [:posts_count])` runs exactly one
+query that includes the count as a subquery, not a separate
+`SELECT count(*)`. ETS does the bookkeeping in Elixir and is fine
+for development.

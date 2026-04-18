@@ -1,0 +1,266 @@
+[[ash-policies]]
+## Policies
+
+Policies answer one question: *is this actor allowed to run this
+action on this record?* They are Ash's authorization story. The
+framework evaluates the policy DSL at the start of every action,
+filters read queries down to what the actor can see, and raises
+`Ash.Error.Forbidden` when a write is rejected.
+
+This chapter builds a tiny blog with `User` and `Post` resources,
+where:
+
+* Anyone can see *published* posts.
+* Authors can see *their own* drafts in addition.
+* Admins can see everything.
+* Only the author or an admin can update or destroy a post.
+
+### Getting the SAT solver in place
+
+Ash's policy engine builds a boolean expression and hands it to a
+https://en.wikipedia.org/wiki/SAT_solver[SAT solver]. Add
+`picosat_elixir` to `mix.exs` so the solver is available:
+
+[source,elixir,title='mix.exs']
+----
+defp deps do
+  [
+    {:ash, "~> 3.0"},
+    {:picosat_elixir, "~> 0.2"} <1>
+  ]
+end
+----
+<1> The recommended production solver. There is also `:simple_sat`,
+pure Elixir, for platforms where compiling a NIF is painful.
+
+`mix deps.get`, and you are ready.
+
+### Two resources, one authorizer
+
+Scaffold a new app with Igniter (see
+xref:ash/setup-fresh-app.adoc[Setting Up a Fresh Ash App]) and create
+a `Blog` domain with two resources.
+
+[source,elixir,title='lib/app/blog.ex']
+----
+defmodule App.Blog do
+  use Ash.Domain, otp_app: :app
+
+  resources do
+    resource App.Blog.User do
+      define :create_user, action: :create
+    end
+
+    resource App.Blog.Post do
+      define :create_post, action: :create
+      define :list_posts, action: :read
+      define :update_post, action: :update
+      define :destroy_post, action: :destroy
+    end
+  end
+end
+----
+
+The `User` resource is ordinary:
+
+[source,elixir,title='lib/app/blog/user.ex']
+----
+defmodule App.Blog.User do
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Blog,
+    otp_app: :app
+
+  attributes do
+    uuid_primary_key :id
+    attribute :email, :string, public?: true, allow_nil?: false
+
+    attribute :role, :atom do
+      public? true
+      default :author
+      constraints one_of: [:admin, :author]
+    end
+  end
+
+  actions do
+    default_accept [:email, :role]
+    defaults [:create, :read, :update, :destroy]
+  end
+end
+----
+
+The `Post` resource adds `authorizers: [Ash.Policy.Authorizer]` and a
+`policies do` block:
+
+[source,elixir,title='lib/app/blog/post.ex']
+----
+defmodule App.Blog.Post do
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Blog,
+    otp_app: :app,
+    authorizers: [Ash.Policy.Authorizer] <1>
+
+  attributes do
+    uuid_primary_key :id
+    attribute :title, :string, public?: true, allow_nil?: false
+    attribute :body, :string, public?: true, allow_nil?: false
+    attribute :published, :boolean, public?: true, default: false
+  end
+
+  relationships do
+    belongs_to :author, App.Blog.User do
+      allow_nil? false
+      public? true
+    end
+  end
+
+  actions do
+    default_accept [:title, :body, :published, :author_id]
+    defaults [:create, :read, :destroy]
+
+    update :update do
+      primary? true
+      require_atomic? false <2>
+    end
+  end
+
+  policies do
+    policy action_type(:read) do
+      authorize_if expr(published == true) <3>
+      authorize_if relates_to_actor_via(:author) <4>
+      authorize_if actor_attribute_equals(:role, :admin) <5>
+    end
+
+    policy action_type([:update, :destroy]) do
+      authorize_if relates_to_actor_via(:author)
+      authorize_if actor_attribute_equals(:role, :admin)
+    end
+
+    policy action_type(:create) do
+      authorize_if actor_present() <6>
+    end
+  end
+end
+----
+
+<1> Flipping this option on is the one-line switch that makes Ash
+check policies for every call on this resource.
+<2> Ash 3.24 defaults updates to atomic (database-side) evaluation.
+Policies that relate back to the actor need the Elixir side, so we
+opt out of atomic for this action.
+<3> `expr(...)` is an Ash expression. For read actions Ash uses it
+to *filter the query*, not just check once, so anonymous users
+automatically get "only published posts".
+<4> `relates_to_actor_via(:author)` means "the `:author` relationship
+of this record equals the actor". It is how you express "only the
+owner" rules.
+<5> `actor_attribute_equals(:role, :admin)` reads an attribute *off
+the actor* and compares it to a literal. Admins bypass the owner
+check this way.
+<6> `actor_present()` just asserts that an actor was passed. Used on
+create when anyone logged in can post but anonymous visitors cannot.
+
+The semantics of a `policy` block: all `authorize_if`, `forbid_if`,
+and `authorize_unless` checks run top to bottom. The first one that
+matches decides. If none match the policy defaults to *forbid*.
+
+### Trying it in IEx
+
+Create a few users and a draft post:
+
+```elixir
+$ iex -S mix
+iex(1)> alice = App.Blog.create_user!(%{email: "alice@example.com", role: :author})
+iex(2)> bob = App.Blog.create_user!(%{email: "bob@example.com", role: :author})
+iex(3)> admin = App.Blog.create_user!(%{email: "admin@example.com", role: :admin})
+iex(4)> {:ok, draft} = App.Blog.create_post(%{title: "Draft", body: "...", author_id: alice.id}, actor: alice) <1>
+iex(5)> {:ok, _live} = App.Blog.create_post(%{title: "Public", body: "...", author_id: alice.id, published: true}, actor: alice)
+```
+<1> Every call passes `actor:` as an option. Forget it and the
+authorizer treats the request as anonymous.
+
+Read policy in action:
+
+```elixir
+iex(6)> App.Blog.list_posts!(actor: alice) |> Enum.map(& &1.title)
+["Public", "Draft"]
+iex(7)> App.Blog.list_posts!(actor: bob) |> Enum.map(& &1.title) <1>
+["Public"]
+iex(8)> App.Blog.list_posts!(actor: admin) |> Enum.map(& &1.title) <2>
+["Public", "Draft"]
+```
+<1> Bob only sees the published post. The `expr(published == true)`
+check became a SQL-like filter on the read query, so Ash *does not
+even load* posts he cannot see.
+<2> Admins see everything thanks to the third `authorize_if`.
+
+Update policy in action:
+
+```elixir
+iex(9)> App.Blog.update_post(draft, %{title: "Hack"}, actor: bob)
+{:error,
+ %Ash.Error.Forbidden{
+   errors: [
+     %Ash.Error.Forbidden.Policy{
+       facts: %{...},
+       must_pass_strict_check?: false,
+       ...
+     }
+   ]
+ }}
+iex(10)> App.Blog.update_post!(draft, %{title: "Alice edit"}, actor: alice).title
+"Alice edit"
+iex(11)> App.Blog.update_post!(draft, %{title: "Admin edit"}, actor: admin).title
+"Admin edit"
+```
+
+### Commonly-used checks
+
+The full list lives at
+https://hexdocs.pm/ash/Ash.Policy.Check.Builtins.html. In practice
+you will reach for a small handful:
+
+* `authorize_if` / `forbid_if` / `authorize_unless` — the three
+block-level checks. Everything else below goes *inside* one of these.
+* `expr(...)` — any Ash expression. For read actions this also
+filters the query.
+* `actor_attribute_equals(:field, value)` — e.g. admins.
+* `actor_attribute_in(:field, list)` — role in a set.
+* `actor_present()` — "logged in".
+* `relates_to_actor_via(:relationship)` — "is owner".
+* `action_type(:read)` and `action_type([:update, :destroy])` — scope
+the policy to a set of action types.
+* `action(:publish)` — scope to one named action.
+
+### The `--actor` and debugging story
+
+`show_policy_breakdowns?: true` in `config/dev.exs` (Igniter sets
+this by default) makes forbidden errors include a readable breakdown
+of which check failed and why. It is the fastest way to figure out
+why your own code got rejected:
+
+[source,elixir,title='config/dev.exs']
+----
+import Config
+config :ash, policies: [show_policy_breakdowns?: true]
+----
+
+With that flag on, the `Ash.Error.Forbidden.Policy` exception prints
+the whole scenario tree. Every `authorize_if` that fired shows up,
+along with the actor attributes that went into the decision.
+
+### Bypass policies for one call
+
+Sometimes you legitimately want to skip the authorizer — a seed
+script, a cron job, an admin tool. Pass `authorize?: false`:
+
+[source,elixir]
+----
+App.Blog.list_posts!(authorize?: false)
+App.Blog.update_post!(post, %{published: true}, authorize?: false)
+----
+
+Leave this out of your LiveViews and controllers. The whole point of
+the DSL is that authorization is declarative — bypassing it in a
+hot path tends to grow into a security hole.
