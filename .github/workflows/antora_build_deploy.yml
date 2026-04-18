@@ -11,23 +11,22 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install rsync, zopfli and brotli
       run: sudo apt-get install -y rsync brotli zopfli
 
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
-        node-version: '16'
+        node-version: '20'
+        cache: 'npm'
 
     - name: Install Antora
-      run: |
-        npm install -g antora
+      run: npm ci
 
     - name: Build the Antora site
-      run: |
-        antora --fetch antora-playbook.yml
+      run: npx antora --fetch antora-playbook.yml
 
     - name: Install PurgeCSS
       run: |
