@@ -529,7 +529,7 @@ main.article > .content {
 }
 
 .toc.embedded {
-  @apply mb-8 border border-neutral-200 bg-neutral-100/60 p-4 xl:hidden dark:border-neutral-800 dark:bg-neutral-900/60;
+  @apply mb-8 border border-neutral-200 bg-neutral-100/60 p-4 lg:hidden dark:border-neutral-800 dark:bg-neutral-900/60;
 }
 
 /* ---------------------------------------------------------------------------
