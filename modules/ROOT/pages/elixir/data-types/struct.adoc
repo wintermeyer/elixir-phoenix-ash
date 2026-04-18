@@ -30,7 +30,9 @@ Structs ensure that only defined fields can be accessed:
 [source,elixir]
 ----
 iex> apple.description <1>
-** (KeyError) key :description not found in: %Product{name: "Apple", price: 0.5}
+** (KeyError) key :description not found in:
+
+    %Product{name: "Apple", price: 0.5}
 
 iex> banana = %Product{name: "Banana", weight: 0.1} <2>
 ** (KeyError) key :weight not found

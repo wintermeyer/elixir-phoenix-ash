@@ -14,7 +14,7 @@ Start IEx from your command line:
 $ iex
 Erlang/OTP 28 [erts-16.2.2] [source] [64-bit] [...]
 
-Interactive Elixir (1.20.0) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.20.0-rc.4) - press Ctrl+C to exit (type h() ENTER for help)
 iex(1)> <1>
 ----
 <1> This is the IEx prompt. The number in parentheses counts the

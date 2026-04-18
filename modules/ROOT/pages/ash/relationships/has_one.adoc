@@ -113,7 +113,7 @@ Let's use it in iex:
 $ iex -S mix
 Erlang/OTP 28 [erts-16.2.2] [...]
 
-Interactive Elixir (1.20.0) [...]
+Interactive Elixir (1.20.0-rc.4) [...]
 iex(1)> orange = App.Shop.create_product!(%{name: "Orange", price: Decimal.new("0.2")})
 %App.Shop.Product{
   id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",

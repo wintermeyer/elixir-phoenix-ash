@@ -85,7 +85,7 @@ $ iex -S mix
 Compiling 2 files (.ex)
 Erlang/OTP 28 [erts-16.2.2] [...]
 
-Interactive Elixir (1.20.0) [...]
+Interactive Elixir (1.20.0-rc.4) [...]
 iex(1)> App.ToDoList.create_task(%{content: "Mow the lawn", is_done: true})
 {:error,
  %Ash.Error.Invalid{

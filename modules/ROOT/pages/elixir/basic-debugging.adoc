@@ -89,10 +89,10 @@ Raw representation
 Reference modules
   String, :binary
 Implemented protocols
-  Collectable, IEx.Info, Inspect, List.Chars, String.Chars
+  Collectable, IEx.Info, Inspect, JSON.Encoder, List.Chars, String.Chars
 ```
 
-This output elucidates that `"Hello, world!"` is a 13-byte BitString and
-provides further details like the string's raw representation and the protocols
+This output tells us that `"Elixir"` is a 6-byte BitString and gives
+further details like the string's raw representation and the protocols
 it implements.
 

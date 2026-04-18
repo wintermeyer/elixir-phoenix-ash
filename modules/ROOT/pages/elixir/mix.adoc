@@ -90,7 +90,7 @@ Compiling 1 file (.ex)
 Generated hello_world app
 Erlang/OTP 28 [...]
 
-Interactive Elixir (1.20.0) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.20.0-rc.4) - press Ctrl+C to exit (type h() ENTER for help)
 iex(1)> 
 ----
 

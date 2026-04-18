@@ -76,8 +76,13 @@ Create a map named `product_prices` that stores the prices of various products.
 
 ```elixir
 iex> product_prices = %{apple: 0.5, orange: 0.7, coconut: 1}
-%{apple: 0.5, coconut: 1, orange: 0.7}
+%{apple: 0.5, orange: 0.7, coconut: 1}
 ```
+
+NOTE: Since Elixir 1.18, small atom-keyed maps print in the order they
+were built (insertion order). Older Elixir versions sorted the keys
+alphabetically, so older tutorials may show `%{apple: 0.5, coconut: 1,
+orange: 0.7}` for the same map.
 indexterm:[`%{}`]
 Here, we have three items - apple, orange, and coconut - each with their respective prices.
 
@@ -88,7 +93,7 @@ The `Map.to_list/1` function allows us to convert a map into a keyword list.
 
 ```elixir
 iex> Map.to_list(product_prices)
-[apple: 0.5, coconut: 1, orange: 0.7]
+[apple: 0.5, orange: 0.7, coconut: 1]
 ```
 We can see that our map has now been transformed into a keyword list.
 
@@ -99,7 +104,7 @@ To fetch all the values from a map (in our case, the product prices), we can uti
 
 ```elixir
 iex> Map.values(product_prices)
-[0.5, 1, 0.7]
+[0.5, 0.7, 1]
 ```
 This gives us the prices for all our products.
 
@@ -155,7 +160,7 @@ The `Map.merge/2` function enables us to combine two maps.
 iex> additional_prices = %{banana: 0.4, pineapple: 1.2}
 %{banana: 0.4, pineapple: 1.2}
 iex> Map.merge(product_prices, additional_prices)
-%{apple: 0.5, banana: 0.4, coconut: 1, orange: 0.7, pineapple: 1.2}
+%{apple: 0.5, orange: 0.7, coconut: 1, banana: 0.4, pineapple: 1.2}
 ```
 A new map is created that contains the items and their prices from both the maps.
 
@@ -166,7 +171,7 @@ The `Map.put/2` function allows us to add a new key-value pair to a map.
 
 ```elixir
 iex> c = Map.put(product_prices, :potato, 0.2)
-%{apple: 0.5, coconut: 1, orange: 0.7, potato: 0.2}
+%{apple: 0.5, orange: 0.7, coconut: 1, potato: 0.2}
 ```
 We've created a new map `c` where `potato` has been added to our original map with a price of 0.2.
 

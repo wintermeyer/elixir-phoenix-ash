@@ -41,13 +41,13 @@ iex> elem(result, 0) <2>
 #### Tuple Functions
 indexterm:["Tuple Functions"]
 
-Elixir's `Tuple` module includes various functions for manipulating tuples, such as appending or deleting elements, and converting tuples to lists. Here are some examples:
+Elixir's `Tuple` module includes various functions for manipulating tuples, such as inserting or deleting elements, and converting tuples to lists. Here are some examples:
 
 [source,elixir]
 ----
 iex> results = {:ok, "Lorem ipsum"}
 {:ok, "Lorem ipsum"}
-iex> b = Tuple.append(results, "Test")
+iex> b = Tuple.insert_at(results, tuple_size(results), "Test") <1>
 {:ok, "Lorem ipsum", "Test"}
 iex> c = Tuple.delete_at(b, 1)
 {:ok, "Test"}
@@ -58,6 +58,9 @@ iex> new_list = Tuple.to_list(d)
 iex> tuple_size(d)
 4
 ----
+<1> To append to the end of a tuple, insert at position `tuple_size/1`.
+`Tuple.append/2` existed in older versions but is deprecated since Elixir
+1.20.
 
 ### List
 indexterm:["Lists"]

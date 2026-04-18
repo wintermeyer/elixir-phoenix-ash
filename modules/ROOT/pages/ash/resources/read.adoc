@@ -53,7 +53,7 @@ task in the store:
 $ iex -S mix
 Erlang/OTP 28 [erts-16.2.2] [...]
 
-Interactive Elixir (1.20.0) [...]
+Interactive Elixir (1.20.0-rc.4) [...]
 iex(1)> App.ToDoList.create_task!(%{content: "Mow the lawn"})
 %App.ToDoList.Task{
   id: "881c6c08-223c-41b1-9d61-2d3a40e478bd",
@@ -67,7 +67,7 @@ iex(2)> App.ToDoList.create_task!(%{content: "Buy milk"})
   __meta__: #Ecto.Schema.Metadata<:loaded>
 }
 iex(3)> App.ToDoList.list_tasks!() |> Enum.map(& &1.content)
-["Mow the lawn", "Buy milk"]
+["Buy milk", "Mow the lawn"]
 iex(4)> App.ToDoList.list_tasks()
 {:ok,
  [
@@ -83,6 +83,10 @@ iex(4)> App.ToDoList.list_tasks()
    }
  ]}
 ```
+
+NOTE: ETS does not guarantee row order, so the two tasks can come back
+in either order. In production, use `sort` in a read action (or
+`Enum.sort_by/2`) when ordering matters.
 
 An empty store simply returns an empty list:
 

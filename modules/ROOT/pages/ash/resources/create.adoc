@@ -57,7 +57,7 @@ $ iex -S mix
 Compiling 2 files (.ex)
 Erlang/OTP 28 [erts-16.2.2] [...]
 
-Interactive Elixir (1.20.0) [...]
+Interactive Elixir (1.20.0-rc.4) [...]
 iex(1)> App.ToDoList.create_task!(%{content: "Mow the lawn"})
 %App.ToDoList.Task{
   id: "8e868c09-c0d0-4362-8270-09272acab769",

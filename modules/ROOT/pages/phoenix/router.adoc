@@ -80,13 +80,16 @@ default `--no-dashboard` project the output is small:
 ----
 $ mix phx.routes
   GET   /                    DemoWeb.PageController :home <1>
-  WS    /live/websocket      Phoenix.LiveView.Socket <2>
+  *     /dev/mailbox         Plug.Swoosh.MailboxPreview [] <2>
+  WS    /live/websocket      Phoenix.LiveView.Socket <3>
   GET   /live/longpoll       Phoenix.LiveView.Socket
   POST  /live/longpoll       Phoenix.LiveView.Socket
 ----
 <1> The root path `GET /` calls the `:home` action on
 `DemoWeb.PageController`.
-<2> The LiveView transport endpoints. Nothing to worry about right now,
+<2> Swoosh's development mailbox viewer for previewing outgoing email.
+Only mounted in `dev`.
+<3> The LiveView transport endpoints. Nothing to worry about right now,
 they power LiveView's real-time features.
 
 TIP: In bigger apps the route list grows quickly. `mix phx.routes |

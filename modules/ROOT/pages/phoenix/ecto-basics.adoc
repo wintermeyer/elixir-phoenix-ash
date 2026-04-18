@@ -105,16 +105,20 @@ get a feel for them as you work through the examples.
 ----
 $ mix phx.gen.context Store Author authors first_name last_name twitter_account
 * creating lib/bookstore/store/author.ex
-* creating priv/repo/migrations/20200526112425_create_authors.exs
+* creating priv/repo/migrations/20260101120000_create_authors.exs <1>
 * creating lib/bookstore/store.ex
 * injecting lib/bookstore/store.ex
 * creating test/bookstore/store_test.exs
 * injecting test/bookstore/store_test.exs
+* creating test/support/fixtures/store_fixtures.ex
+* injecting test/support/fixtures/store_fixtures.ex
 
 Remember to update your repository by running migrations:
 
     $ mix ecto.migrate
 ----
+<1> The timestamp prefix on migration filenames reflects the moment
+you run the generator, so yours will differ.
 
 [[ecto-migrations]]
 ### Migrations
@@ -234,7 +238,7 @@ Erlang/OTP 28 [erts-16.2.2] [source] [64-bit] [...]
 
 [info] Running BookstoreWeb.Endpoint with Bandit 1.10.4 at 127.0.0.1:4000 (http)
 [info] Access BookstoreWeb.Endpoint at http://localhost:4000
-Interactive Elixir (1.20.0) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.20.0-rc.4) - press Ctrl+C to exit (type h() ENTER for help)
 iex> <1>
 ----
 <1> Actually you will see a couple of more messages here which are related to
@@ -246,21 +250,25 @@ function which we use to create a new author:
 [source,elixir]
 ----
 iex> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
-[debug] QUERY OK db=3.8ms decode=1.5ms queue=2.5ms idle=1355.7ms <1>
-INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~N[2020-05-26 11:54:37], ~N[2020-05-26 11:54:37]]
+[debug] QUERY OK source="authors" db=2.5ms decode=0.4ms queue=0.5ms idle=1.9ms <1>
+INSERT INTO "authors" ("first_name","last_name","twitter_account","inserted_at","updated_at") VALUES ($1,$2,$3,$4,$5) RETURNING "id" ["Dave", "Thomas", "pragdave", ~U[2026-04-18 18:28:48Z], ~U[2026-04-18 18:28:48Z]]
 {:ok,
  %Bookstore.Store.Author{
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
-   first_name: "Dave",
    id: 1,
-   inserted_at: ~N[2020-05-26 11:54:37],
+   first_name: "Dave",
    last_name: "Thomas",
    twitter_account: "pragdave",
-   updated_at: ~N[2020-05-26 11:54:37]
+   inserted_at: ~U[2026-04-18 18:28:48Z], <2>
+   updated_at: ~U[2026-04-18 18:28:48Z]
  }}
 ----
-<1> These two debug lines show information about how the query is processed. We
+<1> The `[debug] QUERY ...` lines show how Ecto processed the query. We
 will not show this output in the other examples in this chapter.
+<2> Phoenix 1.8 generates schemas with `:utc_datetime` timestamps, so
+`inserted_at` and `updated_at` use the `~U[…Z]` (UTC) sigil. Older
+Phoenix versions used `~N[...]` (NaiveDateTime), which is why you may
+see that form in legacy code.
 
 TIP: Use `alias Bookstore.Store` at the beginning of an `iex` session and
 afterwards `Store.create_author()` to save typing time. This can make the code
@@ -306,22 +314,22 @@ iex> {:ok, author} = Bookstore.Store.create_author(%{first_name: "Dave", last_na
 {:ok,
  %Bookstore.Store.Author{
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
-   first_name: "Dave",
    id: 1,
-   inserted_at: ~N[2020-05-27 11:00:19],
+   first_name: "Dave",
    last_name: "Thomas",
    twitter_account: "pragdave",
-   updated_at: ~N[2020-05-27 11:00:19]
+   inserted_at: ~U[2026-04-18 18:28:48Z],
+   updated_at: ~U[2026-04-18 18:28:48Z]
  }}
 iex> author
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
   id: 1,
-  inserted_at: ~N[2020-05-27 11:00:19],
+  inserted_at: ~U[2020-05-27 11:00:19Z],
   last_name: "Thomas",
   twitter_account: "pragdave",
-  updated_at: ~N[2020-05-27 11:00:19]
+  updated_at: ~U[2020-05-27 11:00:19Z]
 }
 ----
 ====
@@ -437,10 +445,10 @@ iex> Bookstore.Store.create_author(%{last_name: "Thomas", twitter_account: "prag
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
    first_name: nil,
    id: 3,
-   inserted_at: ~N[2020-05-27 05:37:46],
+   inserted_at: ~U[2020-05-27 05:37:46Z],
    last_name: "Thomas",
    twitter_account: "pragdave",
-   updated_at: ~N[2020-05-27 05:37:46]
+   updated_at: ~U[2020-05-27 05:37:46Z]
  }}
 ----
 
@@ -572,10 +580,10 @@ iex> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", tw
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
    first_name: "Dave",
    id: 1,
-   inserted_at: ~N[2020-05-27 06:17:18],
+   inserted_at: ~U[2020-05-27 06:17:18Z],
    last_name: "Thomas",
    twitter_account: "pragdave",
-   updated_at: ~N[2020-05-27 06:17:18]
+   updated_at: ~U[2020-05-27 06:17:18Z]
  }} <1>
 iex> Bookstore.Store.create_author(%{first_name: "Dave", last_name: "Thomas", twitter_account: "pragdave"})
 {:error,
@@ -669,10 +677,10 @@ iex> Store.create_author(%{first_name: "Dave", last_name: "Thomas"}) <3>
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
    first_name: "Dave",
    id: 1,
-   inserted_at: ~N[2020-05-27 08:35:29],
+   inserted_at: ~U[2020-05-27 08:35:29Z],
    last_name: "Thomas",
    twitter_account: nil,
-   updated_at: ~N[2020-05-27 08:35:29]
+   updated_at: ~U[2020-05-27 08:35:29Z]
  }}
 iex> Store.create_author(%{first_name: "Dave", last_name: "Thomas"}) <4>
 {:error,
@@ -817,28 +825,28 @@ iex> Bookstore.Store.list_authors
     __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
     first_name: "Dave",
     id: 1,
-    inserted_at: ~N[2020-05-27 11:48:17],
+    inserted_at: ~U[2020-05-27 11:48:17Z],
     last_name: "Thomas",
     twitter_account: "pragdave",
-    updated_at: ~N[2020-05-27 11:48:17]
+    updated_at: ~U[2020-05-27 11:48:17Z]
   },
   %Bookstore.Store.Author{
     __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
     first_name: "James",
     id: 2,
-    inserted_at: ~N[2020-05-27 11:48:17],
+    inserted_at: ~U[2020-05-27 11:48:17Z],
     last_name: "Gray",
     twitter_account: "jeg2",
-    updated_at: ~N[2020-05-27 11:48:17]
+    updated_at: ~U[2020-05-27 11:48:17Z]
   },
   %Bookstore.Store.Author{
     __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
     first_name: "Ulisses",
     id: 3,
-    inserted_at: ~N[2020-05-27 11:48:17],
+    inserted_at: ~U[2020-05-27 11:48:17Z],
     last_name: "Almeida",
     twitter_account: "ulissesalmeida",
-    updated_at: ~N[2020-05-27 11:48:17]
+    updated_at: ~U[2020-05-27 11:48:17Z]
   }
 ]
 ----
@@ -878,10 +886,10 @@ iex> first_author
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
   id: 1,
-  inserted_at: ~N[2020-09-04 02:40:21],
+  inserted_at: ~U[2020-09-04 02:40:21Z],
   last_name: "Thomas",
   twitter_account: "pragdave",
-  updated_at: ~N[2020-09-04 02:40:21]
+  updated_at: ~U[2020-09-04 02:40:21Z]
 }
 iex> [first_author, second_author | _] = authors <2>
 [...]
@@ -890,10 +898,10 @@ iex> second_author
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "James",
   id: 2,
-  inserted_at: ~N[2020-09-04 02:40:21],
+  inserted_at: ~U[2020-09-04 02:40:21Z],
   last_name: "Gray",
   twitter_account: "jeg2",
-  updated_at: ~N[2020-09-04 02:40:21]
+  updated_at: ~U[2020-09-04 02:40:21Z]
 }
 ----
 <1> With pattern matching we take the first item of the list (the head) and
@@ -914,10 +922,10 @@ iex> Bookstore.Store.get_author!(1)
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
   id: 1,
-  inserted_at: ~N[2020-05-27 11:48:17],
+  inserted_at: ~U[2020-05-27 11:48:17Z],
   last_name: "Thomas",
   twitter_account: "pragdave",
-  updated_at: ~N[2020-05-27 11:48:17]
+  updated_at: ~U[2020-05-27 11:48:17Z]
 }
 ----
 
@@ -989,10 +997,10 @@ iex> Bookstore.Store.get_author_by_twitter!("jeg2")
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "James",
   id: 2,
-  inserted_at: ~N[2020-09-04 02:40:21],
+  inserted_at: ~U[2020-09-04 02:40:21Z],
   last_name: "Gray",
   twitter_account: "jeg2",
-  updated_at: ~N[2020-09-04 02:40:21]
+  updated_at: ~U[2020-09-04 02:40:21Z]
 }
 ----
 
@@ -1021,10 +1029,10 @@ iex> Bookstore.Store.get_author_by_first_name_last_name!("Ulisses", "Almeida")
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Ulisses",
   id: 3,
-  inserted_at: ~N[2020-09-04 02:40:21],
+  inserted_at: ~U[2020-09-04 02:40:21Z],
   last_name: "Almeida",
   twitter_account: "ulissesalmeida",
-  updated_at: ~N[2020-09-04 02:40:21]
+  updated_at: ~U[2020-09-04 02:40:21Z]
 }
 ----
 
@@ -1048,10 +1056,10 @@ iex> author = Store.get_author!(1) <2>
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
   id: 1,
-  inserted_at: ~N[2020-05-27 11:48:17],
+  inserted_at: ~U[2020-05-27 11:48:17Z],
   last_name: "Thomas",
   twitter_account: "pragdave",
-  updated_at: ~N[2020-05-27 11:48:17]
+  updated_at: ~U[2020-05-27 11:48:17Z]
 }
 iex> Store.update_author(author, %{twitter_account: nil}) <3>
 {:ok,
@@ -1059,20 +1067,20 @@ iex> Store.update_author(author, %{twitter_account: nil}) <3>
    __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
    first_name: "Dave",
    id: 1,
-   inserted_at: ~N[2020-05-27 11:48:17],
+   inserted_at: ~U[2020-05-27 11:48:17Z],
    last_name: "Thomas",
    twitter_account: nil,
-   updated_at: ~N[2020-05-28 10:54:55]
+   updated_at: ~U[2020-05-28 10:54:55Z]
  }}
 iex> Store.get_author!(1) <4>
 %Bookstore.Store.Author{
   __meta__: #Ecto.Schema.Metadata<:loaded, "authors">,
   first_name: "Dave",
   id: 1,
-  inserted_at: ~N[2020-05-27 11:48:17],
+  inserted_at: ~U[2020-05-27 11:48:17Z],
   last_name: "Thomas",
   twitter_account: nil,
-  updated_at: ~N[2020-05-28 10:54:55]
+  updated_at: ~U[2020-05-28 10:54:55Z]
 }
 ----
 <1> We set these aliases to make our lives a bit easier. No technical reason.
@@ -1201,9 +1209,9 @@ iex> Bookstore.Store.create_book(%{title: "Programming Elixir", author_id: 1})
    author: #Ecto.Association.NotLoaded<association :author is not loaded>,
    author_id: 1,
    id: 4,
-   inserted_at: ~N[2020-09-08 01:17:34],
+   inserted_at: ~U[2020-09-08 01:17:34Z],
    title: "Programming Elixir",
-   updated_at: ~N[2020-09-08 01:17:34]
+   updated_at: ~U[2020-09-08 01:17:34Z]
  }}
 ----
 
@@ -1241,10 +1249,10 @@ iex> author = Bookstore.Store.get_author_by_twitter!("pragdave") <1>
   books: #Ecto.Association.NotLoaded<association :books is not loaded>,
   first_name: "Dave",
   id: 1,
-  inserted_at: ~N[2020-09-08 01:56:38],
+  inserted_at: ~U[2020-09-08 01:56:38Z],
   last_name: "Thomas",
   twitter_account: "pragdave",
-  updated_at: ~N[2020-09-08 01:56:38]
+  updated_at: ~U[2020-09-08 01:56:38Z]
 }
 iex> Bookstore.Store.list_books_by_author(author)
 [
@@ -1253,9 +1261,9 @@ iex> Bookstore.Store.list_books_by_author(author)
     author: #Ecto.Association.NotLoaded<association :author is not loaded>, <2>
     author_id: 1,
     id: 1,
-    inserted_at: ~N[2020-09-08 01:56:51],
+    inserted_at: ~U[2020-09-08 01:56:51Z],
     title: "Programming Elixir",
-    updated_at: ~N[2020-09-08 01:56:51]
+    updated_at: ~U[2020-09-08 01:56:51Z]
   }
 ]
 iex> Bookstore.Store.get_book_by_title!("Programming Elixir")
@@ -1264,9 +1272,9 @@ iex> Bookstore.Store.get_book_by_title!("Programming Elixir")
   author: #Ecto.Association.NotLoaded<association :author is not loaded>,
   author_id: 1,
   id: 1,
-  inserted_at: ~N[2020-09-08 01:56:51],
+  inserted_at: ~U[2020-09-08 01:56:51Z],
   title: "Programming Elixir",
-  updated_at: ~N[2020-09-08 01:56:51]
+  updated_at: ~U[2020-09-08 01:56:51Z]
 }
 ----
 <1> We fetch the `author` as we need to use it in the `list_books_by_author/1` function.
@@ -1292,9 +1300,9 @@ iex> elixir_book = Bookstore.Store.get_book_by_title!("Programming Elixir") <1>
   author: #Ecto.Association.NotLoaded<association :author is not loaded>,
   author_id: 1,
   id: 1,
-  inserted_at: ~N[2020-09-08 01:56:51],
+  inserted_at: ~U[2020-09-08 01:56:51Z],
   title: "Programming Elixir",
-  updated_at: ~N[2020-09-08 01:56:51]
+  updated_at: ~U[2020-09-08 01:56:51Z]
 }
 iex> Bookstore.Repo.preload(elixir_book, :author) <2>
 %Bookstore.Store.Book{
@@ -1304,16 +1312,16 @@ iex> Bookstore.Repo.preload(elixir_book, :author) <2>
     books: #Ecto.Association.NotLoaded<association :books is not loaded>,
     first_name: "Dave",
     id: 1,
-    inserted_at: ~N[2020-09-08 01:56:38],
+    inserted_at: ~U[2020-09-08 01:56:38Z],
     last_name: "Thomas",
     twitter_account: "pragdave",
-    updated_at: ~N[2020-09-08 01:56:38]
+    updated_at: ~U[2020-09-08 01:56:38Z]
   },
   author_id: 1,
   id: 1,
-  inserted_at: ~N[2020-09-08 01:56:51],
+  inserted_at: ~U[2020-09-08 01:56:51Z],
   title: "Programming Elixir",
-  updated_at: ~N[2020-09-08 01:56:51]
+  updated_at: ~U[2020-09-08 01:56:51Z]
 }
 ----
 <1> We first fetch the `book` with the title "Programming Elixir".
