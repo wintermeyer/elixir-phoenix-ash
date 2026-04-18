@@ -1,0 +1,6 @@
+<div class="article-kicker">
+{{> nav-toggle}}
+  {{#with page.componentVersion}}
+  <a class="book-link" href="{{{relativize ./url}}}">← {{{./title}}}</a>
+  {{/with}}
+</div>
