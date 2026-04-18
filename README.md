@@ -52,3 +52,18 @@ npm run build && cd .. && npx antora --fetch antora-local-playbook.yml
 ```
 
 Dark mode follows the OS `prefers-color-scheme`; there is no toggle.
+
+## Deployment
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs on
+a self-hosted runner (label `eliph`) on bremen2. The runner checks the
+repo out, runs `scripts/deploy.sh`, and publishes the rendered site to
+`/var/www/elixir-phoenix-ash/releases/<timestamp>/`. An atomic symlink
+swap makes `/var/www/elixir-phoenix-ash/current/` point at the new
+release. The last five releases are kept.
+
+Nginx serves the site under
+<https://wintermeyer-consulting.de/phoenix/book/> via two location
+blocks on the `wintermeyer-consulting.de` vhost (one for pages, one for
+`antora-assets/`). The old domain <https://elixir-phoenix-ash.com>
+returns a path-preserving 301 to the new location.

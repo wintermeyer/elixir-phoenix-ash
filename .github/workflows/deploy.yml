@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    # Self-hosted runner registered on bremen2 under the `eliph` user,
+    # with label `eliph`. Pinned so this never lands on wincon's runner
+    # or any other self-hosted fleet.
+    runs-on: [self-hosted, eliph]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy
+        run: ./scripts/deploy.sh
