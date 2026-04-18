@@ -1,25 +1,45 @@
 [[elixir-introduction-iex]]
 == Elixir's Interactive Shell (IEx)
 
-Elixir equips you with an interactive shell, `IEx` (Interactive Elixir), that's
-going to be our sandbox for a lot of examples in this chapter. So let's roll up
-our sleeves and give it a whirl in your command line: indexterm:[IEx,
-Interactive Elixir]
+Elixir ships with an interactive shell called *IEx* (Interactive Elixir).
+Think of it as a calculator for the language: you type an expression,
+press Enter, and Elixir shows you the result. It is the single most
+useful tool for learning the language, and we will use it for most of
+the examples in this chapter. indexterm:[IEx, Interactive Elixir]
+
+Start IEx from your command line:
 
 [source,elixir]
 ----
 $ iex
-Erlang/OTP 26 [erts-14.0] [source] [64-bit] [...]
+Erlang/OTP 28 [erts-16.2.2] [source] [64-bit] [...]
 
-Interactive Elixir (1.15.0) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.20.0) - press Ctrl+C to exit (type h() ENTER for help)
 iex(1)> <1>
 ----
-<1> This is your IEx prompt.
+<1> This is the IEx prompt. The number in parentheses counts the
+expressions you have entered so far.
 
-IMPORTANT: To bid goodbye to IEx, give `CTRL-C` a double tap or a single `CTRL-\` will do.
+Try a first expression. IEx prints the result right back at you:
 
-TIP: IEx provides autocomplete (just tap `TAB` when you're unsure) and a command
-history (the arrow-up key is your friend).
+[source,elixir]
+----
+iex(1)> 1 + 1
+2
+iex(2)> "Hello, " <> "World!"
+"Hello, World!"
+----
+
+IMPORTANT: To leave IEx, press `CTRL-C` twice, or `CTRL-\` once.
+
+[TIP]
+.Two shortcuts you will use every day
+====
+* *Tab completion.* Start typing `String.` and hit `TAB` to see all
+functions in the `String` module.
+* *History.* Press the up arrow to scroll through expressions you ran
+before, just like in bash or zsh.
+====
 
 [TIP]
 ====

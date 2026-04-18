@@ -67,26 +67,31 @@ $ mkdir -p lib/app/to_do_list
 
 ### Configure the Resource
 
-The resource defines `attributes` which are the fields of the resource.
-In our case we have two attributes: `id` and `content`. The `id` attribute
-is a special attribute because it is the primary key of the resource. We
-use the `uuid_primary_key` macro to define the `id` attribute as a primary
-key. The `content` attribute is a simple string.
+The resource defines `attributes` which are the fields of the
+resource. In our case we have two attributes: `id` and `content`. The
+`id` attribute is special: it is the primary key of the resource, and
+the `uuid_primary_key` macro handles type, default, and indexing for us.
+The `content` attribute is a plain string.
 
 [source,elixir,title='lib/app/to_do_list/task.ex']
 ----
 defmodule App.ToDoList.Task do
-  use Ash.Resource, 
-    data_layer: Ash.DataLayer.Ets, 
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
     domain: App.ToDoList,
     otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :content, :string
+    attribute :content, :string, public?: true <1>
   end
 end
 ----
+<1> *Ash 3.x attributes are private by default.* Mark `:content` as
+`public?: true` so that actions can accept it as input and so that
+JSON/GraphQL layers can expose it. Forgetting this flag is the single
+most common Ash beginner trap, the error message is helpful but
+nothing prints the first time you try it.
 
 In this example we use the
 link:https://hexdocs.pm/ash/Ash.DataLayer.Ets.html[Ash.DataLayer.Ets] as

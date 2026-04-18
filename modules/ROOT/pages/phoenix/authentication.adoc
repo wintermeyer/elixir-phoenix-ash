@@ -2,171 +2,142 @@
 # Authentication
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-There are several authentication libraries that you could use with your Phoenix
-app, but Phoenix 1.8 includes built-in authentication generators that support both
-password-based and magic link authentication. The `phx.gen.auth` generator allows you
-to easily add a complete authentication system to your application that scales with your needs.
+You can of course bolt a third-party authentication library onto a
+Phoenix project, but in 1.8 you usually do not need to. The built-in
+`mix phx.gen.auth` generator scaffolds a complete authentication
+system, complete with *magic link* sign-in, optional password login,
+email confirmation, session management, and *scopes* for secure data
+access.
+
+This chapter walks you through generating that system, running the
+tests, and seeing the sent emails in your browser during development
+(no external SMTP server needed).
 
 [[running-the-generator]]
-## Running the Generator
+## Running the generator
 
-Let's start by creating a new Phoenix app:
+Create a fresh Phoenix app that includes Ecto (authentication needs a
+database):
 
 [source,bash]
 ----
 $ mix phx.new auth_demo
-----
-
-Next, `cd auth_demo` into the new directory, check the database configuration is
-correct and then create the database:
-
-[source,bash]
-----
+$ cd auth_demo
 $ mix ecto.create
 ----
 
-Now we are ready to run the authentication generator:
+Then run the `phx.gen.auth` generator. `Accounts` is the name of the
+context, `User` the schema, and `users` the table:
 
 [source,bash]
 ----
 $ mix phx.gen.auth Accounts User users <1>
-Compiling 14 files (.ex)
-Generated auth_demo app
-* creating priv/repo/migrations/20201006050217_create_users_auth_tables.exs
+[...]
+* creating priv/repo/migrations/...create_users_auth_tables.exs
 * creating lib/auth_demo/accounts/user_notifier.ex
+* creating lib/auth_demo/accounts/user.ex
+* creating lib/auth_demo/accounts/user_token.ex
+* creating lib/auth_demo/accounts.ex
+* creating lib/auth_demo_web/user_auth.ex
+* creating lib/auth_demo_web/controllers/user_session_controller.ex
 [...]
 ----
-<1> In addition to creating templates, views and controllers, this command also
-creates a new `MyApp.Accounts` context, database tables, and sets up a scope for
-secure data access. By default, Phoenix 1.8 uses magic links for authentication,
-but password-based authentication can be enabled in user settings.
+<1> Besides the schema, context, and migrations, the generator adds a
+full set of LiveView-powered registration, login, and settings pages,
+plus a `user_auth.ex` plug that enforces authentication.
 
-After running the generator, we will need to re-fetch the dependencies and run
-the migrations. Then, we can try out our Phoenix app with authentication.
+Phoenix 1.8's default flow is *magic-link*: users enter their email,
+get a single-use link, and log in by clicking it. Password login is
+opt-in and can be enabled by the user from the settings screen.
+
+Finish the install:
 
 [source,bash]
 ----
 $ mix deps.get
 $ mix ecto.migrate
 $ mix test <1>
-$ iex -S mix phx.server <2>
+$ mix phx.server <2>
 ----
-<1> Run the tests.
-<2> Start the server.
+<1> The generator ships with a comprehensive test suite. All tests
+should pass out of the box.
+<2> Start the server and open http://localhost:4000. You will see
+`Log in` and `Register` links in the page header.
 
-[[adding-email-notifications]]
-## Add Email Notifications
+## Watching emails land locally
 
-There is one thing that is currently missing in our app. The generated code does
-not actually send SMSs or emails to users. We need to set that up ourselves.
+The generator uses https://hexdocs.pm/swoosh[Swoosh] for mail, which is
+bundled with Phoenix. In development Swoosh uses the `Swoosh.Adapters.Local`
+adapter, so nothing is sent over the network. Instead, emails are
+available on the *Swoosh mailbox* route that Phoenix 1.8 mounts by
+default:
 
-There are two popular email libraries:
-https://hexdocs.pm/bamboo/readme.html[bamboo] and
-https://hexdocs.pm/swoosh/Swoosh.html[swoosh]. In this example, we are going to
-use bamboo.
+[source,bash]
+----
+http://localhost:4000/dev/mailbox
+----
 
-Add bamboo to our list of dependencies, by adding `{:bamboo, "~> 1.5"},` to the
-`deps` function in `mix.exs`, and fetch it by running `mix deps.get`.
+Sign up a new user through the UI, then open `/dev/mailbox` in the
+browser. You will see the confirmation email with the magic link.
+Click it, and you are logged in.
 
-[[setup-bamboo]]
-### Setup Bamboo
+TIP: The mailbox route is only enabled in development (`Application.compile_env(:auth_demo, :dev_routes)`).
+Production emails require a real adapter such as `Swoosh.Adapters.SMTP`,
+`Swoosh.Adapters.Postmark`, or `Swoosh.Adapters.Sendgrid`. The Swoosh
+docs list them all.
 
-First, we need to create a `Mailer` module with the following code:
+## Scopes: secure data access by default
 
-.lib/auth_demo/mailer.ex
+Phoenix 1.8 introduces *scopes* together with `phx.gen.auth`. A scope
+is a struct that travels through your controllers and LiveViews and
+carries the current user. The generator produces functions such as
+`Accounts.list_notes(scope)` instead of `Accounts.list_notes(user)`.
+That shape makes it natural to add tenant-based access, role checks, or
+multi-scope composition later without retrofitting the code.
+
+You will see the scope referenced throughout the generated module:
+
 [source,elixir]
 ----
-defmodule AuthDemo.Mailer do
-  use Bamboo.Mailer, otp_app: :auth_demo
+defmodule AuthDemoWeb.UserAuth do
+  def require_authenticated_user(conn, _opts) do
+    case conn.assigns.current_scope do <1>
+      %{user: %User{}} -> conn
+      _ -> redirect(conn, to: ~p"/users/log_in")
+    end
+  end
+end
+----
+<1> The scope is available in both controllers and LiveViews via
+`@current_scope` (template) or `conn.assigns.current_scope` (controller).
+
+## Swapping to a custom mail adapter (production)
+
+For production you usually want a real sending backend. Edit
+`config/runtime.exs`:
+
+[source,elixir]
+----
+if config_env() == :prod do
+  config :auth_demo, AuthDemo.Mailer,
+    adapter: Swoosh.Adapters.SMTP,
+    relay: System.fetch_env!("SMTP_HOST"),
+    username: System.fetch_env!("SMTP_USER"),
+    password: System.fetch_env!("SMTP_PASS"),
+    ssl: true,
+    port: 465
 end
 ----
 
-and then update the development config:
+No code changes are required in `user_notifier.ex`: the same Elixir
+code works with any Swoosh adapter.
 
-.config/dev.exs
-[source,elixir]
-----
-[...]
-# Bamboo configuration
-config :auth_demo, AuthDemo.Mailer, adapter: Bamboo.LocalAdapter
-----
+## Next steps
 
-and the test config:
-
-.config/test.exs
-[source,elixir]
-----
-[...]
-# Bamboo test configuration
-config :auth_demo, AuthDemo.Mailer, adapter: Bamboo.TestAdapter
-----
-
-NOTE: You will want to use a different adapter in production. There are many
-adapters available. See the bamboo documentation for details.
-
-To complete the setup, we are going to add a development route which enables us
-to view the emails that have been sent:
-
-.lib/auth_demo_web/router.ex
-[source,elixir]
-----
-[...]
-  if Mix.env() == :dev do
-    forward "/sent_emails", Bamboo.SentEmailViewerPlug
-  end
-[...]
-----
-
-[[update-generated-code]]
-### Update Generated Code
-
-We now need to update the `lib/auth_demo/accounts/user_notifier.ex` file so that
-it uses bamboo to send emails:
-
-.lib/auth_demo/accounts/user_notifier.ex
-[source,elixir]
-----
-defmodule AuthDemo.Accounts.UserNotifier do
-  import Bamboo.Email
-  alias AuthDemo.Mailer
-
-  @from_email "support@example.com"
-
-  defp deliver(to, body) do<1>
-    email =
-      new_email(
-        to: to,
-        from: @from_email,
-        subject: "Message from example.com",
-        text_body: body
-      )
-      |> Mailer.deliver_later()<2>
-
-    {:ok, email}
-  end
-[...]
-----
-<1> We have updated the `deliver/2` function, which previously just logged a
-message to the terminal, so that it sends an email using bamboo.
-<2> By default, `deliver_later` sends the email right away in the background.
-This behavior is configurable.
-
-If we run `mix test` now, we will see several tests failing. To fix that, we
-need to make one small change to `test/support/fixtures/accounts_fixtures.ex`.
-In the `extract_user_token/1` function, replace `captured.body` with
-`captured.text_body`:
-
-.test/support/fixtures/accounts_fixtures.ex
-[source,elixir]
-----
-[...]
-  def extract_user_token(fun) do
-    {:ok, captured} = fun.(&"[TOKEN]#{&1}[TOKEN]")
-    [_, token, _] = String.split(captured.text_body, "[TOKEN]")
-    token
-  end
-[...]
-----
-
-And that's it! Now all the tests will pass, and the emails will be properly
-sent.
+The generated code is a solid starting point and intentionally
+understandable. When you need more (OAuth, SSO, 2FA, API tokens), the
+simplest path is usually to extend what the generator produced rather
+than swap in a whole new library. The official
+https://hexdocs.pm/phoenix/mix_phx_gen_auth.html[`mix phx.gen.auth`
+documentation] lists every flag, including `--hashing-lib argon2` for
+teams that prefer Argon2 over the default bcrypt.

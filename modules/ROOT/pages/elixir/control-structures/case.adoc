@@ -2,9 +2,11 @@
 === `case`
 indexterm:[Control Structures,Case]
 
-The `case` construct in Elixir provides a powerful way to pattern match complex
-data structures and execute code based on the matching pattern. For many Elixir
-porgrammers it is the go-to construct for control flow.
+`case` is Elixir's most common branching construct. You hand it a
+value, a list of patterns, and the block that belongs to the first
+pattern that matches runs. For many Elixir programmers it is the
+go-to tool whenever a branch depends on the shape or the content of a
+value.
 
 A `case` expression evaluates an expression, and compares the result to 
 each pattern specified in the clauses. When a match is found, the associated 

@@ -1,64 +1,74 @@
 ### Update
 
-Ash provides a simple way to update a resource and by now you can
-probably guess how it works:
+By now the pattern should feel familiar: add an action to the resource,
+expose a code interface on the domain, call the generated function.
 
-[source,elixir,title='lib/app/to_do_list/resources/task.ex']
+[source,elixir,title='lib/app/to_do_list/task.ex']
 ----
 defmodule App.ToDoList.Task do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.ToDoList,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :content, :string
+    attribute :content, :string, public?: true
   end
 
   actions do
-    # add :update to the list
-    defaults [:create, :read, :update]
-  end
-
-  code_interface do
-    define_for App.ToDoList
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    # add this line
-    define :update
+    default_accept [:content]
+    defaults [:create, :read, :update] <1>
   end
 end
 ----
+<1> Added `:update` to the defaults.
 
-Let's try it out:
+[source,elixir,title='lib/app/to_do_list.ex']
+----
+defmodule App.ToDoList do
+  use Ash.Domain, otp_app: :app
+
+  resources do
+    resource App.ToDoList.Task do
+      define :create_task, action: :create
+      define :list_tasks, action: :read
+      define :get_task, action: :read, get_by: [:id]
+      define :update_task, action: :update <1>
+    end
+  end
+end
+----
+<1> Exposes `update_task/2` (and `update_task!/2`).
+
+Let's try it in IEx:
 
 ```elixir
 $ iex -S mix
-Erlang/OTP 26 [...]
+Erlang/OTP 28 [erts-16.2.2] [...]
 
-Interactive Elixir (1.15.5) [...]
-iex(1)> alias App.ToDoList.Task
-App.ToDoList.Task
-iex(2)> {:ok, task} = Task.create(%{content: "Mow the lawn"})
+Interactive Elixir (1.20.0) [...]
+iex(1)> {:ok, task} = App.ToDoList.create_task(%{content: "Mow the lawn"})
 {:ok,
- #App.ToDoList.Task<
-   __meta__: #Ecto.Schema.Metadata<:loaded>,
+ %App.ToDoList.Task{
    id: "d4c8cb9a-10b7-45f4-bece-dcea0fd16e5f",
    content: "Mow the lawn",
-   ...
- >}
-iex(3)> Task.update(task, %{content: "Play golf"})
+   __meta__: #Ecto.Schema.Metadata<:loaded>
+ }}
+iex(2)> App.ToDoList.update_task(task, %{content: "Play golf"})
 {:ok,
- #App.ToDoList.Task<
-   __meta__: #Ecto.Schema.Metadata<:loaded>,
+ %App.ToDoList.Task{
    id: "d4c8cb9a-10b7-45f4-bece-dcea0fd16e5f",
    content: "Play golf",
-   ...
- >}
-iex(4)> Task.update!(task, %{content: "Buy milk"})
-#App.ToDoList.Task<
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
+   __meta__: #Ecto.Schema.Metadata<:loaded>
+ }}
+iex(3)> App.ToDoList.update_task!(task, %{content: "Buy milk"})
+%App.ToDoList.Task{
   id: "d4c8cb9a-10b7-45f4-bece-dcea0fd16e5f",
   content: "Buy milk",
-  ...
->
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
 ```
+
+The first argument is the record you are updating (so Ash knows which
+row to change), the second is the map of new values.

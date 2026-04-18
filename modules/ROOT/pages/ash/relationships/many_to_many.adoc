@@ -1,11 +1,13 @@
 [[ash-many_to_many]]
 ### many_to_many
 
-`many_to_many` is a special case of `has_many` where the relationship is
-symmetric. That means that the relationship is defined on both sides of the
-relationship. A good example is a `Tag` resource that can be assigned to
-multiple (or none) `Product` resources and a `Product` resource has multiple
-(or none) `Tag` resources assigned to it.
+`many_to_many` is a symmetric relationship: each record on one side
+can be linked to many records on the other, and vice versa. Classic
+example: a `Tag` resource can be attached to many `Product` resources,
+and each `Product` can carry many `Tag` resources.
+
+Under the hood Ash uses a *join resource* (sometimes called a join
+table) that holds one row per link.
 
 [source]
 ----
@@ -18,44 +20,46 @@ multiple (or none) `Product` resources and a `Product` resource has multiple
 +---------+     +------------+     +--------+
 ----
 
-
-
 [[ash-many_to_many_setup]]
 #### Setup
 
 include::../setup-fresh-app.adoc[]
 
-We need the following resources for our `many_to_many` example:
+We need three resources:
 
-- `Tag`
-- `Product`
-- `ProductTag` (which will be the glue between the two other resources)
+* `Tag`
+* `Product`
+* `ProductTag` (the join between the two)
 
-Please create the following files:
-
-[source,elixir,title='lib/app/shop/resources/tag.ex']
+[source,elixir,title='lib/app/shop/tag.ex']
 ----
 defmodule App.Shop.Tag do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
+    attribute :name, :string, public?: true
   end
 
   relationships do
     many_to_many :products, App.Shop.Product do
-      through App.Shop.ProductTag
+      through App.Shop.ProductTag <1>
       source_attribute_on_join_resource :tag_id
       destination_attribute_on_join_resource :product_id
-    end <1>
+      public? true
+    end
   end
 
   actions do
+    default_accept [:name]
     defaults [:read, :update, :destroy]
 
     create :create do
       primary? true
+      accept [:name]
       argument :products, {:array, :map} <2>
 
       change manage_relationship(:products,
@@ -64,33 +68,28 @@ defmodule App.Shop.Tag do
              ) <3>
     end
   end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
-  end
 end
 ----
 
-<1> The configuration for the `many_to_many` relationship to `product`.
-<2> Now we can use the `products: []` argument to do this: `Tag.create!(%{name: "Sweet", products: [apple, cherry]})`
-<3> This uses the `products: []` argument to create a `Tag` resource with a list of `Product` resources
-    assigned to it.
+<1> Tell Ash which resource stores the join rows.
+<2> Adding a `products` argument to the create action lets callers
+pass existing products when creating a new tag:
+`App.Shop.create_tag!(%{name: "Sweet", products: [apple, cherry]})`.
+<3> `manage_relationship/2` translates that argument into add/remove
+operations on the `ProductTag` join resource.
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
-    attribute :price, :decimal
+    attribute :name, :string, public?: true
+    attribute :price, :decimal, public?: true
   end
 
   relationships do
@@ -98,44 +97,38 @@ defmodule App.Shop.Product do
       through App.Shop.ProductTag
       source_attribute_on_join_resource :product_id
       destination_attribute_on_join_resource :tag_id
+      public? true
     end
   end
 
   actions do
+    default_accept [:name, :price]
     defaults [:read, :update, :destroy]
 
     create :create do
       primary? true
+      accept [:name, :price]
       argument :tags, {:array, :map} <2>
 
       change manage_relationship(:tags,
                type: :append_and_remove,
                on_no_match: :create
-             ) <3>
+             )
     end
-  end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
   end
 end
 ----
 
-<1> The configuration for the `many_to_many` relationship to `tag`.
-<2> Now we can use the `tags: []` argument to do this: `Product.create!(%{name: "Banana", tags: [sweet, tropical]})`
-<3> This uses the `tags: []` argument to create a `Product` resource with a list of `Tag` resources
-    assigned to it.
+<1> Mirror of the `many_to_many` from the `Tag` resource.
+<2> `tags: [sweet, tropical]` on create will attach those tags.
 
-[source,elixir,title='lib/app/shop/resources/product_tag.ex']
+[source,elixir,title='lib/app/shop/product_tag.ex']
 ----
 defmodule App.Shop.ProductTag do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   actions do
     defaults [:create, :read, :destroy] <1>
@@ -155,34 +148,48 @@ defmodule App.Shop.ProductTag do
 end
 ----
 
-<1> No need for an `:update` action. Entries in the join table are immutable. You can delete but not change them.
-<2> The glue between the `Product` and the `Tag` resources.
+<1> Join rows are effectively immutable: you delete and recreate them
+instead of updating, so no `:update` action.
+<2> Two `belongs_to` relationships form the composite primary key.
 
-Finally we have to add the `Tag` and `ProductTag` resources to the
-`App.Shop` API module.
+Finally register all three resources with the domain:
 
 [source,elixir,title='lib/app/shop.ex']
 ----
 defmodule App.Shop do
-  use Ash.Api
+  use Ash.Domain, otp_app: :app
 
   resources do
-    resource App.Shop.Product
+    resource App.Shop.Product do
+      define :create_product, action: :create
+      define :list_products, action: :read
+      define :get_product_by_id, action: :read, get_by: :id
+      define :get_product_by_name, action: :read, get_by: :name
+      define :update_product, action: :update
+      define :destroy_product, action: :destroy
+    end
+
+    resource App.Shop.Tag do
+      define :create_tag, action: :create
+      define :list_tags, action: :read
+      define :get_tag_by_id, action: :read, get_by: :id
+      define :get_tag_by_name, action: :read, get_by: :name
+      define :update_tag, action: :update
+      define :destroy_tag, action: :destroy
+    end
+
     resource App.Shop.ProductTag
-    resource App.Shop.Tag
   end
 end
 ----
 
-Now we have a working `many_to_many` relationship between `Tag` and `Product`.
-
 [[ash-many_to_many_iex_example]]
-#### Example in the iex
+#### Example in iex
 
-Let's use the following data for our example.
+Let us work with a small catalogue.
 
-NOTE: Ash does use UUIDs. I use integer IDs in the example
-table because it's easier to read for humans.
+NOTE: Ash uses UUIDs for primary keys. The integers in the diagram
+below are just for readability.
 
 [source]
 ----
@@ -203,68 +210,52 @@ ProductTag:
 | 1         | 3     |  (Apple is Red)
 | 2         | 1     |  (Banana is Sweet)
 | 2         | 2     |  (Banana is Tropical)
-| 3         | 3     |  (Cherry is Red) <1>
+| 3         | 3     |  (Cherry is Red)
 +-----------+-------+
 ----
 
-<1> Not a complete list of all real world combinations.
-I am aware that cherries can be sweet too. 😉
-
-Open the iex and create all the products with their tags.
+Create the catalogue in iex:
 
 ```elixir
 $ iex -S mix
-iex(1)> alias App.Shop.Tag
-iex(2)> alias App.Shop.Product
-iex(3)> sweet = Tag.create!(%{name: "Sweet"})
-iex(4)> tropical = Tag.create!(%{name: "Tropical"})
-iex(5)> red = Tag.create!(%{name: "Red"})
-iex(6)> Product.create!(%{name: "Apple", tags: [sweet, red]})
-iex(7)> Product.create!(%{name: "Banana", tags: [sweet, tropical]})
-iex(8)> Product.create!(%{name: "Cherry", tags: [red]})
+iex(1)> sweet = App.Shop.create_tag!(%{name: "Sweet"})
+iex(2)> tropical = App.Shop.create_tag!(%{name: "Tropical"})
+iex(3)> red = App.Shop.create_tag!(%{name: "Red"})
+iex(4)> App.Shop.create_product!(%{name: "Apple", tags: [sweet, red]})
+iex(5)> App.Shop.create_product!(%{name: "Banana", tags: [sweet, tropical]})
+iex(6)> App.Shop.create_product!(%{name: "Cherry", tags: [red]})
 ```
 
-Now we can read all products with their tags and vice versa.
+Now fetch products with their tags, and tags with their products:
 
 ```elixir
-iex(9)> Product.read!(load: [:tags]) |>
-...(9)> Enum.map(fn product ->
-...(9)>   %{
-...(9)>     product_name: product.name,
-...(9)>     tag_names: Enum.map(product.tags, & &1.name)
-...(9)>   }
-...(9)> end)
+iex(7)> App.Shop.list_products!(load: [:tags])
+...     |> Enum.map(fn p -> %{product: p.name, tags: Enum.map(p.tags, & &1.name)} end)
 [
-  %{product_name: "Banana", tag_names: ["Sweet", "Tropical"]},
-  %{product_name: "Apple", tag_names: ["Sweet", "Red"]},
-  %{product_name: "Cherry", tag_names: ["Red"]}
+  %{product: "Apple", tags: ["Sweet", "Red"]},
+  %{product: "Banana", tags: ["Sweet", "Tropical"]},
+  %{product: "Cherry", tags: ["Red"]}
 ]
 
-iex(10)> Tag.read!(load: [:products]) |>
-...(10)> Enum.map(fn tag ->
-...(10)>   %{
-...(10)>     tag_name: tag.name,
-...(10)>     product_names: Enum.map(tag.products, & &1.name)
-...(10)>   }
-...(10)> end)
+iex(8)> App.Shop.list_tags!(load: [:products])
+...     |> Enum.map(fn t -> %{tag: t.name, products: Enum.map(t.products, & &1.name)} end)
 [
-  %{tag_name: "Tropical", product_names: ["Banana"]},
-  %{tag_name: "Red", product_names: ["Cherry", "Apple"]},
-  %{tag_name: "Sweet", product_names: ["Apple", "Banana"]}
+  %{tag: "Sweet", products: ["Apple", "Banana"]},
+  %{tag: "Tropical", products: ["Banana"]},
+  %{tag: "Red", products: ["Apple", "Cherry"]}
 ]
 ```
 
 [[ash-many_to_many-sideloading]]
-#### many_to_many sideloading by default
+#### Sideload the join by default
 
-Be default Ash will not load the join table entries. You can change this with the
-`:load` option in the `:read` action:
+By default Ash does not load the related records. Make the read action
+pre-load them if you always need them:
 
-[source,elixir,title='lib/app/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
-  # [...]
-
   actions do
+    default_accept [:name, :price]
     defaults [:update, :destroy] <1>
 
     read :read do
@@ -274,6 +265,7 @@ Be default Ash will not load the join table entries. You can change this with th
 
     create :create do
       primary? true
+      accept [:name, :price]
       argument :tags, {:array, :map}
 
       change manage_relationship(:tags,
@@ -282,101 +274,39 @@ Be default Ash will not load the join table entries. You can change this with th
              )
     end
   end
-
-  # [...]
 ----
 
-<1> Don't forget to remove `:read` here.
-<2> Always sideload the `tags` relationship.
+<1> Remove `:read` from the defaults when you define a custom read.
+<2> Always load `:tags` on read.
 
-[source,elixir,title='lib/app/product.ex']
-----
-  # [...]
-
-  actions do
-    defaults [:update, :destroy] <1>
-
-    read :read do
-      primary? true
-      prepare build(load: [:products]) <2>
-    end
-
-    create :create do
-      primary? true
-      argument :products, {:array, :map}
-
-      change manage_relationship(:products,
-               type: :append_and_remove,
-               on_no_match: :create
-             )
-    end
-  end
-
-  # [...]
-----
-
-<1> Don't forget to remove `:read` here.
-<2> Always sideload the `products` relationship.
-
-Let's use it in the `iex` console:
+Do the equivalent on `App.Shop.Tag` to auto-load `products`. After
+that, the same iex session works without the explicit `load:` option:
 
 ```elixir
-$ iex -S mix
-iex(1)> alias App.Shop.Tag
-iex(2)> alias App.Shop.Product
-iex(3)> sweet = Tag.create!(%{name: "Sweet"})
-iex(4)> tropical = Tag.create!(%{name: "Tropical"})
-iex(5)> red = Tag.create!(%{name: "Red"})
-iex(6)> Product.create!(%{name: "Apple", tags: [sweet, red]})
-iex(7)> Product.create!(%{name: "Banana", tags: [sweet, tropical]})
-iex(8)> Product.create!(%{name: "Cherry", tags: [red]})
-
-iex(9)> Product.read! |> <1>
-...(9)> Enum.map(fn product ->
-...(9)>   %{
-...(9)>     product_name: product.name,
-...(9)>     tag_names: Enum.map(product.tags, & &1.name)
-...(9)>   }
-...(9)> end)
+iex(9)> App.Shop.list_products!()
+...     |> Enum.map(fn p -> %{product: p.name, tags: Enum.map(p.tags, & &1.name)} end)
 [
-  %{product_name: "Banana", tag_names: ["Sweet", "Tropical"]},
-  %{product_name: "Apple", tag_names: ["Sweet", "Red"]},
-  %{product_name: "Cherry", tag_names: ["Red"]}
-]
-
-iex(10)> Tag.read! |> <2>
-...(10)> Enum.map(fn tag ->
-...(10)>   %{
-...(10)>     tag_name: tag.name,
-...(10)>     product_names: Enum.map(tag.products, & &1.name)
-...(10)>   }
-...(10)> end)
-[
-  %{tag_name: "Tropical", product_names: ["Banana"]},
-  %{tag_name: "Red", product_names: ["Cherry", "Apple"]},
-  %{tag_name: "Sweet", product_names: ["Apple", "Banana"]}
+  %{product: "Apple", tags: ["Sweet", "Red"]},
+  %{product: "Banana", tags: ["Sweet", "Tropical"]},
+  %{product: "Cherry", tags: ["Red"]}
 ]
 ```
 
-<1> We don't have to specify `load: [:tags]` here because we set it as the default in the `:read` action.
-<2> We don't have to specify `load: [:tags]` here because we set it as the default in the `:read` action.
-
 [[ash-many_to_many-update]]
-#### Update many_to_many relationships
+#### Updating many_to_many relationships
 
-Sometimes we want to update the `tags` of a `product` resource.
-It feels most natural to do it via the `update` action of the `product` resource.
-For that to work we have to define a custom `:update` action that will update the `tags`
-relationship. We can more or less copy the code from the `:create` action for that:
+The natural place to reassign tags is on the product's `:update`
+action. Duplicate the managed-relationship change from the create:
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
-  # [...]
   actions do
+    default_accept [:name, :price]
     defaults [:read, :destroy]
 
     create :create do
       primary? true
+      accept [:name, :price]
       argument :tags, {:array, :map}
 
       change manage_relationship(:tags,
@@ -385,8 +315,9 @@ relationship. We can more or less copy the code from the `:create` action for th
              )
     end
 
-    update :update do <1>
+    update :update do
       primary? true
+      accept [:name, :price]
       argument :tags, {:array, :map}
 
       change manage_relationship(:tags,
@@ -395,67 +326,55 @@ relationship. We can more or less copy the code from the `:create` action for th
              )
     end
   end
-  # [...]
 ----
 
-<1> Same as the `:create` action just with `:update`.
-
-Let's use it in the `iex` console. We first create a product
-with two tags and than we update it to have only one tag:
+iex session:
 
 ```elixir
 $ iex -S mix
-iex(1)> alias App.Shop.Tag
-iex(2)> alias App.Shop.Product
-iex(3)> good_deal = Tag.create!(%{name: "Good deal"})
-iex(4)> yellow = Tag.create!(%{name: "Yellow"})
-iex(5)> Product.create!(%{name: "Banana", tags: [yellow, good_deal]}) <1>
-iex(6)> Product.by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <2>
+iex(1)> good_deal = App.Shop.create_tag!(%{name: "Good deal"})
+iex(2)> yellow = App.Shop.create_tag!(%{name: "Yellow"})
+iex(3)> App.Shop.create_product!(%{name: "Banana", tags: [yellow, good_deal]}) <1>
+iex(4)> App.Shop.get_product_by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <2>
 ["Yellow", "Good deal"]
-iex(7)> banana = Product.by_name!("Banana") <3>
-iex(8)> Product.update!(banana, %{tags: [yellow]}) <4>
-iex(9)> Product.by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <5>
+iex(5)> banana = App.Shop.get_product_by_name!("Banana") <3>
+iex(6)> App.Shop.update_product!(banana, %{tags: [yellow]}) <4>
+iex(7)> App.Shop.get_product_by_name!("Banana", load: [:tags]).tags |> Enum.map(& &1.name) <5>
 ["Yellow"]
 ```
 
-<1> Create a new product with two tags.
-<2> Query the just created product and print the two tag names.
-<3> Store the product in the variable `banana` for later use.
-<4> Update the product to have only one tag.
-<5> Double check that the product really only has one tag.
-
-The between resource `ProductTag` is automatically updated.
-And by update I mean that one entry was deleted.
+<1> Create a Banana with two tags.
+<2> Verify the tags were attached.
+<3> Hold the banana in a variable for the update.
+<4> Reduce the tag list to just `yellow`.
+<5> The update removed the "Good deal" link; the join resource gets
+the stale row deleted automatically.
 
 [[ash-many_to_many-uniqueness]]
-#### Unique Tags
+#### Unique tag names
 
-We don't want to have multiple tags with the same name. But right
-now this is possible:
+Right now you can create several tags with the same name:
 
 ```elixir
-$ iex -S mix
-iex(1)> alias App.Shop.Tag
-iex(2)> Tag.create!(%{name: "Yellow"}).id
-"d206b758-253d-4f06-9773-5423ae1f6027"
-iex(3)> Tag.create!(%{name: "Yellow"}).id
-"5d66386c-bb02-4a8e-bf2a-5457477a6da2"
-iex(4)> Tag.create!(%{name: "Yellow"}).id
-"3497214e-83a0-43bd-b087-143af5ef8c37"
-iex(5)> Tag.read! |> Enum.map(& &1.name)
-["Yellow", "Yellow", "Yellow"]
+iex(1)> App.Shop.create_tag!(%{name: "Yellow"}).id
+"d206b758-..."
+iex(2)> App.Shop.create_tag!(%{name: "Yellow"}).id
+"5d66386c-..."
 ```
 
-We can fix this with `identities` in the resource:
+Fix that with an `identities` block:
 
-[source,elixir,title='lib/app/shop/resources/tag.ex']
+[source,elixir,title='lib/app/shop/tag.ex']
 ----
 defmodule App.Shop.Tag do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
+    attribute :name, :string, public?: true
   end
 
   identities do
@@ -465,50 +384,46 @@ defmodule App.Shop.Tag do
       pre_check_with App.Shop <3>
     end
   end
-  # [...]
+
+  # rest of resource unchanged
+end
 ----
 
-<1> Use this if you use a PostgreSQL database. Don't forget to run a `mix ash.codegen` after you added it.
-<2> Use this if your use a ETS data layer like we do in this example.
-<3> Since ETS doesn't support unique indexes we have to check for uniqueness before we create it.
+<1> If you use `AshPostgres`, this one line is enough; the unique
+constraint is enforced by the database. Run `mix ash.codegen` to
+create the matching migration.
+<2> The ETS data layer has no unique indexes, so we spell out the
+identity and tell Ash how to check it.
+<3> `pre_check_with` tells Ash to run a lookup via `App.Shop` before
+writing, so duplicates fail with a clean changeset error instead of a
+runtime crash.
 
-Now we can not create multiple tags with the same name anymore:
+Now duplicates are rejected with a friendly error:
 
 ```elixir
-$ iex -S mix
-iex(1)> alias App.Shop.Tag
-iex(2)> Tag.create!(%{name: "Yellow"}).id
-"f03e163f-5a17-4ea4-b708-f2089234d642"
-iex(3)> Tag.create!(%{name: "Yellow"}).id
+iex(1)> App.Shop.create_tag!(%{name: "Yellow"})
+%App.Shop.Tag{id: "f03e163f-...", name: "Yellow", ...}
+iex(2)> App.Shop.create_tag!(%{name: "Yellow"})
 ** (Ash.Error.Invalid) Input Invalid
 
 * name: has already been taken
-    (ash 2.14.18) lib/ash/api/api.ex:2179: Ash.Api.unwrap_or_raise!/3
-iex(3)> Tag.create(%{name: "Yellow"}).id
-** (KeyError) key :id not found in: {:error,
- %Ash.Error.Invalid{
-   errors: [
-     %Ash.Error.Changes.InvalidChanges{
-       fields: [:name],
-       message: "has already been taken",
-       [...]
 ```
 
 [[ash-many_to_many-add_tag]]
-#### add_tag action
+#### `add_tag` action
 
-Sometimes it is useful to have an `add_tag` argument that creates
-and adds a new tag to a new product in one go (
-e.g. `create!(%{name: "Banana", add_tag: %{name: "Yellow"}})`):
+Sometimes you want to create a product *and* a brand-new tag in a
+single call:
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+[source,elixir,title='lib/app/shop/product.ex']
 ----
-  # [...]
   actions do
+    default_accept [:name, :price]
     defaults [:read, :destroy, :update]
 
-    create :create do <1>
+    create :create do
       primary? true
+      accept [:name, :price]
       argument :tags, {:array, :map}
 
       argument :add_tag, :map do
@@ -527,33 +442,19 @@ e.g. `create!(%{name: "Banana", add_tag: %{name: "Yellow"}})`):
              )
     end
   end
-  [...]
 ----
 
-<1> You can copy-paste the code for `update :update do` too
-if you want to be able to add tags to existing products.
-
-Let's test it:
+Try it:
 
 ```elixir
-$ iex -S mix
-iex(1)> App.Shop.Product.create!(%{name: "Banana", add_tag: %{name: "Yellow"}})
-#App.Shop.Product<
-  tags: [
-    #App.Shop.Tag<
-      products: #Ash.NotLoaded<:relationship>,
-      products_join_assoc: #Ash.NotLoaded<:relationship>,
-      __meta__: #Ecto.Schema.Metadata<:loaded>,
-      id: "9b95f8cf-9f95-409a-81d3-b6a66e470d2b",
-      name: "Yellow",
-      ...
-    >
-  ],
-  tags_join_assoc: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
-  id: "52049582-c3cb-458c-bbac-0ba36e57e234",
+iex(1)> App.Shop.create_product!(%{name: "Banana", add_tag: %{name: "Yellow"}})
+%App.Shop.Product{
+  id: "52049582-...",
   name: "Banana",
   price: nil,
+  tags: [
+    %App.Shop.Tag{id: "9b95f8cf-...", name: "Yellow", ...}
+  ],
   ...
->
+}
 ```

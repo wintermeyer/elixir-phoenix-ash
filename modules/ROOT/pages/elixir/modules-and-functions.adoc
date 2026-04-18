@@ -51,9 +51,9 @@ To use the `hello/1` function in the `Greetings` module, we need to load and com
 [source,elixir]
 ----
 $ iex
-Erlang/OTP 26 [erts-14.0] [source] [64-bit] [...]
+Erlang/OTP 28 [erts-16.2.2] [source] [64-bit] [...]
 
-Interactive Elixir (1.15.0) - press Ctrl+C to exit (...)
+Interactive Elixir (1.20.0) - press Ctrl+C to exit (...)
 iex(1)> Code.require_file("greetings.exs")
 [
   {Greetings,

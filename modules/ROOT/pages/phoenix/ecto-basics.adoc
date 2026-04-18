@@ -65,7 +65,7 @@ database or user.
 .config/dev.exs
 [source,elixir]
 ----
-use Mix.Config
+import Config <1>
 
 # Configure your database
 config :bookstore, Bookstore.Repo,
@@ -77,6 +77,8 @@ config :bookstore, Bookstore.Repo,
   pool_size: 10
 [...]
 ----
+<1> `import Config` is the modern replacement for the deprecated
+`use Mix.Config`. Phoenix 1.8 uses it everywhere.
 
 [[ecto-create-table]]
 ## Create a Table
@@ -138,16 +140,17 @@ defmodule Bookstore.Repo.Migrations.CreateAuthors do
       add :last_name, :string
       add :twitter_account, :string
 
-      timestamps() <1>
+      timestamps(type: :utc_datetime) <1>
     end
 
   end
 end
 ----
-<1> `timestamps()` generates the fields `updated_at` and `inserted_at`. Both are
-updated with the current timestamp during the creation of a dataset. Afterwards,
-only `updated_at` is updated with the current timestamp whenever Ecto changes
-that dataset.
+<1> `timestamps(type: :utc_datetime)` generates the fields `updated_at`
+and `inserted_at`. Both are set to "now" when a row is inserted; after
+that only `updated_at` is bumped on each change. Since Phoenix 1.7 the
+default timestamp type is `:utc_datetime`, which we pass explicitly for
+clarity.
 
 To run the migration, we call `mix ecto.migrate`:
 
@@ -227,11 +230,11 @@ during startup) but right now we only use `iex`.
 [source,bash]
 ----
 $ iex -S mix phx.server
-Erlang/OTP 22 [erts-10.6.1] [source] [64-bit] [smp:4:4] [ds:4:4:10] [async-threads:1] [hipe]
+Erlang/OTP 28 [erts-16.2.2] [source] [64-bit] [...]
 
-[info] Running BookstoreWeb.Endpoint with cowboy 2.7.0 at 0.0.0.0:4000 (http)
+[info] Running BookstoreWeb.Endpoint with Bandit 1.10.4 at 127.0.0.1:4000 (http)
 [info] Access BookstoreWeb.Endpoint at http://localhost:4000
-Interactive Elixir (1.10.2) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.20.0) - press Ctrl+C to exit (type h() ENTER for help)
 iex> <1>
 ----
 <1> Actually you will see a couple of more messages here which are related to
@@ -1321,4 +1324,17 @@ associations, we would use a list of atoms.
 For more information about associations, see
 https://hexdocs.pm/ecto/2.2.11/associations.html
 
-#Work in progess#
+### Where to go next
+
+Ecto has many features we did not cover here: schemaless changesets,
+the full `Ecto.Query` DSL, multi-step transactions with `Ecto.Multi`,
+custom types, and more. Two recommended resources:
+
+* The official https://hexdocs.pm/ecto[Ecto documentation].
+* The book https://pragprog.com/book/wmecto/programming-ecto[Programming
+Ecto] by Darin Wilson and Eric Meadows-Jönsson.
+
+When you are ready to move beyond hand-written contexts and
+changesets, jump to the xref:ash/index.adoc[Ash Framework chapter],
+which builds on top of Ecto and makes resource definitions more
+declarative.

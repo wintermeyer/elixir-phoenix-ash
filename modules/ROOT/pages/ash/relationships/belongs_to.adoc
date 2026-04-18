@@ -24,17 +24,18 @@ We need a new `Category` resource:
 [source,elixir,title='lib/app/shop/category.ex']
 ----
 defmodule App.Shop.Category do
-  use Ash.Resource, 
+  use Ash.Resource,
     data_layer: Ash.DataLayer.Ets,
     domain: App.Shop,
     otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
+    attribute :name, :string, public?: true
   end
 
   actions do
+    default_accept [:name]
     defaults [:create, :read, :update, :destroy]
   end
 end
@@ -75,36 +76,44 @@ relationships block to the `Product` resource:
 [source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
-  use Ash.Resource, 
+  use Ash.Resource,
     data_layer: Ash.DataLayer.Ets,
     domain: App.Shop,
     otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
-    attribute :price, :decimal
+    attribute :name, :string, public?: true
+    attribute :price, :decimal, public?: true
   end
 
   relationships do <1>
     belongs_to :category, App.Shop.Category do <2>
       allow_nil? false <3>
+      public? true <4>
     end
   end
 
   actions do
+    default_accept [:name, :price, :category_id] <5>
     defaults [:create, :read, :update, :destroy]
   end
 end
 ----
 
 <1> The `relationships` macro defines relationships between resources.
-<2> The source_attribute is defined as :<relationship_name>_id (category_id in this case)
-    of the type :uuid on the source resource and the destination_attribute
-    is assumed to be :id. To override those defaults have a look at
-    https://hexdocs.pm/ash/relationships.html
-<3> By default the category_id can be nil. Setting `allow_nil?` to `false` makes the
-    relationship required.
+<2> By convention Ash creates a source attribute named
+`<relationship>_id` (`category_id` here) of type `:uuid`, matching the
+`:id` primary key on the destination. See
+https://hexdocs.pm/ash/relationships.html if you need to override those
+defaults.
+<3> By default `category_id` can be `nil`. Setting `allow_nil?` to
+`false` makes the relationship required.
+<4> In Ash 3.x relationships are also private by default. Make them
+`public?: true` when you want the outside world to see them (including
+API extensions such as AshJsonApi or AshGraphql).
+<5> The default create/update actions need to accept the foreign key
+for the relationship to be settable through the code interface.
 
 Let's test this in the iex:
 
@@ -181,24 +190,26 @@ In case you always want to sideload the `Category` of the `Product` without addi
 [source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
-  use Ash.Resource, 
+  use Ash.Resource,
     data_layer: Ash.DataLayer.Ets,
     domain: App.Shop,
     otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
-    attribute :price, :decimal
+    attribute :name, :string, public?: true
+    attribute :price, :decimal, public?: true
   end
 
   relationships do
     belongs_to :category, App.Shop.Category do
       allow_nil? false
+      public? true
     end
   end
 
   actions do
+    default_accept [:name, :price, :category_id]
     defaults [:create, :update, :destroy] <1>
 
     read :read do

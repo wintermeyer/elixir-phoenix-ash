@@ -2,12 +2,13 @@
 ### has_one
 indexterm:[Ash, has_one]
 
-`has_one` is similar to `belongs_to` except that the reference attribute is
-on the destination resource, instead of the source.
+`has_one` is similar to `belongs_to`, with one twist: the foreign-key
+column lives on the *destination* resource instead of the source, and
+uniqueness on that column means the relationship is always 1:1.
 
-Let's assume we run special promotions in our shop (so and so many percent
-rebate off). But each product can only have one promotion and each promotion
-can only be used for one product.
+Imagine our shop has occasional promotions: each product can have at
+most one active promotion, and each promotion applies to exactly one
+product.
 
 [source]
 ----
@@ -20,149 +21,138 @@ can only be used for one product.
 +---------+      +------------+
 ----
 
-Let's adjust our source code accordingly:
+Update the domain to register the new resource:
 
 [source,elixir,title='lib/app/shop.ex']
 ----
 defmodule App.Shop do
-  use Ash.Api
+  use Ash.Domain, otp_app: :app
 
   resources do
-    resource App.Shop.Product
+    resource App.Shop.Product do
+      define :create_product, action: :create
+      define :get_product_by_name, action: :read, get_by: :name
+    end
+
     resource App.Shop.Category
-    resource App.Shop.Promotion
+    resource App.Shop.Promotion do
+      define :create_promotion, action: :create
+    end
   end
 end
 ----
 
-[source,elixir,title='lib/app/shop/resources/promotion.ex']
+Define the `Promotion` resource with a `belongs_to :product`:
+
+[source,elixir,title='lib/app/shop/promotion.ex']
 ----
 defmodule App.Shop.Promotion do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
-    attribute :rebate, :integer
-    attribute :product_id, :uuid
+    attribute :name, :string, public?: true
+    attribute :rebate, :integer, public?: true
   end
 
   relationships do
     belongs_to :product, App.Shop.Product do
-      attribute_writable? true
+      allow_nil? false
+      public? true
     end
   end
 
   actions do
+    default_accept [:name, :rebate, :product_id]
     defaults [:create, :read, :update, :destroy]
-  end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
   end
 end
 ----
 
-[source,elixir,title='lib/app/shop/resources/product.ex']
+And add `has_one :promotion` on the `Product` resource:
+
+[source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
-  use Ash.Resource, data_layer: Ash.DataLayer.Ets
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
-    attribute :price, :decimal
+    attribute :name, :string, public?: true
+    attribute :price, :decimal, public?: true
   end
 
   relationships do
     belongs_to :category, App.Shop.Category do
-      attribute_writable? true
+      public? true
     end
 
-    has_one :promotion, App.Shop.Promotion
+    has_one :promotion, App.Shop.Promotion do <1>
+      public? true
+    end
   end
 
   actions do
+    default_accept [:name, :price, :category_id]
     defaults [:create, :read, :update, :destroy]
-  end
-
-  code_interface do
-    define_for App.Shop
-    define :create
-    define :read
-    define :by_id, get_by: [:id], action: :read
-    define :by_name, get_by: [:name], action: :read
-    define :update
-    define :destroy
   end
 end
 ----
+<1> `has_one` uses the same `<relationship>_id` convention as
+`belongs_to`, but the column lives on `Promotion`, not on `Product`.
 
-Let's use it in the `iex` console:
+Let's use it in iex:
 
 ```elixir
 $ iex -S mix
-Erlang/OTP 26 [...]
+Erlang/OTP 28 [erts-16.2.2] [...]
 
-Interactive Elixir (1.15.5) [...]
-iex(1)> alias App.Shop.Product
-App.Shop.Product
-iex(2)> alias App.Shop.Promotion
-App.Shop.Promotion
-iex(3)> orange = Product.create!(%{name: "Orange", price: 0.2})
-#App.Shop.Product<
-  promotion: #Ash.NotLoaded<:relationship>,
-  category: #Ash.NotLoaded<:relationship>,
-  __meta__: #Ecto.Schema.Metadata<:loaded>,
+Interactive Elixir (1.20.0) [...]
+iex(1)> orange = App.Shop.create_product!(%{name: "Orange", price: Decimal.new("0.2")})
+%App.Shop.Product{
   id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
   name: "Orange",
   price: Decimal.new("0.2"),
-  category_id: nil,
-  ...
->
-iex(4)> {:ok, promotion} = Promotion.create(%{name: "15% off", rebate: 15, product_id: orange.id})
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
+iex(2)> {:ok, _promo} =
+...(2)>   App.Shop.create_promotion(%{
+...(2)>     name: "15% off",
+...(2)>     rebate: 15,
+...(2)>     product_id: orange.id
+...(2)>   })
+{:ok, %App.Shop.Promotion{...rebate: 15, product_id: "c9e9b4ba-..."}}
+iex(3)> Ash.load(orange, :promotion) <1>
 {:ok,
- #App.Shop.Promotion<
-   product: #Ash.NotLoaded<:relationship>,
-   __meta__: #Ecto.Schema.Metadata<:loaded>,
-   id: "68901cef-f2c5-46bb-a737-d6c248d36347",
-   name: "15% off",
-   rebate: 15,
-   product_id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
-   ...
- >}
-iex(5)> App.Shop.load(orange, :promotion) <1>
-{:ok,
- #App.Shop.Product<
-   promotion: #App.Shop.Promotion<
-     product: #Ash.NotLoaded<:relationship>,
-     __meta__: #Ecto.Schema.Metadata<:loaded>,
-     id: "68901cef-f2c5-46bb-a737-d6c248d36347",
+ %App.Shop.Product{
+   id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
+   name: "Orange",
+   promotion: %App.Shop.Promotion{
+     id: "68901cef-...",
      name: "15% off",
      rebate: 15,
      product_id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
      ...
-   >,
-   category: #Ash.NotLoaded<:relationship>,
-   __meta__: #Ecto.Schema.Metadata<:loaded>,
-   id: "c9e9b4ba-408f-4c42-b1e0-e8b3799d5b1f",
-   name: "Orange",
-   price: Decimal.new("0.2"),
-   category_id: nil,
+   },
    ...
- >}
+ }}
 ```
 
-<1> We have to load the promotion explicitly. It is not loaded by default.
+<1> Associations are lazy; call `Ash.load/2` (or pass `load: [...]` to
+a read) when you need the related record.
 
 [NOTE]
 ====
-If you haven't missed `has_one` in your life so fare I wouldn't use it at all.
-xref:ash/relationships/index.adoc#ash-belongs_to[belongs_to] is probably the better choice.
+`has_one` is surprisingly rare in practice. Many relationships that
+look like 1:1 at first (user and profile, product and default
+warehouse) are cleaner modelled by putting the attributes directly on
+the parent resource, or by using `belongs_to` from the side that
+actually references the other. Reach for `has_one` only when the
+destination truly wants its own identity and lifecycle.
 ====

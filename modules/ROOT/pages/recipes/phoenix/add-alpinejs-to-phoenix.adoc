@@ -62,7 +62,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
 
 ### Test if Alpine.js works
 
-Open `lib/example_app_web/controllers/page_html/home_html.heex` and
+Open `lib/example_app_web/controllers/page_html/home.html.heex` and
 replace its content with the following Alpine.js example code:
 
 ```html

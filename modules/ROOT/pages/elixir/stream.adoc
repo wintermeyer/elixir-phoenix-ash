@@ -5,15 +5,27 @@
 === Introduction
 indexterm:[Stream]
 
-The `Stream` module contains functions similar to the `Enum` module for mapping, filtering, grouping, sorting, reducing, and other operations. However, the key difference is that `Stream` operations are _lazy_. This means they only compute results when necessary, **potentially saving a lot of resources when dealing with large data sets or I/O operations.**
+`Stream` is the lazy counterpart to `Enum`. The functions look almost
+the same (`map`, `filter`, `take`, …) but they do *not* do the work
+right away. Instead, they build up a recipe that runs only when you
+finally ask for a concrete result, usually by piping into `Enum.to_list/1`
+or any other `Enum` function.
 
-Consider this example of using `Stream` to multiply each element in a list by 2:
+When does that matter? Two common cases:
+
+* *Huge collections* where computing every intermediate step would
+eat too much memory.
+* *Infinite sequences* (file lines, clock ticks, generated IDs), where
+you only want the first few items and stopping early is essential.
+
+Consider this example of using `Stream` to multiply each element in a
+list by 2:
 
 [source,elixir]
 ----
 list = [1, 2, 3, 4]
 Stream.map(list, fn x -> x * 2 end)
-# => #Stream<[enum: [1, 2, 3, 4], funs: [#Function<45.122072036/1 in Stream.map/2>]]>
+# => #Stream<[enum: [1, 2, 3, 4], funs: [#Function<49.101170868/1 in Stream.map/2>]]>
 ----
 
 You might notice that the output is not a list but a `Stream`. To retrieve the final result, you will need to convert the stream back into a list:
@@ -104,21 +116,27 @@ list
 More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#filter/2[Elixir Stream.filter/2 documentation].
 
 [[stream-reduce]]
-==== Stream.reduce/2,3
+==== Reducing a stream with `Enum.reduce/3`
 indexterm:[Stream,Functions,reduce]
 
-The link:https://hexdocs.pm/elixir/Stream.html#reduce/3[`Stream.reduce/2,3`] function reduces an enumerable to a single value.
+`Stream` itself does not have a `reduce` function, because reducing
+always walks the entire collection and therefore cannot stay lazy.
+Instead, you build up a lazy pipeline with `Stream` and finish it off
+with `Enum.reduce/3` (or `Enum.to_list/1`, `Enum.sum/1`, etc.):
 
 [source,elixir]
 ----
 list = [1, 2, 3, 4]
-Stream.reduce(list, 0, fn x, acc -> x + acc end)
-# => 10
+list
+|> Stream.map(&(&1 * 2))
+|> Enum.reduce(0, fn x, acc -> x + acc end)
+# => 20
 ----
 
-NOTE: The use of `reduce/3` and it's accumulator is similar to the `fold` function in other languages. It can be tricky to use.
-
-More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#reduce/2[Elixir Stream.reduce/2 documentation].
+NOTE: `Enum.reduce/3` is Elixir's version of what other languages call
+`fold`. The accumulator can be a number, a list, a map, anything you
+like. It is the most general `Enum` function, every other Enum function
+could be written in terms of it.
 
 [[stream-take]]
 ==== Stream.take/2
@@ -167,9 +185,7 @@ Stream.concat([1, 2], [3, 4])
 # => [1, 2, 3, 4]
 ----
 
-More details can be found at the official link:https://hex
-
-docs.pm/elixir/Stream.html#concat/2[Elixir Stream.concat/1,2 documentation].
+More details can be found at the official link:https://hexdocs.pm/elixir/Stream.html#concat/2[Elixir Stream.concat/1,2 documentation].
 
 [[stream-cycle]]
 ==== Stream.cycle/1

@@ -16,14 +16,20 @@ defmodule App.ToDoList.Task do
 
   attributes do
     uuid_primary_key :id
-    attribute :content, :string
+    attribute :content, :string, public?: true <1>
   end
 
   actions do
+    default_accept [:content] <2>
     defaults [:create]
   end
 end
 ----
+<1> Mark the attribute as public so that the create action can accept
+it. In Ash 3.x, attributes are private by default.
+<2> `default_accept [:content]` declares which attributes the default
+actions accept as input. Without it, `create` would reject the
+`content` field.
 
 Then, we add a code interface definition to our domain:
 
@@ -47,37 +53,31 @@ Fire up the IEx (Elixir's Interactive Shell) to create your first task:
 ```elixir
 $ iex -S mix
 Compiling 2 files (.ex)
-Erlang/OTP 26 [erts-14.0.2] [...]
+Erlang/OTP 28 [erts-16.2.2] [...]
 
-Interactive Elixir (1.15.5) [...]
+Interactive Elixir (1.20.0) [...]
 iex(1)> App.ToDoList.create_task!(%{content: "Mow the lawn"})
-#App.ToDoList.Task<
-  __meta__: #Ecto.Schema.Metadata<:built, "">,
+%App.ToDoList.Task{
   id: "8e868c09-c0d0-4362-8270-09272acab769",
   content: "Mow the lawn",
-  aggregates: %{},
-  calculations: %{},
-  ...
->
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
 iex(2)>
 ```
 
 The function `App.ToDoList.create_task!/1-2` raises an error if
 something goes wrong (e.g. a validation error). Alternatively you can
-use `App.ToDoList.create_task/1-2` which returns a tuple with the status
-and the resource.
+use `App.ToDoList.create_task/1-2` which returns a tuple with the
+status and the resource.
 
 ```elixir
 iex(2)> App.ToDoList.create_task(%{content: "Mow the lawn"})
 {:ok,
- #App.ToDoList.Task<
-   __meta__: #Ecto.Schema.Metadata<:built, "">,
+ %App.ToDoList.Task{
    id: "a8430505-ef7e-4f64-bc2c-2a6db216d8ea",
    content: "Mow the lawn",
-   aggregates: %{},
-   calculations: %{},
-   ...
- >}
+   __meta__: #Ecto.Schema.Metadata<:loaded>
+ }}
 iex(3)>
 ```
 

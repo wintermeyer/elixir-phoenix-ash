@@ -2,44 +2,46 @@
 ## Immutability
 indexterm:[Elixir,Immutability]
 
-Probably you have already heard about immutability in Elixir. What's that about?
+In most languages, changing a variable means overwriting the value that
+used to live there. Elixir does not work that way. In Elixir, values are
+*immutable*: once a value exists it cannot be changed. You can bind the
+same name to a new value, but the old value is still sitting untouched
+in memory (until it is eventually garbage collected).
 
-A variable points to a specific part of the memory (RAM) where the data is
-stored. In many programming languages that data can be changed to update a
-variable. In Elixir, you can't change it. But that doesn't mean that you can't
-rebind a variable to a different value just that this new value gets a new piece
-of memory and doesn't overwrite the old memory. They both coexist. Once a
-function returns a result and therefore, has finished its work, everything gets
-garbage collected (wiped blank).
+### Why does that matter?
 
-Why is that important at all? With immutable variables, we can be sure that
-other processes can not change their values while running parallel tasks. That
-has a massive effect. In the end, it means that your Phoenix application can run
-on multiple CPUs on the same server in parallel. It even means that your Phoenix
-application can share multiple CPUs on several nodes of a server cluster in your
-data center; this makes Elixir extremely scalable and safe.
+Because immutable values cannot change underneath you, multiple
+processes can look at the same value at the same time without any
+locking. That single property is why Phoenix can comfortably spread a
+workload across every CPU on a server, and why Elixir clusters can
+share state across machines without the usual concurrency headaches.
 
-But doesn't that make your application slower? Funny thing: No. This way is
-faster. Since it is not efficient to change data in memory.
+You might reasonably ask: "does all this copying make my program
+slower?" In practice, no. The runtime shares structure between old and
+new values instead of copying everything, and avoiding mutation lets the
+compiler and scheduler take shortcuts that a traditional imperative
+runtime cannot.
 
-But don't worry. It is not as complicated as it sounds. Everytime you use a
-variable it uses the value of that moment in time. It will not be
-effected/changed afterwords:
+### What it looks like in code
+
+Every time you use a variable, you get the value from the moment it was
+bound. Rebinding the name later does not retroactively change functions
+that captured the old value:
 
 [source,elixir]
 ----
 iex> product = "Orange"
 "Orange"
 iex> test1 = fn -> IO.puts(product) end <1>
-#Function<21.126501267/0 in :erl_eval.expr/5>
+#Function<43.113135111/0 in :erl_eval.expr/6>
 iex> product = "Apple"
 "Apple"
 iex> test2 = fn -> IO.puts(product) end
-#Function<21.126501267/0 in :erl_eval.expr/5>
+#Function<43.113135111/0 in :erl_eval.expr/6>
 iex> product = "Pineapple"
 "Pineapple"
 iex> test3 = fn -> IO.puts(product) end
-#Function<21.126501267/0 in :erl_eval.expr/5>
+#Function<43.113135111/0 in :erl_eval.expr/6>
 iex> product = "Banana"
 "Banana"
 iex> test1.() <2>
@@ -55,12 +57,14 @@ iex> IO.puts(product)
 Banana
 :ok
 ----
-<1> Those anonymous functions can run on totally different CPUs. Each one lives
-in its own little universe.
-<2> The value of `product` has changed multiple times. But for `test1.()` it is
-the value from that point in time when we created the function.
+<1> Each of those anonymous functions captures the current value of
+`product`. They can run on totally different CPUs and each one lives in
+its own little universe.
+<2> `product` has been rebound three more times since we created
+`test1`, but `test1.()` still prints `"Orange"` because that is the
+value it captured.
 
-NOTE: Do you have to understand immutability to learn Elixir? No! Don't stress 
-yourself. It is a concept that you will learn over time. Just keep it in mind 
-that it is there.
+NOTE: You do not need to fully understand immutability to start learning
+Elixir. Just keep the idea in the back of your mind. It will click over
+time.
   

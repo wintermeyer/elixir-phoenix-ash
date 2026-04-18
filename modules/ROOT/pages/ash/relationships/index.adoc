@@ -44,22 +44,27 @@ end
 [source,elixir,title='lib/app/shop/product.ex']
 ----
 defmodule App.Shop.Product do
-  use Ash.Resource, 
+  use Ash.Resource,
     data_layer: Ash.DataLayer.Ets,
     domain: App.Shop,
     otp_app: :app
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :string
-    attribute :price, :decimal
+    attribute :name, :string, public?: true <1>
+    attribute :price, :decimal, public?: true
   end
 
   actions do
+    default_accept [:name, :price] <2>
     defaults [:create, :read, :update, :destroy]
   end
 end
 ----
+<1> Ash 3.x attributes are private by default; mark the ones you want
+writable or exposed as `public?: true`.
+<2> `default_accept` is the whitelist of attributes the default CRUD
+actions will accept as input.
 
 Now let's add code interface definitions in our domain to make working with the resource easier:
 

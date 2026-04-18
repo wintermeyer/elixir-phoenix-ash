@@ -5,12 +5,17 @@
 === Introduction
 indexterm:[Enum]
 
-The `Enum` module contains functions for mapping, filtering, grouping, sorting,
-reducing, and other operations. They are the building blocks for manipulating
-and transforming data collections in a functional and declarative style,
-enhancing code readability and maintainability.
+The `Enum` module is your Swiss-army knife for working with collections.
+Anything a `for` loop would do in another language (transform, filter,
+group, sort, add up, pick an element) you do in Elixir with a function
+from `Enum`.
 
-Consider this example of using `Enum` to multiply each element in a list by 2:
+The big idea is always the same: `Enum` takes a collection and a small
+function that describes what to do with each element, and gives you back
+a new collection or a single value.
+
+Consider this example of using `Enum` to multiply each element in a list
+by 2:
 
 [source,elixir]
 ----
@@ -215,8 +220,16 @@ Groups all items in the enumerable by the given function.
 ----
 list = [{:apple, "fruit"}, {:carrot, "vegetable"}, {:banana, "fruit"}]
 Enum.group_by(list, fn {_name, type} -> type end)
-# Output: %{"fruit" => [{:apple, "fruit"}, {:banana, "fruit"}], "vegetable" => [{:carrot, "vegetable"}]}
+# %{
+#   "fruit" => [apple: "fruit", banana: "fruit"],
+#   "vegetable" => [carrot: "vegetable"]
+# }
 ----
+
+NOTE: IEx prints `{:apple, "fruit"}` as `apple: "fruit"` when every
+element in the list is a two-tuple starting with an atom, that is just
+the keyword list syntax. The data is still a list of tuples, the
+display is nicer to read.
 
 More details can be found at the official link:https://hexdocs.pm/elixir/Enum.html#group_by/3[Elixir Enum.group_by/2,3 documentation].
 
@@ -243,9 +256,7 @@ Returns the maximum value in the enumerable.
 
 [source,elixir]
 ----
-list = [1, 2, 3,
-
-4]
+list = [1, 2, 3, 4]
 Enum.max(list)
 # Output: 4
 ----

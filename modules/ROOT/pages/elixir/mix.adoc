@@ -88,9 +88,9 @@ To start an `iex` with the code of your current project, you can use `iex -S mix
 $ iex -S mix
 Compiling 1 file (.ex)
 Generated hello_world app
-Erlang/OTP 26 [...]
+Erlang/OTP 28 [...]
 
-Interactive Elixir (1.15.0) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.20.0) - press Ctrl+C to exit (type h() ENTER for help)
 iex(1)> 
 ----
 
@@ -167,15 +167,16 @@ You can now run the tests using `mix test`:
 [source,bash]
 ----
 $ mix test
-....
+Compiling 1 file (.ex)
+Running ExUnit with seed: 157727, max_cases: 20
 
-Finished in 0.05 seconds
-1 test, 0 failures
+.
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
 
-Randomized with seed 12345
+Result: 1 passed
 ----
 
-In this example, `mix test` ran 1 test, all of which passed.
+In this example, `mix test` ran 1 test and it passed.
 
 Elixir also supports more complex testing scenarios, such as setup and teardown operations, test tagging, and asynchronous testing. As you write more complex Elixir programs, `mix test` will become an indispensable part of your development workflow.
 

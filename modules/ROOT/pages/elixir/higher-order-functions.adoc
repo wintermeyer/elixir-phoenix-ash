@@ -17,24 +17,30 @@ Anonymous functions are defined using the `fn` keyword, like so:
 [source,elixir]
 ----
 iex> hello = fn -> "Hello, world!" end <1>
-#Function<20.99386804/0 in :erl_eval.expr/5>
+#Function<43.113135111/0 in :erl_eval.expr/6>
 iex> hello.() <2>
 "Hello, world!"
 ----
-<1> We're defining an anonymous function that returns "Hello, world!" and assigning it to the variable `hello`.
-<2> The `.` (dot) operator is used to call anonymous functions.
+<1> We're defining an anonymous function that returns "Hello, world!" and
+assigning it to the variable `hello`. The cryptic `#Function<…>` line is
+how IEx shows a function value. The numbers are internal identifiers,
+your output will differ, that is fine.
+<2> The `.` (dot) between the variable and the parentheses is how you
+*call* an anonymous function. You always need that dot, while named
+functions such as `IO.puts` are called without it.
 
 Anonymous functions can also take parameters:
 
 [source,elixir]
 ----
 iex> add = fn (a, b) -> a + b end <1>
-#Function<12.99386804/2 in :erl_eval.expr/5>
+#Function<41.113135111/2 in :erl_eval.expr/6>
 iex> add.(1, 2) <2>
 3
 ----
-<1> We define an anonymous function that accepts two parameters and returns their sum.
-<2> This anonymous function can be invoked with two numbers to get their sum.
+<1> We define an anonymous function that takes two parameters and
+returns their sum.
+<2> Call it with two numbers to get the sum back.
 
 TIP: Using anonymous functions in Elixir is often easier with the <<capture-operator>> which is a shorthand version.
 
