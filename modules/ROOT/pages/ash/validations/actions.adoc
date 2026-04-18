@@ -1,29 +1,307 @@
 [[ash-action-validations]]
 ## Action Validations
 
-[INFO]
-====
-WIP. This is just a placeholder which will be filled with content
-in the next couple of days.
+xref:ash-attributes-validations[Attribute validations] run every time
+the attribute changes. Action validations are more selective: they run
+*only* for the action you attach them to. They are the right tool for
+cross-field checks ("sale price below regular price"), multi-field
+presence checks ("at least one of these must be filled in"), and any
+rule that should apply to, say, `:create` but not `:update`.
 
-//TODO: Add content here
+Ash ships with a handful of built-in validators you call declaratively
+inside the action, plus the same `Ash.Resource.Validation` behaviour
+you already saw in the
+xref:ash-attributes-validations[attribute validations] chapter.
+
+include::../setup-fresh-app.adoc[]
+
+Our playground is a `Product` resource with a regular `:price` and an
+optional `:sale_price`:
+
+[source,elixir,title='lib/app/shop/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
+
+  attributes do
+    uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? false
+      public? true
+    end
+
+    attribute :price, :decimal do
+      allow_nil? false
+      public? true
+    end
+
+    attribute :sale_price, :decimal, public?: true
+    attribute :category, :atom, public?: true
+  end
+
+  actions do
+    default_accept [:name, :price, :sale_price, :category]
+    defaults [:read, :update, :destroy]
+
+    create :create do
+      primary? true
+    end
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Domain, otp_app: :app
+
+  resources do
+    resource App.Shop.Product do
+      define :create_product, action: :create
+      define :update_product, action: :update
+    end
+  end
+end
+----
+
+### Validate only on one action with `validate compare/2`
+
+`compare/2` takes one field and compares it to another field or a
+literal. We want the sale price, when it is present, to be strictly
+less than the regular price. Add the validation inside the create
+action:
+
+[source,elixir,title='lib/app/shop/product.ex']
+----
+    create :create do
+      primary? true
+
+      validate compare(:sale_price, less_than: :price),
+        where: [present(:sale_price)], <1>
+        message: "must be less than price" <2>
+    end
+----
+<1> `where: [present(:sale_price)]` skips the check when the user
+did not supply a sale price. Without it, every create without a sale
+price would fail because `nil < price` is not true.
+<2> Custom message; without it, Ash's default is
+`"must be less than %{less_than}"`.
+
+Try a valid and an invalid create:
 
 ```elixir
-actions do
-  create :create do
-    validate compare(:age, greater_than_or_equal_to: 18)
-  end
-end
+$ iex -S mix
+iex(1)> App.Shop.create_product!(%{
+  name: "Apple",
+  price: Decimal.new("1.00"),
+  sale_price: Decimal.new("0.80"),
+  category: :food
+})
+%App.Shop.Product{
+  id: "35757c5a-c7be-4ab9-91b8-8318c1e1d084",
+  name: "Apple",
+  price: Decimal.new("1.00"),
+  sale_price: Decimal.new("0.80"),
+  category: :food,
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
+iex(2)> App.Shop.create_product(%{
+  name: "Bad",
+  price: Decimal.new("1.00"),
+  sale_price: Decimal.new("2.00"), <1>
+  category: :food
+})
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.InvalidAttribute{
+       field: :sale_price,
+       message: "must be less than price",
+       value: Decimal.new("2.00"),
+       ...
+     }
+   ]
+ }}
+```
+<1> `sale_price` greater than `price` triggers the rejection.
 
-# or
+`compare/2` accepts `greater_than`, `less_than`,
+`greater_than_or_equal_to`, `less_than_or_equal_to`, `equal_to`,
+`not_equal_to`. Each can take a literal value or another field name.
 
-validations do
-  validate present([:foo, :bar], at_least: 1) do
-    on [:create, :update]
-    where present(:baz)
-  end
-end
+### `one_of` for whitelists
+
+Use `one_of` when an attribute's valid values are a fixed set and
+you don't want to model them as a separate resource:
+
+[source,elixir,title='lib/app/shop/product.ex']
+----
+    create :create do
+      primary? true
+
+      validate compare(:sale_price, less_than: :price),
+        where: [present(:sale_price)],
+        message: "must be less than price"
+
+      validate one_of(:category, [:food, :toy, :tool]), <1>
+        where: [present(:category)]
+    end
+----
+<1> If a `:category` is supplied, it must be one of those three atoms.
+Atoms and strings are not interchangeable here: `"food"` would fail.
+
+Rejected input:
+
+```elixir
+iex(3)> App.Shop.create_product(%{
+  name: "Bad",
+  price: Decimal.new("1.00"),
+  category: :clothing
+})
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.InvalidAttribute{
+       field: :category,
+       message: "expected one of %{values}",
+       value: :clothing,
+       vars: [values: "food, toy, tool"],
+       ...
+     }
+   ]
+ }}
 ```
 
-// TODO: https://hexdocs.pm/ash/validations.html#builtin-validations
-====
+### `present` with `at_least`
+
+`present/2` counts how many of a list of fields have a value. The
+`at_least` / `at_most` / `exactly` options let you require "at least
+one contact method" or "exactly one of these" without writing custom
+code:
+
+[source,elixir,title='lib/app/shop/product.ex']
+----
+  validations do <1>
+    validate present([:price, :sale_price], at_least: 1),
+      on: [:create, :update] <2>
+  end
+----
+<1> `validations do … end` is the *resource-wide* block. Anything in
+here runs for every action listed in `on:`.
+<2> `on: [:create, :update]` limits the scope. Without it, the
+validation runs on `:destroy` too, which is usually pointless.
+
+Trigger it with a create that has neither price:
+
+```elixir
+iex(4)> App.Shop.create_product(%{name: "Nothing"})
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.Required{field: :price, ...}, <1>
+     %Ash.Error.Changes.InvalidChanges{
+       fields: [:price, :sale_price],
+       message: "at least %{at_least} of %{keys} must be present",
+       vars: [
+         fields: [:price, :sale_price],
+         keys: "price,sale_price",
+         attributes: [:price, :sale_price],
+         at_least: 1
+       ],
+       ...
+     }
+   ]
+ }}
+```
+<1> `:price` is `allow_nil? false` on the attribute, so you also get
+the `Required` error. The two are complementary: `allow_nil?` fails
+as soon as the single field is missing, `present([...], at_least:)`
+reports the group-level rule.
+
+### Built-ins worth knowing
+
+The full list is at
+https://hexdocs.pm/ash/Ash.Resource.Validation.Builtins.html. The
+ones you will reach for repeatedly:
+
+* `compare/2` — cross-field numeric / date comparisons.
+* `one_of/2` — whitelist.
+* `present/2` — presence with `at_least` / `at_most` / `exactly`.
+* `absent/2` — the opposite: "none of these may be set".
+* `match/2` — regex.
+* `string_length/2` — min/max length.
+* `attribute_equals/2` and `attribute_does_not_equal/2` — combined
+with `where:` these are handy guards ("only allow `:update` if
+`:locked` is false").
+* `confirm/2` — two fields must match (classic for password
+confirmations).
+
+Every built-in accepts `where:`, `message:`, and `on:` the same way.
+
+### Custom validations on an action
+
+Reach for a full `Ash.Resource.Validation` module when the rule needs
+Elixir logic the built-ins can't express. The shape is the same as
+for xref:ash-attributes-validations[attribute validations], but you
+attach it to the *action*:
+
+[source,elixir,title='lib/app/validations/not_on_weekend.ex']
+----
+defmodule App.Validations.NotOnWeekend do
+  use Ash.Resource.Validation
+
+  @impl true
+  def init(opts), do: {:ok, opts}
+
+  @impl true
+  def validate(_changeset, _opts, _context) do
+    case Date.day_of_week(Date.utc_today()) do
+      d when d >= 6 -> {:error, message: "not on weekends"}
+      _ -> :ok
+    end
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop/product.ex']
+----
+    create :create do
+      primary? true
+      validate {App.Validations.NotOnWeekend, []} <1>
+      # …other validations…
+    end
+----
+<1> The `[]` is the options list that `init/1` receives. An empty
+list is fine when the validation has no configuration to read.
+
+Run it on a Saturday:
+
+```elixir
+iex(5)> App.Shop.create_product(%{name: "Apple", price: Decimal.new("1.00")})
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.InvalidChanges{
+       fields: [],
+       message: "not on weekends",
+       vars: [],
+       ...
+     }
+   ]
+ }}
+```
+
+NOTE: `Ash.Resource.Validation`'s `validate/3` callback is the one
+you implement. The third argument is an `Ash.Resource.Validation.Context`
+struct (Ash 3.x signature). Old Ash 2.x tutorials show a `validate/2`
+signature; that will no longer compile.
+
+### Action-level vs attribute-level, in one sentence
+
+Put the check *on the attribute* when it is always true for that
+field, regardless of action; put it *on the action* when the rule is
+"only when someone tries to create/update in this specific way".

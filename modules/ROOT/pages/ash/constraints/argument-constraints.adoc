@@ -1,10 +1,224 @@
 [[ash-argument-constraints]]
-### Agument Constraints
+### Argument Constraints
 
-[INFO]
-====
-WIP. This is just a placeholder which will be filled with content
-in the next couple of days.
+xref:ash-attribute-constraints[Attribute constraints] validate data that
+lives *on a record*. Argument constraints validate input that only exists
+*during an action*: quantities passed to a `:restock`, reasons on a
+`:cancel`, email addresses on a `:invite`. The reader pays the exact
+same DSL tax as attribute constraints: `constraints min: ..., match: ...`
+on the argument, and Ash refuses the call before your change logic runs.
 
-//TODO: Add content
-====
+include::../setup-fresh-app.adoc[]
+
+Start from a minimal `Product` with a `stock_quantity` column:
+
+[source,elixir,title='lib/app/shop/product.ex']
+----
+defmodule App.Shop.Product do
+  use Ash.Resource,
+    data_layer: Ash.DataLayer.Ets,
+    domain: App.Shop,
+    otp_app: :app
+
+  attributes do
+    uuid_primary_key :id
+
+    attribute :name, :string do
+      allow_nil? false
+      public? true
+    end
+
+    attribute :price, :decimal do
+      allow_nil? false
+      public? true
+    end
+
+    attribute :stock_quantity, :integer do
+      public? true
+      default 0
+    end
+  end
+
+  actions do
+    default_accept [:name, :price]
+    defaults [:create, :read, :update, :destroy]
+  end
+end
+----
+
+[source,elixir,title='lib/app/shop.ex']
+----
+defmodule App.Shop do
+  use Ash.Domain, otp_app: :app
+
+  resources do
+    resource App.Shop.Product do
+      define :create_product, action: :create
+      define :restock_product, action: :restock <1>
+    end
+  end
+end
+----
+<1> We add the code interface line *before* the action, even though
+the action does not exist yet. Ash will fail compilation if the
+`:restock` action is missing, so we will add it next.
+
+#### Adding a custom action with constrained arguments
+
+Extend the `actions` block with a `:restock` update action. The
+action takes three arguments, each with its own constraints:
+
+[source,elixir,title='lib/app/shop/product.ex']
+----
+  actions do
+    default_accept [:name, :price]
+    defaults [:create, :read, :update, :destroy]
+
+    update :restock do
+      accept [] <1>
+
+      argument :quantity, :integer do
+        allow_nil? false
+        constraints min: 1, max: 1_000 <2>
+      end
+
+      argument :reason, :string do
+        allow_nil? false
+        constraints min_length: 3,
+                    max_length: 80,
+                    match: ~r/^[A-Za-z0-9 .,\-]+$/ <3>
+      end
+
+      argument :source, :atom do
+        allow_nil? false
+        constraints one_of: [:supplier, :return, :correction] <4>
+      end
+
+      change atomic_update(
+               :stock_quantity,
+               expr(stock_quantity + ^arg(:quantity))
+             ) <5>
+    end
+  end
+----
+
+<1> `accept []` on the action head: the caller may *not* set
+attributes directly, they can only pass the three arguments we
+declare below.
+<2> `min` / `max` work the same for integer arguments as they do for
+integer attributes.
+<3> `min_length` / `max_length` / `match` are the same string
+constraints as on attributes.
+<4> `one_of: [...]` restricts an atom argument to a known set of
+values. Ash compares the accepted atoms *as they are* — `"supplier"`
+(a string) would fail this check even though `:supplier` passes.
+<5> `atomic_update` refers to the argument via `^arg(:quantity)`.
+The changeset still benefits from the constraint check *before*
+this expression runs.
+
+#### Happy path
+
+Compile, then call the new action:
+
+```elixir
+$ iex -S mix
+iex(1)> product = App.Shop.create_product!(%{name: "Banana", price: Decimal.new("0.10")})
+%App.Shop.Product{
+  id: "0c067e94-27d9-4200-8162-b214e0a4e468",
+  name: "Banana",
+  price: Decimal.new("0.10"),
+  stock_quantity: 0,
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
+iex(2)> App.Shop.restock_product!(product, %{
+  quantity: 10,
+  reason: "weekly delivery",
+  source: :supplier
+})
+%App.Shop.Product{
+  id: "0c067e94-27d9-4200-8162-b214e0a4e468",
+  name: "Banana",
+  price: Decimal.new("0.10"),
+  stock_quantity: 10, <1>
+  __meta__: #Ecto.Schema.Metadata<:loaded>
+}
+```
+<1> The `atomic_update` moved the stock by the argument's value.
+
+#### Rejected inputs
+
+Every constraint shows up as an `Ash.Error.Changes.InvalidArgument`
+inside `Ash.Error.Invalid.errors`. Send a request that breaks all
+three at once and Ash returns all three errors:
+
+```elixir
+iex(3)> App.Shop.restock_product(product, %{
+  quantity: 0,
+  reason: "x",
+  source: :theft
+})
+{:error,
+ %Ash.Error.Invalid{
+   errors: [
+     %Ash.Error.Changes.InvalidArgument{
+       field: :reason,
+       message: "length must be greater than or equal to %{min}",
+       value: "x",
+       vars: [min: 3],
+       ...
+     },
+     %Ash.Error.Changes.InvalidArgument{
+       field: :source,
+       message: "atom must be one of %{atom_list}, got: %{value}",
+       value: :theft,
+       vars: [atom_list: "supplier, return, correction", value: :theft],
+       ...
+     },
+     %Ash.Error.Changes.InvalidArgument{
+       field: :quantity,
+       message: "must be greater than or equal to %{min}",
+       value: 0,
+       vars: [min: 1],
+       ...
+     }
+   ]
+ }}
+```
+
+NOTE: The `message` template interpolates the `vars` — rendering UI
+(`AshPhoenix.Form` and friends) substitutes `%{min}` with the value
+from `vars`, so the user sees `"length must be greater than or equal
+to 3"`. The raw template is what lives on the error struct.
+
+The bang variant raises with the rendered message instead:
+
+```elixir
+iex(4)> App.Shop.restock_product!(product, %{
+  quantity: 5,
+  reason: "Delivery!", <1>
+  source: :supplier
+})
+** (Ash.Error.Invalid)
+Invalid Error
+
+* Invalid value provided for reason: must match the pattern "~r/^[A-Za-z0-9 .,\-]+$/".
+
+"Delivery!"
+```
+<1> The exclamation mark is not in our regex, so the string is rejected.
+
+#### When argument constraints are the right tool
+
+Use argument constraints when:
+
+* The value is input to an action but is *never stored* on the
+record (a confirmation password, a "reason" field, a bulk-action
+filter argument).
+* You want Ash to reject the call before any `change` block runs,
+so your changes never see bad data.
+* You would otherwise have to write the same check as the first line
+of every `change` function — constraints are declarative and show
+up in generated UI helpers automatically.
+
+For everything that lives on the record after the action, reach for
+xref:ash-attribute-constraints[attribute constraints] instead.
