@@ -1,79 +1,82 @@
 # Elixir, Phoenix and Ash Beginner's Guide
 
 Content is authored in AsciiDoc under `modules/ROOT/pages/` and rendered
-by [Antora](https://antora.org). The visual style matches
-[wintermeyer-consulting.de](https://wintermeyer-consulting.de) and is
-produced by a custom Tailwind CSS v4 UI bundle that lives in
-`ui-bundle/`.
+by [Antora](https://antora.org). The visual chrome (Tailwind v4 theme,
+sidebars, pagination, TOC) comes from the shared UI bundle at
+[`wintermeyer/wincon-antora-ui`](https://github.com/wintermeyer/wincon-antora-ui),
+which is also used by the Rails book at `/rails/book/`.
 
 ## Build
 
-The site build is two steps: first build the UI bundle, then run Antora.
-
 ```sh
-# 1. Build the UI bundle (produces ui-bundle/build/ui-bundle.zip)
-cd ui-bundle
-npm install
-npm run build
-cd ..
-
-# 2. Render the site against the local source (build/site/)
-npx antora --fetch antora-local-playbook.yml
+npm install                                          # installs Antora
+npx antora --fetch antora-local-playbook.yml         # renders build/site/
 ```
 
-Open `build/site/index.html` in a browser to preview.
+`--fetch` refreshes both the content source and the UI bundle
+(pulled from the `latest` release of wincon-antora-ui). Open
+`build/site/index.html` to preview.
 
-To render the production playbook (pulls content from the remote repo
-instead of the working directory), swap step 2 for:
+To render against the main branch on GitHub instead of the local
+working copy:
 
 ```sh
 npx antora --fetch antora-playbook.yml
 ```
 
-## UI bundle development
+## UI bundle changes
 
-Work on the chrome and styles lives in `ui-bundle/src/`:
+Edit `src/` in
+[wintermeyer/wincon-antora-ui](https://github.com/wintermeyer/wincon-antora-ui)
+and push to main. A GitHub Actions workflow rebuilds `ui-bundle.zip`
+and re-uploads it to the `latest` release in ~30 seconds. The next
+deploy of this book (or of the Rails book) picks it up.
 
-- `css/site.css` — Tailwind v4 source (`@theme` tokens, `@custom-variant
-  dark`, and `@apply`-scoped rules for Antora's class surface)
-- `partials/header-content.hbs`, `partials/footer-content.hbs` — the
-  wincon-matching top nav and four-column footer. These are the
-  *committed fallbacks*; the real canonical versions live in
-  [wincon/priv/static/partials/](https://github.com/wintermeyer/wincon/tree/main/priv/static/partials)
-  and are pulled in by `scripts/fetch-partials.sh` at deploy time
-  (with `data-book-current="phoenix"` stamped into the nav).
-- `partials/*.hbs`, `layouts/*.hbs`, `helpers/*.js`, `js/site.js`,
-  `img/*.svg` — carried from the Antora default UI so Antora's internal
-  plumbing and sidebar JS keep working
+For a tight local loop while editing the bundle, point this repo's
+playbook at the UI bundle checkout:
 
-For a tight iteration loop:
-
-```sh
-cd ui-bundle
-npm run dev      # Tailwind CLI in watch mode
-# then, in another shell, rebuild the bundle + site on demand
-npm run build && cd .. && npx antora --fetch antora-local-playbook.yml
+```yaml
+ui:
+  bundle:
+    url: /path/to/wincon-antora-ui/build/ui-bundle.zip
+    snapshot: true
 ```
 
-Dark mode follows the OS `prefers-color-scheme`; there is no toggle.
+## Per-book chrome override
+
+`scripts/fetch-partials.sh` pulls the canonical nav + footer from
+[`wincon/priv/static/partials/`](https://github.com/wintermeyer/wincon/tree/main/priv/static/partials),
+stamps `data-book-current="phoenix"` into the nav, and drops the files
+into `ui-supplemental/partials/`. Antora's `ui.supplemental_files`
+overlay then overrides the default `header-content.hbs` and
+`footer-content.hbs` shipped with the UI bundle. The `ui-supplemental/`
+directory is gitignored — it's generated at every deploy.
 
 ## Deployment
 
-Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs on
-a self-hosted runner (label `eliph`) on bremen2. The runner checks the
-repo out, runs `scripts/deploy.sh`, and publishes the rendered site to
-`/var/www/elixir-phoenix-ash/releases/<timestamp>/`. An atomic symlink
-swap makes `/var/www/elixir-phoenix-ash/current/` point at the new
-release. The last five releases are kept.
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs
+on the self-hosted runner (label `eliph`) on bremen2. The runner
+checks the repo out, runs `scripts/deploy.sh`, and publishes the
+rendered site to `/var/www/elixir-phoenix-ash/releases/<timestamp>/`.
+An atomic symlink swap makes `/var/www/elixir-phoenix-ash/current/`
+point at the new release. The last five releases are kept.
 
-`scripts/deploy.sh` calls `scripts/fetch-partials.sh` first, which
-pulls the canonical nav/footer HTML from wincon (production → GitHub
-raw fallback) and overwrites `ui-bundle/src/partials/{header,footer}-content.hbs`
-before the UI bundle is built. A fetch failure is non-fatal: the
-committed copies are used as-is.
+`scripts/deploy.sh`:
 
-Nginx serves the site under
-<https://wintermeyer-consulting.de/phoenix/book/> via two location
-blocks on the `wintermeyer-consulting.de` vhost (one for pages, one for
-`antora-assets/`). The old domain <https://elixir-phoenix-ash.com>
-returns a path-preserving 301 to the new location.
+1. Activates mise (Node 20 pinned in `.tool-versions`).
+2. Calls `scripts/fetch-partials.sh` to pull the canonical nav/footer.
+3. Runs `npm ci` and `npx antora --fetch antora-playbook.yml`.
+4. Copies `build/site/` into the new release dir and swaps the
+   `current` symlink.
+5. Prunes old releases (keeps last 5).
+
+A fetch failure in step 2 is non-fatal: Antora silently falls back to
+the UI bundle's default partials (with an empty `data-book-current`).
+
+## Nginx
+
+The site is served under <https://wintermeyer-consulting.de/phoenix/book/>
+via two location blocks on the `wintermeyer-consulting.de` vhost (one
+for pages, one for `antora-assets/`). The old domain
+<https://elixir-phoenix-ash.com> returns a path-preserving 301 to the
+new location.
