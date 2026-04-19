@@ -272,6 +272,13 @@ main.article > .content {
   @apply text-[#65a30d] underline decoration-[#65a30d]/40 underline-offset-[3px] hover:decoration-[#65a30d] dark:text-[#c8f55a] dark:decoration-[#c8f55a]/40 dark:hover:decoration-[#c8f55a];
 }
 
+/* Email addresses never wrap mid-address, even if they push the line
+   wrap point out. Applies globally (header, body, footer) so a mailto
+   link always renders as one uninterrupted token. */
+a[href^="mailto:"] {
+  white-space: nowrap;
+}
+
 .doc a.anchor {
   @apply hidden;
 }
