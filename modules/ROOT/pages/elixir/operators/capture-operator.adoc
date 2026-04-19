@@ -9,19 +9,21 @@ The Capture operator is often used to create quick, inline functions. Here's a s
 [source,elixir]
 ----
 iex> add = &(&1 + &2)
-#Function<12.128620087/2 in :erl_eval.expr/5>
+&:erlang.+/2
 iex> add.(1, 2)
 3
 ----
 
 In the above example, `&(&1 + &2)` creates an anonymous function that adds two arguments together. The placeholders `&1` and `&2` refer to the first and second arguments, respectively. The function is then assigned to the variable `add`, and it can be invoked with `add.(1, 2)`.
 
+TIP: When the captured expression is just a direct function call, like `&(&1 + &2)` which is `Kernel.+/2` applied to its arguments, IEx prints the result as `&:erlang.+/2`, the direct reference to the underlying Erlang function. For anything more involved (see `double` below), IEx falls back to the generic `#Function<...>` representation.
+
 The Capture operator isn't just for simple functions. It can be used with more complex expressions and even function calls:
 
 [source,elixir]
 ----
 iex> double = &(&1 * 2)
-#Function<6.128620087/1 in :erl_eval.expr/5>
+#Function<42.113135111/1 in :erl_eval.expr/6>
 iex> double.(10)
 20
 ----

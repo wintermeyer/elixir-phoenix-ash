@@ -46,7 +46,7 @@ While the Cons operator can be used to construct lists, it should be noted that 
 [source,elixir]
 ----
 iex> ["Hello" | "World"]
-["Hello"| "World"]
+["Hello" | "World"]
 ----
 
 In this case, since `"World"` is not a list, Elixir does not treat the entire structure as a regular list.

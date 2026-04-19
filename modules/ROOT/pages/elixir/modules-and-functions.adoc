@@ -21,7 +21,7 @@ iex> defmodule Greetings do <1>
 ...>   end
 ...> end
 {:module, Greetings,
- <<...>>, {:hello, 1}} <4>
+ <<...>>, ...} <4>
 iex> Greetings.hello("Alice") <5>
 "Hello, Alice!"
 ----
@@ -309,12 +309,12 @@ In these examples, both the `FruitShop.Apples` and `FruitShop.Bananas` modules *
 [source,elixir]
 ----
 iex> FruitShop.Apples.apply_discount(10, 20)
-8
+8.0
 
 iex> FruitShop.Bananas.apply_discount(5, 15)
 4.25
 ----
-In these cases, we've applied a 20% discount to the price of apples (which was 10), and the result is 8. Similarly, we've applied a 15% discount to the price of bananas (which was 5), and the result is 4.25. 
+In these cases, we've applied a 20% discount to the price of apples (which was 10), and the result is 8.0. The result is a float because `/` always returns a float in Elixir, so the intermediate multiplication promotes the value. Similarly, we've applied a 15% discount to the price of bananas (which was 5), and the result is 4.25.
 
 By leveraging the power of the `use` keyword and metaprogramming, we've written a versatile `Discount` module that can be used across multiple fruit modules to apply discounts to their prices.
 

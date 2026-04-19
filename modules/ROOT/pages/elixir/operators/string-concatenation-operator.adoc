@@ -31,7 +31,7 @@ It's important to note that the `<>` operator only works with strings. Attemptin
 [source,elixir]
 ----
 iex> "The answer is " <> 42
-** (ArgumentError) "argument error"
+** (ArgumentError) expected binary argument in <> operator but got: 42
 ----
 
 To avoid such errors, ensure all operands of the `<>` operator are strings. For example, you can use the `Integer.to_string/1` function to convert an integer to a string:

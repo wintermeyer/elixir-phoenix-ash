@@ -27,10 +27,9 @@ iex(2)> product_prices["Orange"] <2>
 iex(3)> product_prices["Banana"] <3>
 nil
 iex(4)> product_prices = %{"Apple" => 0.5, "Apple" => 1, "Orange" => 0.7}
-warning: key "Apple" will be overridden in map
-  iex:4
-
 %{"Apple" => 1, "Orange" => 0.7} <4>
+warning: key "Apple" will be overridden in map
+└─ iex:4
 ----
 <1> A new map is created and bound to the variable `product_prices`.
 <2> Value retrieval is straightforward: append the key to the map name within brackets.

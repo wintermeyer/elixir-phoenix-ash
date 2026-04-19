@@ -26,19 +26,29 @@ iex> "The square of #{number} is #{number * number}"
 
 In the above code, the expressions inside the interpolation operator `#{}` are evaluated, and their results are automatically converted into strings and inserted in the appropriate place.
 
-Another powerful aspect of string interpolation in Elixir is that it's not restricted to strings. It can handle any data type that can be meaningfully converted into a string representation, including integers, floats, atoms, lists, and even tuples:
+Another powerful aspect of string interpolation in Elixir is that it's not restricted to strings. It works with any value that implements the `String.Chars` protocol, including integers, floats, atoms, booleans, and binaries.
+
+[source,elixir]
+----
+iex> list = [1, 2, 3]
+[1, 2, 3]
+iex> "The list is #{inspect(list)}"
+"The list is [1, 2, 3]"
+----
+
+Complex types such as tuples, maps, and regular lists do not implement `String.Chars`, so interpolating them directly raises `Protocol.UndefinedError`:
 
 [source,elixir]
 ----
 iex> tuple = {1, 2, 3}
 {1, 2, 3}
 iex> "The tuple is #{tuple}"
-"The tuple is {1, 2, 3}"
+** (Protocol.UndefinedError) protocol String.Chars not implemented for Tuple
 ----
 
-In the above example, the tuple is automatically converted to its string representation and inserted into the string.
+To embed those values, pipe them through `Kernel.inspect/1` first (as with the list above), which always produces a string.
 
-Remember, the expressions inside the interpolation operator `#{}` must be valid Elixir expressions. 
+Remember, the expressions inside the interpolation operator `#{}` must be valid Elixir expressions.
 
 IMPORTANT: The `#{}` operator itself can't be used outside a string, as it's a part of the string syntax, not a standalone operator.
 

@@ -2,7 +2,7 @@
 === Boolean Operators
 indexterm:[Elixir,Operators,Boolean]
 
-Boolean operators help to control logical flow within your program. They perform operations on boolean values and return a boolean result (`true` or `false`). The primary boolean operators include `and`, `or`, `not`, and `xor`.
+Boolean operators help to control logical flow within your program. They perform operations on boolean values and return a boolean result (`true` or `false`). The primary boolean operators are `and`, `or`, and `not`.
 
 * `and`: The `and` operator returns true if both the operands are true. Otherwise, it returns false.
 +
@@ -37,14 +37,14 @@ iex> not false
 true
 ----
 
-* `xor`: The `xor` (exclusive or) operator returns true if exactly one of the operands is true.
-+
+NOTE: Elixir does not provide an `xor` infix operator. For exclusive-or on booleans, use `a != b` (two booleans are "xor true" exactly when they differ). If you need it spelled out, `:erlang.xor/2` works too.
+
 [source,elixir]
 ----
-iex> true xor false
+iex> true != false
 true
 
-iex> true xor true
+iex> :erlang.xor(true, true)
 false
 ----
 

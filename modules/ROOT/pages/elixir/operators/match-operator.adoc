@@ -295,14 +295,16 @@ iex(1)> cart = {"apple", "orange", "banana"}
 iex(2)> {first, _, _} = cart <1>
 {"apple", "orange", "banana"}
 iex(3)> IO.puts(first)
-"apple"
+apple
+:ok
 
 iex(4)> cart2 = ["apple", "orange", "banana", "pineapple"]
 ["apple", "orange", "banana", "pineapple"]
 iex(5)> [head | _tail] = cart2 <2>
 ["apple", "orange", "banana", "pineapple"]
 iex(6)> IO.puts(head)
-"apple"
+apple
+:ok
 ----
 <1> We use wildcards `_` to ignore "orange" and "banana" in the `cart` tuple
 while pattern matching the first item to `first`.
