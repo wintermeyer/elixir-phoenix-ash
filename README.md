@@ -37,7 +37,11 @@ Work on the chrome and styles lives in `ui-bundle/src/`:
 - `css/site.css` — Tailwind v4 source (`@theme` tokens, `@custom-variant
   dark`, and `@apply`-scoped rules for Antora's class surface)
 - `partials/header-content.hbs`, `partials/footer-content.hbs` — the
-  wincon-matching top nav and four-column footer
+  wincon-matching top nav and four-column footer. These are the
+  *committed fallbacks*; the real canonical versions live in
+  [wincon/priv/static/partials/](https://github.com/wintermeyer/wincon/tree/main/priv/static/partials)
+  and are pulled in by `scripts/fetch-partials.sh` at deploy time
+  (with `data-book-current="phoenix"` stamped into the nav).
 - `partials/*.hbs`, `layouts/*.hbs`, `helpers/*.js`, `js/site.js`,
   `img/*.svg` — carried from the Antora default UI so Antora's internal
   plumbing and sidebar JS keep working
@@ -61,6 +65,12 @@ repo out, runs `scripts/deploy.sh`, and publishes the rendered site to
 `/var/www/elixir-phoenix-ash/releases/<timestamp>/`. An atomic symlink
 swap makes `/var/www/elixir-phoenix-ash/current/` point at the new
 release. The last five releases are kept.
+
+`scripts/deploy.sh` calls `scripts/fetch-partials.sh` first, which
+pulls the canonical nav/footer HTML from wincon (production → GitHub
+raw fallback) and overwrites `ui-bundle/src/partials/{header,footer}-content.hbs`
+before the UI bundle is built. A fetch failure is non-fatal: the
+committed copies are used as-is.
 
 Nginx serves the site under
 <https://wintermeyer-consulting.de/phoenix/book/> via two location

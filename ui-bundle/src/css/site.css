@@ -19,6 +19,20 @@
   --color-ink-dark: #f0ede6;
 }
 
+/* Highlight the current book's link in the shared book nav. The
+ * nav element carries data-book-current="phoenix" (stamped in by
+ * scripts/fetch-partials.sh), and each stack link carries
+ * data-stack="rails|phoenix|ruby|elixir". Keep the selector list in
+ * sync with learn-ruby-on-rails-book/assets/chrome.css. */
+@layer components {
+  [data-book-current="rails"] [data-stack="rails"],
+  [data-book-current="phoenix"] [data-stack="phoenix"],
+  [data-book-current="ruby"] [data-stack="ruby"],
+  [data-book-current="elixir"] [data-stack="elixir"] {
+    @apply font-semibold text-lime-700 dark:text-[#c8f55a];
+  }
+}
+
 @layer base {
   html {
     scroll-padding-top: 4rem;

@@ -35,6 +35,9 @@ flock -n 9 || { log "ERROR: another deploy is running"; exit 1; }
 REPO_DIR="$(pwd)"
 log "Repo: ${REPO_DIR}"
 
+log "Fetching latest nav + footer partials from wincon..."
+./scripts/fetch-partials.sh
+
 log "Building UI bundle..."
 ( cd "${REPO_DIR}/ui-bundle" && npm ci --no-audit --no-fund && npm run build )
 
