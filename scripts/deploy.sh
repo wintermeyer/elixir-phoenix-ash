@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deploy the Phoenix book (Antora) to bremen2 under
-# /var/www/elixir-phoenix-ash/releases/<timestamp>/ and atomically
+# /var/www/phoenix-book/releases/<timestamp>/ and atomically
 # swap the `current` symlink.
 #
 # Runs on the `books` self-hosted GitHub Actions runner from the
@@ -16,7 +16,7 @@ elif [ -x "$HOME/.local/bin/mise" ]; then
   eval "$("$HOME/.local/bin/mise" activate bash)"
 fi
 
-APP_DIR="/var/www/elixir-phoenix-ash"
+APP_DIR="/var/www/phoenix-book"
 RELEASES_DIR="${APP_DIR}/releases"
 CURRENT_LINK="${APP_DIR}/current"
 SHARED_DIR="${APP_DIR}/shared"

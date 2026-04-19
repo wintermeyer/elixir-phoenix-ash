@@ -57,8 +57,8 @@ directory is gitignored — it's generated at every deploy.
 Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs
 on the self-hosted runner (label `books`) on bremen2. The runner
 checks the repo out, runs `scripts/deploy.sh`, and publishes the
-rendered site to `/var/www/elixir-phoenix-ash/releases/<timestamp>/`.
-An atomic symlink swap makes `/var/www/elixir-phoenix-ash/current/`
+rendered site to `/var/www/phoenix-book/releases/<timestamp>/`.
+An atomic symlink swap makes `/var/www/phoenix-book/current/`
 point at the new release. The last five releases are kept.
 
 `scripts/deploy.sh`:
