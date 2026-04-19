@@ -9,10 +9,10 @@ permissions:
 
 jobs:
   deploy:
-    # Self-hosted runner registered on bremen2 under the `eliph` user,
-    # with label `eliph`. Pinned so this never lands on wincon's runner
+    # Self-hosted runner registered on bremen2 under the `books` user,
+    # with label `books`. Pinned so this never lands on wincon's runner
     # or any other self-hosted fleet.
-    runs-on: [self-hosted, eliph]
+    runs-on: [self-hosted, books]
 
     steps:
       - uses: actions/checkout@v4

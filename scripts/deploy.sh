@@ -3,10 +3,10 @@
 # /var/www/elixir-phoenix-ash/releases/<timestamp>/ and atomically
 # swap the `current` symlink.
 #
-# Runs on the `eliph` self-hosted GitHub Actions runner from the
+# Runs on the `books` self-hosted GitHub Actions runner from the
 # actions/checkout workdir. Invoked as `./scripts/deploy.sh`.
 #
-# The Antora build needs Node (provided via mise under ~eliph).
+# The Antora build needs Node (provided via mise under ~books).
 
 set -euo pipefail
 
