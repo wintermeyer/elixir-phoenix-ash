@@ -169,18 +169,13 @@ body.article > .body {
 }
 
 /* ---------------------------------------------------------------------------
-   Article kicker — small serif back-link above the h1. Matches wincon's
-   editorial tone (serif italic, muted, lime on hover) and replaces the
-   earlier full-width mono breadcrumb band.
+   Article kicker — mobile-only strip above the article h1 that hosts the
+   sidebar toggle. On desktop the sidebar is always visible, so the kicker
+   collapses to nothing.
 --------------------------------------------------------------------------- */
 
 .article-kicker {
-  @apply mb-5 flex items-center gap-3;
-}
-
-.article-kicker .book-link {
-  @apply font-serif text-[15px] italic text-neutral-500 no-underline hover:text-[#65a30d] dark:text-neutral-400 dark:hover:text-[#c8f55a];
-  text-decoration: none;
+  @apply mb-5 flex items-center gap-3 lg:mb-0 lg:hidden;
 }
 
 .nav-toggle {
