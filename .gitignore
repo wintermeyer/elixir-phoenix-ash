@@ -9,3 +9,4 @@ sandbox/*
 /ignore/
 # Generated at deploy time by scripts/fetch-partials.sh.
 /ui-supplemental/
+/.claude/
