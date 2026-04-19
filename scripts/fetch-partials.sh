@@ -1,29 +1,28 @@
 #!/usr/bin/env bash
-# Fetch the canonical nav + footer partials from wincon and write them
-# into ./ui-supplemental/partials/ so Antora overrides the default
-# header-content.hbs / footer-content.hbs from the shared UI bundle
-# (wintermeyer/wincon-antora-ui) with book-specific content.
+# Fetch the canonical nav + footer partials from wincon and write
+# them into the ui-supplemental/ directories so Antora overrides
+# the shared UI bundle's header-content.hbs / footer-content.hbs
+# with book-specific content.
 #
-# Source of truth: https://wintermeyer-consulting.de/partials/
-# (served from wincon/priv/static/partials/).
+# This repo publishes TWO Antora sites:
+#   - main Phoenix book  -> ./ui-supplemental/                 (phoenix)
+#   - Elixir mini-book   -> ./elixir-book/ui-supplemental/     (elixir)
 #
+# Each site gets the same fetched footer but its own header with
+# a different data-book-current stamp, which drives which stack
+# link gets highlighted in the top nav.
+#
+# Source of truth: https://wintermeyer-consulting.de/partials/.
 # Falls back to the GitHub raw URL when production is unreachable.
-#
-# On total failure the supplemental files are left at whatever state
-# the previous run put them in (or absent on first deploy), so Antora
-# silently falls back to the bundle defaults. Deploys never break on
-# a transient wincon outage.
+# On total failure the supplemental files are left as-is; Antora
+# falls back to the UI bundle defaults and the deploy still works.
 
 set -u
 
 PROD_BASE="https://wintermeyer-consulting.de/partials"
 GH_BASE="https://raw.githubusercontent.com/wintermeyer/wincon/main/priv/static/partials"
-BOOK_CURRENT="phoenix"
 
 cd "$(dirname "$0")/.."
-
-PARTIALS_DIR="ui-supplemental/partials"
-mkdir -p "${PARTIALS_DIR}"
 
 try_fetch() {
   local source_name="$1"
@@ -46,12 +45,21 @@ try_fetch() {
   return 1
 }
 
-try_fetch footer.html "${PARTIALS_DIR}/footer-content.hbs" || true
+stamp_book_for() {
+  local partials_dir="$1"
+  local book_current="$2"
 
-if try_fetch book-nav.html "${PARTIALS_DIR}/header-content.hbs"; then
-  # Highlight the Phoenix link in the shared book nav.
-  tmp="${PARTIALS_DIR}/header-content.hbs.tmp"
-  sed -e "s/data-book-current=\"\"/data-book-current=\"${BOOK_CURRENT}\"/" \
-    "${PARTIALS_DIR}/header-content.hbs" > "$tmp"
-  mv "$tmp" "${PARTIALS_DIR}/header-content.hbs"
-fi
+  mkdir -p "${partials_dir}"
+
+  try_fetch footer.html "${partials_dir}/footer-content.hbs" || true
+
+  if try_fetch book-nav.html "${partials_dir}/header-content.hbs"; then
+    local tmp="${partials_dir}/header-content.hbs.tmp"
+    sed -e "s/data-book-current=\"\"/data-book-current=\"${book_current}\"/" \
+      "${partials_dir}/header-content.hbs" > "${tmp}"
+    mv "${tmp}" "${partials_dir}/header-content.hbs"
+  fi
+}
+
+stamp_book_for "ui-supplemental/partials" "phoenix"
+stamp_book_for "elixir-book/ui-supplemental/partials" "elixir"

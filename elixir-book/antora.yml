@@ -1,0 +1,6 @@
+name: book
+title: Elixir
+version: ~
+start_page: ROOT:index.adoc
+nav:
+- modules/ROOT/nav.adoc
