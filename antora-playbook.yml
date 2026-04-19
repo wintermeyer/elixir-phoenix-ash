@@ -1,7 +1,7 @@
 site:
   title: An Elixir, Phoenix and Ash Beginner's Guide
   url: https://wintermeyer-consulting.de/phoenix
-  start_page: book:index.adoc
+  start_page: book::index.adoc
   keys:
     google_analytics: 'G-B4DB8GLK8G'
 content:

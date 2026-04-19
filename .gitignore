@@ -9,7 +9,3 @@ sandbox/*
 /ignore/
 # Generated at deploy time by scripts/fetch-partials.sh.
 /ui-supplemental/
-/elixir-book/ui-supplemental/
-# Generated at deploy time by elixir-book/scripts/sync.py from
-# modules/ROOT/pages/elixir/.
-/elixir-book/modules/ROOT/pages/

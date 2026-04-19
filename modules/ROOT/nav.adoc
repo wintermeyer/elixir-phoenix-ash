@@ -1,5 +1,5 @@
 * xref:index.adoc#preface[Preface]
-* xref:elixir/index.adoc[Elixir]
+* https://wintermeyer-consulting.de/elixir/book/[Elixir ↗]
 * xref:phoenix/index.adoc[Phoenix Framework]
 ** xref:phoenix/index.adoc#the-base-setup[The Base Setup]
 ** xref:phoenix/index.adoc#hello-world[Hello World!]
