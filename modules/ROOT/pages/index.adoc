@@ -4,25 +4,36 @@ Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
 Learning https://elixir-phoenix-ash.com/elixir/[Elixir],
 https://elixir-phoenix-ash.com/phoenix/[Phoenix] and
-https://elixir-phoenix-ash.com/ash/[Ash] is a
-steep climb. No sugar-coating. This book aims to make that ascent
-less steep — it's the same route I take when I run Phoenix and
-Ash trainings, written so you can work through it on your own.
-It's a guide crafted for beginners.
+https://elixir-phoenix-ash.com/ash/[Ash] is a steep climb. No
+sugar-coating. This book is my attempt to make that ascent less
+steep — a beginner's guide, written in the same step-by-step
+shape I use when I run Phoenix and Ash trainings.
 
-* *A step-by-step guide.* While no prior knowledge is required, a basic
-understanding of programming and HTML will be beneficial.
+* *Step-by-step.* No prior Elixir or Phoenix knowledge required;
+  a basic grasp of programming and HTML is beneficial.
 * *Bite-sized "Hello World!" code examples.* Crafted for
-comprehension just by reading the code, with added notes for clarity. No abstract
-programming theories.
+  comprehension just by reading the code, with notes added for
+  clarity. No abstract programming theory.
 * *Simplicity is key.* My goal is to get you productive ASAP.
-* *Not a beauty contest.* We're not investing much time in aesthetics. This is
-not a CSS design book.
+* *Not a beauty contest.* We're not investing much time in
+  aesthetics. This is not a CSS design book.
 
-If a section doesn't resonate with you, skip it. You can circle back later
-if needed. I recommend reading the book in order, but it's not required.
+**The Elixir basics live in their own book.** If pattern
+matching, the pipe operator, GenServer or Mix are still
+strange, start with
+link:https://wintermeyer-consulting.de/elixir/book/[Elixir] —
+the language primer — and come back here for the framework.
 
-Stefan Wintermeyer
+Coming from Ruby on Rails? Phoenix is conceptually the Rails of
+the BEAM. The Rails-specific sibling book is at
+link:https://wintermeyer-consulting.de/rails/book/[Learn Ruby
+on Rails].
+
+The sidebar lets you jump to any chapter at any time — nothing
+is locked, later chapters don't assume you memorised the
+earlier ones. That said, the book is written to be read front
+to back: each chapter sets up the next. If a section doesn't
+resonate, skip it — you can circle back later if needed.
 
 == Don't be a stranger
 
