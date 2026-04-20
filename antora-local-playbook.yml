@@ -18,3 +18,7 @@ ui:
   output_dir: antora-assets
 runtime:
   fetch: true
+
+asciidoc:
+  extensions:
+    - ./asciidoctor-extensions/terminal-role.js
