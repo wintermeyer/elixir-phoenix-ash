@@ -1,5 +1,5 @@
 name: book
-title: An Elixir, Phoenix and Ash Beginner's Guide
+title: Phoenix
 version: ~
 start_page: ROOT:index.adoc
 nav:

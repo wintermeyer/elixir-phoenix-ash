@@ -1,4 +1,4 @@
-# Elixir, Phoenix and Ash Beginner's Guide
+# Phoenix (with an Ash bonus track)
 
 Content is authored in AsciiDoc under `modules/ROOT/pages/` and rendered
 by [Antora](https://antora.org). The visual chrome (Tailwind v4 theme,

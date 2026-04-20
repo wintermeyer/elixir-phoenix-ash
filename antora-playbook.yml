@@ -1,5 +1,5 @@
 site:
-  title: An Elixir, Phoenix and Ash Beginner's Guide
+  title: Phoenix
   url: https://wintermeyer-consulting.de/phoenix
   start_page: book::index.adoc
   keys:

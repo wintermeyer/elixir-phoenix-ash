@@ -2,15 +2,15 @@
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-Learning https://elixir-phoenix-ash.com/elixir/[Elixir],
-https://elixir-phoenix-ash.com/phoenix/[Phoenix] and
-https://elixir-phoenix-ash.com/ash/[Ash] is a steep climb. No
-sugar-coating. This book is my attempt to make that ascent less
-steep — a beginner's guide, written in the same step-by-step
-shape I use when I run Phoenix and Ash trainings.
+Learning Phoenix is a steep climb. No sugar-coating. This book
+is my attempt to make that ascent less steep — a beginner's
+guide to Phoenix, written in the same step-by-step shape I use
+when I run Phoenix trainings. A bonus track on
+link:https://hexdocs.pm/ash/[Ash] is included, because in
+practice the two ship together often enough that it pays to
+see both.
 
-* *Step-by-step.* No prior Elixir or Phoenix knowledge required;
-  a basic grasp of programming and HTML is beneficial.
+* *Step-by-step.* No prior Phoenix knowledge required.
 * *Bite-sized "Hello World!" code examples.* Crafted for
   comprehension just by reading the code, with notes added for
   clarity. No abstract programming theory.
@@ -18,14 +18,15 @@ shape I use when I run Phoenix and Ash trainings.
 * *Not a beauty contest.* We're not investing much time in
   aesthetics. This is not a CSS design book.
 
-**The Elixir basics live in their own book.** If pattern
-matching, the pipe operator, GenServer or Mix are still
-strange, start with
+**Elixir before Phoenix.** Phoenix is built on Elixir, and this
+book assumes you know Elixir basics. If pattern matching, the
+pipe operator, GenServer or Mix are still strange, start with
 link:https://wintermeyer-consulting.de/elixir/book/[Elixir] —
-the language primer — and come back here for the framework.
+the language primer written as the prerequisite for this book
+— and come back here for the framework.
 
-Coming from Ruby on Rails? Phoenix is conceptually the Rails of
-the BEAM. The Rails-specific sibling book is at
+Coming from Ruby on Rails? Phoenix is conceptually the Rails
+of the BEAM. The Rails-specific sibling book is at
 link:https://wintermeyer-consulting.de/rails/book/[Learn Ruby
 on Rails].
 
@@ -42,7 +43,7 @@ A book like this gets better every time a reader sends me a note.
 * Did a chapter click, or did it leave you more confused than
   before? Either answer is useful.
 * Found a typo, a broken example, code that no longer works on
-  the current Phoenix, Elixir or Ash version, a link that 404s?
+  the current Phoenix or Ash version, a link that 404s?
 * Missing a topic you expected? Or curious about something this
   book doesn't cover?
 
