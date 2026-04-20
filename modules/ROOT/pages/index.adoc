@@ -2,9 +2,17 @@
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-Learning Phoenix is a steep climb, and well worth every step
-of it. No sugar-coating: the BEAM, OTP, Ecto and LiveView each
-take real time to internalise — and once they do, you're
+Phoenix is built on Elixir — and this book doesn't teach you
+Elixir. It teaches you Phoenix, the framework. **If Elixir is
+still new to you, start with the
+link:https://wintermeyer-consulting.de/elixir/book/[Elixir]
+book first** — the language primer written as the prerequisite
+for this one — and come back when pattern matching, the pipe
+operator and Mix feel normal.
+
+Learning Phoenix itself is a steep climb, and well worth every
+step of it. No sugar-coating: the BEAM, OTP, Ecto and LiveView
+each take real time to internalise — and once they do, you're
 shipping real-time applications with fewer moving parts than
 any mainstream alternative. This book is my attempt to make
 that ascent less steep: a beginner's guide to Phoenix, written
@@ -25,13 +33,6 @@ mailto:sw@wintermeyer-consulting.de[sw@wintermeyer-consulting.de].
 * *Simplicity is key.* My goal is to get you productive ASAP.
 * *Not a beauty contest.* We're not investing much time in
   aesthetics. This is not a CSS design book.
-
-**Elixir before Phoenix.** Phoenix is built on Elixir, and this
-book assumes you know Elixir basics. If pattern matching, the
-pipe operator, GenServer or Mix are still strange, start with
-link:https://wintermeyer-consulting.de/elixir/book/[Elixir] —
-the language primer written as the prerequisite for this book
-— and come back here for the framework.
 
 Coming from Ruby on Rails? Phoenix is conceptually the Rails
 of the BEAM. The Rails-specific sibling book is at
