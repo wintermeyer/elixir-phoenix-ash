@@ -6,7 +6,9 @@ Learning https://elixir-phoenix-ash.com/elixir/[Elixir],
 https://elixir-phoenix-ash.com/phoenix/[Phoenix] and
 https://elixir-phoenix-ash.com/ash/[Ash] is a
 steep climb. No sugar-coating. This book aims to make that ascent
-less steep. It's a guide crafted for beginners.
+less steep — it's the same route I take when I run Phoenix and
+Ash trainings, written so you can work through it on your own.
+It's a guide crafted for beginners.
 
 * *A step-by-step guide.* While no prior knowledge is required, a basic
 understanding of programming and HTML will be beneficial.
@@ -21,13 +23,6 @@ If a section doesn't resonate with you, skip it. You can circle back later
 if needed. I recommend reading the book in order, but it's not required.
 
 Stefan Wintermeyer
-
-[[training]]
-== Elixir, Phoenix and Ash Training
-
-I offer remote and on-site Elixir, Phoenix and Ash beginner's training in English
-and German. Please contact me with background information (e.g. group size,
-location and prefered date) at sw@wintermeyer-consulting.de to discuss details.
 
 == Don't be a stranger
 
