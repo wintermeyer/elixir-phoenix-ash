@@ -2,10 +2,14 @@
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
 
-Learning Phoenix is a steep climb. No sugar-coating. This book
-is my attempt to make that ascent less steep — a beginner's
-guide to Phoenix, written in the same step-by-step shape I use
-when I run Phoenix trainings. A bonus track on
+Learning Phoenix is a steep climb, and well worth every step
+of it. No sugar-coating: the BEAM, OTP, Ecto and LiveView each
+take real time to internalise — and once they do, you're
+shipping real-time applications with fewer moving parts than
+any mainstream alternative. This book is my attempt to make
+that ascent less steep: a beginner's guide to Phoenix, written
+in the same step-by-step shape I use when I run Phoenix
+trainings. A bonus track on
 link:https://hexdocs.pm/ash/[Ash] is included, because in
 practice the two ship together often enough that it pays to
 see both.
