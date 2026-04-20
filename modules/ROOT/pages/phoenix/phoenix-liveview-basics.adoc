@@ -196,6 +196,72 @@ instantly, no page reload.
 
 image::liveview-on-button-after-clicking.png[http://localhost:4000/light]
 
+[.agentic-tip]
+****
+.Agentic Coding Tip: `assign/2` Returns a New Socket — the Original is Immutable
+LiveView's `handle_event/3`, `handle_info/2`, and `mount/3`
+callbacks all look like they mutate the socket. They don't.
+Elixir is immutable, so every `assign/2` and `assign/3`
+call returns a new socket that you must thread through to
+the return value.
+
+The classic agent mistake:
+
+[source,elixir]
+----
+# WRONG — the assign is thrown away
+def handle_event("on", _params, socket) do
+  assign(socket, :light_bulb_status, "on")
+  {:noreply, socket}
+end
+----
+
+The call to `assign/3` produces a new socket, but nothing
+captures the return value, so the `{:noreply, socket}` at
+the end sends back the *original* unchanged socket. The
+page looks frozen — clicks do nothing, no error, no hint.
+
+The fix is to thread the new socket through:
+
+[source,elixir]
+----
+def handle_event("on", _params, socket) do
+  socket = assign(socket, :light_bulb_status, "on")
+  {:noreply, socket}
+end
+
+# Or, more idiomatic:
+
+def handle_event("on", _params, socket) do
+  {:noreply, assign(socket, :light_bulb_status, "on")}
+end
+----
+
+The same trap appears with `push_event/3`, `put_flash/3`,
+`stream_insert/4`, and every other `SocketX`-named helper:
+they return a new socket, they do not mutate.
+
+*Rule to add to your project's `CLAUDE.md`:*
+
+[source]
+----
+In a Phoenix LiveView, every call to `assign/2`, `assign/3`,
+`push_event/3`, `put_flash/3`, `stream/4`, or
+`stream_insert/4` returns a new socket and does NOT mutate
+the argument. Always either assign the return value
+(`socket = assign(socket, :key, value)`) or inline it into
+the callback's return tuple
+(`{:noreply, assign(socket, :key, value)}`). Never write
+`assign(socket, ...)` as a standalone statement and then
+return the old `socket`.
+----
+
+When reviewing an agent's diff, the fastest check is to
+grep each callback for a standalone `assign(socket, ...)`
+line that isn't `socket = ...` or piped into `{:noreply,
+...}`. Every such line is a bug.
+****
+
 ### Step 5: add an "Off" button
 
 Mirror the `on` flow for the opposite direction:
@@ -946,3 +1012,45 @@ all into memory at once, combine `stream/3` with
 outside this chapter; the
 https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#stream/4[official
 `stream/3` docs] are excellent.
+
+[.agentic-tip]
+****
+.Agentic Coding Tip: The `/simplify` Slash Command
+LiveView code grows fast. A `render/1` that started out
+clean accretes conditionals, a `handle_event/3` clause that
+was one pattern becomes three, a context function grows a
+pipe with an intermediate variable per step. Claude Code
+ships a `/simplify` slash command that rewrites the
+current file into more idiomatic Elixir/Phoenix while
+preserving behaviour.
+
+Where it's good:
+
+* Collapsing `if`/`else` chains in templates into
+  `case` or multi-clause components.
+* Turning `handle_event/3` branches that differ only in
+  the atom value into one pattern-matched clause.
+* Replacing explicit accumulators with an `Enum.map` /
+  `Enum.reduce` pipe.
+* Removing intermediate variables when a `|>` chain reads
+  cleaner.
+
+Where it's not:
+
+* Anything that would rename a public function (a
+  LiveView callback name, a context function referenced
+  from another module) — other code in the project may
+  depend on the exact shape.
+* Any change to `mount/3` / `handle_params/3` timing —
+  the callback order matters, and `/simplify` doesn't
+  always reason about it.
+* Performance-sensitive code where `Stream` or a tail-
+  recursive function is better than `Enum`.
+
+Treat `/simplify` as a "one file, one diff" tool. Always
+review the diff before accepting; green tests are
+necessary but not sufficient, because a LiveView can be
+semantically identical from the test's point of view
+while feeling different to the user in the browser.
+****
+

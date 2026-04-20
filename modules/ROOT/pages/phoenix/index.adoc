@@ -171,6 +171,53 @@ rendering.
 Feel free to edit the home template while the browser is open. Phoenix
 watches the file and live-reloads the page after each save.
 
+[.agentic-tip]
+****
+.Agentic Coding Tip: Always Let the Agent Use `mix phx.gen.*`
+Claude is fully capable of hand-writing a Phoenix
+controller, a LiveView, an Ecto schema, a migration, and
+its matching test. It is also happy to do so when asked.
+You don't want this. A hand-written migration skips the
+timestamp prefix convention. A hand-written LiveView
+forgets the companion `index.html.heex` or the matching
+`*_live_test.exs`. A hand-written context glues business
+logic into a controller.
+
+Phoenix ships a full family of generators that enforce
+the conventions and the companion files the framework
+expects:
+
+* `mix phx.gen.html` — controller + views + templates +
+  context + schema + migration + tests (CRUD scaffold).
+* `mix phx.gen.live` — LiveView equivalent.
+* `mix phx.gen.context` — context + schema + migration
+  only (when you don't want the web layer yet).
+* `mix phx.gen.schema` — schema + migration.
+* `mix phx.gen.auth` — full email/password + magic-link
+  authentication (see the Authentication chapter).
+* `mix phx.gen.json`, `mix phx.gen.channel`,
+  `mix phx.gen.presence`, and more.
+
+*Rule to add to your project's `CLAUDE.md`:*
+
+[source]
+----
+For any Phoenix artefact that has a generator (context,
+schema, migration, controller, LiveView, auth, channel,
+presence), always use `mix phx.gen.*` instead of writing
+the files by hand. Show me the exact generator command
+before running it. If you believe a hand-written file is
+genuinely needed, stop and explain why.
+----
+
+The "show me the command first" part matters: the agent
+will sometimes reach for `mix phx.gen.html` when
+`mix phx.gen.live` was the right move, or pick the wrong
+field types (`:string` vs `:text` vs `:utc_datetime`).
+Seeing the command in the conversation lets you veto in
+one second, before any file lands on disk.
+****
+
 [[hello-world]]
 ## Hello World!
 

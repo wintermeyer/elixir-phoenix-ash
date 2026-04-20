@@ -456,6 +456,56 @@ No surprise here. It works.
 
 A list of available validations can be found at https://hexdocs.pm/ecto/Ecto.Changeset.html
 
+[.agentic-tip]
+****
+.Agentic Coding Tip: `cast` is the Allow-List — Don't Let the Agent Widen It
+The `cast(attrs, [:first_name, :last_name, :twitter_account])`
+call in the changeset is Ecto's allow-list. Only those three
+fields can flow in from a form (or any other external data
+source). Everything else — `id`, `inserted_at`, `role`,
+`verified`, whatever you haven't named — gets silently
+dropped. That is exactly what you want: it is the mechanism
+that stops a hostile request from setting `admin: true` by
+crafting the form submission.
+
+When you ask Claude to "add a `featured` field to Author,"
+it will correctly add the column, update the form, add
+`:featured` to the `cast` list, and add a validation. That
+is the safe path. When it hits friction — a test failure, a
+missing-field error, a bug in an adjacent function — it will
+sometimes reach for one of these shortcuts:
+
+* `cast(attrs, __schema__(:fields))` — permit every field
+  the schema defines.
+* `cast(attrs, Map.keys(attrs))` — permit whatever the caller
+  sent.
+* Quietly adding admin-only fields (`role`, `verified`,
+  `user_id`) to the cast list because a test "was failing."
+
+Each of these is a real security hole. The first and second
+turn the changeset into a rubber stamp for arbitrary input.
+
+*Rule to add to your project's `CLAUDE.md`:*
+
+[source]
+----
+Never pass a dynamic field list to `Ecto.Changeset.cast/4`.
+Every field must be listed by name. Admin-only or
+system-only columns (role, verified, user_id, confirmation
+tokens, system status fields) stay out of the user-facing
+`cast/4` call entirely, even if a test seems to demand them
+— in that case the test needs fixing, not the allow-list.
+Prefer a separate admin-only changeset function
+(`admin_changeset/2`) when a privileged update path really
+is needed.
+----
+
+When reviewing an agent's diff on a changeset, the fastest
+check is to grep for `__schema__(:fields)`, `Map.keys`, and
+any new `:role` / `:admin` / `:user_id` entries in a `cast`
+list — and to challenge every one of them.
+****
+
 [[ecto-uniqueness]]
 ### Uniqueness Validation
 
@@ -1331,6 +1381,73 @@ associations, we would use a list of atoms.
 
 For more information about associations, see
 https://hexdocs.pm/ecto/2.2.11/associations.html
+
+[.agentic-tip]
+****
+.Agentic Coding Tip: N+1 Queries via Forgotten Preloads
+The single most common Ecto bug an AI agent produces: it
+writes a LiveView or template that iterates over records
+and calls an association in the loop, without preloading
+it. Every iteration fires a fresh `SELECT` and you don't
+notice on seed data.
+
+[source,heex]
+----
+<%! WRONG — one query per book %>
+<%= for book <- @books do %>
+  <p><%= book.title %> — <%= book.author.last_name %></p>
+<% end %>
+----
+
+The `book.author` on each iteration triggers a database
+lookup *unless* the association was preloaded. With twenty
+books you pay twenty-one queries instead of two. The page
+still works. It falls over when the table grows.
+
+The fix is a preload in the context function that supplies
+the data:
+
+[source,elixir]
+----
+def list_books do
+  Book
+  |> Repo.all()
+  |> Repo.preload(:author)
+end
+
+# Or, in a single query joined at the database:
+
+def list_books do
+  from(b in Book,
+    join: a in assoc(b, :author),
+    preload: [author: a]
+  )
+  |> Repo.all()
+end
+----
+
+Agents don't naturally check for this because the code
+runs clean in development. The pitfall only shows up in
+the logs (`[debug] QUERY ...` lines repeating per record).
+
+*Rule to add to your project's `CLAUDE.md`:*
+
+[source]
+----
+When generating or editing a LiveView, template, or
+context function that iterates over records and touches
+an association (book.author, post.comments,
+user.organization, etc.), add a `Repo.preload/2` or a
+`preload:` clause in the Ecto query. After making the
+change, run the page / action in iex or the browser,
+inspect the emitted SQL in `:debug` logs, and confirm
+there is one query per association, not one per record.
+----
+
+The same applies to `assoc()` in queries: `Repo.one(...) |>
+Repo.preload([:author, comments: :user])` when the view
+needs nested associations.
+****
 
 ### Where to go next
 

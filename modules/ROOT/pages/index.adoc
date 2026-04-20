@@ -40,6 +40,18 @@ of the BEAM. The Rails-specific sibling book is at
 link:https://wintermeyer-consulting.de/rails/book/[Learn Ruby
 on Rails].
 
+Most readers will write Phoenix code alongside an AI coding
+agent, and this book assumes you are one of them. Everything
+still works if you type every character yourself. Throughout
+the book you will find boxes labelled *Agentic Coding Tip*
+flagging the Phoenix-specific places where an agent reliably
+takes a wrong turn (hand-writing files a `mix phx.gen.*`
+would produce, missing Ecto preloads, over-permitting in a
+changeset, rolling its own authentication) together with a
+concrete `CLAUDE.md` rule or prompt that keeps the agent
+honest. The tips assume Claude Code as the concrete tool,
+but the underlying advice applies to any capable agent.
+
 The sidebar lets you jump to any chapter at any time — nothing
 is locked, later chapters don't assume you memorised the
 earlier ones. That said, the book is written to be read front
