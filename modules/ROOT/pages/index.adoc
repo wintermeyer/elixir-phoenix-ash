@@ -10,6 +10,10 @@ link:https://hexdocs.pm/ash/[Ash] is included, because in
 practice the two ship together often enough that it pays to
 see both.
 
+Shameless plug: if you'd rather have the training itself —
+personalized, on-site or remote — drop me an email at
+mailto:sw@wintermeyer-consulting.de[sw@wintermeyer-consulting.de].
+
 * *Step-by-step.* No prior Phoenix knowledge required.
 * *Bite-sized "Hello World!" code examples.* Crafted for
   comprehension just by reading the code, with notes added for
