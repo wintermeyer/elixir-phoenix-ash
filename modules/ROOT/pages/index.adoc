@@ -1,6 +1,7 @@
 [[preface]]
 = Preface
 Stefan Wintermeyer <sw@wintermeyer-consulting.de>
+:page-notoc: true
 
 Phoenix is built on Elixir — and this book doesn't teach you
 Elixir. It teaches you Phoenix, the framework. **If Elixir is
