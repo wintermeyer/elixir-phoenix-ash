@@ -66,9 +66,14 @@ point at the new release. The last five releases are kept.
 1. Activates mise (Node 20 pinned in `.tool-versions`).
 2. Calls `scripts/fetch-partials.sh` to pull the canonical nav/footer.
 3. Runs `npm ci` and `npx antora --fetch antora-playbook.yml`.
-4. Copies `build/site/` into the new release dir and swaps the
-   `current` symlink.
-5. Prunes old releases (keeps last 5).
+4. Copies `build/site/` into the new release dir.
+5. Pre-compresses every text asset (`.html`, `.css`, `.js`,
+   `.svg`, `.xml`, `.json`, `.mjs`, `.txt`, `.map`) into `.br`
+   (brotli q11) and `.gz` (gzip -9) siblings so nginx's
+   `brotli_static` / `gzip_static` can serve them with zero CPU
+   on the hot path.
+6. Swaps the `current` symlink atomically.
+7. Prunes old releases (keeps last 5).
 
 A fetch failure in step 2 is non-fatal: Antora silently falls back to
 the UI bundle's default partials (with an empty `data-book-current`).
